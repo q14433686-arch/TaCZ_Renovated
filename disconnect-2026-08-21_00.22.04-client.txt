@@ -1,0 +1,213 @@
+---- Minecraft Network Protocol Error Report ----
+// Maybe this time it will work!
+
+Time: 2026-08-21 00:22:04
+Description: Packet handling error
+
+io.netty.handler.codec.EncoderException: Failed to encode packet 'serverbound/minecraft:custom_payload'
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.IdDispatchCodec.encode(IdDispatchCodec.java:60) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.IdDispatchCodec.encode(IdDispatchCodec.java:13) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/neoforge@26.1.2.97/net.neoforged.neoforge.network.filters.GenericPacketSplitter.encode(GenericPacketSplitter.java:104) ~[neoforge-26.1.2.97-universal.jar:?] {}
+	at TRANSFORMER/neoforge@26.1.2.97/net.neoforged.neoforge.network.filters.GenericPacketSplitter.encode(GenericPacketSplitter.java:39) ~[neoforge-26.1.2.97-universal.jar:?] {}
+	at io.netty.handler.codec.MessageToMessageEncoder.write(MessageToMessageEncoder.java:90) ~[netty-codec-base-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:827) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:752) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.ChannelOutboundHandlerAdapter.write(ChannelOutboundHandlerAdapter.java:113) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.Connection$2.write(Connection.java:476) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:827) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.AbstractChannelHandlerContext.writeAndFlush(AbstractChannelHandlerContext.java:804) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.DefaultChannelPipeline.writeAndFlush(DefaultChannelPipeline.java:1041) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.Channel.writeAndFlush(Channel.java:262) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.Connection.doSendPacket(Connection.java:330) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.Connection.lambda$sendPacket$0(Connection.java:321) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:148) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:141) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:535) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.SingleThreadIoEventLoop.run(SingleThreadIoEventLoop.java:201) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:1193) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?] {}
+Caused by: java.lang.RuntimeException: Failed encoding custom payload tacz:client_player_draw_gun: java.lang.IllegalStateException: Can't encode 'com.tacz.guns.network.message.ClientMessagePlayerDrawGun@57c50d26', expected 'com.tacz.guns.network.message.ClientMessagePlayerDrawGun@423a018d'
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.protocol.common.custom.CustomPacketPayload$1.writeCap(CustomPacketPayload.java:42) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.protocol.common.custom.CustomPacketPayload$1.encode(CustomPacketPayload.java:47) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.protocol.common.custom.CustomPacketPayload$1.encode(CustomPacketPayload.java:29) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.StreamCodec$4.encode(StreamCodec.java:83) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.StreamCodec$5.encode(StreamCodec.java:101) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.StreamCodec$5.encode(StreamCodec.java:89) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.IdDispatchCodec.encode(IdDispatchCodec.java:55) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	... 21 more
+Caused by: java.lang.IllegalStateException: Can't encode 'com.tacz.guns.network.message.ClientMessagePlayerDrawGun@57c50d26', expected 'com.tacz.guns.network.message.ClientMessagePlayerDrawGun@423a018d'
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.StreamCodec$3.encode(StreamCodec.java:60) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.protocol.common.custom.CustomPacketPayload$1.writeCap(CustomPacketPayload.java:40) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.protocol.common.custom.CustomPacketPayload$1.encode(CustomPacketPayload.java:47) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.protocol.common.custom.CustomPacketPayload$1.encode(CustomPacketPayload.java:29) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.StreamCodec$4.encode(StreamCodec.java:83) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.StreamCodec$5.encode(StreamCodec.java:101) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.StreamCodec$5.encode(StreamCodec.java:89) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.codec.IdDispatchCodec.encode(IdDispatchCodec.java:55) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	... 21 more
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Netty Local IO #0
+Stacktrace:
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.PacketListener.fillCrashReport(PacketListener.java:33) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+-- Connection --
+Details:
+	Protocol: play
+	Flow: CLIENTBOUND
+	Is Local: true
+	Server type: <none>
+	Server brand: neoforge
+Stacktrace:
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.PacketListener.fillCrashReport(PacketListener.java:33) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.protocol.PacketUtils.fillCrashReport(PacketUtils.java:47) ~[minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl.storeDisconnectionReport(ClientCommonPacketListenerImpl.java:138) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl.createDisconnectionInfo(ClientCommonPacketListenerImpl.java:131) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.Connection.exceptionCaught(Connection.java:131) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:289) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.AbstractChannelHandlerContext.fireExceptionCaught(AbstractChannelHandlerContext.java:271) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.exceptionCaught(DefaultChannelPipeline.java:1396) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.DefaultChannelPipeline.fireExceptionCaught(DefaultChannelPipeline.java:890) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.VoidChannelPromise.fireException0(VoidChannelPromise.java:236) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.VoidChannelPromise.tryFailure(VoidChannelPromise.java:178) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.internal.PromiseNotificationUtil.tryFailure(PromiseNotificationUtil.java:64) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.AbstractChannelHandlerContext.notifyOutboundHandlerException(AbstractChannelHandlerContext.java:875) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:832) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:752) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.ChannelOutboundHandlerAdapter.write(ChannelOutboundHandlerAdapter.java:113) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.Connection$2.write(Connection.java:476) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at io.netty.channel.AbstractChannelHandlerContext.write(AbstractChannelHandlerContext.java:827) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.AbstractChannelHandlerContext.writeAndFlush(AbstractChannelHandlerContext.java:804) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.DefaultChannelPipeline.writeAndFlush(DefaultChannelPipeline.java:1041) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.Channel.writeAndFlush(Channel.java:262) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.Connection.doSendPacket(Connection.java:330) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.network.Connection.lambda$sendPacket$0(Connection.java:321) [minecraft-client-patched-26.1.2.97.jar:?] {}
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java:148) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:141) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:535) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.channel.SingleThreadIoEventLoop.run(SingleThreadIoEventLoop.java:201) [netty-transport-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:1193) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) [netty-common-4.2.7.Final.jar:4.2.7.Final] {}
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?] {}
+
+
+-- Dynamic Lighting --
+Details:
+	Description: This section contains information related to dynamic lighting, this may not be related to your crash.
+	Mode: fancy
+	Dynamic Light Sources: 0
+	Spatial Hash Occupancy: 0 / 1024
+
+-- System Details --
+Details:
+	Minecraft Version: 26.1.2
+	Minecraft Version ID: 26.1.2
+	Operating System: Windows 11 (amd64) version 10.0
+	Java Version: 25.0.3, Eclipse Adoptium
+	Java VM Version: OpenJDK 64-Bit Server VM (mixed mode, sharing), Eclipse Adoptium
+	Memory: 356650336 bytes (340 MiB) / 1409286144 bytes (1344 MiB) up to 8187281408 bytes (7808 MiB)
+	Memory (heap): init: 512MiB, used: 977MiB, committed: 1344MiB, max: 7808MiB
+	Memory (non-head): init: 007MiB, used: 264MiB, committed: 268MiB, max: 000MiB
+	CPUs: 16
+	Processor Vendor: AuthenticAMD
+	Processor Name: AMD Ryzen 7 7700 8-Core Processor              
+	Identifier: AuthenticAMD Family 25 Model 97 Stepping 2
+	Microarchitecture: Zen 3
+	Frequency (GHz): 3.79
+	Number of physical packages: 1
+	Number of physical CPUs: 8
+	Number of logical CPUs: 16
+	Graphics card #0 name: AMD  Radeon RX 7800 XT
+	Graphics card #0 vendor: Advanced Micro Devices, Inc.
+	Graphics card #0 VRAM (MiB): 16368.00
+	Graphics card #0 deviceId: VideoController1
+	Graphics card #0 versionInfo: 32.0.31035.1003
+	Graphics card #1 name: AMD Radeon(TM) Graphics
+	Graphics card #1 vendor: Advanced Micro Devices, Inc.
+	Graphics card #1 VRAM (MiB): 512.00
+	Graphics card #1 deviceId: VideoController2
+	Graphics card #1 versionInfo: 32.0.21045.1000
+	Memory slot #0 capacity (MiB): 16384.00
+	Memory slot #0 clockSpeed (GHz): 4.80
+	Memory slot #0 type: DDR5
+	Memory slot #1 capacity (MiB): 16384.00
+	Memory slot #1 clockSpeed (GHz): 4.80
+	Memory slot #1 type: DDR5
+	Virtual memory max (MiB): 64605.93
+	Virtual memory used (MiB): 18528.05
+	Swap memory total (MiB): 32784.00
+	Swap memory used (MiB): 730.96
+	Space in storage for jna.tmpdir (MiB): available: 474130.22, total: 684062.94
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): available: 474130.22, total: 684062.94
+	Space in storage for io.netty.native.workdir (MiB): available: 474130.22, total: 684062.94
+	Space in storage for java.io.tmpdir (MiB): available: 110621.23, total: 269803.38
+	Space in storage for workdir (MiB): available: 474130.22, total: 684062.94
+	JVM Flags: 13 total; -XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -XX:-OmitStackTraceInFastThrow -Xmx7782m -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:G1HeapRegionSize=32M -XX:MaxGCPauseMillis=50 -XX:+PerfDisableSharedMem -XX:MinHeapFreeRatio=25 -XX:MaxHeapFreeRatio=40
+	Debug Flags: 0 total; 
+	Loaded Shaderpack: (off)
+	Yumi MC Core: 1.1.0+26.1
+	Mods: 
+		architectury: Architectury v20.0.12
+		carryon: Carry On v2.10.0
+		cloth_config: Cloth Config v26.1 API v26.1.154
+		dynamic_fps: Dynamic FPS v3.11.7
+		dynamic_fps_common: Dynamic FPS Common v3.11.7
+		immediatelyfast: ImmediatelyFast v1.15.3+26.1
+		iris: Iris v1.11.3+mc26.1.2
+		lambdynlights: LambDynamicLights v4.11.1+26.1.2
+		lambdynlights_api: LambDynamicLights (API) v4.11.1+26.1.2
+		minecraft: Minecraft v26.1.2
+		mousetweaks: Mouse Tweaks v2.31
+		neoforge: NeoForge v26.1.2.97
+		pride: Pride Lib v1.6.0+26.1
+		reeses_sodium_options: Reese's Sodium Options v2.2.3+mc26.1.2
+		skinlayers3d: 3d-Skin-Layers v1.11.2
+		sodium: Sodium v0.9.1+mc26.1.2
+		spruceui: SpruceUI v10.0.0+26.1
+		tacz: Timeless and Classics Zero v1.1.8+neoforge.26.1.2.r1
+		transition: TRansition v1.0.21
+		trender: TRender v1.0.15
+		xaerolib: XaeroLib v1.7.1
+		xaerominimap: Xaero's Minimap v26.4.2
+		yumi_mc_core: Yumi Minecraft Libraries: Foundation v1.1.0+26.1
+	Class Processors: 
+		00.00%: neoforge:computing_frames (marker)
+		00.00%: neoforge:runtime_enum_extender
+		04.21%: neoforge:access_transformer
+		02.53%: neoforge:mixin
+		00.00%: neoforge:simple_processors_default (marker)
+		00.01%: neoforge.coremods:field_to_getter.net.minecraft.world.level.biome.biome
+		00.01%: neoforge.coremods:field_to_getter.net.minecraft.world.level.block.flowerpotblock
+		00.01%: neoforge.coremods:field_to_getter.net.minecraft.world.level.levelgen.structure.structure
+		00.22%: neoforge.coremods:method_redirector
+	Mod List: 
+		[3D 皮肤层] skinlayers3d-neoforge-1.11.2-mc26.1.2.jar|3d-Skin-Layers                |skinlayers3d                  |1.11.2              |Manifest: da55a664fb6c2b5aae0b7a01bba5de4238e226b7b6603c079b3a3932e2c7b577
+		architectury-neoforge-20.0.12.jar                 |Architectury                  |architectury                  |20.0.12             |Manifest: 2a1334b637ac943db66cdd032e297600991541c0d4b7e3f8a49fbb80199f2283
+		[搬运] carryon-neoforge-26.1.2-2.10.0.jar           |Carry On                      |carryon                       |2.10.0              |Manifest: bab11675ea202fef6c4c6ab7c3b3e9f13a5e097f9b5a7eab6c1636ffed14bfba
+		cloth-config-26.1.154.jar                         |Cloth Config v26.1 API        |cloth_config                  |26.1.154            |Manifest: d9147c8549fedad478bd18e2ddeef172ef290a081f80bd4d242d54e027ecd9d8
+		[动态 FPS] dynamic-fps-3.11.7+minecraft-26.1.0-neofo|Dynamic FPS                   |dynamic_fps                   |3.11.7              |Manifest: 7a0ef098fa6c16a9d786d82c77148db5b23a825e6b277ffdc2a1b8e14db037d5
+		net.lostluma.dynamic-fps-3.11.7+minecraft-26.1.0-c|Dynamic FPS Common            |dynamic_fps_common            |3.11.7              |Manifest: d9d0a90ac821f66a53b19ffa25a37477a3eedce8d68b79faab9afd72c2b5078f
+		ImmediatelyFast-NeoForge-1.15.3+26.1.jar          |ImmediatelyFast               |immediatelyfast               |1.15.3+26.1         |Manifest: 0d95ed9cb59f134e49cf123d90f3f96b28407e91fe31f515109ccf6cd7797344
+		iris-neoforge-1.11.3+mc26.1.2.jar                 |Iris                          |iris                          |1.11.3+mc26.1.2     |Manifest: a9c3909e8587a54f16965a3655aae2a6968db0e64ec1bf3e138e6bf6029a2866
+		[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar  |LambDynamicLights             |lambdynlights                 |4.11.1+26.1.2       |Manifest: e4ff87093815c09664375f45669bd9a519449733759a65b0f4c28bf34b963372
+		lambdynamiclights-api-4.11.1+26.1.2.jar           |LambDynamicLights (API)       |lambdynlights_api             |4.11.1+26.1.2       |Manifest: 00fc428a72b4d3bd9937fd70ed676b49970edcf5a4f59c7457d6b1773523ff94
+		minecraft-client-patched-26.1.2.97.jar            |Minecraft                     |minecraft                     |26.1.2              |Manifest: 88145e79a7f755dc14b627e687587c7a85e442137abd1c0d05b850f66f7b19d0
+		[鼠标手势] MouseTweaks-neoforge-mc26.1-2.31.jar       |Mouse Tweaks                  |mousetweaks                   |2.31                |Manifest: b4923774b96f14364d9e249096ea9f93e10c63ef0b9b7b8cc81f9b047e48c430
+		neoforge-26.1.2.97-universal.jar                  |NeoForge                      |neoforge                      |26.1.2.97           |Manifest: 5a96d8ce915209ad0d2b5613e891770a27392e89066cd4587cc2a7853c494bbd
+		pridelib-1.6.0+26.1.jar                           |Pride Lib                     |pride                         |1.6.0+26.1          |Manifest: e5f1308efaa0e65f2f53a2597db58f81815a935f98f5eaf206e4e320b5494335
+		[Reese的钠视频界面] reeses-sodium-options-neoforge-2.2.3|Reese's Sodium Options        |reeses_sodium_options         |2.2.3+mc26.1.2      |Manifest: 8e9760d6834475070289c82cde381274970514b478a71c3ebeba7303a30de86c
+		net.caffeinemc.sodium-neoforge-0.9.1+mc26.1.2-mod.|Sodium                        |sodium                        |0.9.1+mc26.1.2      |Manifest: 73780c4ee946bf7c4be7ee8ba8feaf0cd573b8df46b88d7b65e15ab9135ddde1
+		spruceui-10.0.0+26.1.jar                          |SpruceUI                      |spruceui                      |10.0.0+26.1         |Manifest: 9b97d10226738afecedc8d1e619a9c83426b3a2d59aa23c36f71999f44f9d21c
+		tacz-1.1.8+neoforge.26.1.2.r1.jar                 |Timeless and Classics Zero    |tacz                          |1.1.8+neoforge.26.1.|Manifest: 7f8374ed5abfc3a91a254c4cd082402a598947cb2772cc2902cfbefc5c9827ed
+		TRansition-1.0.21-26.1.2-neoforge-SNAPSHOT.jar    |TRansition                    |transition                    |1.0.21              |Manifest: 3b6f9aa99b2a7aa79e93b4a7b057eb493ffd9fe1255259a788a6051c2940ce00
+		TRender-1.0.15-26.1.2-neoforge-SNAPSHOT.jar       |TRender                       |trender                       |1.0.15              |Manifest: 6e5b254639b79bade3075dc53cc0f0af4993f1b60906059796d658889bb190da
+		[Xaero的小地图] xaerominimap-neoforge-26.1.2-26.4.2.ja|Xaero's Minimap               |xaerominimap                  |26.4.2              |Manifest: 5c421dd3dfe133023ddb07c4e32e7b9cdae4935e32b3bfb43bc4b55e40702ee0
+		xaerolib-neoforge-26.1.2-1.7.1.jar                |XaeroLib                      |xaerolib                      |1.7.1               |Manifest: d834085cb6553563a968f1b82b304be8766dd24d1405526ebc9d96e8af9caf8c
+		yumi-mc-foundation-1.1.0+26.1.jar                 |Yumi Minecraft Libraries: Foun|yumi_mc_core                  |1.1.0+26.1          |Manifest: d656ac3ecd3c73d3b66e50aba5a6c44e60f4d5b0065684b16e9382ffac0b039a
+	Crash Report UUID: 428f78e4-4ede-4cd6-bb27-0906ec74a417
+	FML: 11.0.15
+	NeoForge: 26.1.2.97
