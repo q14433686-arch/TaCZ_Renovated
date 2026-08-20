@@ -47,7 +47,7 @@ public class GunSmithTableResult {
         this.group = group == null ? EMPTY_GROUP : group;
         this.rawResult = raw;
         this.customResult = null;
-        this.groupOverride = group;
+        this.groupOverride = group == null || EMPTY_GROUP.equals(group) ? null : group;
         this.initialized = false;
     }
 
@@ -80,6 +80,7 @@ public class GunSmithTableResult {
         } catch (RuntimeException exception) {
             GunMod.LOGGER.warn("Failed to resolve gun smith table result", exception);
             this.result = ItemStack.EMPTY;
+            this.group = EMPTY_GROUP;
         } finally {
             this.initialized = true;
         }
