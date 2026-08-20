@@ -28,7 +28,7 @@
 
 `java.lang.NoClassDefFoundError: org/luaj/vm2/LuaError`（`ModItems` → `ModernKineticGunItem`）。
 
-因此 `build.gradle` 对下列本地 jar 同时声明 `implementation` + `jarJar`（FML `META-INF/jarjar/`），与 MUKSC/TACZ-1.21.1 的加载器习语一致。
+因此 `build.gradle` 对下列本地 jar 声明 `implementation`，再经 `jarJarPrepare_*` 盖上 `Automatic-Module-Name` 后 `jarJar`（FML `META-INF/jarjar/`）。ModDevGradle 2 拒绝嵌入没有 JPMS 名的本地文件；这与官方 MDK「local file jarJar」示例一致。
 
 | 组件 | 用途 | 许可 / 来源 |
 |---|---|---|
