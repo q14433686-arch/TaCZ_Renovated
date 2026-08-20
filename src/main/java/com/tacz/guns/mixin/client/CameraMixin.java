@@ -34,6 +34,14 @@ public abstract class CameraMixin {
 
     @Inject(method = "update", at = @At("TAIL"))
     private void tacz$applyCameraAnimations(DeltaTracker deltaTracker, CallbackInfo ci) {
+        // Camera.update() also runs while the title screen is active. During that
+        // phase Camera has no Level, but getCameraEntityPartialTicks() consults
+        // the Level's tick-rate manager. Do not dispatch world camera events until
+        // the client has an active level, otherwise entering the game crashes on
+        // the first render frame with an NPE.
+        if (Minecraft.getInstance().level == null) {
+            return;
+        }
         Camera self = (Camera) (Object) this;
         float partialTick = self.getCameraEntityPartialTicks(deltaTracker);
         ViewportEvent.ComputeCameraAngles event = new ViewportEvent.ComputeCameraAngles(
