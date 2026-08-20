@@ -59,6 +59,9 @@ public class GunSmithTableIngredient {
         JsonElement raw = rawIngredient;
         try {
             JsonElement normalized = RecipeCompat.normalizeLegacyIngredient(raw);
+            // NeoForge patches Ingredient.CODEC itself to dispatch native custom ingredients
+            // through neoforge:ingredient_type. Do not wrap it a second time: the current
+            // 26.1.2 codec already contains IngredientCodecs.codec(...).
             ingredient = Ingredient.CODEC.parse(
                     RegistryOps.create(JsonOps.INSTANCE, registryAccess), normalized
             ).getOrThrow();

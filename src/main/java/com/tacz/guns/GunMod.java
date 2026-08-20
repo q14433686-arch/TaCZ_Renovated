@@ -49,6 +49,7 @@ public class GunMod {
         ModRecipe.RECIPE_SERIALIZERS.register(modEventBus);
         ModRecipe.RECIPE_TYPES.register(modEventBus);
         ModRecipe.RECIPE_BOOK_CATEGORIES.register(modEventBus);
+        ModRecipe.INGREDIENT_TYPES.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
         com.tacz.guns.init.ModContainer.CONTAINER_TYPE.register(modEventBus);
         ModSounds.SOUNDS.register(modEventBus);

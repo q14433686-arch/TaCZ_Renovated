@@ -16,10 +16,11 @@ import java.lang.reflect.Modifier;
  * Without a subsequent viewer reload, a viewer can retain categories built before the sync and collapse
  * a custom workbench into whichever generic table happened to register first.
  *
- * <p>REI exposes a client reload entry point that can be invoked reflectively. NeoForge JEI
- * exposes no equivalent public lightweight hook and is refreshed through its native client
- * resource-reload listener. If a viewer hook is unavailable, the bridge falls back ONCE to
- * a normal client-resource reload.
+ * <p>NeoForge JEI 29.5 waits for the native {@code RecipesReceivedEvent} before its first
+ * startup, which occurs after TaCZ's synchronized pack cache in the verified 26.1.2 load
+ * order. JEI therefore must not trigger a second full resource reload here. REI does not
+ * provide the same ordering guarantee, so its client plugin reload entry point is invoked
+ * reflectively when REI is present.
  */
 public final class RecipeViewerReloadBridge {
     private static boolean reloadRequested;
@@ -30,7 +31,9 @@ public final class RecipeViewerReloadBridge {
 
     /** Called after the synchronized common gun-pack cache has been installed on the client. */
     public static void requestReload() {
-        if (hasJei() || hasRei()) {
+        // JEI's NeoForge StartEventObserver waits for RecipesReceivedEvent and starts
+        // after this cache is installed. Only REI needs an explicit lightweight reload.
+        if (hasRei()) {
             reloadRequested = true;
         }
     }
@@ -54,13 +57,7 @@ public final class RecipeViewerReloadBridge {
         GunMod.LOGGER.info("[TACZ Recipe Viewer] Refreshing after gun-pack sync ({} table(s), {} recipe(s)).",
                 tableCount, recipeCount);
 
-        boolean requiresResourceFallback = false;
-        if (hasJei() && !refreshJei()) {
-            requiresResourceFallback = true;
-        }
-        if (hasRei() && !refreshRei()) {
-            requiresResourceFallback = true;
-        }
+        boolean requiresResourceFallback = hasRei() && !refreshRei();
 
         if (!requiresResourceFallback) {
             reloadInProgress = false;
@@ -85,16 +82,6 @@ public final class RecipeViewerReloadBridge {
         }
     }
 
-    /**
-     * NeoForge JEI 29.5 has no public lightweight recipe-plugin reload hook.
-     * Its verified NeoForge implementation restarts JEI from its client resource-reload
-     * listener, so return false and let the single fallback resource reload perform the
-     * supported restart. Do not probe the Fabric lifecycle event on this port.
-     */
-    private static boolean refreshJei() {
-        return false;
-    }
-
     /** REI 26.1.2 rebuilds categories/displays through this all-stage plugin reload entry point. */
     private static boolean refreshRei() {
         try {
@@ -117,10 +104,6 @@ public final class RecipeViewerReloadBridge {
             GunMod.LOGGER.debug("[TACZ Recipe Viewer] REI lightweight refresh unavailable.", exception);
             return false;
         }
-    }
-
-    private static boolean hasJei() {
-        return ModList.get().isLoaded("jei");
     }
 
     private static boolean hasRei() {

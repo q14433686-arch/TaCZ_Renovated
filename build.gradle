@@ -44,6 +44,10 @@ repositories {
         name = "Shedaniel"
         url = "https://maven.shedaniel.me"
     }
+    maven {
+        name = "BlameJared"
+        url = "https://maven.blamejared.com"
+    }
 }
 
 base {
@@ -173,9 +177,10 @@ dependencies {
     jarJar files(commonsMath3ForJarJar)
     jarJar files(luajForJarJar)
 
-    // JEI 29.5.0.26 / REI 26.1.819 NeoForge APIs are optional at runtime.
-    // The integrations are discovered only when the corresponding viewer is present.
-    compileOnly "curse.maven:jei-238222:${jei_neoforge_file}"
+    // Current environment: JEI 29.29.0.77 / REI 26.1.819 for NeoForge 26.1.2.
+    // These integrations are optional at runtime and are discovered only when the
+    // corresponding viewer is present.
+    compileOnly "mezz.jei:jei-26.1.2-neoforge:${jei_neoforge_version}"
     compileOnly "curse.maven:roughly-enough-items-310111:${rei_neoforge_file}"
     compileOnly "dev.architectury:architectury-neoforge:${rei_architectury_version}"
     compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rei_cloth_config_version}"
