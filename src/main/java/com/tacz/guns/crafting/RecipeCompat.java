@@ -1,13 +1,21 @@
 package com.tacz.guns.crafting;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.Strictness;
+import com.google.gson.stream.JsonReader;
 import com.tacz.guns.GunMod;
 
 import net.minecraft.resources.Identifier;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.io.Reader;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,10 +29,22 @@ import java.util.Set;
  *   <li>{@code result.group} bare names default to {@code tacz:} not {@code minecraft:}.</li>
  * </ul>
  *
- * ① {@code ShapedRecipe} in 26.1.2 client.jar has {@code MAP_CODEC}/{@code STREAM_CODEC}/{@code SERIALIZER}
- * only — no JSON parse mixin target.
+ * <p>① {@code ShapedRecipe} in 26.1.2 client.jar has {@code MAP_CODEC}/{@code STREAM_CODEC}/{@code SERIALIZER}
+ * only — no JSON parse mixin target.</p>
+ *
+ * <p>① {@code RecipeManager} on 26.1.2 extends {@code SimplePreparableReloadListener<RecipeMap>}
+ * and builds that map from the {@code minecraft:recipe} datapack registry
+ * ({@code FileToIdConverter.registry(Registries.RECIPE)} → directory {@code recipe/}).
+ * There is no {@code fromJson(Map)} and no mutable {@code Map<ResourceKey, RecipeHolder>}
+ * field to inject into — {@code RecipeMap} is immutable. Legacy gun-pack
+ * {@code data/<ns>/recipes/} files must be remapped at {@code PackResources}
+ * so the registry loader sees them.</p>
  */
 public final class RecipeCompat {
+    private static final Gson LENIENT_GSON = new GsonBuilder().setStrictness(Strictness.LENIENT).create();
+    private static final String RECIPE_DIR = "recipe";
+    private static final String LEGACY_RECIPES_DIR = "recipes";
+
     private RecipeCompat() {
     }
 
@@ -111,5 +131,139 @@ public final class RecipeCompat {
 
     public static boolean isLegacyRecipesDirectory(String path) {
         return path.contains("/recipes/") && !path.contains("/recipe/");
+    }
+
+    /**
+     * {@code ResourceManager#listResources} path argument for the recipe registry:
+     * exact {@code recipe} or a subdirectory {@code recipe/...}. Does not match
+     * {@code recipe_filters} / {@code recipe_priorities}.
+     */
+    public static boolean isVanillaRecipeDirectory(String paths) {
+        return RECIPE_DIR.equals(paths) || paths.startsWith(RECIPE_DIR + "/");
+    }
+
+    /**
+     * {@code recipe} → {@code recipes}; {@code recipe/ammo} → {@code recipes/ammo}.
+     */
+    @Nullable
+    public static String toLegacyRecipesDirectory(String paths) {
+        if (!isVanillaRecipeDirectory(paths)) {
+            return null;
+        }
+        return LEGACY_RECIPES_DIR + paths.substring(RECIPE_DIR.length());
+    }
+
+    /**
+     * Pack resource id {@code ns:recipes/oldworkbench.json} → {@code ns:recipe/oldworkbench.json}.
+     */
+    @Nullable
+    public static Identifier remapRecipesToRecipe(Identifier location) {
+        String path = location.getPath();
+        if (!path.equals(LEGACY_RECIPES_DIR) && !path.startsWith(LEGACY_RECIPES_DIR + "/")) {
+            return null;
+        }
+        return Identifier.fromNamespaceAndPath(
+                location.getNamespace(),
+                RECIPE_DIR + path.substring(LEGACY_RECIPES_DIR.length()));
+    }
+
+    /**
+     * Inverse of {@link #remapRecipesToRecipe}: {@code ns:recipe/foo.json} → {@code ns:recipes/foo.json}.
+     */
+    @Nullable
+    public static Identifier toLegacyRecipesLocation(Identifier location) {
+        String path = location.getPath();
+        if (!path.equals(RECIPE_DIR) && !path.startsWith(RECIPE_DIR + "/")) {
+            return null;
+        }
+        return Identifier.fromNamespaceAndPath(
+                location.getNamespace(),
+                LEGACY_RECIPES_DIR + path.substring(RECIPE_DIR.length()));
+    }
+
+    public static boolean isVanillaCraftingRecipe(@Nullable JsonElement element) {
+        if (element == null || !element.isJsonObject()) {
+            return false;
+        }
+        JsonElement typeEl = element.getAsJsonObject().get("type");
+        if (typeEl == null || !typeEl.isJsonPrimitive() || !typeEl.getAsJsonPrimitive().isString()) {
+            return false;
+        }
+        String type = typeEl.getAsString();
+        return "minecraft:crafting_shaped".equals(type) || "minecraft:crafting_shapeless".equals(type);
+    }
+
+    /**
+     * Rewrite a 1.20-era vanilla crafting JSON into the 26.x codec form.
+     * Returns {@code null} when the element is not a shaped/shapeless crafting recipe
+     * (gun-smith-table recipes stay on the {@code recipes/} path and are handled by
+     * {@code TableRecipeManager}).
+     */
+    @Nullable
+    public static JsonElement convertLegacyVanillaRecipe(@Nullable JsonElement element) {
+        if (!isVanillaCraftingRecipe(element)) {
+            return null;
+        }
+        JsonObject obj = element.getAsJsonObject().deepCopy();
+        if (obj.has("result")) {
+            obj.add("result", convertResult(obj.get("result")));
+        }
+        if (obj.has("key") && obj.get("key").isJsonObject()) {
+            JsonObject key = obj.getAsJsonObject("key");
+            JsonObject newKey = new JsonObject();
+            for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
+                newKey.add(entry.getKey(), normalizeLegacyIngredient(entry.getValue()));
+            }
+            obj.add("key", newKey);
+        }
+        if (obj.has("ingredients")) {
+            obj.add("ingredients", normalizeLegacyIngredient(obj.get("ingredients")));
+        }
+        return obj;
+    }
+
+    private static JsonElement convertResult(JsonElement result) {
+        if (!result.isJsonObject()) {
+            return result;
+        }
+        JsonObject source = result.getAsJsonObject();
+        boolean hasLegacyItem = source.has("item");
+        boolean hasLegacyNbt = source.has("nbt");
+        if (!hasLegacyItem && !hasLegacyNbt) {
+            return source;
+        }
+        JsonObject out = new JsonObject();
+        if (source.has("id")) {
+            out.add("id", source.get("id"));
+        } else if (hasLegacyItem && source.get("item").isJsonPrimitive()) {
+            out.addProperty("id", source.get("item").getAsString());
+        }
+        if (source.has("count")) {
+            out.add("count", source.get("count"));
+        }
+        if (source.has("components")) {
+            out.add("components", source.get("components"));
+        } else if (hasLegacyNbt) {
+            JsonObject components = new JsonObject();
+            components.add("minecraft:custom_data", source.get("nbt"));
+            out.add("components", components);
+        }
+        for (Map.Entry<String, JsonElement> entry : source.entrySet()) {
+            String key = entry.getKey();
+            if ("item".equals(key) || "nbt".equals(key) || "id".equals(key)
+                    || "count".equals(key) || "components".equals(key)) {
+                continue;
+            }
+            if (!out.has(key)) {
+                out.add(key, entry.getValue());
+            }
+        }
+        return out;
+    }
+
+    public static JsonElement parseLenient(Reader reader) {
+        JsonReader jsonReader = LENIENT_GSON.newJsonReader(reader);
+        jsonReader.setStrictness(Strictness.LENIENT);
+        return LENIENT_GSON.fromJson(jsonReader, JsonElement.class);
     }
 }
