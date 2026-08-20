@@ -7,7 +7,6 @@
     "common.EntityMixin",
     "common.LivingEntityMixin",
     "common.PlayerMixin",
-    "common.RecipeManagerMixin",
     "common.ServerGamePacketListenerImplMixin",
     "common.ServerPlayerMixin",
     "common.ServerPlayNetHandlerMixin"
