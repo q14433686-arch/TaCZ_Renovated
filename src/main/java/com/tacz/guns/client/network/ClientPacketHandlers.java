@@ -130,9 +130,15 @@ public final class ClientPacketHandlers {
         // Rebuild them now so the tab receives initialized gun/ammo/attachment/workbench stacks
         // instead of the bare registry items that have no data-pack id or dynamic model.
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.level != null && minecraft.getConnection() != null) {
+        if (minecraft.level != null && minecraft.getConnection() != null && minecraft.player != null) {
+            boolean hasPermissions = minecraft.player.hasPermissions(2);
+            // tryRebuildTabContents intentionally skips identical feature/permission inputs.
+            // Flip once to invalidate the pre-sync build, then rebuild with the real permission
+            // state so vanilla operator-only tabs are not left in the temporary state.
             CreativeModeTabs.tryRebuildTabContents(
-                    minecraft.getConnection().enabledFeatures(), false, minecraft.level.registryAccess());
+                    minecraft.getConnection().enabledFeatures(), !hasPermissions, minecraft.level.registryAccess());
+            CreativeModeTabs.tryRebuildTabContents(
+                    minecraft.getConnection().enabledFeatures(), hasPermissions, minecraft.level.registryAccess());
         }
     }
 
