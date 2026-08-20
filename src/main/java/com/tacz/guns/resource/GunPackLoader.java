@@ -89,6 +89,7 @@ public enum GunPackLoader implements RepositorySource {
     }
 
     private Pack discoverExtensions(PackType packType) {
+        GunMod.LOGGER.info(MARKER, "discoverExtensions called with packType={}, firstLoad={}", packType, firstLoad);
         Path resourcePacksPath = FMLPaths.GAMEDIR.get().resolve("tacz");
         File folder = resourcePacksPath.toFile();
         if (!folder.isDirectory()) {

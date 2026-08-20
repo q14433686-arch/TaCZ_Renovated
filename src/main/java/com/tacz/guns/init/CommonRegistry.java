@@ -1,5 +1,6 @@
 package com.tacz.guns.init;
 
+import com.tacz.guns.GunMod;
 import com.tacz.guns.entity.sync.ModSyncedEntityData;
 import com.tacz.guns.resource.GunPackLoader;
 import net.minecraft.server.packs.PackType;
@@ -41,7 +42,10 @@ public final class CommonRegistry {
         // for the opposite PackType.  The lambda closes over the local
         // variable, so each repository gets the correct type.
         PackType type = event.getPackType();
-        event.addRepositorySource(pOnLoad ->
-                GunPackLoader.INSTANCE.loadPacksForType(pOnLoad, type));
+        GunMod.LOGGER.info("WP③ onAddPackFinders called with packType={}", type);
+        event.addRepositorySource(pOnLoad -> {
+            GunMod.LOGGER.info("WP③ RepositorySource.loadPacks invoked for packType={}", type);
+            GunPackLoader.INSTANCE.loadPacksForType(pOnLoad, type);
+        });
     }
 }
