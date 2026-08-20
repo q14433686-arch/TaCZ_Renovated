@@ -1,6 +1,13 @@
 package com.tacz.guns.init;
 
 import com.tacz.guns.GunMod;
+import com.tacz.guns.api.item.GunTabType;
+import com.tacz.guns.api.item.attachment.AttachmentType;
+import com.tacz.guns.api.item.gun.AbstractGunItem;
+import com.tacz.guns.item.AmmoBoxItem;
+import com.tacz.guns.item.AmmoItem;
+import com.tacz.guns.item.AttachmentItem;
+import com.tacz.guns.item.GunSmithTableItem;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -17,16 +24,25 @@ public class ModCreativeTabs {
                     .title(Component.translatable("itemGroup.tab.tacz.other"))
                     .icon(() -> ModItems.GUN_SMITH_TABLE.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
-                        output.accept(ModItems.GUN_SMITH_TABLE.get());
-                        output.accept(ModItems.WORKBENCH_111.get());
-                        output.accept(ModItems.WORKBENCH_211.get());
-                        output.accept(ModItems.WORKBENCH_121.get());
+                        // These are data-driven items. Adding the bare registry item here creates
+                        // an empty stack with no gun/ammo/attachment/table id, which explains the
+                        // generic "item.tacz.*" names and blank dynamic models. Populate the tab
+                        // with the same fully initialized stacks used by the workbench and tooltips.
+                        GunSmithTableItem.fillItemCategory().forEach(output::accept);
+                        for (GunTabType type : GunTabType.values()) {
+                            AbstractGunItem.fillItemCategory(type).forEach(output::accept);
+                        }
+                        AmmoItem.fillItemCategory().forEach(output::accept);
+                        for (AttachmentType type : AttachmentType.values()) {
+                            if (type != AttachmentType.NONE) {
+                                AttachmentItem.fillItemCategory(type).forEach(output::accept);
+                            }
+                        }
+
+                        // Static and variant items do not carry gun-pack ids.
                         output.accept(ModItems.TARGET.get());
                         output.accept(ModItems.STATUE.get());
                         output.accept(ModItems.TARGET_MINECART.get());
-                        output.accept(ModItems.AMMO_BOX.get());
-                        output.accept(ModItems.MODERN_KINETIC_GUN.get());
-                        output.accept(ModItems.AMMO.get());
-                        output.accept(ModItems.ATTACHMENT.get());
+                        AmmoBoxItem.fillItemCategory(output);
                     }).build());
 }

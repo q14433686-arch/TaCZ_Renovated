@@ -32,6 +32,7 @@ import com.tacz.guns.network.message.event.ServerMessageGunShoot;
 import com.tacz.guns.resource.network.CommonNetworkCache;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
@@ -124,6 +125,15 @@ public final class ClientPacketHandlers {
     public static void onSyncGunPack(ServerMessageSyncGunPack message) {
         CommonNetworkCache.INSTANCE.fromNetwork(message.getCache());
         ClientIndexManager.reload();
+
+        // Creative tab contents are built before the integrated server sends the gun-pack cache.
+        // Rebuild them now so the tab receives initialized gun/ammo/attachment/workbench stacks
+        // instead of the bare registry items that have no data-pack id or dynamic model.
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level != null && minecraft.getConnection() != null) {
+            CreativeModeTabs.tryRebuildTabContents(
+                    minecraft.getConnection().enabledFeatures(), false, minecraft.level.registryAccess());
+        }
     }
 
     public static void onSyncBaseTimestamp(ServerMessageSyncBaseTimestamp message) {

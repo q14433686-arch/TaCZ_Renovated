@@ -4,6 +4,7 @@ import com.tacz.guns.crafting.result.GunSmithTableResult;
 import com.tacz.guns.init.ModRecipe;
 import com.tacz.guns.resource.pojo.data.recipe.TableRecipe;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.PlacementInfo;
@@ -91,6 +92,13 @@ public class GunSmithTableRecipe implements Recipe<SingleRecipeInput> {
 
     public void init() {
         result.init();
+    }
+
+    /** Resolve delayed tag ingredients after the level registry has finished loading. */
+    public void resolveIngredients(RegistryAccess registryAccess) {
+        for (GunSmithTableIngredient input : inputs) {
+            input.resolve(registryAccess);
+        }
     }
 
     public ItemStack getOutput() {

@@ -123,6 +123,9 @@ public class GunSmithTableMenu extends AbstractContainerMenu {
         if (recipe == null) {
             return;
         }
+        if (level instanceof ServerLevel serverLevel) {
+            recipe.resolveIngredients(serverLevel.registryAccess());
+        }
         net.neoforged.neoforge.items.IItemHandler handler = new net.neoforged.neoforge.items.wrapper.InvWrapper(player.getInventory());
         if (true) {
             // 是创造模式，就不扣材料
