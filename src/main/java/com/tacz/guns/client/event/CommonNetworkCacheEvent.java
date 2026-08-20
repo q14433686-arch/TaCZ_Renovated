@@ -1,6 +1,7 @@
 package com.tacz.guns.client.event;
 
 import com.tacz.guns.client.compat.RecipeViewerReloadBridge;
+import com.tacz.guns.client.gameplay.LocalPlayerDataHolder;
 import com.tacz.guns.client.resource.ClientIndexManager;
 import com.tacz.guns.resource.CommonAssetsManager;
 import com.tacz.guns.resource.network.CommonNetworkCache;
@@ -24,5 +25,8 @@ public final class CommonNetworkCacheEvent {
         }
         CommonNetworkCache.INSTANCE.clear();
         ClientIndexManager.clear();
+        // Reset the static base timestamp so a stale value from a previous world does
+        // not corrupt the first shoot packet sent after joining the next world.
+        LocalPlayerDataHolder.clientBaseTimestamp = -1L;
     }
 }

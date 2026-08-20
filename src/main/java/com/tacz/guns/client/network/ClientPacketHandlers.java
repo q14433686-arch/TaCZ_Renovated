@@ -17,7 +17,7 @@ import com.tacz.guns.client.gui.GunSmithTableScreen;
 import com.tacz.guns.client.resource.ClientIndexManager;
 import com.tacz.guns.client.sound.SoundPlayManager;
 import com.tacz.guns.client.compat.RecipeViewerReloadBridge;
-import com.tacz.guns.resource.modifier.AttachmentPropertyManager;
+import com.tacz.guns.network.message.ClientMessageSyncBaseTimestamp;
 import com.tacz.guns.network.message.ServerMessageCraft;
 import com.tacz.guns.network.message.ServerMessageLevelUp;
 import com.tacz.guns.network.message.ServerMessageRefreshRefitScreen;
@@ -26,6 +26,7 @@ import com.tacz.guns.network.message.ServerMessageSwapItem;
 import com.tacz.guns.network.message.ServerMessageSyncBaseTimestamp;
 import com.tacz.guns.network.message.ServerMessageSyncGunPack;
 import com.tacz.guns.network.message.ServerMessageUpdateEntityData;
+import com.tacz.guns.resource.modifier.AttachmentPropertyManager;
 import com.tacz.guns.network.message.event.ServerMessageGunDraw;
 import com.tacz.guns.network.message.event.ServerMessageGunFire;
 import com.tacz.guns.network.message.event.ServerMessageGunFireSelect;
@@ -40,6 +41,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 
 public final class ClientPacketHandlers {
@@ -197,5 +199,9 @@ public final class ClientPacketHandlers {
 
     public static void onSyncBaseTimestamp(ServerMessageSyncBaseTimestamp message) {
         LocalPlayerDataHolder.clientBaseTimestamp = System.currentTimeMillis();
+        // Notify the server to update its baseTimestamp too, preventing unbounded
+        // timestamp drift between client and server that makes every shoot fail the
+        // network timestamp check (alpha out of [-300, 300+2*tick]).
+        ClientPacketDistributor.sendToServer(ClientMessageSyncBaseTimestamp.INSTANCE);
     }
 }

@@ -192,6 +192,8 @@
   "subtitle.tacz.target_block_hit": "目標方塊：擊中",
   "jei.tacz.attachment_query.title": "配件查詢",
   "jei.tacz.attachment_query.more": "更多...",
+  "jei.tacz.ammo_query.title": "子彈查詢",
+  "jei.tacz.ammo_query.more": "更多...",
   "config.tacz.open_gunpack_folder": "打開槍包資料夾",
   "config.tacz.client.key": "按鍵",
   "config.tacz.client.key.hold_to_aim": "按住瞄準",

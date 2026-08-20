@@ -310,6 +310,13 @@ public class LocalPlayerShoot {
             // 记录新的开火时间戳
             data.clientLastShootTimestamp = data.clientShootTimestamp;
             data.clientShootTimestamp = System.currentTimeMillis();
+            // Do not send a shoot packet before the server has synchronised the base
+            // timestamp (clientBaseTimestamp == -1).  Any such request would carry a
+            // multi-trillion-ms delta and always fail the server-side network check,
+            // wasting a round-trip resync cycle.
+            if (data.clientBaseTimestamp < 0) {
+                return;
+            }
             // 发送开火的数据包，通知服务器
             ClientPacketDistributor.sendToServer(new ClientMessagePlayerShoot(data.clientShootTimestamp - data.clientBaseTimestamp, chargeProgress));
         }

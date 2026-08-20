@@ -5,7 +5,6 @@ import com.tacz.guns.resource.GunPackLoader;
 import net.minecraft.server.packs.PackType;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 
@@ -36,9 +35,13 @@ public final class CommonRegistry {
     }
 
     public static void onAddPackFinders(AddPackFindersEvent event) {
-        GunPackLoader.INSTANCE.packType = FMLEnvironment.getDist().isClient()
-                ? PackType.CLIENT_RESOURCES
-                : PackType.SERVER_DATA;
-        event.addRepositorySource(GunPackLoader.INSTANCE);
+        // Capture the pack type at event-handling time (when we know the
+        // correct type from the event) rather than setting a mutable field
+        // on the singleton that can be overwritten by a later event firing
+        // for the opposite PackType.  The lambda closes over the local
+        // variable, so each repository gets the correct type.
+        PackType type = event.getPackType();
+        event.addRepositorySource(pOnLoad ->
+                GunPackLoader.INSTANCE.loadPacksForType(pOnLoad, type));
     }
 }

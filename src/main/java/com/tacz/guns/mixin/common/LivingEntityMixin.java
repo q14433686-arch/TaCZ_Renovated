@@ -229,12 +229,20 @@ public abstract class LivingEntityMixin extends Entity implements IGunOperator, 
             // runs while the holder is uninitialized; normal hotbar transitions still use
             // LivingEntityDrawGun and retain their draw timing.
             ItemStack mainHandItem = tacz$shooter.getMainHandItem();
-            if (mainHandItem.getItem() instanceof IGun iGun
-                    && (this.tacz$data.currentGunItem == null
-                    || this.tacz$data.cacheProperty == null
-                    && TimelessAPI.getCommonGunIndex(iGun.getGunId(mainHandItem)).isPresent())) {
-                this.initialData();
-                GunMod.LOGGER.debug("WP③ server gun state initialized from main hand entity={}", tacz$shooter.getId());
+            if (mainHandItem.getItem() instanceof IGun iGun) {
+                // First tick: no currentGunItem -> full initialization
+                if (this.tacz$data.currentGunItem == null) {
+                    this.initialData();
+                    GunMod.LOGGER.debug("WP③ server gun state initialized from main hand entity={}", tacz$shooter.getId());
+                }
+                // Subsequent tick: gun index now ready but cacheProperty was not set during
+                // initialData() because the gun index was not loaded yet. Recover just the
+                // cache property without resetting all gameplay state (reload, shoot timers, etc.).
+                else if (this.tacz$data.cacheProperty == null
+                        && TimelessAPI.getCommonGunIndex(iGun.getGunId(mainHandItem)).isPresent()) {
+                    AttachmentPropertyManager.postChangeEvent(tacz$shooter, mainHandItem);
+                    GunMod.LOGGER.debug("WP③ cache property recovered for entity={}", tacz$shooter.getId());
+                }
             }
 
             // 完成各种 tick 任务
