@@ -337,7 +337,7 @@ public class CommonAssetsManager implements ICommonResourceProvider {
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static void injectLegacyVanillaRecipes() {
         if (getInstance() == null || getInstance().recipeManager == null || getInstance().tableRecipe == null) return;
-        Map<Identifier, JsonElement> legacy = getInstance().tableRecipe.getLegacyVanillaRecipes();
+        Map<Identifier, JsonElement> legacy = ((TableRecipeManager) getInstance().tableRecipe).getLegacyVanillaRecipes();
         if (legacy.isEmpty()) return;
         try {
             RecipeManager rm = getInstance().recipeManager;
