@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -150,20 +151,18 @@ public abstract class AbstractGunSmithTableBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockPos companionPos = isRoot(state)
-                    ? getCompanionPos(pos, state)
-                    : getRootPos(pos, state);
-            if (!level.isClientSide() && companionPos != null && !companionPos.equals(pos)
-                    && level.getBlockState(companionPos).is(this)) {
-                // Carry On removes only the clicked half and does not call playerWillDestroy.
-                // Remove the other half here so a horizontal table is never left behind as a
-                // one-block fragment.
-                level.removeBlock(companionPos, false);
-            }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        BlockPos companionPos = isRoot(state)
+                ? getCompanionPos(pos, state)
+                : getRootPos(pos, state);
+        if (companionPos != null && !companionPos.equals(pos)
+                && level.getBlockState(companionPos).is(this)) {
+            // Carry On removes only the clicked half and does not call playerWillDestroy.
+            // Remove the other half here so a horizontal table is never left behind as a
+            // one-block fragment.
+            level.removeBlock(companionPos, false);
         }
-        super.onRemove(state, level, pos, newState, isMoving);
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
     @Override
