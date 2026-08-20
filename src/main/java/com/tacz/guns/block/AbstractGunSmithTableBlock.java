@@ -1,6 +1,7 @@
 package com.tacz.guns.block;
 
 import com.tacz.guns.api.DefaultAssets;
+import com.tacz.guns.api.item.builder.BlockItemBuilder;
 import com.tacz.guns.api.item.nbt.BlockItemDataAccessor;
 import com.tacz.guns.block.entity.GunSmithTableBlockEntity;
 import com.tacz.guns.inventory.GunSmithTableMenu;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -122,6 +124,46 @@ public abstract class AbstractGunSmithTableBlock extends BaseEntityBlock {
     @Nullable
     public BlockState getCompanionState(BlockState rootState) {
         return null;
+    }
+
+    @Override
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeEntity) {
+        BlockPos rootPos = getRootPos(pos, state);
+        BlockEntity blockEntity = level.getBlockEntity(rootPos);
+        if (blockEntity instanceof GunSmithTableBlockEntity table && table.getId() != null) {
+            return BlockItemBuilder.create(this).setId(table.getId()).build();
+        }
+        return new ItemStack(this);
+    }
+
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        // Only the root carries the custom BlockId. Preserve it when survival breaks the
+        // companion half, otherwise the normal loot table cannot reconstruct the data item.
+        if (!level.isClientSide() && !player.isCreative() && !isRoot(state)) {
+            ItemStack drop = getCloneItemStack(level, pos, state, true);
+            if (!drop.isEmpty()) {
+                popResource(level, pos, drop);
+            }
+        }
+        return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            BlockPos companionPos = isRoot(state)
+                    ? getCompanionPos(pos, state)
+                    : getRootPos(pos, state);
+            if (!level.isClientSide() && companionPos != null && !companionPos.equals(pos)
+                    && level.getBlockState(companionPos).is(this)) {
+                // Carry On removes only the clicked half and does not call playerWillDestroy.
+                // Remove the other half here so a horizontal table is never left behind as a
+                // one-block fragment.
+                level.removeBlock(companionPos, false);
+            }
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override

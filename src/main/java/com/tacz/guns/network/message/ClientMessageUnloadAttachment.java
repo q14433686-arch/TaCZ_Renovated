@@ -40,6 +40,35 @@ public class ClientMessageUnloadAttachment implements CustomPacketPayload {
     }
 
     public static void handle(ClientMessageUnloadAttachment message, IPayloadContext context) {
-        context.enqueueWork(() -> GunMod.LOGGER.debug("WP③ C2S unload attachment gunSlot={}", message.gunSlotIndex));
+        context.enqueueWork(() -> {
+            if (!(context.player() instanceof ServerPlayer player)) {
+                return;
+            }
+            Inventory inventory = player.getInventory();
+            if (message.gunSlotIndex < 0 || message.gunSlotIndex >= inventory.getContainerSize()) {
+                return;
+            }
+
+            ItemStack gunItem = inventory.getItem(message.gunSlotIndex);
+            IGun gun = IGun.getIGunOrNull(gunItem);
+            if (gun == null || gun.hasAttachmentLock(gunItem)
+                    || message.attachmentType == AttachmentType.NONE) {
+                return;
+            }
+
+            ItemStack attachmentItem = gun.getAttachment(gunItem, message.attachmentType);
+            if (attachmentItem.isEmpty() || !inventory.add(attachmentItem)) {
+                return;
+            }
+            gun.unloadAttachment(gunItem, message.attachmentType);
+            AttachmentPropertyManager.postChangeEvent(player, gunItem);
+            if (message.attachmentType == AttachmentType.EXTENDED_MAG) {
+                gun.dropAllAmmo(player, gunItem);
+            }
+            player.inventoryMenu.broadcastChanges();
+            NetworkHandler.sendToClientPlayer(ServerMessageRefreshRefitScreen.INSTANCE, player);
+            GunMod.LOGGER.debug("WP③ C2S unload attachment gunSlot={} type={}",
+                    message.gunSlotIndex, message.attachmentType);
+        });
     }
 }

@@ -30,7 +30,9 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -72,6 +74,14 @@ public final class ClientGameEvents {
         RefitTransform.tickInterpolation(event);
         TickAnimationEvent.tickAnimation(event);
         RenderCrosshairEvent.onRenderTick(event);
+    }
+
+    @SubscribeEvent
+    public static void onRenderGuiLayer(RenderGuiLayerEvent.Pre event) {
+        if (VanillaGuiLayers.CROSSHAIR.equals(event.getName())
+                && RenderCrosshairEvent.shouldHideVanillaCrosshair()) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent

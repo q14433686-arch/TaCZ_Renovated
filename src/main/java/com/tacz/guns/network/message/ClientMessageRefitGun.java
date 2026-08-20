@@ -44,7 +44,44 @@ public class ClientMessageRefitGun implements CustomPacketPayload {
     }
 
     public static void handle(ClientMessageRefitGun message, IPayloadContext context) {
-        context.enqueueWork(() -> GunMod.LOGGER.debug("WP③ C2S refit gunSlot={}", message.gunSlotIndex));
+        context.enqueueWork(() -> {
+            if (!(context.player() instanceof ServerPlayer player)) {
+                return;
+            }
+            Inventory inventory = player.getInventory();
+            if (!validSlot(inventory, message.attachmentSlotIndex)
+                    || !validSlot(inventory, message.gunSlotIndex)) {
+                return;
+            }
+
+            ItemStack attachmentItem = inventory.getItem(message.attachmentSlotIndex);
+            ItemStack gunItem = inventory.getItem(message.gunSlotIndex);
+            IGun gun = IGun.getIGunOrNull(gunItem);
+            IAttachment attachment = IAttachment.getIAttachmentOrNull(attachmentItem);
+            if (gun == null || attachment == null || gun.hasAttachmentLock(gunItem)
+                    || !gun.allowAttachment(gunItem, attachmentItem)) {
+                return;
+            }
+
+            // The server derives the slot type from the actual item; never trust the client
+            // supplied enum when deciding which attachment slot to replace.
+            AttachmentType realType = attachment.getType(attachmentItem);
+            ItemStack oldAttachment = gun.getAttachment(gunItem, realType);
+            gun.installAttachment(gunItem, attachmentItem);
+            AttachmentPropertyManager.postChangeEvent(player, gunItem);
+            inventory.setItem(message.attachmentSlotIndex, oldAttachment);
+            if (realType == AttachmentType.EXTENDED_MAG) {
+                gun.dropAllAmmo(player, gunItem);
+            }
+            player.inventoryMenu.broadcastChanges();
+            NetworkHandler.sendToClientPlayer(ServerMessageRefreshRefitScreen.INSTANCE, player);
+            GunMod.LOGGER.debug("WP③ C2S refit gunSlot={} attachmentSlot={} type={}",
+                    message.gunSlotIndex, message.attachmentSlotIndex, realType);
+        });
+    }
+
+    private static boolean validSlot(Inventory inventory, int slot) {
+        return slot >= 0 && slot < inventory.getContainerSize();
     }
 
 }

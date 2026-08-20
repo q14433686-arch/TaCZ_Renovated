@@ -1,6 +1,7 @@
 package com.tacz.guns.network.message;
 
 import com.tacz.guns.GunMod;
+import com.tacz.guns.inventory.GunSmithTableMenu;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -35,10 +36,13 @@ public class ClientMessageCraft implements CustomPacketPayload {
 
     public static void handle(ClientMessageCraft message, IPayloadContext context) {
         context.enqueueWork(() -> {
-            ServerPlayer entity = (ServerPlayer) context.player();
-            if (entity.containerMenu.containerId == message.menuId) {
-                GunMod.LOGGER.debug("WP③ C2S craft menu={} recipe={}", message.menuId, message.recipeId);
+            if (!(context.player() instanceof ServerPlayer player)
+                    || player.containerMenu.containerId != message.menuId
+                    || !(player.containerMenu instanceof GunSmithTableMenu menu)) {
+                return;
             }
+            menu.doCraft(message.recipeId, player);
+            GunMod.LOGGER.debug("WP③ C2S craft menu={} recipe={}", message.menuId, message.recipeId);
         });
     }
 }
