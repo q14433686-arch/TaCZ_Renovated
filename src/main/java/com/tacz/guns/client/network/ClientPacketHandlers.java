@@ -2,8 +2,10 @@ package com.tacz.guns.client.network;
 
 import com.tacz.guns.api.LogicalSide;
 import com.tacz.guns.api.client.event.SwapItemWithOffHand;
-import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
+import com.tacz.guns.api.event.common.EntityKillByGunEvent;
 import com.tacz.guns.api.event.common.GunDrawEvent;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.event.common.GunFireEvent;
 import com.tacz.guns.api.event.common.GunFireSelectEvent;
 import com.tacz.guns.api.event.common.GunMeleeEvent;
@@ -95,9 +97,33 @@ public final class ClientPacketHandlers {
     }
 
     public static void onGunHurt(ServerMessageGunHurt message) {
+        Level level = Minecraft.getInstance().level;
+        if (level == null) {
+            return;
+        }
+        Entity bullet = level.getEntity(message.bulletId);
+        Entity hurtEntity = level.getEntity(message.hurtEntityId);
+        LivingEntity attacker = level.getEntity(message.attackerId) instanceof LivingEntity living ? living : null;
+        NeoForge.EVENT_BUS.post(new EntityHurtByGunEvent.Post(
+                bullet, hurtEntity, attacker,
+                message.getGunId(), message.getGunDisplayId(), message.getAmount(), null,
+                message.isHeadShot(), message.getHeadshotMultiplier(), LogicalSide.CLIENT
+        ));
     }
 
     public static void onGunKill(ServerMessageGunKill message) {
+        Level level = Minecraft.getInstance().level;
+        if (level == null) {
+            return;
+        }
+        Entity bullet = level.getEntity(message.bulletId);
+        LivingEntity killedEntity = level.getEntity(message.killEntityId) instanceof LivingEntity living ? living : null;
+        LivingEntity attacker = level.getEntity(message.attackerId) instanceof LivingEntity living ? living : null;
+        NeoForge.EVENT_BUS.post(new EntityKillByGunEvent(
+                bullet, killedEntity, attacker,
+                message.getGunId(), message.getGunDisplayId(), message.getBaseDamage(), null,
+                message.isHeadShot(), message.getHeadshotMultiplier(), LogicalSide.CLIENT
+        ));
     }
 
     public static void onSound(ServerMessageSound message) {
@@ -126,9 +152,22 @@ public final class ClientPacketHandlers {
     }
 
     public static void onLevelUp(ServerMessageLevelUp message) {
+        // Intentional no-op: the current TaCZ 1.1.8 API has no level/experience manager,
+        // no server sender, and AbstractGunItem reports max level zero. Do not fabricate
+        // a client-side progression or toast for this reserved compatibility payload.
     }
 
     public static void onUpdateEntityData(ServerMessageUpdateEntityData message) {
+        Level level = Minecraft.getInstance().level;
+        if (level == null) {
+            return;
+        }
+        Entity entity = level.getEntity(message.entityId);
+        if (entity == null) {
+            return;
+        }
+        var syncedData = com.tacz.guns.entity.sync.core.SyncedEntityData.instance();
+        message.getEntries().forEach(entry -> syncedData.set(entity, entry.getKey(), entry.getValue()));
     }
 
     public static void onSyncGunPack(ServerMessageSyncGunPack message) {
