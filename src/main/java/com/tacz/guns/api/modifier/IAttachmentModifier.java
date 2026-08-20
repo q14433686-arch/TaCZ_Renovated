@@ -2,6 +2,7 @@ package com.tacz.guns.api.modifier;
 
 import com.tacz.guns.resource.modifier.AttachmentCacheProperty;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
+import com.google.gson.JsonObject;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.world.item.ItemStack;
@@ -31,6 +32,18 @@ public interface IAttachmentModifier<T, K> {
      */
     default String getOptionalFields() {
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * Returns whether this modifier has a field in the raw attachment JSON.
+     * Implementations with more than one legacy or state-specific field can override
+     * this hook so their {@link #readJson(String)} method is still invoked when the
+     * primary id is absent.
+     */
+    default boolean hasJsonField(JsonObject jsonObject) {
+        String optionalFields = getOptionalFields();
+        return jsonObject.has(getId())
+                || !StringUtils.isEmpty(optionalFields) && jsonObject.has(optionalFields);
     }
 
     /**

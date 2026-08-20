@@ -2,6 +2,7 @@ package com.tacz.guns.client.network;
 
 import com.tacz.guns.api.LogicalSide;
 import com.tacz.guns.api.client.event.SwapItemWithOffHand;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.event.common.GunDrawEvent;
 import com.tacz.guns.api.event.common.GunFireEvent;
 import com.tacz.guns.api.event.common.GunFireSelectEvent;
@@ -13,6 +14,7 @@ import com.tacz.guns.client.gui.GunRefitScreen;
 import com.tacz.guns.client.gui.GunSmithTableScreen;
 import com.tacz.guns.client.resource.ClientIndexManager;
 import com.tacz.guns.client.sound.SoundPlayManager;
+import com.tacz.guns.resource.modifier.AttachmentPropertyManager;
 import com.tacz.guns.network.message.ServerMessageCraft;
 import com.tacz.guns.network.message.ServerMessageLevelUp;
 import com.tacz.guns.network.message.ServerMessageRefreshRefitScreen;
@@ -109,6 +111,13 @@ public final class ClientPacketHandlers {
     }
 
     public static void onRefreshRefit(ServerMessageRefreshRefitScreen message) {
+        // The server has just synchronized the modified gun stack. Rebuild the local
+        // AttachmentCacheProperty as well; ADS, recoil, RPM, weight and silence consumers
+        // read this cache rather than recalculating directly from the inventory every tick.
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player != null && IGun.getIGunOrNull(minecraft.player.getMainHandItem()) != null) {
+            AttachmentPropertyManager.postChangeEvent(minecraft.player, minecraft.player.getMainHandItem());
+        }
         GunRefitScreen.refresh();
     }
 

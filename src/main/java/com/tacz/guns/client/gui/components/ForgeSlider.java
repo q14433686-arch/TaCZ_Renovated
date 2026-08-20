@@ -69,6 +69,11 @@ public class ForgeSlider extends AbstractSliderButton {
 
     @Override
     public void onClick(MouseButtonEvent event, boolean doubleClick) {
+        // NeoForge 26.1's AbstractSliderButton only calls onDrag while its protected
+        // dragging flag is set. ExtendedSlider in the 26.1 NeoForge sources sets this
+        // flag here; without it a track click works, but holding the mouse button and
+        // moving the handle never produces a drag update.
+        this.dragging = this.active;
         this.setValueFromMouse(event.x());
     }
 
