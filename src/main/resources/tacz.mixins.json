@@ -1,0 +1,32 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.tacz.guns.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "common.EntityMixin",
+    "common.LivingEntityMixin",
+    "common.PlayerMixin",
+    "common.ServerGamePacketListenerImplMixin",
+    "common.ServerPlayerMixin",
+    "common.ServerPlayNetHandlerMixin"
+  ],
+  "client": [
+    "client.AbstractButtonMixin",
+    "client.CameraMixin",
+    "client.GameRendererMixin",
+    "client.GlCommandEncoderScopeDepthCopyMixin",
+    "client.ItemInHandLayerMixin",
+    "client.ItemInHandRendererMixin",
+    "client.LanguageMixin",
+    "client.LocalPlayerMixin",
+    "client.MouseHandlerMixin",
+    "client.PlayerModelMixin",
+    "client.ScreenAccessor",
+    "client.SoundManagerPreparationsMixin",
+    "client.StairBlockAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

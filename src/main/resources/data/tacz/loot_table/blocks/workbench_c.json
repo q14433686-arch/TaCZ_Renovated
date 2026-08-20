@@ -1,0 +1,42 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "functions": [
+        {
+          "function": "minecraft:copy_custom_data",
+          "source": "block_entity",
+          "ops": [
+            {
+              "op": "replace",
+              "source": "BlockId",
+              "target": "BlockId"
+            }
+          ]
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "tacz:workbench_c",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "tacz:workbench_c",
+              "properties": {
+                "half": "lower"
+              }
+            }
+          ]
+        }
+      ],
+      "rolls": 1
+    }
+  ]
+}

@@ -1,0 +1,457 @@
+package com.tacz.guns.client.renderer.item;
+
+import net.neoforged.neoforge.client.event.ViewportEvent;
+import com.google.common.base.Suppliers;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.client.animation.statemachine.LuaAnimationStateMachine;
+import com.tacz.guns.api.client.event.BeforeRenderHandEvent;
+import com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator;
+import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.client.animation.screen.RefitTransform;
+import com.tacz.guns.client.animation.statemachine.GunAnimationConstant;
+import com.tacz.guns.client.animation.statemachine.GunAnimationStateContext;
+import com.tacz.guns.client.event.CameraSetupEvent;
+import com.tacz.guns.client.event.FirstPersonRenderGunEvent;
+import com.tacz.guns.client.model.BedrockGunModel;
+import com.tacz.guns.client.model.SlotModel;
+import com.tacz.guns.client.model.bedrock.BedrockPart;
+import com.tacz.guns.client.model.functional.MuzzleFlashRender;
+import com.tacz.guns.client.model.functional.ShellRender;
+import com.tacz.guns.client.render.scope.ScopeRenderTypes;
+import com.tacz.guns.client.resource.GunDisplayInstance;
+import com.tacz.guns.client.resource.pojo.TransformScale;
+import com.tacz.guns.compat.iris.IrisCompat;
+import com.tacz.guns.util.RenderDistance;
+import com.tacz.guns.util.math.MathUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import org.apache.commons.lang3.tuple.Pair;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
+
+import static net.minecraft.world.item.ItemDisplayContext.*;
+
+/**
+ * 负责主要的枪械动画模型渲染。额外的效果见 {@link FirstPersonRenderGunEvent}
+ */
+public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunModel, GunAnimationStateContext> {
+    private static final SlotModel SLOT_GUN_MODEL = new SlotModel();
+    private static BedrockGunModel lastModel = null;
+    public static final Vector3f muzzleRenderOffset = new Vector3f();
+
+    /**
+     * 第一人称手部提交进入 {@link #renderFirstPerson} 时的完整入口矩阵。
+     * 枪口位置需要相对这个实际入口做归一化；它包含相机基座和手部 bob，不能拿来替代
+     * 动画约束所需的纯相机旋转。仅由渲染线程在一次同步提交内读写。
+     */
+    private static final Matrix4f handBasePose = new Matrix4f();
+
+    /**
+     * 当前手部 pass 中真正需要在最终 model-view 阶段抵消的相机基座旋转。
+     * vanilla 为 Camera 的 view-to-world 旋转；Iris 接管的 hand pass 不预乘该基座，故为单位阵。
+     *
+     * <p>不能直接拿 {@link #handBasePose} 的 3x3 代替：入口矩阵还包含 hurt/view bob 与
+     * ItemInHand 的延滞旋转，而这些本来就属于旧版 authored 视图空间。把它们也当作相机基座
+     * 逆掉，会在偏航与俯仰组合时重新引入朝向相关平移。</p>
+     */
+    private static final Matrix3f handCameraRotation = new Matrix3f();
+
+    public static void copyHandCameraRotation(Matrix3f dst) {
+        dst.set(handCameraRotation);
+    }
+
+    /**
+     * 「当前这次 THIRD_PERSON_*_HAND 提交对应的是<b>主手</b>」。
+     *
+     * <p>由 {@code ItemInHandLayerMixin#submitArmWithItem} 在 HEAD 置位、TAIL 清除。
+     * 用于把「左手」与「副手」区分开 —— 左利手玩家的主手就是左手，
+     * 不能像上游那样用 {@code arm == LEFT} 代替「副手」判定，否则他的主手枪不渲染。</p>
+     *
+     * <p>渲染线程单线程，且 {@code ItemStackRenderState#submit} 是同步直调
+     * {@code SpecialModelRenderer#submit}（字节码确认），因此普通 static 字段即可，
+     * 不需要 ThreadLocal，也不会跨帧残留。</p>
+     */
+    public static boolean IS_MAIN_HAND_SUBMIT = false;
+
+    public static final Supplier<GunItemRendererWrapper> INSTANCE = Suppliers.memoize(GunItemRendererWrapper::new);
+
+    public GunItemRendererWrapper() {
+        super();
+    }
+
+    @Override
+    public GunAnimationStateContext initContext(ItemStack stack, Player player, float partialTick) {
+        GunAnimationStateContext context = new GunAnimationStateContext();
+        this.updateContext(context, stack, player, partialTick);
+        return context;
+    }
+
+    @Override
+    public void updateContext(GunAnimationStateContext context, ItemStack stack, Player player, float partialTick) {
+        context.setPartialTicks(partialTick);
+        context.setCurrentGunItem(stack);
+    }
+
+    @Override
+    public void tryInit(ItemStack stack, Player player, float partialTick) {
+        super.tryInit(stack, player, partialTick);
+    }
+
+    @Override
+    public void tryExit(ItemStack stack, long putAwayTime) {
+        var stateMachine = getStateMachine(stack);
+        if (stateMachine == null) {
+            return;
+        }
+        stateMachine.processContextIfExist(context -> {
+            context.setPutAwayTime(putAwayTime / 1000F);
+            context.setCurrentGunItem(stack);
+        });
+        if (stateMachine.isInitialized()) {
+            stateMachine.trigger(GunAnimationConstant.INPUT_PUT_AWAY);
+//            KeepingItemRenderer.getRenderer().keep(stack, putAwayTime);
+            stateMachine.exit();
+            stateMachine.setExitingTime(putAwayTime + 50);
+        }
+    }
+
+    @Override
+    public long getPutAwayTime(ItemStack stack) {
+        if (stack.getItem() instanceof IGun iGun) {
+            return TimelessAPI.getCommonGunIndex(iGun.getGunId(stack))
+                    .map(index -> (long) (index.getGunData().getPutAwayTime() * 1000L))
+                    .orElse(0L);
+        }
+        return 0;
+    }
+
+    @Nullable
+    @Override
+    public LuaAnimationStateMachine<GunAnimationStateContext> getStateMachine(ItemStack stack) {
+        return TimelessAPI.getGunDisplay(stack).map(GunDisplayInstance::getAnimationStateMachine).orElse(null);
+    }
+
+    @Override
+    public BedrockGunModel getModel(ItemStack stack) {
+        return TimelessAPI.getGunDisplay(stack).map(GunDisplayInstance::getGunModel).orElse(null);
+    }
+
+    @Override
+    public Identifier getTextureLocation(ItemStack stack) {
+        return TimelessAPI.getGunDisplay(stack).map(GunDisplayInstance::getModelTexture).orElse(null);
+    }
+
+    @Override
+    public void applyLevelCameraAnimation(ViewportEvent.ComputeCameraAngles event, ItemStack stack, LocalPlayer player) {
+        if (!(stack.getItem() instanceof IGun iGun)) {
+            return;
+        }
+        Optional.ofNullable(getModel(stack)).ifPresent(model -> {
+            if (lastModel != model) {
+                // 切换枪械模型的时候清理一下摄像机动画数据，以避免上一次播放到一半的摄像机动画影响观感。
+                model.cleanCameraAnimationTransform();
+                lastModel = model;
+            }
+            IClientPlayerGunOperator clientPlayerGunOperator = IClientPlayerGunOperator.fromLocalPlayer(player);
+            float partialTicks = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+            float aimingProgress = clientPlayerGunOperator.getClientAimingProgress(partialTicks);
+            float zoom = iGun.getAimingZoom(stack);
+            float multiplier = 1 - aimingProgress + aimingProgress / (float) Math.sqrt(zoom);
+            this.applyLevelCameraAnimation(event, stack, multiplier);
+        });
+    }
+
+    @Override
+    public void applyItemInHandCameraAnimation(BeforeRenderHandEvent event, ItemStack stack, LocalPlayer player) {
+        if (!(stack.getItem() instanceof IGun iGun)) {
+            return;
+        }
+        Optional.ofNullable(getModel(stack)).ifPresent(model -> {
+            PoseStack poseStack = event.getPoseStack();
+            IClientPlayerGunOperator clientPlayerGunOperator = IClientPlayerGunOperator.fromLocalPlayer(player);
+            float partialTicks = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+            float aimingProgress = clientPlayerGunOperator.getClientAimingProgress(partialTicks);
+            float zoom = iGun.getAimingZoom(stack);
+            float multiplier = 1 - aimingProgress + aimingProgress / (float) Math.sqrt(zoom);
+            Quaternionf quaternion = MathUtil.multiplyQuaternion(model.getCameraAnimationObject().rotationQuaternion, multiplier);
+            poseStack.mulPose(quaternion);
+            // 截至目前，摄像机动画数据已消费完毕。是否有更好的清理动画数据的方法？
+            model.cleanCameraAnimationTransform();
+        });
+    }
+
+    @Override
+    public void renderFirstPerson(LocalPlayer player, ItemStack stack, ItemDisplayContext ctx, PoseStack poseStack, SubmitNodeCollector collector,
+                                  int light, float partialTick) {
+        if (!(stack.getItem() instanceof IGun)) {
+            return;
+        }
+
+        TimelessAPI.getGunDisplay(stack).ifPresent(display -> {
+            BedrockGunModel gunModel = display.getGunModel();
+            var animationStateMachine = display.getAnimationStateMachine();
+            if (gunModel == null) {
+                return;
+            }
+
+            // 在渲染之前，先更新动画，让动画数据写入模型
+            if (animationStateMachine != null) {
+                animationStateMachine.processContextIfExist(context -> {
+                    updateContext(context, stack, player, partialTick);
+                });
+                animationStateMachine.update();
+            }
+
+            poseStack.pushPose();
+            // 入口基座必须在 TACZ 自己施加任何旋转/位移前捕获。它与稍后枪口矩阵
+            // 共享同一前缀，因此可用 B 的转置恢复纯视图空间位移。
+            handBasePose.set(poseStack.last().pose());
+            // 约束位移只应剥离 GameRenderer 的相机基座，不能把同处入口矩阵中的
+            // hurt/view bob 和手部延滞一并剥离。Iris hand pass 没有该预乘，保持单位阵。
+            if (IrisCompat.isHandRendererActive()) {
+                handCameraRotation.identity();
+            } else {
+                handCameraRotation.set(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
+            }
+            // 逆转原版施加在手上的延滞效果，改为写入模型动画数据中
+            float xRotOffset = Mth.lerp(partialTick, player.xBobO, player.xBob);
+            float yRotOffset = Mth.lerp(partialTick, player.yBobO, player.yBob);
+            float xRot = player.getViewXRot(partialTick) - xRotOffset;
+            float yRot = player.getViewYRot(partialTick) - yRotOffset;
+            poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F));
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F));
+            BedrockPart rootNode = gunModel.getRootNode();
+            if (rootNode != null) {
+                xRot = (float) Math.tanh(xRot / 25) * 25;
+                yRot = (float) Math.tanh(yRot / 25) * 25;
+                rootNode.offsetX += yRot * 0.1F / 16F / 3F;
+                rootNode.offsetY += -xRot * 0.1F / 16F / 3F;
+                rootNode.additionalQuaternion.mul(Axis.XP.rotationDegrees(xRot * 0.05F));
+                rootNode.additionalQuaternion.mul(Axis.YP.rotationDegrees(yRot * 0.05F));
+            }
+            // 从渲染原点 (0, 24, 0) 移动到模型原点 (0, 0, 0)
+            poseStack.translate(0, 1.5f, 0);
+            // 基岩版模型是上下颠倒的，需要翻转过来。
+            poseStack.mulPose(Axis.ZP.rotationDegrees(180f));
+            // 应用持枪姿态变换，如第一人称摄像机定位
+            FirstPersonRenderGunEvent.applyFirstPersonGunTransform(player, stack, poseStack, gunModel, partialTick);
+
+            // 开启第一人称弹壳和火焰渲染
+            MuzzleFlashRender.isSelf = true;
+            ShellRender.isSelf = true;
+            // 如果正在打开改装界面，则取消手臂渲染
+            boolean renderHand = gunModel.getRenderHand();
+            if (RefitTransform.getOpeningProgress() != 0) {
+                gunModel.setRenderHand(false);
+            }
+            // 第一人称手部 pass 下，预先让 Iris 把 vanilla entity/item 管线归到 hand program。
+            // 方法内部只尝试一次，避免 shader 下每帧重复匹配刷日志。
+            IrisCompat.assignCommonEntityPipelinesToHandIfNeeded();
+            // Reset the extraction-time aperture marker before the scope attachment and gun FX
+            // are traversed synchronously by gunModel.submit.
+            ScopeRenderTypes.beginViewmodelSubmission();
+            // 调用枪械模型渲染
+            RenderType renderType = display.enablesTransparency()
+                    ? RenderTypes.entityTranslucent(display.getModelTexture())
+                    : RenderTypes.entityCutout(display.getModelTexture());
+            gunModel.submit(poseStack, stack, ctx, collector, renderType,
+                    display.getModelTexture(), light, OverlayTexture.NO_OVERLAY);
+            // 缓存枪口位置，为第一人称曳光弹渲染作准备
+            cacheMuzzlePosition(poseStack, gunModel);
+            // 恢复手臂渲染
+            gunModel.setRenderHand(renderHand);
+            // 渲染完成后，将动画数据从模型中清除，不对其他视角下的模型渲染产生影响
+            poseStack.popPose();
+            gunModel.cleanAnimationTransform();
+            // 关闭第一人称弹壳和火焰渲染
+            MuzzleFlashRender.isSelf = false;
+            ShellRender.isSelf = false;
+        });
+    }
+
+    private static void cacheMuzzlePosition(PoseStack poseStack, BedrockGunModel gunModel) {
+        if (gunModel.getMuzzleFlashPosPath() != null) {
+            // 计算出枪口相对于摄像机中心的坐标
+            poseStack.pushPose();
+            for (BedrockPart bedrockPart : gunModel.getMuzzleFlashPosPath()) {
+                bedrockPart.translateAndRotateAndScale(poseStack);
+            }
+            Matrix4f pose = poseStack.last().pose();
+            double itemRenderFov = CameraSetupEvent.ITEM_MODEL_FOV_DYNAMICS.get();
+            double levelRenderFov = CameraSetupEvent.WORLD_FOV_DYNAMICS.get();
+            poseStack.popPose();
+            // 26.1.2 的 vanilla 手部 pass 在入口预乘基座 B≈R(camera)，所以这里的
+            // 枪口平移 m 是世界轴的 B·v，而不是旧版代码所假定的纯视图空间 v。
+            // 去掉基座平移并乘 B 的转置（正交旋转的逆），恢复统一的视图空间契约：
+            //     v = Bᵀ · (m - B.t)
+            float dx = pose.m30() - handBasePose.m30();
+            float dy = pose.m31() - handBasePose.m31();
+            float dz = pose.m32() - handBasePose.m32();
+            float viewX = handBasePose.m00() * dx + handBasePose.m01() * dy + handBasePose.m02() * dz;
+            float viewY = handBasePose.m10() * dx + handBasePose.m11() * dy + handBasePose.m12() * dz;
+            float viewZ = handBasePose.m20() * dx + handBasePose.m21() * dy + handBasePose.m22() * dz;
+
+            // FOV 比值只应缩放视图空间深度，不能缩放基座旋转后的世界 Z 分量。
+            double fovScale = Math.tan(itemRenderFov / 2 * Math.PI / 180)
+                    / Math.tan(levelRenderFov / 2 * Math.PI / 180);
+            muzzleRenderOffset.set(viewX, viewY, (float) (viewZ * fovScale));
+        }
+    }
+
+
+    @Override
+    public void renderByItem(@Nonnull ItemStack stack, @Nonnull ItemDisplayContext transformType, @Nonnull PoseStack poseStack, @Nonnull SubmitNodeCollector collector,
+                             int pPackedLight, int pPackedOverlay) {
+        if (!(stack.getItem() instanceof IGun)) {
+            return;
+        }
+        poseStack.pushPose();
+        TimelessAPI.getGunDisplay(stack).ifPresentOrElse(gunIndex -> {
+            // 第一人称就不渲染了，交给别的地方
+            if (transformType == FIRST_PERSON_LEFT_HAND || transformType == FIRST_PERSON_RIGHT_HAND) {
+                return;
+            }
+            // 第三人称「副手」不渲染 —— 副手枪改由 HumanoidOffhandRender 以背挂姿态绘制。
+            //
+            // 【本轮修复：左利手玩家第三人称看不到主手枪】
+            //
+            // 上游 1.21.1 这里写的是「transformType == THIRD_PERSON_LEFT_HAND 就 return」，
+            // 配合它的 mixin「arm == LEFT 就 cancel」，两处都<b>把「左手」等同于「副手」</b>。
+            // 对左利手玩家（getMainArm() == LEFT）这个等式不成立：他的主手就是左手，
+            // 于是主手那把枪要么被 mixin 取消、要么走到这里被 return —— 两条路都画不出来。
+            // 这是上游就有的缺陷，不是移植引入的。
+            //
+            // 26.2 的 ArmedEntityRenderState 明确带了 mainArm 字段（字节码确认），
+            // 因此可以严格按「是不是副手」判定，而不是按「是不是左手」。
+            // ItemInHandLayerMixin 在放行主手那一侧时会置位 IS_MAIN_HAND_SUBMIT，
+            // 这里据此区分「左手＝主手」与「左手＝副手」两种情况。
+            //
+            // 该标志的读写严格同步：ItemStackRenderState#submit 内部是<b>直接</b>调用
+            // SpecialModelRenderer#submit（字节码确认，无延迟队列），
+            // 也就是本方法就在 mixin 的 HEAD/TAIL 之间执行，不存在跨帧残留。
+            if (transformType == THIRD_PERSON_LEFT_HAND && !IS_MAIN_HAND_SUBMIT) {
+                return;
+            }
+            // GUI 特殊渲染
+            if (transformType == GUI) {
+                renderSlotTexture(poseStack, collector, pPackedLight, pPackedOverlay, gunIndex.getSlotTexture());
+                return;
+            }
+            // 剩下的渲染
+            BedrockGunModel gunModel;
+            Identifier gunTexture;
+            Pair<BedrockGunModel, Identifier> lodModel = gunIndex.getLodModel();
+            if (lodModel == null || RenderDistance.inRenderHighPolyModelDistance(poseStack)) {
+                gunModel = gunIndex.getGunModel();
+                gunTexture = gunIndex.getModelTexture();
+            } else {
+                gunModel = lodModel.getLeft();
+                gunTexture = lodModel.getRight();
+            }
+            if (gunModel == null) {
+                renderSlotTexture(poseStack, collector, pPackedLight, pPackedOverlay, gunIndex.getSlotTexture());
+                return;
+            }
+            // 移动到模型原点
+            poseStack.translate(0.5, 2, 0.5);
+            // 反转模型
+            poseStack.scale(-1, -1, 1);
+            // 应用定位组的变换（位移和旋转，不包括缩放）
+            applyPositioningTransform(transformType, gunIndex.getTransform().getScale(), gunModel, poseStack);
+            // 应用 display 数据中的缩放
+            applyScaleTransform(transformType, gunIndex.getTransform().getScale(), poseStack);
+            // 渲染枪械模型
+            RenderType renderType = RenderTypes.entityCutout(gunTexture);
+            gunModel.submit(poseStack, stack, transformType, collector, renderType, pPackedLight, pPackedOverlay);
+        }, () -> {
+            // 没有这个 gunID，渲染个错误材质提醒别人
+            renderSlotTexture(poseStack, collector, pPackedLight, pPackedOverlay, MissingTextureAtlasSprite.getLocation());
+        });
+        poseStack.popPose();
+    }
+
+    private static void renderSlotTexture(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, int packedOverlay, Identifier texture) {
+        poseStack.translate(0.5, 1.5, 0.5);
+        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+        collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, buffer) -> {
+            // 26.2: 必须使用回调参数 pose（= 提交那一刻 poseStack.last().copy() 的快照），
+            // 而不是外层 poseStack —— 回调执行时它早已被 popPose/复用，
+            // 结果就是图标被画到错误位置（物品栏一片空白）。
+            PoseStack tacz$snapshotPose = new PoseStack();
+            tacz$snapshotPose.last().pose().set(pose.pose());
+            tacz$snapshotPose.last().normal().set(pose.normal());
+            SLOT_GUN_MODEL.renderToBuffer(tacz$snapshotPose, buffer, packedLight, packedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        });
+    }
+
+    private static void applyPositioningTransform(ItemDisplayContext transformType, TransformScale scale, BedrockGunModel model,
+                                                  PoseStack poseStack) {
+        switch (transformType) {
+            case FIXED -> applyPositioningNodeTransform(model.getFixedOriginPath(), poseStack, scale.getFixed());
+            case GROUND -> applyPositioningNodeTransform(model.getGroundOriginPath(), poseStack, scale.getGround());
+            case THIRD_PERSON_RIGHT_HAND, THIRD_PERSON_LEFT_HAND ->
+                    applyPositioningNodeTransform(model.getThirdPersonHandOriginPath(), poseStack, scale.getThirdPerson());
+        }
+    }
+
+    private static void applyScaleTransform(ItemDisplayContext transformType, TransformScale scale, PoseStack poseStack) {
+        if (scale == null) {
+            return;
+        }
+        Vector3f vector3f = null;
+        switch (transformType) {
+            case FIXED -> vector3f = scale.getFixed();
+            case GROUND -> vector3f = scale.getGround();
+            case THIRD_PERSON_RIGHT_HAND, THIRD_PERSON_LEFT_HAND -> vector3f = scale.getThirdPerson();
+        }
+        if (vector3f != null) {
+            poseStack.translate(0, 1.5, 0);
+            poseStack.scale(vector3f.x(), vector3f.y(), vector3f.z());
+            poseStack.translate(0, -1.5, 0);
+        }
+    }
+
+    private static void applyPositioningNodeTransform(List<BedrockPart> nodePath, PoseStack poseStack, Vector3f scale) {
+        if (nodePath == null) {
+            return;
+        }
+        if (scale == null) {
+            scale = new Vector3f(1, 1, 1);
+        }
+        // 应用定位组的反向位移、旋转，使定位组的位置就是渲染中心
+        poseStack.translate(0, 1.5, 0);
+        for (int i = nodePath.size() - 1; i >= 0; i--) {
+            BedrockPart t = nodePath.get(i);
+            poseStack.mulPose(Axis.XN.rotation(t.xRot));
+            poseStack.mulPose(Axis.YN.rotation(t.yRot));
+            poseStack.mulPose(Axis.ZN.rotation(t.zRot));
+            if (t.getParent() != null) {
+                poseStack.translate(-t.x * scale.x() / 16.0F, -t.y * scale.y() / 16.0F, -t.z * scale.z() / 16.0F);
+            } else {
+                poseStack.translate(-t.x * scale.x() / 16.0F, (1.5F - t.y / 16.0F) * scale.y(), -t.z * scale.z() / 16.0F);
+            }
+        }
+        poseStack.translate(0, -1.5, 0);
+    }
+}
