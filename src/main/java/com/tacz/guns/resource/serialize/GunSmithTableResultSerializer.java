@@ -31,7 +31,11 @@ public class GunSmithTableResultSerializer implements JsonDeserializer<GunSmithT
             if (jsonObject.has("nbt")) {
                 extraTag = CraftingHelper.getNBT(jsonObject.get("nbt"));
             }
-            if (jsonObject.has("group")) {
+            // For gun/ammo/attachment results, "group" is the recipe-book grouping key
+            // (for example "shotgun_shells"), not the gun-smith table tab. Their tab is
+            // derived from the result type/index by RawGunTableResult. Only custom results
+            // use this field as an explicit table-tab override.
+            if (GunSmithTableResult.CUSTOM.equals(typeName) && jsonObject.has("group")) {
                 String raw = GsonHelper.getAsString(jsonObject, "group");
                 if (!raw.contains(":")) {
                     raw = GunMod.MOD_ID + ":" + raw;
