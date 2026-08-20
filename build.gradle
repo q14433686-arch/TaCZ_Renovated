@@ -121,9 +121,43 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+// Vendored runtime libs. `implementation files(...)` only puts them on the Gradle
+// compile/run classpath — the published mod jar does NOT contain them, so a real
+// launcher (PCL / Prism / vanilla NeoForge) crashes at construct:
+//   NoClassDefFoundError: org/luaj/vm2/LuaError
+//   at ModItems.<clinit> → ModernKineticGunItem (imports LuaError)
+//
+// ModDevGradle 2 refuses to jarJar a local file that has no JPMS name:
+//   Cannot embed local file dependency ... because it has no explicit Java module name.
+// Official MDG local-file example stamps Automatic-Module-Name on a Jar task, then
+// `jarJar files(thatTask)`. We do the same for the two vendored jars (offline; no
+// extra Maven fetch). Filename = artifact-id, MD5 = version.
+def jarJarLocalLib = { String jarFileName, String moduleName ->
+    def src = layout.projectDirectory.file("libs/${jarFileName}")
+    return tasks.register("jarJarPrepare_${moduleName.replace('.', '_')}", Jar) {
+        description = "Stamp Automatic-Module-Name=${moduleName} onto ${jarFileName} for FML jarJar"
+        from { zipTree(src) }
+        exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+        archiveFileName.set(jarFileName)
+        destinationDirectory.set(layout.buildDirectory.dir("jarjar-libs"))
+        manifest {
+            attributes(
+                    'Automatic-Module-Name': moduleName,
+                    'FMLModType': 'LIBRARY'
+            )
+        }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
+
+def commonsMath3ForJarJar = jarJarLocalLib('commons-math3-3.6.1.jar', 'org.apache.commons.math3')
+def luajForJarJar = jarJarLocalLib('luaj-jse-3.0.1.jar', 'org.luaj.vm2')
+
 dependencies {
     implementation files("libs/commons-math3-3.6.1.jar")
     implementation files("libs/luaj-jse-3.0.1.jar")
+    jarJar files(commonsMath3ForJarJar)
+    jarJar files(luajForJarJar)
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

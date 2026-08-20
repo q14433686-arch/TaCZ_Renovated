@@ -72,8 +72,18 @@ public final class GetJarResources {
     public static void copyModDirectory(Class<?> resourceClass, String srcPath, Path root, String path) {
         URL url = resourceClass.getResource(srcPath);
         if (url == null) {
+            // Gradle's Jar task commonly omits empty directory entries. In that
+            // case Class#getResource(directory) returns null even though all files
+            // in the directory are present in the mod jar. Resolve a known file
+            // below the pack and turn it back into the directory URL instead.
+            url = findDirectoryFromMarker(resourceClass, srcPath, "gunpack.meta.json");
+        }
+        if (url == null) {
             String rel = srcPath.startsWith("/") ? srcPath.substring(1) : srcPath;
             url = resourceClass.getClassLoader().getResource(rel);
+            if (url == null) {
+                url = findDirectoryFromMarker(resourceClass, "/" + rel, "gunpack.meta.json");
+            }
             if (url == null) {
                 try {
                     Path fallback = net.neoforged.fml.loading.FMLPaths.GAMEDIR.get()
@@ -96,6 +106,42 @@ public final class GetJarResources {
         } catch (IOException e) {
             GunMod.LOGGER.warn("Failed to export gun pack {}", srcPath, e);
         }
+    }
+
+    /**
+     * Returns a directory URL when the classloader exposes a file inside the
+     * directory but not the directory entry itself.
+     */
+    @Nullable
+    private static URL findDirectoryFromMarker(Class<?> resourceClass, String srcPath, String markerName) {
+        String normalizedPath = srcPath.endsWith("/") ? srcPath.substring(0, srcPath.length() - 1) : srcPath;
+        URL marker = resourceClass.getResource(normalizedPath + "/" + markerName);
+        if (marker == null) {
+            String relativePath = normalizedPath.startsWith("/")
+                    ? normalizedPath.substring(1)
+                    : normalizedPath;
+            marker = resourceClass.getClassLoader().getResource(relativePath + "/" + markerName);
+        }
+        if (marker == null) {
+            return null;
+        }
+
+        try {
+            if ("file".equals(marker.getProtocol())) {
+                return Paths.get(marker.toURI()).getParent().toUri().toURL();
+            }
+            if ("jar".equals(marker.getProtocol())) {
+                JarURLConnection connection = (JarURLConnection) marker.openConnection();
+                connection.setUseCaches(false);
+                String entryName = connection.getEntryName();
+                int separator = entryName.lastIndexOf('/');
+                String directoryEntry = separator >= 0 ? entryName.substring(0, separator + 1) : "";
+                return new URL("jar:" + connection.getJarFileURL() + "!/" + directoryEntry);
+            }
+        } catch (Exception ignored) {
+            // Fall through to the normal "not found" warning below.
+        }
+        return null;
     }
 
     /**
