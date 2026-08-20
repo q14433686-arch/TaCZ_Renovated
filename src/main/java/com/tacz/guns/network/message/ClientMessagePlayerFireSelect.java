@@ -17,7 +17,7 @@ public class ClientMessagePlayerFireSelect implements CustomPacketPayload {
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientMessagePlayerFireSelect> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public ClientMessagePlayerFireSelect() { }
+    private ClientMessagePlayerFireSelect() { }
 
     @Override
     public @NotNull CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

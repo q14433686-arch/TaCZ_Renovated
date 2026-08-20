@@ -17,7 +17,7 @@ public class ClientMessagePlayerZoom implements CustomPacketPayload {
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientMessagePlayerZoom> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public ClientMessagePlayerZoom() { }
+    private ClientMessagePlayerZoom() { }
 
     @Override
     public @NotNull CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

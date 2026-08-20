@@ -46,7 +46,7 @@ public class LocalPlayerDraw {
         if (Minecraft.getInstance().gameMode != null) {
             Minecraft.getInstance().gameMode.ensureHasSentCarriedItem();
         }
-        ClientPacketDistributor.sendToServer(new ClientMessagePlayerDrawGun());
+        ClientPacketDistributor.sendToServer(ClientMessagePlayerDrawGun.INSTANCE);
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new GunDrawEvent(player, lastItem, currentItem, LogicalSide.CLIENT));
 
         // 不处于收枪状态时才能收枪

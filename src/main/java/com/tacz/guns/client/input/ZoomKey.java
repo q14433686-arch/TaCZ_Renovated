@@ -38,7 +38,7 @@ public class ZoomKey {
             }
             IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
             if (operator.isAim()) {
-                ClientPacketDistributor.sendToServer(new ClientMessagePlayerZoom());
+                ClientPacketDistributor.sendToServer(ClientMessagePlayerZoom.INSTANCE);
                 return true;
             }
         }
@@ -52,7 +52,7 @@ public class ZoomKey {
         }
         IClientPlayerGunOperator operator = IClientPlayerGunOperator.fromLocalPlayer(player);
         if (operator.isAim()) {
-            ClientPacketDistributor.sendToServer(new ClientMessagePlayerZoom());
+            ClientPacketDistributor.sendToServer(ClientMessagePlayerZoom.INSTANCE);
         }
     }
 }

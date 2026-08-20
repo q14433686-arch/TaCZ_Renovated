@@ -49,7 +49,7 @@ public class LocalPlayerReload {
             return;
         }
         // 发包通知服务器
-        ClientPacketDistributor.sendToServer(new ClientMessagePlayerCancelReload());
+        ClientPacketDistributor.sendToServer(ClientMessagePlayerCancelReload.INSTANCE);
         // 执行本地取消换弹逻辑
         this.triggerClientReloadCancelAnimation(display);
     }
@@ -99,7 +99,7 @@ public class LocalPlayerReload {
             return;
         }
         // 发包通知服务器
-        ClientPacketDistributor.sendToServer(new ClientMessagePlayerReloadGun());
+        ClientPacketDistributor.sendToServer(ClientMessagePlayerReloadGun.INSTANCE);
         // 执行客户端 reload 相关内容
         this.triggerClientReloadAnimation(gunItem, display, gunData, mainHandItem);
     }
