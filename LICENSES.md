@@ -21,3 +21,17 @@
 | Gradle 9.2.1 Wrapper | 构建 | Apache-2.0 |
 
 工作包①为空 mod，尚未引入 SimpleBedrockModel、luaj、commons-math3 等运行时重打包依赖。后续工作包引入时在此追加。
+
+## 运行时 Jar-in-Jar（必须打进发布 jar）
+
+`implementation files(...)` 只覆盖 Gradle 开发 classpath。玩家把 mod jar 丢进 `mods/` 时，FML 的模块类加载器看不到这些类，会在 `GunMod` 构造期直接崩：
+
+`java.lang.NoClassDefFoundError: org/luaj/vm2/LuaError`（`ModItems` → `ModernKineticGunItem`）。
+
+因此 `build.gradle` 对下列本地 jar 同时声明 `implementation` + `jarJar`（FML `META-INF/jarjar/`），与 MUKSC/TACZ-1.21.1 的加载器习语一致。
+
+| 组件 | 用途 | 许可 / 来源 |
+|---|---|---|
+| `libs/luaj-jse-3.0.1.jar`（`org.luaj.vm2`） | 枪包 Lua 脚本（开火/换弹/动画状态机） | MIT（LuaJ） |
+| `libs/commons-math3-3.6.1.jar` | 后坐力样条插值（`GunRecoil`） | Apache-2.0 |
+| SimpleBedrockModel v1 | 基岩版几何渲染；本仓库以源码形式 vendored（`com.github.mcmodderanchor.simplebedrockmodel`） | 上游 GPL-3.0 谱系 |

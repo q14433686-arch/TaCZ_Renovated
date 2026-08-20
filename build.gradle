@@ -121,9 +121,19 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+// Vendored runtime libs. `implementation files(...)` only puts them on the Gradle
+// compile/run classpath — the published mod jar does NOT contain them, so a real
+// launcher (PCL / Prism / vanilla NeoForge) crashes at construct:
+//   NoClassDefFoundError: org/luaj/vm2/LuaError
+//   at ModItems.<clinit> → ModernKineticGunItem (imports LuaError)
+// `jarJar` embeds them as FML Jar-in-Jar (META-INF/jarjar/), matching MUKSC
+// TACZ-1.21.1 (implementation + jarJar for luaj / commons-math3).
+// Local-file jarJar uses the filename as artifact-id and the MD5 as version.
 dependencies {
     implementation files("libs/commons-math3-3.6.1.jar")
+    jarJar files("libs/commons-math3-3.6.1.jar")
     implementation files("libs/luaj-jse-3.0.1.jar")
+    jarJar files("libs/luaj-jse-3.0.1.jar")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
