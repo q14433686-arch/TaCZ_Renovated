@@ -1,0 +1,495 @@
+[218月2026 00:05:46.463] [main/INFO] [net.neoforged.fml.startup.Entrypoint/]: JVM Uptime at startup: 359ms
+[218月2026 00:05:46.690] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Starting FancyModLoader version 11.0.15 (CLIENT in PROD)
+[218月2026 00:05:46.690] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Game directory: D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97
+[218月2026 00:05:46.757] [main/INFO] [net.neoforged.fml.loading.EarlyServiceDiscovery/]: Found 3 early service jars (out of 115) in 36ms
+[218月2026 00:05:46.757] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Loading FML Early Services:
+[218月2026 00:05:46.758] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - D:/DOWLOD/.minecraft/libraries/net/neoforged/fancymodloader/earlydisplay/11.0.15/earlydisplay-11.0.15.jar
+[218月2026 00:05:46.759] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - D:/DOWLOD/.minecraft/libraries/net/neoforged/fancymodloader/loader/11.0.15/loader-11.0.15.jar
+[218月2026 00:05:46.760] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/[钠] sodium-neoforge-0.9.1+mc26.1.2.jar
+[218月2026 00:05:46.768] [main/INFO] [net.neoforged.fml.loading.ImmediateWindowHandler/]: Running graphics bootstrap plugin sodium
+[218月2026 00:05:46.772] [main/INFO] [Sodium-GraphicsAdapterProbe/]: Searching for graphics cards...
+[218月2026 00:05:46.957] [main/INFO] [Sodium-GraphicsAdapterProbe/]: Found graphics adapter: AdapterInfo{vendor=AMD, description='AMD Radeon(TM) Graphics', adapterType=0x00002303, openglIcdFilePath='C:\Windows\System32\DriverStore\FileRepository\u0202642.inf_amd64_870f6b155aa057ce\B026261\atig6pxx.dll', openglIcdVersion=32.0.21045.1000}
+[218月2026 00:05:46.957] [main/INFO] [Sodium-GraphicsAdapterProbe/]: Found graphics adapter: AdapterInfo{vendor=AMD, description='AMD  Radeon RX 7800 XT', adapterType=0x0000230B, openglIcdFilePath='C:\Windows\System32\DriverStore\FileRepository\u0202643.inf_amd64_8835e06f359414be\B026283\atig6pxx.dll', openglIcdVersion=32.0.31035.1003}
+[218月2026 00:05:46.959] [main/WARN] [Sodium-Workarounds/]: Sodium has applied one or more workarounds to prevent crashes or other issues on your system: [AMD_GAME_OPTIMIZATION_BROKEN]
+[218月2026 00:05:46.959] [main/WARN] [Sodium-Workarounds/]: This is not necessarily an issue, but it may result in certain features or optimizations being disabled. You can sometimes fix these issues by upgrading your graphics driver.
+[218月2026 00:05:46.959] [main/INFO] [Sodium-AmdWorkarounds/]: Modifying process environment to apply workarounds for the AMD graphics driver...
+[218月2026 00:05:46.962] [main/INFO] [net.neoforged.fml.loading.ImmediateWindowHandler/]: Loading ImmediateWindowProvider fmlearlywindow
+[218月2026 00:05:48.034] [ForkJoinPool.commonPool-worker-4/INFO] [net.neoforged.fml.loading.moddiscovery.locators.GameLocator/]: Marking unmodified client jar as claimed to prevent loading: D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97\26.1.2-NeoForge_26.1.2.97.jar
+[218月2026 00:05:48.043] [ForkJoinPool.commonPool-worker-4/INFO] [net.neoforged.fml.loading.moddiscovery.locators.GameLocator/]: Failed to find common Minecraft classes and resources on the classpath. Assuming we're launching production.
+[218月2026 00:05:48.066] [fml-loadingscreen/INFO] [net.neoforged.fml.earlydisplay.render.LoadingScreenRenderer/]: GL info: AMD  Radeon RX 7800 XT GL version 3.3.0 Core Profile Context 26.7.1.260716, ATI Technologies Inc.
+[218月2026 00:05:48.410] [ForkJoinPool.commonPool-worker-4/INFO] [net.neoforged.fml.loading.moddiscovery.locators.JarInJarDependencyLocator/]: Found 21 dependencies adding them to mods collection
+[218月2026 00:05:48.412] [ForkJoinPool.commonPool-worker-4/INFO] [net.neoforged.fml.loading.moddiscovery.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		3d-Skin-Layers 1.11.2 (skinlayers3d)
+		Architectury 20.0.12 (architectury)
+		Carry On 2.10.0 (carryon)
+		Cloth Config v26.1 API 26.1.154 (cloth_config)
+		Dynamic FPS 3.11.7 (dynamic_fps)
+		Dynamic FPS Common 3.11.7 (dynamic_fps_common)
+		ImmediatelyFast 1.15.3+26.1 (immediatelyfast)
+		Iris 1.11.3+mc26.1.2 (iris)
+		LambDynamicLights 4.11.1+26.1.2 (lambdynlights)
+		LambDynamicLights (API) 4.11.1+26.1.2 (lambdynlights_api)
+		Minecraft 26.1.2 (minecraft)
+		Mouse Tweaks 2.31 (mousetweaks)
+		NeoForge 26.1.2.97 (neoforge)
+		Pride Lib 1.6.0+26.1 (pride)
+		Reese's Sodium Options 2.2.3+mc26.1.2 (reeses_sodium_options)
+		Sodium 0.9.1+mc26.1.2 (sodium)
+		SpruceUI 10.0.0+26.1 (spruceui)
+		Timeless and Classics Zero 1.1.8+neoforge.26.1.2.r1 (tacz)
+		TRansition 1.0.21 (transition)
+		TRender 1.0.15 (trender)
+		Xaero's Minimap 26.4.2 (xaerominimap)
+		XaeroLib 1.7.1 (xaerolib)
+		Yumi Minecraft Libraries: Foundation 1.1.0+26.1 (yumi_mc_core)
+[218月2026 00:05:48.640] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/D:/DOWLOD/.minecraft/libraries/net/fabricmc/sponge-mixin/0.17.3+mixin.0.8.7/sponge-mixin-0.17.3+mixin.0.8.7.jar Service=FML Env=CLIENT
+[218月2026 00:05:48.660] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Loading FML Plugins:
+[218月2026 00:05:48.660] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/iris-neoforge-1.11.3+mc26.1.2.jar > jcpp-1.4.14.jar
+[218月2026 00:05:48.661] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/tacz-1.1.8+neoforge.26.1.2.r1.jar > luaj-jse-3.0.1.jar
+[218月2026 00:05:48.662] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/iris-neoforge-1.11.3+mc26.1.2.jar > glsl-transformer-3.0.0-pre3.jar
+[218月2026 00:05:48.662] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/tacz-1.1.8+neoforge.26.1.2.r1.jar > commons-math3-3.6.1.jar
+[218月2026 00:05:48.662] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/[动态 FPS] dynamic-fps-3.11.7+minecraft-26.1.0-neoforge.jar > battery-2.1.0.jar
+[218月2026 00:05:48.663] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/iris-neoforge-1.11.3+mc26.1.2.jar > antlr4-runtime-4.13.1.jar
+[218月2026 00:05:48.663] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/ImmediatelyFast-NeoForge-1.15.3+26.1.jar > Reflect-1.6.2.jar
+[218月2026 00:05:48.663] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - ~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar > net.neoforged.neoforge-coremods-26.1.2.97.jar
+[218月2026 00:05:48.750] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Building game content classloader:
+ - architectury (jar(mods/architectury-neoforge-20.0.12.jar))
+ - carryon (jar(mods/[搬运] carryon-neoforge-26.1.2-2.10.0.jar))
+ - cloth_config (jar(mods/cloth-config-26.1.154.jar))
+ - dev.yumi.commons.collections (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > lambdynamiclights-api-4.11.1+26.1.2.jar > yumi-commons-collections-2.0.0.jar))
+ - dev.yumi.commons.core (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > lambdynamiclights-api-4.11.1+26.1.2.jar > yumi-commons-core-2.0.0.jar))
+ - dev.yumi.commons.event (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > lambdynamiclights-api-4.11.1+26.1.2.jar > yumi-commons-event-2.0.0.jar))
+ - dynamic_fps (jar(mods/[动态 FPS] dynamic-fps-3.11.7+minecraft-26.1.0-neoforge.jar))
+ - dynamic_fps_common (jar(mods/[动态 FPS] dynamic-fps-3.11.7+minecraft-26.1.0-neoforge.jar > net.lostluma.dynamic-fps-3.11.7+minecraft-26.1.0-common.jar))
+ - immediatelyfast (jar(mods/ImmediatelyFast-NeoForge-1.15.3+26.1.jar))
+ - iris (jar(mods/iris-neoforge-1.11.3+mc26.1.2.jar))
+ - lambdynlights (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar))
+ - lambdynlights_api (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > lambdynamiclights-api-4.11.1+26.1.2.jar))
+ - minecraft (jar(~libraries/net/neoforged/minecraft-client-patched/26.1.2.97/minecraft-client-patched-26.1.2.97.jar))
+ - mixinextras.neoforge (jar(~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar > mixinextras-neoforge-0.5.4.jar))
+ - mousetweaks (jar(mods/[鼠标手势] MouseTweaks-neoforge-mc26.1-2.31.jar))
+ - neoforge (jar(~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar))
+ - net.neoforged.fml.generated (empty(VirtualJar/net.neoforged.fml.generated))
+ - pride (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > pridelib-1.6.0+26.1.jar))
+ - reeses_sodium_options (jar(mods/[Reese的钠视频界面] reeses-sodium-options-neoforge-2.2.3+mc26.1.2.jar))
+ - skinlayers3d (jar(mods/[3D 皮肤层] skinlayers3d-neoforge-1.11.2-mc26.1.2.jar))
+ - sodium (jar(mods/[钠] sodium-neoforge-0.9.1+mc26.1.2.jar > net.caffeinemc.sodium-neoforge-0.9.1+mc26.1.2-mod.jar))
+ - spruceui (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > spruceui-10.0.0+26.1.jar))
+ - tacz (jar(mods/tacz-1.1.8+neoforge.26.1.2.r1.jar))
+ - transition (jar(mods/[3D 皮肤层] skinlayers3d-neoforge-1.11.2-mc26.1.2.jar > TRansition-1.0.21-26.1.2-neoforge-SNAPSHOT.jar))
+ - trender (jar(mods/[3D 皮肤层] skinlayers3d-neoforge-1.11.2-mc26.1.2.jar > TRender-1.0.15-26.1.2-neoforge-SNAPSHOT.jar))
+ - xaerolib (jar(mods/[Xaero的小地图] xaerominimap-neoforge-26.1.2-26.4.2.jar > xaerolib-neoforge-26.1.2-1.7.1.jar))
+ - xaerominimap (jar(mods/[Xaero的小地图] xaerominimap-neoforge-26.1.2-26.4.2.jar))
+ - yumi_mc_core (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > yumi-mc-foundation-1.1.0+26.1.jar))
+[218月2026 00:05:48.768] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Built game content classloader in 38ms
+[218月2026 00:05:48.807] [main/INFO] [mixin/]: Compatibility level set to JAVA_25
+[218月2026 00:05:48.838] [main/WARN] [mixin/]: Reference map 'iris.refmap.json' for mixins.iris.json could not be read. If this is a development environment you can ignore this message
+[218月2026 00:05:48.838] [main/WARN] [mixin/]: Reference map 'iris.refmap.json' for mixins.iris.vertexformat.json could not be read. If this is a development environment you can ignore this message
+[218月2026 00:05:48.838] [main/WARN] [mixin/]: Reference map 'iris.refmap.json' for mixins.iris.compat.sodium.json could not be read. If this is a development environment you can ignore this message
+[218月2026 00:05:48.924] [main/WARN] [mixin/]: Reference map 'carryon.refmap.json' for carryon.mixins.json could not be read. If this is a development environment you can ignore this message
+[218月2026 00:05:48.930] [main/INFO] [Sodium/]: Loaded configuration file for Sodium: 36 options available, 1 override(s) found
+[218月2026 00:05:48.931] [main/WARN] [mixin/]: Reference map 'xaerolib.refmap.json' for xaerolib.mixins.json could not be read. If this is a development environment you can ignore this message
+[218月2026 00:05:48.932] [main/WARN] [mixin/]: Reference map 'skinlayers3d.refmap.mixins.json' for skinlayers3d.mixins.json could not be read. If this is a development environment you can ignore this message
+[218月2026 00:05:49.154] [main/WARN] [mixin/]: Error loading class: com/portingdeadmods/cable_facades/events/GameClientEvents$2 (java.lang.ClassNotFoundException: com.portingdeadmods.cable_facades.events.GameClientEvents$2)
+[218月2026 00:05:49.154] [main/WARN] [mixin/]: Error loading class: com/direwolf20/justdirethings/client/renderers/OurRenderTypes (java.lang.ClassNotFoundException: com.direwolf20.justdirethings.client.renderers.OurRenderTypes)
+[218月2026 00:05:49.155] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/entity/RenderFlame (java.lang.ClassNotFoundException: mekanism.client.render.entity.RenderFlame)
+[218月2026 00:05:49.155] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/armor/MekaSuitArmor (java.lang.ClassNotFoundException: mekanism.client.render.armor.MekaSuitArmor)
+[218月2026 00:05:49.155] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/lib/effect/BillboardingEffectRenderer (java.lang.ClassNotFoundException: mekanism.client.render.lib.effect.BillboardingEffectRenderer)
+[218月2026 00:05:49.156] [main/WARN] [mixin/]: Error loading class: blusunrize/immersiveengineering/client/utils/IEGLShaders (java.lang.ClassNotFoundException: blusunrize.immersiveengineering.client.utils.IEGLShaders)
+[218月2026 00:05:49.243] [main/WARN] [Sodium/]: Force-disabling mixin 'features.render.world.sky.LevelRendererMixin' as rule 'mixin.features.render.world.sky' (added by mods [iris]) disables it and children
+[218月2026 00:05:49.289] [main/WARN] [mixin/]: Error loading class: traben/entity_model_features/models/parts/EMFModelPart (java.lang.ClassNotFoundException: traben.entity_model_features.models.parts.EMFModelPart)
+[218月2026 00:05:49.354] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.4).
+[218月2026 00:05:50.084] [Datafixer Bootstrap/INFO] [com.mojang.datafixers.DataFixerBuilder/]: 294 Datafixer optimizations took 222 milliseconds
+[218月2026 00:05:50.221] [main/WARN] [oshi.driver.windows.perfmon.PerfmonDisabled/]: Invalid registry value type detected for PerfOS counters. Should be REG_DWORD. Ignoring: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PerfOS\Performance\Disable Performance Counters.
+[218月2026 00:05:52.631] [pool-18-thread-1/INFO] [dev.yumi.mc.core.impl.YumiFoundationMod/]: Initializing mods (entrypoint yumi:init)...
+[218月2026 00:05:52.762] [modloading-worker-0/INFO] [net.minecraft.server.LoggedPrintStream/]: [STDOUT]: [TRender] Initializing Client...
+[218月2026 00:05:52.773] [modloading-worker-0/INFO] [net.neoforged.neoforge.common.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 26.1.2.97, for MC 26.1.2
+[218月2026 00:05:52.780] [modloading-worker-0/INFO] [xaero.hud.minimap.MinimapLogs/]: No Optifine!
+[218月2026 00:05:52.780] [modloading-worker-0/INFO] [xaero.hud.minimap.MinimapLogs/]: Xaero's Minimap: No Vivecraft!
+[218月2026 00:05:52.780] [modloading-worker-0/INFO] [xaero.hud.minimap.MinimapLogs/]: Xaero's Minimap: Iris found!
+[218月2026 00:05:52.810] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Registering common data for channel xaerolib:main!
+[218月2026 00:05:52.811] [modloading-worker-0/WARN] [Iris/]: Found fine program match for neoforge:pipeline/entity_smooth_cutout_cull: ENTITIES_CUTOUT
+[218月2026 00:05:52.814] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Registering client data for channel xaerolib:main!
+[218月2026 00:05:52.816] [modloading-worker-0/WARN] [Iris/]: Found fine program match for neoforge:pipeline/entity_translucent_cull: ENTITIES_TRANSLUCENT
+[218月2026 00:05:52.816] [modloading-worker-0/WARN] [Iris/]: Found fine program match for neoforge:pipeline/entity_unlit_translucent: ENTITIES_TRANSLUCENT
+[218月2026 00:05:52.824] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading primary common config for channel xaerolib:main!
+[218月2026 00:05:52.838] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading server config profiles for channel xaerolib:main!
+[218月2026 00:05:52.844] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading primary client config for channel xaerolib:main!
+[218月2026 00:05:52.849] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading client config profiles for channel xaerolib:main!
+[218月2026 00:05:52.854] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Registering common data for channel xaerominimap:main!
+[218月2026 00:05:52.867] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: TaCZ NeoForge 26.1.2 port work package ⑥ loading. modId=tacz
+[218月2026 00:05:52.869] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Registering client data for channel xaerominimap:main!
+[218月2026 00:05:52.876] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_depth_aperture: HAND_CUTOUT
+[218月2026 00:05:52.876] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_depth_aperture to the Iris HAND program.
+[218月2026 00:05:52.876] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_depth_cleanup: HAND_CUTOUT
+[218月2026 00:05:52.876] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_depth_cleanup to the Iris HAND program.
+[218月2026 00:05:52.876] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_etched_reticle: HAND_CUTOUT
+[218月2026 00:05:52.876] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Loading primary common config for channel xaerominimap:main!
+[218月2026 00:05:52.876] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_etched_reticle to the Iris HAND program.
+[218月2026 00:05:52.876] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_visible_reticle: HAND_TRANSLUCENT
+[218月2026 00:05:52.876] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_visible_reticle to the Iris HAND_TRANSLUCENT program.
+[218月2026 00:05:52.877] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_viewmodel_cutout: HAND_CUTOUT
+[218月2026 00:05:52.877] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_viewmodel_cutout to the Iris HAND program.
+[218月2026 00:05:52.877] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_flash_translucent: HAND_TRANSLUCENT
+[218月2026 00:05:52.877] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_flash_translucent to the Iris HAND_TRANSLUCENT program.
+[218月2026 00:05:52.877] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_flash_swirl: HAND_TRANSLUCENT
+[218月2026 00:05:52.877] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_flash_swirl to the Iris HAND_TRANSLUCENT program.
+[218月2026 00:05:52.877] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: TaCZ NeoForge 26.1.2 port work package ⑤ client loading. modId=tacz
+[218月2026 00:05:52.881] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Loading server config profiles for channel xaerominimap:main!
+[218月2026 00:05:52.888] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Loading primary client config for channel xaerominimap:main!
+[218月2026 00:05:52.892] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Loading client config profiles for channel xaerominimap:main!
+[218月2026 00:05:53.224] [Render thread/INFO] [com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService/]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[218月2026 00:05:53.232] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Setting user: GOOSTL
+[218月2026 00:05:53.290] [Render thread/INFO] [LambDynamicLights/]: [LambDynLights] Initializing LambDynamicLights...
+[218月2026 00:05:53.303] [Render thread/INFO] [LambDynamicLights|Config/]: [LambDynLights] Configuration loaded.
+[218月2026 00:05:53.425] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Backend library: LWJGL version 3.4.1+2
+[218月2026 00:05:53.425] [Render thread/WARN] [net.minecraft.client.Minecraft/]: Detected unexpected shutdown during last game startup: resetting fullscreen mode
+[218月2026 00:05:53.469] [ForkJoinPool.commonPool-worker-12/WARN] [Iris/]: [Iris Update Check] Failed to get update info!
+javax.net.ssl.SSLHandshakeException: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:130) ~[?:?]
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:376) ~[?:?]
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:319) ~[?:?]
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:314) ~[?:?]
+	at java.base/sun.security.ssl.CertificateMessage$T13CertificateConsumer.checkServerCerts(CertificateMessage.java:1295) ~[?:?]
+	at java.base/sun.security.ssl.CertificateMessage$T13CertificateConsumer.onConsumeCertificate(CertificateMessage.java:1172) ~[?:?]
+	at java.base/sun.security.ssl.CertificateMessage$T13CertificateConsumer.consume(CertificateMessage.java:1115) ~[?:?]
+	at java.base/sun.security.ssl.SSLHandshake.consume(SSLHandshake.java:421) ~[?:?]
+	at java.base/sun.security.ssl.HandshakeContext.dispatch(HandshakeContext.java:477) ~[?:?]
+	at java.base/sun.security.ssl.HandshakeContext.dispatch(HandshakeContext.java:448) ~[?:?]
+	at java.base/sun.security.ssl.TransportContext.dispatch(TransportContext.java:199) ~[?:?]
+	at java.base/sun.security.ssl.SSLTransport.decode(SSLTransport.java:172) ~[?:?]
+	at java.base/sun.security.ssl.SSLSocketImpl.decode(SSLSocketImpl.java:1506) ~[?:?]
+	at java.base/sun.security.ssl.SSLSocketImpl.readHandshakeRecord(SSLSocketImpl.java:1421) ~[?:?]
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:455) ~[?:?]
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:426) ~[?:?]
+	at java.base/sun.net.www.protocol.https.HttpsClient.afterConnect(HttpsClient.java:483) ~[?:?]
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:187) ~[?:?]
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1377) ~[?:?]
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1302) ~[?:?]
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:223) ~[?:?]
+	at java.base/java.net.URL.openStream(URL.java:1263) ~[?:?]
+	at TRANSFORMER/iris@1.11.3+mc26.1.2/net.irisshaders.iris.UpdateChecker.lambda$checkForUpdates$0(UpdateChecker.java:89) ~[?:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1789) [?:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1781) [?:?]
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:511) [?:?]
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1450) [?:?]
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2019) [?:?]
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187) [?:?]
+Caused by: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:387) ~[?:?]
+	at java.base/sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:270) ~[?:?]
+	at java.base/sun.security.validator.Validator.validate(Validator.java:256) ~[?:?]
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:230) ~[?:?]
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:132) ~[?:?]
+	at java.base/sun.security.ssl.CertificateMessage$T13CertificateConsumer.checkServerCerts(CertificateMessage.java:1279) ~[?:?]
+	... 24 more
+Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.build(SunCertPathBuilder.java:148) ~[?:?]
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:129) ~[?:?]
+	at java.base/java.security.cert.CertPathBuilder.build(CertPathBuilder.java:299) ~[?:?]
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:382) ~[?:?]
+	... 29 more
+[218月2026 00:05:53.611] [Render thread/INFO] [Iris/]: Debug functionality is disabled.
+[218月2026 00:05:53.611] [Render thread/INFO] [Iris/]: ARB_direct_state_access detected, enabling DSA.
+[218月2026 00:05:53.622] [Render thread/INFO] [Iris/]: Shaders are disabled because no valid shaderpack is selected
+[218月2026 00:05:53.622] [Render thread/INFO] [ImmediatelyFast/]: Initializing ImmediatelyFast 1.15.3+26.1 on AMD  Radeon RX 7800 XT (ATI Technologies Inc.) with OpenGL 3.3.0 Core Profile Context 26.7.1.260716
+[218月2026 00:05:53.622] [Render thread/INFO] [ImmediatelyFast/]: Found Iris 1.11.3+mc26.1.2. Enabling compatibility.
+[218月2026 00:05:53.670] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Using optional rendering extensions: GL_ARB_buffer_storage, GL_KHR_debug, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access, GL_EXT_texture_filter_anisotropic
+[218月2026 00:05:53.776] [Render thread/WARN] [com.tacz.guns.GunMod/]: Gun pack source not on classpath: /assets/tacz/custom/tacz_default_gun
+[218月2026 00:05:53.776] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Start scanning for gun packs in D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97\tacz
+[218月2026 00:05:53.776] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Found 0 possible gunpack(s) and added them to resource set.
+[218月2026 00:05:54.102] [Render thread/INFO] [Iris/]: Hardware information:
+[218月2026 00:05:54.102] [Render thread/INFO] [Iris/]: CPU: 16x AMD Ryzen 7 7700 8-Core Processor 
+[218月2026 00:05:54.102] [Render thread/INFO] [Iris/]: GPU: AMD  Radeon RX 7800 XT (Supports OpenGL 3.3.0 Core Profile Context 26.7.1.260716)
+[218月2026 00:05:54.102] [Render thread/INFO] [Iris/]: OS: Windows 11 (10.0)
+[218月2026 00:05:54.384] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib common 1/2!
+[218月2026 00:05:54.385] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: WP② registries ready: gun=tacz:modern_kinetic_gun workbench_a=tacz:workbench_a gun_smith_table=tacz:gun_smith_table recipe=tacz:gun_smith_table_crafting
+[218月2026 00:05:54.399] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:shoot_cool_down for minecraft:living_entity
+[218月2026 00:05:54.400] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:melee_cool_down for minecraft:living_entity
+[218月2026 00:05:54.400] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:reload_state for minecraft:living_entity
+[218月2026 00:05:54.400] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:aiming_progress for minecraft:living_entity
+[218月2026 00:05:54.400] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:draw_cool_down for minecraft:living_entity
+[218月2026 00:05:54.400] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:is_aiming for minecraft:living_entity
+[218月2026 00:05:54.400] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:sprint_time for minecraft:living_entity
+[218月2026 00:05:54.400] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:is_bolting for minecraft:living_entity
+[218月2026 00:05:54.400] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:throwable_using for minecraft:living_entity
+[218月2026 00:05:54.401] [modloading-worker-0/INFO] [xaero.minimap.XaeroMinimap/]: Loading Xaero's Minimap - Stage 1/3
+[218月2026 00:05:54.402] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib client 1/3!
+[218月2026 00:05:54.402] [modloading-worker-0/INFO] [net.minecraft.server.LoggedPrintStream/]: [STDOUT]: [Mouse Tweaks] Main.initialize()
+[218月2026 00:05:54.404] [modloading-worker-0/INFO] [net.minecraft.server.LoggedPrintStream/]: [STDOUT]: [Mouse Tweaks] Initialized.
+[218月2026 00:05:54.416] [NeoForge Version Check/INFO] [net.neoforged.fml.VersionChecker/]: [dynamic_fps] Starting version check at https://api.lostluma.net/updates/dynamic-fps?platform=neoforge
+[218月2026 00:05:55.308] [modloading-worker-0/WARN] [xaero.lib.XaeroLib/]: io exception while checking patreon: Read timed out
+[218月2026 00:05:55.317] [modloading-sync-worker/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 00:05:55.318] [modloading-sync-worker/WARN] [com.tacz.guns.GunMod/]: [TACZ Iris] Iris cannot classify render pipeline entity_cutout; vanilla pipeline used.
+java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:119) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[?:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.compat.iris.IrisCompat.assignPipelineToIris(IrisCompat.java:57) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.compat.iris.IrisCompat.assignCommonEntityPipelinesToHandIfNeeded(IrisCompat.java:75) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.compat.shader.ShaderCompat.assignCommonEntityPipelinesToHandIfNeeded(ShaderCompat.java:35) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.GunModClient.lambda$onClientSetup$0(GunModClient.java:32) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at net.neoforged.fml.DeferredWorkQueue.lambda$makeRunnable$0(DeferredWorkQueue.java:67) [loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.DeferredWorkQueue.makeRunnable(DeferredWorkQueue.java:62) [loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.DeferredWorkQueue.lambda$runTasks$0(DeferredWorkQueue.java:47) [loader-11.0.15.jar:11.0]
+	at java.base/java.util.concurrent.ConcurrentLinkedDeque.forEach(ConcurrentLinkedDeque.java:1650) [?:?]
+	at net.neoforged.fml.DeferredWorkQueue.runTasks(DeferredWorkQueue.java:47) [loader-11.0.15.jar:11.0]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+Caused by: java.lang.IllegalStateException: Shader already assigned: minecraft:pipeline/entity_cutout: HAND_CUTOUT
+	at TRANSFORMER/iris@1.11.3+mc26.1.2/net.irisshaders.iris.pipeline.IrisPipelines.assignPipeline(IrisPipelines.java:235) ~[iris-neoforge-1.11.3+mc26.1.2.jar:?]
+	at TRANSFORMER/iris@1.11.3+mc26.1.2/net.irisshaders.iris.apiimpl.IrisApiV0Impl.assignPipeline(IrisApiV0Impl.java:83) ~[iris-neoforge-1.11.3+mc26.1.2.jar:?]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[?:?]
+	... 15 more
+[218月2026 00:05:55.319] [modloading-sync-worker/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 00:05:55.319] [modloading-sync-worker/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 00:05:55.319] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/]: TaCZ client setup (work package ⑥ ShaderCompat). minecraft=GOOSTL
+[218月2026 00:05:55.319] [modloading-sync-worker/INFO] [xaero.minimap.XaeroMinimap/]: Loading Xaero's Minimap - Stage 2/3
+[218月2026 00:05:55.902] [NeoForge Version Check/INFO] [net.neoforged.fml.VersionChecker/]: [dynamic_fps] Found status: UP_TO_DATE Current: 3.11.7 Target: null
+[218月2026 00:05:56.256] [modloading-sync-worker/WARN] [xaero.hud.minimap.MinimapLogs/]: io exception while checking versions: Read timed out
+[218月2026 00:05:56.258] [modloading-sync-worker/INFO] [xaero.hud.minimap.MinimapLogs/]: Registered player tracker system: minimap_synced
+[218月2026 00:05:56.258] [modloading-sync-worker/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib common 2/2!
+[218月2026 00:05:56.259] [modloading-sync-worker/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib client 2/3!
+[218月2026 00:05:56.290] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/]: WP③ payloads registered (play + configuration), version=1.0.5
+[218月2026 00:05:56.326] [Render thread/INFO] [net.minecraft.server.packs.resources.ReloadableResourceManager/]: Reloading ResourceManager: tacz_resources, vanilla, mod_resources, mod/sodium, mod/iris, mod/lambdynlights, mod/yumi_mc_core, mod/mousetweaks, mod/immediatelyfast, mod/lambdynlights_api, mod/architectury, mod/transition, mod/dynamic_fps, mod/carryon, mod/xaerolib, mod/tacz, mod/trender, mod/cloth_config, mod/skinlayers3d, mod/reeses_sodium_options, mod/pride, mod/xaerominimap, mod/neoforge, mod/spruceui, mod/dynamic_fps_common
+[218月2026 00:05:56.441] [Render thread/INFO] [xaero.minimap.XaeroMinimap/]: Loading Xaero's Minimap - Stage 3/3
+[218月2026 00:05:56.441] [Render thread/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib client 3/3!
+[218月2026 00:05:56.464] [Worker-Main-13/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_pua-17.0.01.hex, loading
+[218月2026 00:05:56.490] [Worker-Main-9/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_all_no_pua-17.0.01.hex, loading
+[218月2026 00:05:56.512] [Render thread/INFO] [com.mojang.blaze3d.systems.RenderSystem/]: Thread[#3,Render thread,10,main]
+[218月2026 00:05:56.512] [Render thread/INFO] [com.mojang.blaze3d.systems.RenderSystem/]: OpenGL Vendor: ATI Technologies Inc.
+[218月2026 00:05:56.513] [Render thread/INFO] [com.mojang.blaze3d.systems.RenderSystem/]: OpenGL Renderer: AMD  Radeon RX 7800 XT
+[218月2026 00:05:56.513] [Render thread/INFO] [com.mojang.blaze3d.systems.RenderSystem/]: OpenGL Version: 3.3.0 Core Profile Context 26.7.1.260716
+[218月2026 00:05:56.593] [Worker-Main-12/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_jp_patch-17.0.01.hex, loading
+[218月2026 00:05:57.181] [Render thread/WARN] [com.mojang.blaze3d.opengl.GlProgram/]: tacz:pipeline/scope_depth_cleanup shader program does not use sampler Sampler0 defined in the pipeline. This might be a bug.
+[218月2026 00:05:57.270] [Render thread/INFO] [com.mojang.blaze3d.audio.Library/]: OpenAL initialized on device OpenAL Soft on 耳机 (High Definition Audio Device)
+[218月2026 00:05:57.272] [Render thread/INFO] [net.minecraft.client.sounds.SoundEngine/SOUNDS]: Sound engine started
+[218月2026 00:05:57.272] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[218月2026 00:05:57.282] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 128x128x0 minecraft:textures/atlas/decorated_pot.png-atlas
+[218月2026 00:05:57.283] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 2048x1024x0 minecraft:textures/atlas/armor_trims.png-atlas
+[218月2026 00:05:57.289] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[218月2026 00:05:57.290] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x512x0 minecraft:textures/atlas/shield_patterns.png-atlas
+[218月2026 00:05:57.291] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 2048x2048x4 minecraft:textures/atlas/blocks.png-atlas
+[218月2026 00:05:57.321] [Render thread/ERROR] [net.neoforged.fml.javafmlmod.FMLModContainer/]: Exception caught during firing event: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	Index: 0
+	Listeners:
+		0: net.neoforged.bus.EventListenerFactory$onTextureAtlasStitched/0x0000000099a49c00@3b8c15de
+java.lang.RuntimeException: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.loadAnimations(InternalAssetLoader.java:75)
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.onResourceReload(InternalAssetLoader.java:55)
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.event.ReloadResourceEvent.onTextureAtlasStitched(ReloadResourceEvent.java:14)
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.init.ClientSetupEvent.onTextureAtlasStitched(ClientSetupEvent.java:132)
+	at net.neoforged.bus.EventBus.post(EventBus.java:360)
+	at net.neoforged.bus.EventBus.post(EventBus.java:342)
+	at net.neoforged.fml.ModContainer.acceptEvent(ModContainer.java:177)
+	at net.neoforged.fml.ModLoader.lambda$postEvent$0(ModLoader.java:330)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at net.neoforged.fml.ModList.forEachModInOrder(ModList.java:175)
+	at net.neoforged.fml.ModLoader.postEvent(ModLoader.java:330)
+	at TRANSFORMER/neoforge@26.1.2.97/net.neoforged.neoforge.client.ClientHooks.onTextureAtlasStitched(ClientHooks.java:301)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.texture.TextureAtlas.upload(TextureAtlas.java:137)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitch.joinAndUpload(AtlasManager.java:194)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.lambda$joinAndUpload$0(AtlasManager.java:217)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.joinAndUpload(AtlasManager.java:217)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.updateSpriteMaps(AtlasManager.java:148)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.lambda$reload$2(AtlasManager.java:144)
+	at java.base/java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:739)
+	at java.base/java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:503)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.SimpleReloadInstance.lambda$prepareTasks$3(SimpleReloadInstance.java:75)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:163)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.ReentrantBlockableEventLoop.doRunTask(ReentrantBlockableEventLoop.java:24)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:137)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.runAllTasks(BlockableEventLoop.java:121)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.runTick(Minecraft.java:1293)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.run(Minecraft.java:937)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:246)
+	at net.neoforged.fml.startup.Client.main(Client.java:19)
+Caused by: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.lambda$getResourceOrThrow$0(ResourceProvider.java:18)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.getResourceOrThrow(ResourceProvider.java:18)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.open(ResourceProvider.java:22)
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.loadAnimations(InternalAssetLoader.java:70)
+	... 29 more
+
+[218月2026 00:05:57.323] [Render thread/ERROR] [net.neoforged.fml.ModContainer/LOADING]: Caught exception during event net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent@29767156 dispatch for modid tacz
+java.lang.RuntimeException: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.loadAnimations(InternalAssetLoader.java:75) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.onResourceReload(InternalAssetLoader.java:55) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.event.ReloadResourceEvent.onTextureAtlasStitched(ReloadResourceEvent.java:14) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.init.ClientSetupEvent.onTextureAtlasStitched(ClientSetupEvent.java:132) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at net.neoforged.bus.EventBus.post(EventBus.java:360) ~[bus-8.0.5.jar:?]
+	at net.neoforged.bus.EventBus.post(EventBus.java:342) ~[bus-8.0.5.jar:?]
+	at net.neoforged.fml.ModContainer.acceptEvent(ModContainer.java:177) ~[loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.ModLoader.lambda$postEvent$0(ModLoader.java:330) ~[loader-11.0.15.jar:11.0]
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75) ~[?:?]
+	at net.neoforged.fml.ModList.forEachModInOrder(ModList.java:175) ~[loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.ModLoader.postEvent(ModLoader.java:330) ~[loader-11.0.15.jar:11.0]
+	at TRANSFORMER/neoforge@26.1.2.97/net.neoforged.neoforge.client.ClientHooks.onTextureAtlasStitched(ClientHooks.java:301) ~[neoforge-26.1.2.97-universal.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.texture.TextureAtlas.upload(TextureAtlas.java:137) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitch.joinAndUpload(AtlasManager.java:194) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.lambda$joinAndUpload$0(AtlasManager.java:217) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[?:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.joinAndUpload(AtlasManager.java:217) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.updateSpriteMaps(AtlasManager.java:148) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.lambda$reload$2(AtlasManager.java:144) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:739) ~[?:?]
+	at java.base/java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:503) ~[?:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.SimpleReloadInstance.lambda$prepareTasks$3(SimpleReloadInstance.java:75) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:163) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.ReentrantBlockableEventLoop.doRunTask(ReentrantBlockableEventLoop.java:24) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:137) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.runAllTasks(BlockableEventLoop.java:121) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.runTick(Minecraft.java:1293) [minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.run(Minecraft.java:937) [minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:246) [minecraft-client-patched-26.1.2.97.jar:?]
+	at net.neoforged.fml.startup.Client.main(Client.java:19) [loader-11.0.15.jar:11.0]
+Caused by: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.lambda$getResourceOrThrow$0(ResourceProvider.java:18) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403) ~[?:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.getResourceOrThrow(ResourceProvider.java:18) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.open(ResourceProvider.java:22) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.loadAnimations(InternalAssetLoader.java:70) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	... 29 more
+[218月2026 00:05:57.356] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Caught error loading resourcepacks, removing all selected resourcepacks
+java.util.concurrent.CompletionException: net.neoforged.fml.ModLoadingException: Loading errors encountered:
+	- Timeless and Classics Zero (tacz) encountered an error while dispatching the net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent event
+	  java.lang.RuntimeException: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+
+	at java.base/java.util.concurrent.CompletableFuture.wrapInCompletionException(CompletableFuture.java:323) ~[?:?]
+	at java.base/java.util.concurrent.CompletableFuture.encodeThrowable(CompletableFuture.java:359) ~[?:?]
+	at java.base/java.util.concurrent.CompletableFuture.completeThrowable(CompletableFuture.java:364) ~[?:?]
+	at java.base/java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:743) ~[?:?]
+	at java.base/java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:503) ~[?:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.SimpleReloadInstance.lambda$prepareTasks$3(SimpleReloadInstance.java:75) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:163) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.ReentrantBlockableEventLoop.doRunTask(ReentrantBlockableEventLoop.java:24) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:137) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.runAllTasks(BlockableEventLoop.java:121) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.runTick(Minecraft.java:1293) [minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.run(Minecraft.java:937) [minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:246) [minecraft-client-patched-26.1.2.97.jar:?]
+	at net.neoforged.fml.startup.Client.main(Client.java:19) [loader-11.0.15.jar:11.0]
+Caused by: net.neoforged.fml.ModLoadingException: Loading errors encountered:
+	- Timeless and Classics Zero (tacz) encountered an error while dispatching the net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent event
+	  java.lang.RuntimeException: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+
+	at net.neoforged.fml.ModContainer.acceptEvent(ModContainer.java:181) ~[loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.ModLoader.lambda$postEvent$0(ModLoader.java:330) ~[loader-11.0.15.jar:11.0]
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75) ~[?:?]
+	at net.neoforged.fml.ModList.forEachModInOrder(ModList.java:175) ~[loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.ModLoader.postEvent(ModLoader.java:330) ~[loader-11.0.15.jar:11.0]
+	at TRANSFORMER/neoforge@26.1.2.97/net.neoforged.neoforge.client.ClientHooks.onTextureAtlasStitched(ClientHooks.java:301) ~[neoforge-26.1.2.97-universal.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.texture.TextureAtlas.upload(TextureAtlas.java:137) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitch.joinAndUpload(AtlasManager.java:194) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.lambda$joinAndUpload$0(AtlasManager.java:217) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[?:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.joinAndUpload(AtlasManager.java:217) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.updateSpriteMaps(AtlasManager.java:148) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.lambda$reload$2(AtlasManager.java:144) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:739) ~[?:?]
+	... 10 more
+[218月2026 00:05:57.367] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Start scanning for gun packs in D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97\tacz
+[218月2026 00:05:57.367] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Found 0 possible gunpack(s) and added them to resource set.
+[218月2026 00:05:57.367] [Render thread/INFO] [net.minecraft.server.packs.resources.ReloadableResourceManager/]: Reloading ResourceManager: tacz_resources, vanilla, mod_resources, mod/sodium, mod/iris, mod/lambdynlights, mod/yumi_mc_core, mod/mousetweaks, mod/immediatelyfast, mod/lambdynlights_api, mod/architectury, mod/transition, mod/dynamic_fps, mod/carryon, mod/xaerolib, mod/tacz, mod/trender, mod/cloth_config, mod/skinlayers3d, mod/reeses_sodium_options, mod/pride, mod/xaerominimap, mod/neoforge, mod/spruceui, mod/dynamic_fps_common
+[218月2026 00:05:57.427] [Worker-Main-15/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_all_no_pua-17.0.01.hex, loading
+[218月2026 00:05:57.427] [Worker-Main-6/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_pua-17.0.01.hex, loading
+[218月2026 00:05:57.508] [Worker-Main-7/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_jp_patch-17.0.01.hex, loading
+[218月2026 00:05:57.828] [Render thread/WARN] [com.mojang.blaze3d.opengl.GlProgram/]: tacz:pipeline/scope_depth_cleanup shader program does not use sampler Sampler0 defined in the pipeline. This might be a bug.
+[218月2026 00:05:57.868] [Render thread/INFO] [com.mojang.blaze3d.audio.Library/]: OpenAL initialized on device OpenAL Soft on 耳机 (High Definition Audio Device)
+[218月2026 00:05:57.868] [Render thread/INFO] [net.minecraft.client.sounds.SoundEngine/SOUNDS]: Sound engine started
+[218月2026 00:05:57.868] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[218月2026 00:05:57.870] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 128x128x0 minecraft:textures/atlas/decorated_pot.png-atlas
+[218月2026 00:05:57.871] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 2048x1024x0 minecraft:textures/atlas/armor_trims.png-atlas
+[218月2026 00:05:57.874] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[218月2026 00:05:57.875] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x512x0 minecraft:textures/atlas/shield_patterns.png-atlas
+[218月2026 00:05:57.875] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 2048x2048x4 minecraft:textures/atlas/blocks.png-atlas
+[218月2026 00:05:57.898] [Render thread/ERROR] [net.neoforged.fml.javafmlmod.FMLModContainer/]: Exception caught during firing event: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	Index: 0
+	Listeners:
+		0: net.neoforged.bus.EventListenerFactory$onTextureAtlasStitched/0x0000000099a49c00@3b8c15de
+java.lang.RuntimeException: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.loadAnimations(InternalAssetLoader.java:75)
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.onResourceReload(InternalAssetLoader.java:55)
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.event.ReloadResourceEvent.onTextureAtlasStitched(ReloadResourceEvent.java:14)
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.init.ClientSetupEvent.onTextureAtlasStitched(ClientSetupEvent.java:132)
+	at net.neoforged.bus.EventBus.post(EventBus.java:360)
+	at net.neoforged.bus.EventBus.post(EventBus.java:342)
+	at net.neoforged.fml.ModContainer.acceptEvent(ModContainer.java:177)
+	at net.neoforged.fml.ModLoader.lambda$postEvent$0(ModLoader.java:330)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at net.neoforged.fml.ModList.forEachModInOrder(ModList.java:175)
+	at net.neoforged.fml.ModLoader.postEvent(ModLoader.java:330)
+	at TRANSFORMER/neoforge@26.1.2.97/net.neoforged.neoforge.client.ClientHooks.onTextureAtlasStitched(ClientHooks.java:301)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.texture.TextureAtlas.upload(TextureAtlas.java:137)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitch.joinAndUpload(AtlasManager.java:194)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.lambda$joinAndUpload$0(AtlasManager.java:217)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.joinAndUpload(AtlasManager.java:217)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.updateSpriteMaps(AtlasManager.java:148)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.lambda$reload$2(AtlasManager.java:144)
+	at java.base/java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:739)
+	at java.base/java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:503)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.SimpleReloadInstance.lambda$prepareTasks$3(SimpleReloadInstance.java:75)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:163)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.ReentrantBlockableEventLoop.doRunTask(ReentrantBlockableEventLoop.java:24)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:137)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.runAllTasks(BlockableEventLoop.java:121)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.runTick(Minecraft.java:1293)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.run(Minecraft.java:937)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:246)
+	at net.neoforged.fml.startup.Client.main(Client.java:19)
+Caused by: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.lambda$getResourceOrThrow$0(ResourceProvider.java:18)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.getResourceOrThrow(ResourceProvider.java:18)
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.open(ResourceProvider.java:22)
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.loadAnimations(InternalAssetLoader.java:70)
+	... 29 more
+
+[218月2026 00:05:57.899] [Render thread/ERROR] [net.neoforged.fml.ModContainer/LOADING]: Caught exception during event net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent@8318808 dispatch for modid tacz
+java.lang.RuntimeException: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.loadAnimations(InternalAssetLoader.java:75) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.onResourceReload(InternalAssetLoader.java:55) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.event.ReloadResourceEvent.onTextureAtlasStitched(ReloadResourceEvent.java:14) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.init.ClientSetupEvent.onTextureAtlasStitched(ClientSetupEvent.java:132) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	at net.neoforged.bus.EventBus.post(EventBus.java:360) ~[bus-8.0.5.jar:?]
+	at net.neoforged.bus.EventBus.post(EventBus.java:342) ~[bus-8.0.5.jar:?]
+	at net.neoforged.fml.ModContainer.acceptEvent(ModContainer.java:177) ~[loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.ModLoader.lambda$postEvent$0(ModLoader.java:330) ~[loader-11.0.15.jar:11.0]
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75) ~[?:?]
+	at net.neoforged.fml.ModList.forEachModInOrder(ModList.java:175) ~[loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.ModLoader.postEvent(ModLoader.java:330) ~[loader-11.0.15.jar:11.0]
+	at TRANSFORMER/neoforge@26.1.2.97/net.neoforged.neoforge.client.ClientHooks.onTextureAtlasStitched(ClientHooks.java:301) ~[neoforge-26.1.2.97-universal.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.renderer.texture.TextureAtlas.upload(TextureAtlas.java:137) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitch.joinAndUpload(AtlasManager.java:194) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.lambda$joinAndUpload$0(AtlasManager.java:217) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[?:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager$PendingStitchResults.joinAndUpload(AtlasManager.java:217) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.updateSpriteMaps(AtlasManager.java:148) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.resources.model.sprite.AtlasManager.lambda$reload$2(AtlasManager.java:144) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:739) ~[?:?]
+	at java.base/java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:503) ~[?:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.SimpleReloadInstance.lambda$prepareTasks$3(SimpleReloadInstance.java:75) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.doRunTask(BlockableEventLoop.java:163) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.ReentrantBlockableEventLoop.doRunTask(ReentrantBlockableEventLoop.java:24) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.pollTask(BlockableEventLoop.java:137) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.util.thread.BlockableEventLoop.runAllTasks(BlockableEventLoop.java:121) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.runTick(Minecraft.java:1293) [minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.Minecraft.run(Minecraft.java:937) [minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.client.main.Main.main(Main.java:246) [minecraft-client-patched-26.1.2.97.jar:?]
+	at net.neoforged.fml.startup.Client.main(Client.java:19) [loader-11.0.15.jar:11.0]
+Caused by: java.io.FileNotFoundException: tacz:animations/pistol_default.animation.json
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.lambda$getResourceOrThrow$0(ResourceProvider.java:18) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403) ~[?:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.getResourceOrThrow(ResourceProvider.java:18) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/minecraft@26.1.2/net.minecraft.server.packs.resources.ResourceProvider.open(ResourceProvider.java:22) ~[minecraft-client-patched-26.1.2.97.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r1/com.tacz.guns.client.resource.InternalAssetLoader.loadAnimations(InternalAssetLoader.java:70) ~[tacz-1.1.8+neoforge.26.1.2.r1.jar:?]
+	... 29 more
+[218月2026 00:05:57.940] [Render thread/INFO] [Iris/]: Creating pipeline for dimension minecraft:overworld
