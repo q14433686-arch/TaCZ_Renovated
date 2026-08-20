@@ -131,7 +131,10 @@ public final class ClientPacketHandlers {
         // instead of the bare registry items that have no data-pack id or dynamic model.
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.getConnection() != null && minecraft.player != null) {
-            boolean hasPermissions = minecraft.player.hasPermissions(2);
+            // LocalPlayer does not expose the server permission level in 26.1.2.
+            // Creative mode is the same gate used by the client tab screen for this local world;
+            // the custom TaCZ tab itself does not depend on this flag.
+            boolean hasPermissions = minecraft.player.isCreative();
             // tryRebuildTabContents intentionally skips identical feature/permission inputs.
             // Flip once to invalidate the pre-sync build, then rebuild with the real permission
             // state so vanilla operator-only tabs are not left in the temporary state.
