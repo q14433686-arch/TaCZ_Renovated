@@ -16,8 +16,10 @@ import java.lang.reflect.Modifier;
  * Without a subsequent viewer reload, a viewer can retain categories built before the sync and collapse
  * a custom workbench into whichever generic table happened to register first.
  *
- * <p>Both viewers have a version-specific lightweight reload hook, invoked reflectively when installed.
- * If a future viewer version moves the hook, it falls back ONCE to a normal client-resource reload.
+ * <p>REI exposes a client reload entry point that can be invoked reflectively. NeoForge JEI
+ * exposes no equivalent public lightweight hook and is refreshed through its native client
+ * resource-reload listener. If a viewer hook is unavailable, the bridge falls back ONCE to
+ * a normal client-resource reload.
  */
 public final class RecipeViewerReloadBridge {
     private static boolean reloadRequested;
@@ -36,6 +38,7 @@ public final class RecipeViewerReloadBridge {
     /** Drops a queued refresh when leaving a server before its sync has completed. */
     public static void clear() {
         reloadRequested = false;
+        reloadInProgress = false;
     }
 
     /** Runs on the client tick so packet ordering and initial world setup have completed first. */
@@ -65,7 +68,7 @@ public final class RecipeViewerReloadBridge {
             return;
         }
 
-        GunMod.LOGGER.warn("[TACZ Recipe Viewer] Viewer reload hook unavailable; falling back to a client resource reload.");
+        GunMod.LOGGER.info("[TACZ Recipe Viewer] Using the NeoForge client resource reload to rebuild viewer registrations.");
         try {
             client.reloadResourcePacks().whenComplete((unused, throwable) -> client.execute(() -> {
                 reloadInProgress = false;
@@ -82,21 +85,14 @@ public final class RecipeViewerReloadBridge {
         }
     }
 
-    /** JEI Fabric 26.1.2 restarts its plugin registry when this lifecycle event is invoked. */
+    /**
+     * NeoForge JEI 29.5 has no public lightweight recipe-plugin reload hook.
+     * Its verified NeoForge implementation restarts JEI from its client resource-reload
+     * listener, so return false and let the single fallback resource reload perform the
+     * supported restart. Do not probe the Fabric lifecycle event on this port.
+     */
     private static boolean refreshJei() {
-        try {
-            Class<?> lifecycleEvents = Class.forName("mezz.jei.fabric.events.JeiLifecycleEvents");
-            Object event = lifecycleEvents.getField("AFTER_RECIPES_UPDATED").get(null);
-            Object invoker = event.getClass().getMethod("invoker").invoke(event);
-            if (!(invoker instanceof Runnable runnable)) {
-                throw new IllegalStateException("JEI recipe-update invoker is not Runnable");
-            }
-            runnable.run();
-            return true;
-        } catch (ReflectiveOperationException | LinkageError | RuntimeException exception) {
-            GunMod.LOGGER.debug("[TACZ Recipe Viewer] JEI lightweight refresh unavailable.", exception);
-            return false;
-        }
+        return false;
     }
 
     /** REI 26.1.2 rebuilds categories/displays through this all-stage plugin reload entry point. */

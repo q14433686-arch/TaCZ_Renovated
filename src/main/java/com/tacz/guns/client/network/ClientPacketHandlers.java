@@ -16,6 +16,7 @@ import com.tacz.guns.client.gui.GunRefitScreen;
 import com.tacz.guns.client.gui.GunSmithTableScreen;
 import com.tacz.guns.client.resource.ClientIndexManager;
 import com.tacz.guns.client.sound.SoundPlayManager;
+import com.tacz.guns.client.compat.RecipeViewerReloadBridge;
 import com.tacz.guns.resource.modifier.AttachmentPropertyManager;
 import com.tacz.guns.network.message.ServerMessageCraft;
 import com.tacz.guns.network.message.ServerMessageLevelUp;
@@ -173,6 +174,7 @@ public final class ClientPacketHandlers {
     public static void onSyncGunPack(ServerMessageSyncGunPack message) {
         CommonNetworkCache.INSTANCE.fromNetwork(message.getCache());
         ClientIndexManager.reload();
+        RecipeViewerReloadBridge.requestReload();
 
         // Creative tab contents are built before the integrated server sends the gun-pack cache.
         // Rebuild them now so the tab receives initialized gun/ammo/attachment/workbench stacks

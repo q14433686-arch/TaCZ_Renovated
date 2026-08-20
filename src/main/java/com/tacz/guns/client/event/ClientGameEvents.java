@@ -163,10 +163,7 @@ public final class ClientGameEvents {
     @SubscribeEvent
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         InventoryEvent.onPlayerLoggedOut(event);
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.getConnection() != null) {
-            CommonNetworkCacheEvent.onClientPlayerLoggingIn(mc.getConnection(), mc);
-        }
+        CommonNetworkCacheEvent.onClientPlayerLoggingOut(event);
     }
 
     @SubscribeEvent

@@ -30,6 +30,20 @@ sourceSets.main.resources {
 repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
+    // Optional recipe-viewer compile APIs. Runtime use remains conditional on the
+    // corresponding mod being installed by the player.
+    maven {
+        name = "CurseMaven"
+        url = "https://www.cursemaven.com"
+    }
+    maven {
+        name = "Architectury"
+        url = "https://maven.architectury.dev"
+    }
+    maven {
+        name = "Shedaniel"
+        url = "https://maven.shedaniel.me"
+    }
 }
 
 base {
@@ -158,6 +172,13 @@ dependencies {
     implementation files("libs/luaj-jse-3.0.1.jar")
     jarJar files(commonsMath3ForJarJar)
     jarJar files(luajForJarJar)
+
+    // JEI 29.5.0.26 / REI 26.1.819 NeoForge APIs are optional at runtime.
+    // The integrations are discovered only when the corresponding viewer is present.
+    compileOnly "curse.maven:jei-238222:${jei_neoforge_file}"
+    compileOnly "curse.maven:roughly-enough-items-310111:${rei_neoforge_file}"
+    compileOnly "dev.architectury:architectury-neoforge:${rei_architectury_version}"
+    compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rei_cloth_config_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -1,9 +1,12 @@
 package com.tacz.guns.mixin.common;
 
+import com.tacz.guns.GunMod;
+import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.KnockBackModifier;
 import com.tacz.guns.api.entity.ReloadState;
 import com.tacz.guns.api.entity.ShootResult;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.entity.shooter.*;
 import com.tacz.guns.entity.sync.ModSyncedEntityData;
 import com.tacz.guns.resource.modifier.AttachmentCacheProperty;
@@ -220,6 +223,20 @@ public abstract class LivingEntityMixin extends Entity implements IGunOperator, 
     private void onTickServerSide(CallbackInfo ci) {
         // 仅在服务端调用
         if (!level().isClientSide()) {
+            // A newly joined ServerPlayer can receive its inventory before the first client
+            // draw payload reaches the server. Bind the authoritative main-hand supplier as
+            // a fallback so the first reload/shoot cannot be rejected as NOT_DRAW. This only
+            // runs while the holder is uninitialized; normal hotbar transitions still use
+            // LivingEntityDrawGun and retain their draw timing.
+            ItemStack mainHandItem = tacz$shooter.getMainHandItem();
+            if (mainHandItem.getItem() instanceof IGun iGun
+                    && (this.tacz$data.currentGunItem == null
+                    || this.tacz$data.cacheProperty == null
+                    && TimelessAPI.getCommonGunIndex(iGun.getGunId(mainHandItem)).isPresent())) {
+                this.initialData();
+                GunMod.LOGGER.debug("WP③ server gun state initialized from main hand entity={}", tacz$shooter.getId());
+            }
+
             // 完成各种 tick 任务
             ReloadState reloadState = this.tacz$reload.tickReloadState();
             this.tacz$aim.tickAimingProgress();
