@@ -48,8 +48,10 @@ import com.tacz.guns.resource.serialize.IgniteSerializer;
 import com.tacz.guns.resource.serialize.PairSerializer;
 import com.tacz.guns.resource.serialize.Vec3Serializer;
 import com.tacz.guns.util.AllowAttachmentTagMatcher;
+import com.google.gson.JsonElement;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -67,8 +69,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.luaj.vm2.LuaTable;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -322,6 +329,70 @@ public class CommonAssetsManager implements ICommonResourceProvider {
                         getInstance().blockIndex == null ? 0 : getInstance().blockIndex.getAllData().size(),
                         getInstance().tableRecipe == null ? 0 : getInstance().tableRecipe.getAllData().size());
             }
+            // Inject legacy vanilla crafting recipes from 'recipes/' directory into RecipeManager
+            injectLegacyVanillaRecipes();
+        }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void injectLegacyVanillaRecipes() {
+        if (getInstance() == null || getInstance().recipeManager == null || getInstance().tableRecipe == null) return;
+        Map<Identifier, JsonElement> legacy = getInstance().tableRecipe.getLegacyVanillaRecipes();
+        if (legacy.isEmpty()) return;
+        try {
+            RecipeManager rm = getInstance().recipeManager;
+
+            // Find private fromJson(Map<Identifier, JsonElement>) method
+            Method fromJson = null;
+            for (Method m : RecipeManager.class.getDeclaredMethods()) {
+                if (Map.class.isAssignableFrom(m.getReturnType())
+                        && m.getParameterCount() == 1
+                        && Map.class.isAssignableFrom(m.getParameterTypes()[0])) {
+                    fromJson = m;
+                    fromJson.setAccessible(true);
+                    break;
+                }
+            }
+            if (fromJson == null) {
+                GunMod.LOGGER.warn("[TACZ] Cannot inject legacy recipes: fromJson method not found");
+                return;
+            }
+            Map<ResourceKey, RecipeHolder> parsed =
+                    (Map<ResourceKey, RecipeHolder>) fromJson.invoke(rm, legacy);
+            if (parsed == null || parsed.isEmpty()) return;
+
+            // Find private 'recipes' field and merge
+            Field recipesField = null;
+            for (Field f : RecipeManager.class.getDeclaredFields()) {
+                if (Map.class.isAssignableFrom(f.getType())
+                        && !Modifier.isStatic(f.getModifiers())
+                        && f.getGenericType().getTypeName().contains("ResourceKey")) {
+                    recipesField = f;
+                    recipesField.setAccessible(true);
+                    break;
+                }
+            }
+            if (recipesField == null) return;
+
+            Map<ResourceKey, RecipeHolder> existing =
+                    (Map<ResourceKey, RecipeHolder>) recipesField.get(rm);
+            if (existing == null) return;
+
+            Map<ResourceKey, RecipeHolder> merged = new LinkedHashMap<>(existing);
+            int injected = 0;
+            for (Map.Entry<ResourceKey, RecipeHolder> entry : parsed.entrySet()) {
+                if (!merged.containsKey(entry.getKey())) {
+                    merged.put(entry.getKey(), entry.getValue());
+                    injected++;
+                }
+            }
+            if (injected > 0) {
+                recipesField.set(rm, merged);
+                GunMod.LOGGER.info("[TACZ] Injected {} legacy recipe(s) into RecipeManager", injected);
+            }
+
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            GunMod.LOGGER.error("[TACZ] Failed to inject legacy recipes", e);
         }
     }
 
