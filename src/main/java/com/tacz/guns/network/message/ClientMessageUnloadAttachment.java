@@ -57,10 +57,18 @@ public class ClientMessageUnloadAttachment implements CustomPacketPayload {
             }
 
             ItemStack attachmentItem = gun.getAttachment(gunItem, message.attachmentType);
-            if (attachmentItem.isEmpty() || !inventory.add(attachmentItem)) {
+            if (attachmentItem.isEmpty()) {
                 return;
             }
+            // Remove first, then give the item back. This avoids duplication if the component
+            // write fails; a full inventory falls back to dropping the attachment.
             gun.unloadAttachment(gunItem, message.attachmentType);
+            if (!gun.getAttachment(gunItem, message.attachmentType).isEmpty()) {
+                return;
+            }
+            if (!inventory.add(attachmentItem)) {
+                player.drop(attachmentItem, false);
+            }
             AttachmentPropertyManager.postChangeEvent(player, gunItem);
             if (message.attachmentType == AttachmentType.EXTENDED_MAG) {
                 gun.dropAllAmmo(player, gunItem);
