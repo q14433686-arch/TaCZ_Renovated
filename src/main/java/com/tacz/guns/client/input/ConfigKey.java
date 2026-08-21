@@ -44,7 +44,7 @@ public class ConfigKey {
                         style.withColor(0x5555FF).withUnderlined(true).withClickEvent(clickEvent).withHoverEvent(hoverEvent));
                 player.sendSystemMessage(component);
             } else {
-                Minecraft.getInstance().setScreen(MenuIntegration.getConfigScreen(null));
+                Minecraft.getInstance().gui.setScreen(MenuIntegration.getConfigScreen(null));
             }
         }
     }

@@ -134,7 +134,7 @@ public final class ClientPacketHandlers {
     }
 
     public static void onCraft(ServerMessageCraft message) {
-        if (Minecraft.getInstance().screen instanceof GunSmithTableScreen screen) {
+        if (Minecraft.getInstance().gui.screen() instanceof GunSmithTableScreen screen) {
             screen.updateIngredientCount();
         }
     }

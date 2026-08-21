@@ -11,7 +11,7 @@ public final class InputExtraCheck {
         if (mc.player == null) {
             return false;
         }
-        if (mc.screen != null) {
+        if (mc.gui.screen() != null) {
             return false;
         }
         return mc.mouseHandler != null && mc.mouseHandler.isMouseGrabbed();

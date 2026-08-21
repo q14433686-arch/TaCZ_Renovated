@@ -320,7 +320,7 @@ public class GunRefitScreen extends Screen {
     }
 
     public static void refresh() {
-        if (net.minecraft.client.Minecraft.getInstance().screen instanceof GunRefitScreen screen) {
+        if (net.minecraft.client.Minecraft.getInstance().gui.screen() instanceof GunRefitScreen screen) {
             screen.init();
         }
     }
