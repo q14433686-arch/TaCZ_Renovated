@@ -7,12 +7,18 @@
 
 ```
 仓库：q14433686-arch/TaCZ-Renovated
-分支：arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0   ← 26.1.2 线的 R1 基线（最新提交即是）
+分支：arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
+基线：**钉死在提交 `b9de5e0`（R1）**——不要跟分支最新提交！
 ```
 
 ```bash
 git fetch origin arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
+git checkout b9de5e0   # R1 基线
 ```
+
+> ⚠️ 2026-08-21 起该分支尖端开始进行 **WP-LR2（LRTactical 内置层）** 开发
+> （`docs/WP_LR2_BRIEF.md`），属 26.1.2 线的 R2 目标，**不在你的 26.2 首发范围**。
+> LR 稳定后另行通知你平移；在那之前你的一切同步以 `b9de5e0` 为准。
 
 你的基线如果切自 `4d2edc1`（Beta-1 时代的 main），就缺少三轮多人联机实测抓出的
 全部修复。**26.2 必须从 R1 起跳**（R1 = 该分支 `5d2358d` 切版 + 后续文档收尾，
