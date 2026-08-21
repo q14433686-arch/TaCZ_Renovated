@@ -66,7 +66,7 @@ public class GunMod {
 
         registerDefaultExtraGunPack();
         AttachmentPropertyManager.registerModifier();
-        LOGGER.info("TaCZ NeoForge 26.1.2 port work package ⑥ loading. modId={}", MOD_ID);
+        LOGGER.info("TaCZ NeoForge 26.2 port r0 loading. modId={}", MOD_ID);
     }
 
     private static void registerDefaultExtraGunPack() {

@@ -25,7 +25,7 @@ public class GunModClient {
         } else {
             com.tacz.guns.client.gui.compat.ClothConfigScreen.registerNoClothConfigPage(container);
         }
-        GunMod.LOGGER.info("TaCZ NeoForge 26.1.2 port work package ⑤ client loading. modId={}", GunMod.MOD_ID);
+        GunMod.LOGGER.info("TaCZ NeoForge 26.2 port r0 client loading. modId={}", GunMod.MOD_ID);
     }
 
     @SubscribeEvent

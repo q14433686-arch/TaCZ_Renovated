@@ -11,9 +11,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -57,14 +57,9 @@ import org.apache.commons.lang3.StringUtils;
  * <h2>26.2 侧的两处改写</h2>
  * <ul>
  *   <li>{@code GuiGraphics#drawString} → {@code GuiGraphicsExtractor#text}。</li>
- *   <li><b>颜色取值按 26.1.2 的 API 写</b>：26.1.2 的 {@code ChatFormatting#getColor()}
- *       依然存在（已对 26.1.2 jar 字节码确认，返回 {@code Integer}），
- *       与上游 1.21.1 写法一致；而 26.2 补丁用的 {@code TextColor.YELLOW/GRAY}
- *       具名常量是<b>26.2 新增</b>的（26.1.2 的 {@code TextColor} 只有
- *       {@code CODEC/NAMED_COLORS} 等几个字段，没有任何具名颜色常量），直接套用会编译失败。
- *       同理，「{@code ChatFormatting#getColor()} 已删除」是 26.2 的变更，不适用于本版。
- *       必须补 alpha —— {@code ChatFormatting#getColor()} 给的是六位色，
- *       {@code text()} 见 alpha=0 会整段短路丢弃（见 docs/PORTING_NOTES.md §1）。</li>
+ *   <li><b>{@code ChatFormatting#getColor()} 在 26.2 已删除</b>；具名颜色改由
+ *       {@code TextColor.YELLOW/GRAY} 提供，并通过 {@code getValue()} 读取。
+ *       返回值仍是六位 RGB，必须显式补 alpha，否则 {@code text()} 会丢弃整段文字。</li>
  * </ul>
  */
 public class InteractKeyTextOverlay {
@@ -138,16 +133,15 @@ public class InteractKeyTextOverlay {
     private static void renderText(GuiGraphicsExtractor graphics, int width, int height,
                                    Font font, String keyName, boolean willFilterByHand) {
         Component title = Component.translatable("gui.tacz.interact_key.text.desc", StringUtils.capitalize(keyName));
-        // 颜色补 alpha：ChatFormatting#getColor 给的是六位色，text() 会把 alpha=0 的整段丢弃。
-        // （26.1.2 用上游同款 ChatFormatting；TextColor.YELLOW/GRAY 具名常量是 26.2 才有的。）
+        // TextColor#getValue is six-digit RGB; GUI text requires an explicit alpha channel.
         graphics.text(font, title,
                 (int) ((width - font.width(title)) / 2.0f), (int) (height / 2.0f - 25),
-                0xFF000000 | ChatFormatting.YELLOW.getColor(), false);
+                0xFF000000 | TextColor.YELLOW.getValue(), false);
         if (willFilterByHand) {
             Component filter = Component.translatable("gui.tacz.interact_key.text.gun_smith_table_filter");
             graphics.text(font, filter,
                     (int) ((width - font.width(filter)) / 2.0f), (int) (height / 2.0f - 14),
-                    0xFF000000 | ChatFormatting.GRAY.getColor(), false);
+                    0xFF000000 | TextColor.GRAY.getValue(), false);
         }
     }
 }

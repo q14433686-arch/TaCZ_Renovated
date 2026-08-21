@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import java.util.function.Supplier;
 
 /**
- * Evidence: AttachmentType.builder(Supplier)#build ② AttachmentType.java 26.1.2.97-sources.
+ * Evidence: AttachmentType.builder(Supplier)#build, revalidated in NeoForge 26.2.0.64 sources.
  */
 public class CapabilityRegistry {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES =

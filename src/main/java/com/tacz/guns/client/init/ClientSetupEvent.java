@@ -59,11 +59,9 @@ import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
 /**
- * IModBusEvent handlers. 26.1 EventBusSubscriber has no Bus enum; MDK 26.1.2 still
- * delivers IModBusEvent to {@code @EventBusSubscriber(modid, Dist.CLIENT)}.
- * Evidence: official MDK ExampleModClient {@code FMLClientSetupEvent};
- * NeoForge 26.1.2.97 sources: RegisterKeyMappingsEvent / AddClientReloadListenersEvent
- * implement IModBusEvent.
+ * Client-side IModBusEvent handlers. Revalidated against NeoForge 26.2.0.64 sources:
+ * RegisterKeyMappingsEvent, RegisterGuiLayersEvent, the item-model events and
+ * AddClientReloadListenersEvent remain mod-bus events.
  */
 @EventBusSubscriber(modid = GunMod.MOD_ID, value = Dist.CLIENT)
 public class ClientSetupEvent {

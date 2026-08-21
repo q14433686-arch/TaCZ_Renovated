@@ -21,6 +21,7 @@ import com.tacz.guns.client.input.ReloadKey;
 import com.tacz.guns.client.input.ShootKey;
 import com.tacz.guns.client.input.ZoomKey;
 import com.tacz.guns.client.sound.SoundPlayManager;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -39,7 +40,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
- * Game-bus client listeners. Evidence: NeoForge 26.1.2.97
+ * Game-bus client listeners. Revalidated against NeoForge 26.2.0.64:
  * ClientTickEvent / RenderFrameEvent / ViewportEvent / InputEvent.
  */
 @EventBusSubscriber(modid = GunMod.MOD_ID, value = Dist.CLIENT)
@@ -78,6 +79,12 @@ public final class ClientGameEvents {
 
     @SubscribeEvent
     public static void onRenderGuiLayer(RenderGuiLayerEvent.Pre event) {
+        AtomicBoolean hideHud = new AtomicBoolean();
+        PreventsHotbarEvent.onRenderHotbarEvent(hideHud);
+        if (hideHud.get()) {
+            event.setCanceled(true);
+            return;
+        }
         if (VanillaGuiLayers.CROSSHAIR.equals(event.getName())
                 && RenderCrosshairEvent.shouldHideVanillaCrosshair()) {
             event.setCanceled(true);
