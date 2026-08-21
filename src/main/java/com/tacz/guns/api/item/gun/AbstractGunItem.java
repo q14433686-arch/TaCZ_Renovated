@@ -9,7 +9,6 @@ import com.tacz.guns.api.item.ammo.AmmoSourceRegistry;
 import com.tacz.guns.api.item.attachment.AttachmentType;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
-import com.tacz.guns.client.resource.index.ClientGunIndex;
 import com.tacz.guns.entity.shooter.ShooterDataHolder;
 import com.tacz.guns.inventory.tooltip.GunTooltip;
 import com.tacz.guns.resource.index.CommonGunIndex;
@@ -17,8 +16,6 @@ import com.tacz.guns.resource.pojo.data.gun.FeedType;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import com.tacz.guns.util.AllowAttachmentTagMatcher;
 import com.tacz.guns.util.AttachmentDataUtils;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -285,12 +282,16 @@ public abstract class AbstractGunItem extends Item implements IGun, IAnimationIt
      */
     @Override
     @Nonnull
-    @OnlyIn(Dist.CLIENT)
+    // 2026-08-21 专服实测崩溃修复：getName 是双端公共方法（/give 回显、容器标题、聊天
+    // hover 等服务端路径都会调）。26.1 dist cleaner 不再按 @OnlyIn 剥离成员（records/WP04），
+    // 方法体引用 client 索引类在 dedicated 上必抛 NoClassDefFoundError。
+    // 改走 common 索引：与 client 索引读同一份 index json，翻译键一致，双端安全
+    // （docs/records/SERVER_TEST_20260821_DEDICATED.md）。
     public Component getName(@Nonnull ItemStack stack) {
         Identifier gunId = this.getGunId(stack);
-        Optional<ClientGunIndex> gunIndex = TimelessAPI.getClientGunIndex(gunId);
-        if (gunIndex.isPresent()) {
-            return Component.translatable(gunIndex.get().getName());
+        var gunIndex = TimelessAPI.getCommonGunIndex(gunId);
+        if (gunIndex.isPresent() && gunIndex.get().getPojo().getName() != null) {
+            return Component.translatable(gunIndex.get().getPojo().getName());
         }
         return super.getName(stack);
     }

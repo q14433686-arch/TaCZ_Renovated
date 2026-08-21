@@ -6,11 +6,8 @@ import com.tacz.guns.api.item.attachment.AttachmentType;
 import com.tacz.guns.api.item.builder.AttachmentItemBuilder;
 import com.tacz.guns.api.item.nbt.AttachmentItemDataAccessor;
 import com.tacz.guns.client.renderer.item.AttachmentItemRenderer;
-import com.tacz.guns.client.resource.index.ClientAttachmentIndex;
 import com.tacz.guns.inventory.tooltip.AttachmentItemTooltip;
 import com.tacz.guns.resource.index.CommonAttachmentIndex;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -34,12 +31,13 @@ public class AttachmentItem extends Item implements AttachmentItemDataAccessor {
 
     @Override
     @Nonnull
-    @OnlyIn(Dist.CLIENT)
+    // 双端公共方法，禁用 client 索引（26.1 不剥 @OnlyIn 成员，dedicated 必崩）。
+    // 详见 AbstractGunItem#getName 注释与 docs/records/SERVER_TEST_20260821_DEDICATED.md。
     public Component getName(@Nonnull ItemStack stack) {
         Identifier attachmentId = this.getAttachmentId(stack);
-        Optional<ClientAttachmentIndex> attachmentIndex = TimelessAPI.getClientAttachmentIndex(attachmentId);
-        if (attachmentIndex.isPresent()) {
-            return Component.translatable(attachmentIndex.get().getName());
+        var attachmentIndex = TimelessAPI.getCommonAttachmentIndex(attachmentId);
+        if (attachmentIndex.isPresent() && attachmentIndex.get().getPojo().getName() != null) {
+            return Component.translatable(attachmentIndex.get().getPojo().getName());
         }
         return super.getName(stack);
     }

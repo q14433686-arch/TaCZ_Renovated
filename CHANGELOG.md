@@ -18,6 +18,8 @@
 - Added `AttachmentsTagManager` and `RecipeFilterManager` to the network-cache listener list so
   attachment rules and block recipe filters reach multiplayer clients.
 - Treats Iris' `Shader already assigned` response as successful existing classification.
+- Moved gun, ammo, attachment and workbench `Item#getName(ItemStack)` overrides from client indices
+  to common indices, preventing dedicated `/give` and display-name paths from loading client classes.
 - Migrated legacy NeoForge item handlers to transactional `ResourceHandler<ItemResource>` APIs.
 - Migrated current-screen access to `Minecraft.gui`, retained NeoForge GUI-layer registration, and
   revalidated the minimal access transformer against the NeoForge 26.2 transformed compile classpath.

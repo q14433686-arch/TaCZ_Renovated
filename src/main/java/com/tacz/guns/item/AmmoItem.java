@@ -5,7 +5,6 @@ import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.api.item.nbt.AmmoItemDataAccessor;
 import com.tacz.guns.client.renderer.item.AmmoItemRenderer;
 import com.tacz.guns.client.resource.ClientAssetsManager;
-import com.tacz.guns.client.resource.index.ClientAmmoIndex;
 import com.tacz.guns.client.resource.pojo.PackInfo;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
 import net.neoforged.api.distmarker.Dist;
@@ -28,7 +27,6 @@ import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class AmmoItem extends Item implements AmmoItemDataAccessor {
@@ -98,12 +96,13 @@ public class AmmoItem extends Item implements AmmoItemDataAccessor {
 
     @Override
     @Nonnull
-    @OnlyIn(Dist.CLIENT)
+    // 双端公共方法，禁用 client 索引（26.1 不剥 @OnlyIn 成员，dedicated 必崩）。
+    // 详见 AbstractGunItem#getName 注释与 docs/records/SERVER_TEST_20260821_DEDICATED.md。
     public Component getName(@Nonnull ItemStack stack) {
         Identifier ammoId = this.getAmmoId(stack);
-        Optional<ClientAmmoIndex> ammoIndex = TimelessAPI.getClientAmmoIndex(ammoId);
-        if (ammoIndex.isPresent()) {
-            return Component.translatable(ammoIndex.get().getName());
+        var ammoIndex = TimelessAPI.getCommonAmmoIndex(ammoId);
+        if (ammoIndex.isPresent() && ammoIndex.get().getPojo().getName() != null) {
+            return Component.translatable(ammoIndex.get().getPojo().getName());
         }
         return super.getName(stack);
     }
