@@ -42,7 +42,8 @@
 - User-reported production JDK 25 `compileJava` and `build`: **PASS for commit `c40dab9`**.
   The subsequent scope-mask replacement changes the current HEAD and requires a fresh build.
 - Dedicated-server `Done`, gun-pack load counts and the built jar's final contents are not yet verified.
-- OpenGL, Iris and Vulkan scope-mask paths require GPU testing.
+- OpenGL and Iris scope-mask paths require GPU testing; the first Vulkan attempt failed during GLFW
+  surface creation before TACZ rendering ran, so the Vulkan mask path remains unexecuted.
 - Optional compatibility entries are source/API-audited but not user PASS.
 - Aperture and LRTactical are not included.
 

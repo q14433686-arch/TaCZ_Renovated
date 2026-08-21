@@ -165,3 +165,29 @@ Vulkan: stage-boundary target switch, mask debug preview, no device loss, same s
 Resize/reload: target rebuild and dynamic texture handle refresh
 Third-party scopes: sparse/sliver ocular and non-solid ocular geometry
 ```
+
+## 2026-08-21 Vulkan 启动反馈
+
+用户上传到默认分支 commit `972742496180624af2b8811b2a61c211be979267` 的
+`RawOutput.log` 显示 Vulkan 尝试在进入任何 TACZ scope target/pipeline/render pass 之前失败：
+
+```text
+Window size: <not initialized>
+Surface Info: <no surface>
+glfwCreateWindowSurface
+VulkanGpuSurface.<init>
+Minecraft.<init>
+```
+
+崩溃报告表面的 NPE 是 `Minecraft#cursorEntered()` 在 `mouseHandler` 初始化前被 GLFW
+错误对话框重入；它掩盖了先发生的 window-surface 创建错误。日志中没有
+`ScopeMaskRenderer`、`FeatureRenderDispatcherMixin`、TACZ pipeline draw 或 mask target 的
+调用帧，也没有进入第一帧。因此该次结果记为：
+
+- Vulkan 启动：**FAIL（surface 创建阶段）**；
+- TACZ Vulkan scope-mask：**未执行，不能归因也不能标 PASS**；
+- 环境证据：加载了 `RTSSVkLayer64.dll`，Vulkan loader 同时报 Epic EOS overlay JSON
+  缺失与 `mediasdkhook/game_detour_64.dll` 缺失；两块 AMD GPU 驱动版本不同，进程中出现
+  两个不同版本的 `amdvlk64.dll`；
+- 精确失败类还被 Sodium Extra 的 `MixinVulkanGpuSurface`/`MixinWindow` 修改，故必须先做
+  无隐式 Vulkan layer、最小 Mod 集与驱动清理的隔离测试，不能在 TACZ 中伪造 workaround。

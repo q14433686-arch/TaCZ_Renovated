@@ -71,7 +71,7 @@
 |---|---|
 | OpenGL（无 Iris） | 阶段边界离屏 ocular mask 已接入；GPU 未实测 |
 | OpenGL + Iris 1.11.2 | HAND pipeline 分类、linked-fragment dormant branch 与逐 draw mask uniform bridge 已接入；GPU 未实测 |
-| Vulkan | 普通 mask 路径只用 26.2 `TextureTarget`/`RenderPass`，无直接 GL；启动与 device-loss 矩阵未实测 |
+| Vulkan | 普通 mask 路径只用 26.2 `TextureTarget`/`RenderPass`，无直接 GL；用户启动在 GLFW surface 创建阶段 FAIL，尚未执行到 TACZ mask |
 | 其他 shader replacement / Aperture | 没有已核 bridge 时走普通未掩码回退；未作为硬依赖接入 |
 
 ## 其他兼容层
