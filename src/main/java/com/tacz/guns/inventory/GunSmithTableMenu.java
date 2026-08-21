@@ -23,6 +23,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -126,7 +131,7 @@ public class GunSmithTableMenu extends AbstractContainerMenu {
         if (level instanceof ServerLevel serverLevel) {
             recipe.resolveIngredients(serverLevel.registryAccess());
         }
-        net.neoforged.neoforge.items.IItemHandler handler = new net.neoforged.neoforge.items.wrapper.InvWrapper(player.getInventory());
+        ResourceHandler<ItemResource> handler = VanillaContainerWrapper.of(player.getInventory());
         if (true) {
             // 是创造模式，就不扣材料
             if (!player.isCreative()) {
@@ -141,8 +146,8 @@ public class GunSmithTableMenu extends AbstractContainerMenu {
                     if (resolved == null) {
                         return;
                     }
-                    for (int slotIndex = 0; slotIndex < handler.getSlots(); slotIndex++) {
-                        ItemStack stack = handler.getStackInSlot(slotIndex);
+                    for (int slotIndex = 0; slotIndex < handler.size(); slotIndex++) {
+                        ItemStack stack = ItemUtil.getStack(handler, slotIndex);
                         int stackCount = stack.getCount();
                         if (!stack.isEmpty() && resolved.test(stack)) {
                             count = count + stackCount;
@@ -164,9 +169,20 @@ public class GunSmithTableMenu extends AbstractContainerMenu {
                     }
                 }
 
-                // 开始扣材料
-                for (int slotIndex : recordCount.keySet()) {
-                    handler.extractItem(slotIndex, recordCount.get(slotIndex), false);
+                // 开始扣材料。统一在一个 transfer transaction 中提交，任一 slot
+                // 无法完整扣除时回滚，避免只扣掉一部分材料。
+                try (Transaction transaction = Transaction.openRoot()) {
+                    for (int slotIndex : recordCount.keySet()) {
+                        ItemResource resource = handler.getResource(slotIndex);
+                        int requested = recordCount.get(slotIndex);
+                        int extracted = resource.isEmpty()
+                                ? 0
+                                : handler.extract(slotIndex, resource, requested, transaction);
+                        if (extracted != requested) {
+                            return;
+                        }
+                    }
+                    transaction.commit();
                 }
             }
 

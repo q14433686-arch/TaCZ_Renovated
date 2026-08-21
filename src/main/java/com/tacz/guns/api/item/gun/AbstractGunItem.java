@@ -1,7 +1,7 @@
 package com.tacz.guns.api.item.gun;
 
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.ReloadState;
 import com.tacz.guns.api.item.*;
@@ -199,7 +199,7 @@ public abstract class AbstractGunItem extends Item implements IGun, IAnimationIt
                 for (int i = 0; i <= roundCount; i++) {
                     int count = Math.min(tmpAmmoCount, stackSize);
                     ItemStack ammoItem = AmmoItemBuilder.create().setId(ammoId).setCount(count).build();
-                    ItemHandlerHelper.giveItemToPlayer(player, ammoItem);
+                    player.getInventory().placeItemBackInInventory(ammoItem);
                     tmpAmmoCount -= stackSize;
                 }
                 setCurrentAmmoCount(gunItem, 0);
@@ -216,7 +216,7 @@ public abstract class AbstractGunItem extends Item implements IGun, IAnimationIt
      * @return 寻找到的弹药 (物品) 数量
      */
     @Deprecated
-    public int findAndExtractInventoryAmmos(IItemHandler itemHandler, ItemStack gunItem, int needAmmoCount) {
+    public int findAndExtractInventoryAmmos(ResourceHandler<ItemResource> itemHandler, ItemStack gunItem, int needAmmoCount) {
         return findAndExtractInventoryAmmo(itemHandler, gunItem, needAmmoCount);
     }
 
@@ -228,7 +228,7 @@ public abstract class AbstractGunItem extends Item implements IGun, IAnimationIt
      * @param needAmmoCount 需要的弹药 (物品) 数量
      * @return 寻找到的弹药 (物品) 数量
      */
-    public int findAndExtractInventoryAmmo(IItemHandler itemHandler, ItemStack gunItem, int needAmmoCount) {
+    public int findAndExtractInventoryAmmo(ResourceHandler<ItemResource> itemHandler, ItemStack gunItem, int needAmmoCount) {
         return AmmoSourceRegistry.consumeAmmo(itemHandler, gunItem, needAmmoCount);
     }
 
