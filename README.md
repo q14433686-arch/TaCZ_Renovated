@@ -11,7 +11,7 @@
 （Fabric 26.x / 1.21.11 移植）的 26.1.2 分支；本仓库当前源码版本为
 **`1.1.8+neoforge.26.1.2.Beta-1`**。
 
-[问题反馈](https://github.com/q14433686-arch/tacz-1.1.8-neoforge.26.1.2.r0-sources/issues)
+[问题反馈](https://github.com/q14433686-arch/TaCZ-Renovated/issues)
 · [姊妹项目（Fabric）](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
 · [原始 TaCZ 项目](https://github.com/MCModderAnchor/TACZ)
 
@@ -175,7 +175,7 @@ AI 协作者请先读 [`AGENTS.md`](AGENTS.md)。版本历史见 [CHANGELOG.md](
 
 ## 9. 反馈
 
-请在[本仓库 Issues](https://github.com/q14433686-arch/tacz-1.1.8-neoforge.26.1.2.r0-sources/issues)提交：
+请在[本仓库 Issues](https://github.com/q14433686-arch/TaCZ-Renovated/issues)提交：
 
 1. 完整 `logs/latest.log`（崩溃再附 crash report）；
 2. Minecraft、NeoForge 与本 mod 的完整版本；
