@@ -1,0 +1,725 @@
+[218月2026 21:10:41.446] [main/INFO] [net.neoforged.fml.startup.Entrypoint/]: JVM Uptime at startup: 117ms
+[218月2026 21:10:41.454] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Starting FancyModLoader version 11.0.15 (DEDICATED_SERVER in PROD)
+[218月2026 21:10:41.455] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Game directory: D:\tacz_srv
+[218月2026 21:10:41.503] [main/INFO] [net.neoforged.fml.loading.EarlyServiceDiscovery/]: Found 2 early service jars (out of 68) in 23ms
+[218月2026 21:10:41.504] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Loading FML Early Services:
+[218月2026 21:10:41.504] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - libraries/net/neoforged/fancymodloader/earlydisplay/11.0.15/earlydisplay-11.0.15.jar
+[218月2026 21:10:41.505] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - libraries/net/neoforged/fancymodloader/loader/11.0.15/loader-11.0.15.jar
+[218月2026 21:10:41.510] [main/INFO] [net.neoforged.fml.loading.ImmediateWindowHandler/]: Not loading early display in headless mode.
+[218月2026 21:10:41.524] [main/INFO] [net.neoforged.fml.loading.moddiscovery.locators.GameLocator/]: Failed to find common Minecraft classes and resources on the classpath. Assuming we're launching production.
+[218月2026 21:10:41.724] [main/INFO] [net.neoforged.fml.loading.moddiscovery.locators.JarInJarDependencyLocator/]: Found 4 dependencies adding them to mods collection
+[218月2026 21:10:41.726] [main/INFO] [net.neoforged.fml.loading.moddiscovery.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		Minecraft 26.1.2 (minecraft)
+		NeoForge 26.1.2.97 (neoforge)
+		TaCZ: Renovated 1.1.8+neoforge.26.1.2.Beta-1 (tacz)
+[218月2026 21:10:41.825] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/D:/tacz_srv/libraries/net/fabricmc/sponge-mixin/0.17.3+mixin.0.8.7/sponge-mixin-0.17.3+mixin.0.8.7.jar Service=FML Env=SERVER
+[218月2026 21:10:41.843] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Loading FML Plugins:
+[218月2026 21:10:41.843] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/tacz-1.1.8+neoforge.26.1.2.Beta-1.jar > commons-math3-3.6.1.jar
+[218月2026 21:10:41.844] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/tacz-1.1.8+neoforge.26.1.2.Beta-1.jar > luaj-jse-3.0.1.jar
+[218月2026 21:10:41.844] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - ~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar > net.neoforged.neoforge-coremods-26.1.2.97.jar
+[218月2026 21:10:41.899] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Building game content classloader:
+ - minecraft (jar(~libraries/net/neoforged/minecraft-server-patched/26.1.2.97/minecraft-server-patched-26.1.2.97.jar))
+ - mixinextras.neoforge (jar(~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar > mixinextras-neoforge-0.5.4.jar))
+ - neoforge (jar(~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar))
+ - net.neoforged.fml.generated (empty(VirtualJar/net.neoforged.fml.generated))
+ - tacz (jar(mods/tacz-1.1.8+neoforge.26.1.2.Beta-1.jar))
+[218月2026 21:10:41.914] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Built game content classloader in 21ms
+[218月2026 21:10:41.938] [main/INFO] [mixin/]: Compatibility level set to JAVA_25
+[218月2026 21:10:42.410] [main/WARN] [oshi.driver.windows.perfmon.PerfmonDisabled/]: Invalid registry value type detected for PerfOS counters. Should be REG_DWORD. Ignoring: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PerfOS\Performance\Disable Performance Counters.
+[218月2026 21:10:42.868] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.4).
+[218月2026 21:10:45.887] [modloading-worker-0/INFO] [net.neoforged.neoforge.common.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 26.1.2.97, for MC 26.1.2
+[218月2026 21:10:45.987] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: TaCZ NeoForge 26.1.2 port work package ⑥ loading. modId=tacz
+[218月2026 21:10:46.187] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: WP② registries ready: gun=tacz:modern_kinetic_gun workbench_a=tacz:workbench_a gun_smith_table=tacz:gun_smith_table recipe=tacz:gun_smith_table_crafting
+[218月2026 21:10:46.198] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:shoot_cool_down for minecraft:living_entity
+[218月2026 21:10:46.198] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:melee_cool_down for minecraft:living_entity
+[218月2026 21:10:46.199] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:reload_state for minecraft:living_entity
+[218月2026 21:10:46.199] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:aiming_progress for minecraft:living_entity
+[218月2026 21:10:46.199] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:draw_cool_down for minecraft:living_entity
+[218月2026 21:10:46.199] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:is_aiming for minecraft:living_entity
+[218月2026 21:10:46.199] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:sprint_time for minecraft:living_entity
+[218月2026 21:10:46.199] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:is_bolting for minecraft:living_entity
+[218月2026 21:10:46.199] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:throwable_using for minecraft:living_entity
+[218月2026 21:10:46.240] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/]: WP③ payloads registered (play + configuration), version=1.0.5
+[218月2026 21:10:46.277] [main/INFO] [com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService/]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[218月2026 21:10:46.388] [main/INFO] [com.tacz.guns.GunMod/]: WP③ onAddPackFinders called with packType=SERVER_DATA
+[218月2026 21:10:46.434] [main/INFO] [com.tacz.guns.GunMod/]: WP③ RepositorySource.loadPacks invoked for packType=SERVER_DATA
+[218月2026 21:10:46.436] [main/INFO] [com.tacz.guns.GunMod/GunPackFinder]: discoverExtensions called with packType=SERVER_DATA, firstLoad=true
+[218月2026 21:10:46.455] [main/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Start scanning for gun packs in D:\tacz_srv\tacz
+[218月2026 21:10:46.460] [main/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - Cold War from 1947-1991 v0.51.zip, Main namespace: rainforest
+[218月2026 21:10:46.461] [main/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - KhanPowder_v0.8.99_hotfix.zip, Main namespace: murasamet
+[218月2026 21:10:46.462] [main/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - tacz_default_gun, Main namespace: tacz
+[218月2026 21:10:46.463] [main/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - [Tacz1.1.7+]CIBR_GunsPack_v0.3_1.1.7.zip, Main namespace: cib
+[218月2026 21:10:46.464] [main/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Found 4 possible gunpack(s) and added them to resource set.
+[218月2026 21:10:47.664] [Worker-Main-9/INFO] [com.tacz.guns.GunMod/]: WP④ CommonAssetsManager listeners registered (gun index fills after reload). placeholderGuns=0
+[218月2026 21:10:47.747] [Worker-Main-10/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'ciblr'
+[218月2026 21:10:47.759] [Worker-Main-10/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'cibs'
+[218月2026 21:10:47.780] [Worker-Main-10/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 7 legacy recipes/ file(s) to recipe/ for namespace 'murasamet'
+[218月2026 21:10:47.791] [Worker-Main-10/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 3 legacy recipes/ file(s) to recipe/ for namespace 'cib'
+[218月2026 21:10:47.795] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'ciblr'
+[218月2026 21:10:47.798] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'cibs'
+[218月2026 21:10:47.812] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 7 legacy recipes/ file(s) to recipe/ for namespace 'murasamet'
+[218月2026 21:10:47.817] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 3 legacy recipes/ file(s) to recipe/ for namespace 'cib'
+[218月2026 21:10:47.938] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/TableRecipeLoader]: Found 281 recipe file(s) in legacy 'recipes/' directory (old gun pack layout), 1711 in 'recipe/'.
+[218月2026 21:10:48.345] [main/INFO] [net.minecraft.world.item.crafting.RecipeManager/]: Loaded 1711 recipes
+[218月2026 21:10:48.354] [main/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 1617 advancements
+[218月2026 21:10:48.356] [main/INFO] [net.neoforged.neoforge.common.crafting.RecipePriorityManager/]: Loaded 0 recipe priority overrides
+[218月2026 21:10:48.477] [main/WARN] [com.tacz.guns.GunMod/ScriptLoader]: Failed to read script file: murasamet:blunderbuss_gun_logic
+[218月2026 21:10:48.522] [main/INFO] [com.tacz.guns.GunMod/TableRecipeLoader]: Left 1052 vanilla recipe(s) from 'recipes/' to PackResources remapping (RecipeManager registry).
+[218月2026 21:10:48.557] [main/INFO] [com.tacz.guns.GunMod/]: WP④ gun pack loaded: guns=253 ammo=44 attachments=145 blocks=9 recipes=441
+[218月2026 21:10:48.609] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/12g can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/22wmr can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/308 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/30_06 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/338 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/357mag can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/40mm can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/45_70 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/45acp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.610] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/46x30 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.611] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/500mag can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.611] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/50ae can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.611] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/50bmg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.611] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/545x39 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/556x45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/57x28 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/58x42 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/68x51fury can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x25 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x39 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x54 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/792x57 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/9mm can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.612] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/rpg_rocket can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.613] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_fmj can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.613] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_he can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.614] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_hp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.614] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_i can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.614] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_slug can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.614] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/bayonet_6h3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.614] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/bayonet_m9 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.614] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/deagle_golden_long_barrel can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.614] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.614] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_cobra can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_magpul_afg_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_osovets_black can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk0 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk1_b25u can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_se_5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_td can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_military can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_ranger can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.615] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_talon can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_compact can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_lopro can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_nightstick can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_peq6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_cthulhu can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_cyclone_d2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_mastiff_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.616] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_pioneer can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_timeless50 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_trex can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_choke_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_compensator_trident can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_knight_qd can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_mirage can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_phantom_s1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_ptilopsis can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_ursus can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_vulture can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.617] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_wraith can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_heavy can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_light can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_tactical can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_1873_6x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_98k can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_acog_ta31 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_contender can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_elcan_4x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_hamr can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_lpvo_1_6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_mk5hd can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.618] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_qmk152 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_retro_2x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_standard_8x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_vudu can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_552 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_acro_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_acro_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_coyote can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_deltapoint_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_deltapoint_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_exp3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_fastfire_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.619] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_fastfire_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_okp7 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_pk06_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_pk06_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_rmr_dot can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_sro_dot can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_srs_02 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_t1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_t2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_uh1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.620] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_ak12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_carbon_bone_c5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_heavy_spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_hk_slim_line can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_m4ss can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_militech_b5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_moe can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_ripstock can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_sba3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_tactical_ar can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.621] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_tactical_spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.624] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/aa12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.624] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ai_awp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.624] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ak47 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.624] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/aug can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.624] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/b93r can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.624] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/cz75 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.624] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/db_long can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.624] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/db_short can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/deagle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/deagle_golden can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/fn_evolys can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/fn_fal can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/g36k can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/glock_17 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk416d can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_g3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_mk23 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_mp5a5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/kar98 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/lonetrail can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m1014 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m107 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.625] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m16a1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m16a4 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m1911 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m249 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m320 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m4a1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m700 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m870 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m95 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m9a4 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/minigun can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/mk14 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/p320 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/p90 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.626] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/qbz_191 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/qbz_95 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rhino357 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rpg7 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rpk can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/scar_h can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/scar_l can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/sks_tactical can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/spr15hb can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/springfield1873 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/taurus500 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/timeless50 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.627] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/type_81 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.628] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ump45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.628] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/uzi can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.628] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/vector45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:48.628] [main/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:misc/blood_strike_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:10:49.315] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Starting minecraft server version 26.1.2
+[218月2026 21:10:49.315] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Loading properties
+[218月2026 21:10:49.315] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Default game type: SURVIVAL
+[218月2026 21:10:49.315] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Generating keypair
+[218月2026 21:10:49.362] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Starting Minecraft server on *:25565
+[218月2026 21:10:49.482] [Server thread/WARN] [net.minecraft.server.dedicated.DedicatedServer/]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[218月2026 21:10:49.483] [Server thread/WARN] [net.minecraft.server.dedicated.DedicatedServer/]: The server will make no attempt to authenticate usernames. Beware.
+[218月2026 21:10:49.483] [Server thread/WARN] [net.minecraft.server.dedicated.DedicatedServer/]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[218月2026 21:10:49.483] [Server thread/WARN] [net.minecraft.server.dedicated.DedicatedServer/]: To change this, set "online-mode" to "true" in the server.properties file.
+[218月2026 21:10:49.525] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Preparing level "world"
+[218月2026 21:10:49.722] [Server thread/INFO] [net.minecraft.server.level.progress.LoggingLevelLoadListener/]: Loading 0 persistent chunks...
+[218月2026 21:10:49.725] [Server thread/INFO] [net.minecraft.server.level.progress.LoggingLevelLoadListener/]: Preparing spawn area: 100%
+[218月2026 21:10:49.748] [Server thread/INFO] [net.minecraft.server.level.progress.LoggingLevelLoadListener/]: Time elapsed: 27 ms
+[218月2026 21:10:49.750] [Server thread/INFO] [net.minecraft.server.dedicated.DedicatedServer/]: Done (0.252s)! For help, type "help"
+[218月2026 21:10:49.753] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[218月2026 21:10:49.772] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[218月2026 21:10:49.792] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[218月2026 21:10:49.821] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[218月2026 21:10:49.824] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[218月2026 21:10:49.835] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[218月2026 21:10:49.848] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage: All dimensions are saved
+[218月2026 21:10:49.879] [Server thread/INFO] [net.neoforged.neoforge.server.permission.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[218月2026 21:11:40.025] [Server thread/INFO] [net.minecraft.server.players.PlayerList/]: GOOSTL[/127.0.0.1:49408] logged in with entity id 77 at (240.73204060148421, 70.0, -161.852003543164)
+[218月2026 21:11:40.116] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: GOOSTL joined the game
+[218月2026 21:12:40.148] [Server thread/INFO] [com.tacz.guns.GunMod/]: WP③ RepositorySource.loadPacks invoked for packType=SERVER_DATA
+[218月2026 21:12:40.149] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: discoverExtensions called with packType=SERVER_DATA, firstLoad=false
+[218月2026 21:12:40.149] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Start scanning for gun packs in D:\tacz_srv\tacz
+[218月2026 21:12:40.150] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - Cold War from 1947-1991 v0.51.zip, Main namespace: rainforest
+[218月2026 21:12:40.151] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - KhanPowder_v0.8.99_hotfix.zip, Main namespace: murasamet
+[218月2026 21:12:40.151] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - tacz_default_gun, Main namespace: tacz
+[218月2026 21:12:40.152] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - [Tacz1.1.7+]CIBR_GunsPack_v0.3_1.1.7.zip, Main namespace: cib
+[218月2026 21:12:40.152] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Found 4 possible gunpack(s) and added them to resource set.
+[218月2026 21:12:40.880] [Worker-Main-15/INFO] [com.tacz.guns.GunMod/]: WP④ CommonAssetsManager listeners registered (gun index fills after reload). placeholderGuns=0
+[218月2026 21:12:40.926] [Worker-Main-15/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'ciblr'
+[218月2026 21:12:40.936] [Worker-Main-15/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'cibs'
+[218月2026 21:12:40.961] [Worker-Main-15/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 7 legacy recipes/ file(s) to recipe/ for namespace 'murasamet'
+[218月2026 21:12:40.987] [Worker-Main-15/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 3 legacy recipes/ file(s) to recipe/ for namespace 'cib'
+[218月2026 21:12:40.995] [Worker-Main-3/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'ciblr'
+[218月2026 21:12:40.998] [Worker-Main-3/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'cibs'
+[218月2026 21:12:41.005] [Worker-Main-3/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 7 legacy recipes/ file(s) to recipe/ for namespace 'murasamet'
+[218月2026 21:12:41.010] [Worker-Main-3/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 3 legacy recipes/ file(s) to recipe/ for namespace 'cib'
+[218月2026 21:12:41.129] [Worker-Main-3/INFO] [com.tacz.guns.GunMod/TableRecipeLoader]: Found 281 recipe file(s) in legacy 'recipes/' directory (old gun pack layout), 1711 in 'recipe/'.
+[218月2026 21:12:41.535] [Server thread/INFO] [net.minecraft.world.item.crafting.RecipeManager/]: Loaded 1711 recipes
+[218月2026 21:12:41.542] [Server thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 1617 advancements
+[218月2026 21:12:41.542] [Server thread/INFO] [net.neoforged.neoforge.common.crafting.RecipePriorityManager/]: Loaded 0 recipe priority overrides
+[218月2026 21:12:41.599] [Server thread/WARN] [com.tacz.guns.GunMod/ScriptLoader]: Failed to read script file: murasamet:blunderbuss_gun_logic
+[218月2026 21:12:41.632] [Server thread/INFO] [com.tacz.guns.GunMod/TableRecipeLoader]: Left 1052 vanilla recipe(s) from 'recipes/' to PackResources remapping (RecipeManager registry).
+[218月2026 21:12:41.670] [Server thread/INFO] [com.tacz.guns.GunMod/]: WP④ gun pack loaded: guns=253 ammo=44 attachments=145 blocks=9 recipes=441
+[218月2026 21:12:41.674] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/12g can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.674] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/22wmr can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.674] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/308 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.674] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/30_06 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/338 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/357mag can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/40mm can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/45_70 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/45acp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/46x30 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/500mag can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/50ae can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/50bmg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/545x39 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/556x45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/57x28 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/58x42 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/68x51fury can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x25 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x39 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x54 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/792x57 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/9mm can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/rpg_rocket can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.675] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_fmj can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_he can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_hp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_i can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_slug can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/bayonet_6h3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/bayonet_m9 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/deagle_golden_long_barrel can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_cobra can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_magpul_afg_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_osovets_black can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk0 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk1_b25u can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_se_5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.677] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_td can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_military can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_ranger can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_talon can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_compact can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_lopro can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_nightstick can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_peq6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_cthulhu can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_cyclone_d2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.678] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_mastiff_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_pioneer can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_timeless50 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_trex can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_choke_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_compensator_trident can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_knight_qd can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_mirage can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_phantom_s1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_ptilopsis can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_ursus can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_vulture can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_wraith can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_heavy can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_light can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.679] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_tactical can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_1873_6x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_98k can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_acog_ta31 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_contender can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_elcan_4x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_hamr can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_lpvo_1_6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_mk5hd can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_qmk152 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_retro_2x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.680] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_standard_8x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_vudu can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_552 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_acro_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_acro_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_coyote can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_deltapoint_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_deltapoint_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_exp3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_fastfire_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_fastfire_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_okp7 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_pk06_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_pk06_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_rmr_dot can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_sro_dot can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_srs_02 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_t1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_t2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_uh1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.681] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_ak12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_carbon_bone_c5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_heavy_spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_hk_slim_line can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_m4ss can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_militech_b5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_moe can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_ripstock can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_sba3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_tactical_ar can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.683] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_tactical_spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.685] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/aa12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.685] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ai_awp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.685] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ak47 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.685] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/aug can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.685] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/b93r can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.685] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/cz75 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/db_long can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/db_short can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/deagle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/deagle_golden can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/fn_evolys can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/fn_fal can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/g36k can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/glock_17 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk416d can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_g3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_mk23 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_mp5a5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/kar98 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.686] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/lonetrail can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m1014 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m107 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m16a1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m16a4 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m1911 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m249 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m320 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m4a1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m700 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m870 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m95 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m9a4 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/minigun can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/mk14 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.687] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/p320 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/p90 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/qbz_191 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/qbz_95 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rhino357 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rpg7 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rpk can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/scar_h can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/scar_l can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/sks_tactical can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/spr15hb can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/springfield1873 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/taurus500 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/timeless50 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.688] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/type_81 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.689] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ump45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.689] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/uzi can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.689] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/vector45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:41.689] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:misc/blood_strike_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:12:59.419] [Server thread/INFO] [com.tacz.guns.GunMod/]: WP③ RepositorySource.loadPacks invoked for packType=SERVER_DATA
+[218月2026 21:12:59.419] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: discoverExtensions called with packType=SERVER_DATA, firstLoad=false
+[218月2026 21:12:59.420] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Start scanning for gun packs in D:\tacz_srv\tacz
+[218月2026 21:12:59.420] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - Cold War from 1947-1991 v0.51.zip, Main namespace: rainforest
+[218月2026 21:12:59.421] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - KhanPowder_v0.8.99_hotfix.zip, Main namespace: murasamet
+[218月2026 21:12:59.421] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - tacz_default_gun, Main namespace: tacz
+[218月2026 21:12:59.421] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - [Tacz1.1.7+]CIBR_GunsPack_v0.3_1.1.7.zip, Main namespace: cib
+[218月2026 21:12:59.422] [Server thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Found 4 possible gunpack(s) and added them to resource set.
+[218月2026 21:12:59.424] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: [GOOSTL: Reloading!]
+[218月2026 21:13:00.071] [Worker-Main-15/INFO] [com.tacz.guns.GunMod/]: WP④ CommonAssetsManager listeners registered (gun index fills after reload). placeholderGuns=0
+[218月2026 21:13:00.110] [Worker-Main-13/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'ciblr'
+[218月2026 21:13:00.117] [Worker-Main-13/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'cibs'
+[218月2026 21:13:00.135] [Worker-Main-13/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 7 legacy recipes/ file(s) to recipe/ for namespace 'murasamet'
+[218月2026 21:13:00.151] [Worker-Main-13/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 3 legacy recipes/ file(s) to recipe/ for namespace 'cib'
+[218月2026 21:13:00.156] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'ciblr'
+[218月2026 21:13:00.159] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'cibs'
+[218月2026 21:13:00.167] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 7 legacy recipes/ file(s) to recipe/ for namespace 'murasamet'
+[218月2026 21:13:00.172] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 3 legacy recipes/ file(s) to recipe/ for namespace 'cib'
+[218月2026 21:13:00.260] [Worker-Main-2/INFO] [com.tacz.guns.GunMod/TableRecipeLoader]: Found 281 recipe file(s) in legacy 'recipes/' directory (old gun pack layout), 1711 in 'recipe/'.
+[218月2026 21:13:00.807] [Server thread/INFO] [net.minecraft.world.item.crafting.RecipeManager/]: Loaded 1711 recipes
+[218月2026 21:13:00.812] [Server thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 1617 advancements
+[218月2026 21:13:00.812] [Server thread/INFO] [net.neoforged.neoforge.common.crafting.RecipePriorityManager/]: Loaded 0 recipe priority overrides
+[218月2026 21:13:00.842] [Server thread/WARN] [com.tacz.guns.GunMod/ScriptLoader]: Failed to read script file: murasamet:blunderbuss_gun_logic
+[218月2026 21:13:00.854] [Server thread/INFO] [com.tacz.guns.GunMod/TableRecipeLoader]: Left 1052 vanilla recipe(s) from 'recipes/' to PackResources remapping (RecipeManager registry).
+[218月2026 21:13:00.870] [Server thread/INFO] [com.tacz.guns.GunMod/]: WP④ gun pack loaded: guns=253 ammo=44 attachments=145 blocks=9 recipes=441
+[218月2026 21:13:00.872] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/12g can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.872] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/22wmr can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/308 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/30_06 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/338 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/357mag can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/40mm can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/45_70 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/45acp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/46x30 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/500mag can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/50ae can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/50bmg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/545x39 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/556x45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/57x28 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/58x42 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.873] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/68x51fury can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x25 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x39 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x54 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/792x57 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/9mm can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/rpg_rocket can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_fmj can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_he can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_hp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_i can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_slug can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/bayonet_6h3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/bayonet_m9 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/deagle_golden_long_barrel can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_cobra can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_magpul_afg_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_osovets_black can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk0 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.874] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk1_b25u can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_se_5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_td can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_military can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_ranger can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_talon can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_compact can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_lopro can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_nightstick can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.875] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_peq6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_cthulhu can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_cyclone_d2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_mastiff_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_pioneer can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_timeless50 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_trex can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_choke_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_compensator_trident can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_knight_qd can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_mirage can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_phantom_s1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.876] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_ptilopsis can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_ursus can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_vulture can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_wraith can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_heavy can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_light can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_tactical can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_1873_6x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_98k can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.877] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_acog_ta31 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_contender can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_elcan_4x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_hamr can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_lpvo_1_6 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_mk5hd can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_qmk152 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_retro_2x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_standard_8x can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_vudu can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_552 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_acro_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.878] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_acro_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_coyote can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_deltapoint_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_deltapoint_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_exp3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_fastfire_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_fastfire_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_okp7 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_pk06_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_pk06_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_rmr_dot can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_sro_dot can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_srs_02 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_t1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_t2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_uh1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.879] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_ak12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_carbon_bone_c5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_heavy_spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_hk_slim_line can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_m4ss can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_militech_b5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_moe can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_ripstock can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_sba3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_tactical_ar can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.880] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_tactical_spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.881] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/aa12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.881] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ai_awp can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.881] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ak47 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.881] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/aug can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.881] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/b93r can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.881] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/cz75 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/db_long can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/db_short can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/deagle can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/deagle_golden can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/fn_evolys can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/fn_fal can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/g36k can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/glock_17 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk416d can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_g3 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_mk23 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_mp5a5 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/kar98 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/lonetrail can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m1014 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m107 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m16a1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m16a4 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m1911 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m249 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m320 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m4a1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m700 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m870 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m95 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m9a4 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/minigun can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/mk14 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/p320 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/p90 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.882] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/qbz_191 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/qbz_95 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rhino357 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rpg7 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rpk can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/scar_h can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/scar_l can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/sks_tactical can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/spr15hb can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/springfield1873 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/taurus500 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/timeless50 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/type_81 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ump45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/uzi can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.884] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/vector45 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:00.885] [Server thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:misc/blood_strike_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 21:13:23.386] [Server thread/INFO] [net.minecraft.server.network.ServerGamePacketListenerImpl/]: GOOSTL lost connection: Disconnected
+[218月2026 21:13:23.387] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: GOOSTL left the game
+[218月2026 21:13:24.546] [Server thread/INFO] [net.minecraft.server.players.PlayerList/]: GOOSTL[/127.0.0.1:61706] logged in with entity id 406 at (236.69999998807907, 70.0, -158.79747859443236)
+[218月2026 21:13:24.554] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: GOOSTL joined the game
+[218月2026 21:15:45.310] [Netty NIO IO #4/ERROR] [net.minecraft.network.Connection/]: Exception caught in connection
+java.net.SocketException: Connection reset
+	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:399) ~[?:?]
+	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:431) ~[?:?]
+	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:489) ~[?:?]
+	at io.netty.buffer.AdaptivePoolingAllocator$AdaptiveByteBuf.setBytes(AdaptivePoolingAllocator.java:1824) ~[netty-buffer-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1139) ~[netty-buffer-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:350) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:153) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.handle(AbstractNioChannel.java:445) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler$DefaultNioRegistration.handle(NioIoHandler.java:388) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKey(NioIoHandler.java:596) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKeysPlain(NioIoHandler.java:541) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKeys(NioIoHandler.java:514) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler.run(NioIoHandler.java:484) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.runIo(SingleThreadIoEventLoop.java:225) [netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.run(SingleThreadIoEventLoop.java:196) [netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:1193) [netty-common-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) [netty-common-4.2.7.Final.jar:4.2.7.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 21:15:45.337] [Server thread/INFO] [net.minecraft.server.network.ServerGamePacketListenerImpl/]: GOOSTL lost connection: Disconnected
+[218月2026 21:15:45.337] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: GOOSTL left the game
+[218月2026 21:16:13.105] [Server thread/INFO] [net.minecraft.server.players.PlayerList/]: GOOSTL[/127.0.0.1:64080] logged in with entity id 804 at (241.51287773783173, 69.0, -159.882250592755)
+[218月2026 21:16:13.124] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: GOOSTL joined the game
+[218月2026 21:17:59.828] [Netty NIO IO #5/ERROR] [net.minecraft.network.Connection/]: Exception caught in connection
+java.net.SocketException: Connection reset
+	at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:399) ~[?:?]
+	at java.base/sun.nio.ch.SocketChannelImpl.implRead(SocketChannelImpl.java:431) ~[?:?]
+	at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:489) ~[?:?]
+	at io.netty.buffer.AdaptivePoolingAllocator$AdaptiveByteBuf.setBytes(AdaptivePoolingAllocator.java:1824) ~[netty-buffer-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:1139) ~[netty-buffer-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:350) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:153) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.handle(AbstractNioChannel.java:445) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler$DefaultNioRegistration.handle(NioIoHandler.java:388) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKey(NioIoHandler.java:596) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKeysPlain(NioIoHandler.java:541) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler.processSelectedKeys(NioIoHandler.java:514) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.nio.NioIoHandler.run(NioIoHandler.java:484) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.runIo(SingleThreadIoEventLoop.java:225) [netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.run(SingleThreadIoEventLoop.java:196) [netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:1193) [netty-common-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) [netty-common-4.2.7.Final.jar:4.2.7.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 21:17:59.836] [Server thread/INFO] [net.minecraft.server.network.ServerGamePacketListenerImpl/]: GOOSTL lost connection: Disconnected
+[218月2026 21:17:59.837] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: GOOSTL left the game
+[218月2026 21:18:01.535] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Stopping server
+[218月2026 21:18:01.536] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving players
+[218月2026 21:18:01.536] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving worlds
+[218月2026 21:18:01.536] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[218月2026 21:18:01.554] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[218月2026 21:18:01.566] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[218月2026 21:18:01.597] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[218月2026 21:18:01.598] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[218月2026 21:18:01.598] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[218月2026 21:18:01.598] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage: All dimensions are saved
+[218月2026 21:18:01.646] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Closing FML Loader 78b9785d
+[218月2026 21:18:01.648] [main/INFO] [net.neoforged.fml.ModLoader/]: Clearing ModLoader
