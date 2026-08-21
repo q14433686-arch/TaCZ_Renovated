@@ -1,0 +1,1063 @@
+[218月2026 14:55:45.539] [main/INFO] [net.neoforged.fml.startup.Entrypoint/]: JVM Uptime at startup: 368ms
+[218月2026 14:55:45.765] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Starting FancyModLoader version 11.0.15 (CLIENT in PROD)
+[218月2026 14:55:45.765] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Game directory: D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97
+[218月2026 14:55:45.833] [main/INFO] [net.neoforged.fml.loading.EarlyServiceDiscovery/]: Found 3 early service jars (out of 118) in 37ms
+[218月2026 14:55:45.833] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Loading FML Early Services:
+[218月2026 14:55:45.834] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - D:/DOWLOD/.minecraft/libraries/net/neoforged/fancymodloader/earlydisplay/11.0.15/earlydisplay-11.0.15.jar
+[218月2026 14:55:45.835] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - D:/DOWLOD/.minecraft/libraries/net/neoforged/fancymodloader/loader/11.0.15/loader-11.0.15.jar
+[218月2026 14:55:45.836] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/[钠] sodium-neoforge-0.9.1+mc26.1.2.jar
+[218月2026 14:55:45.844] [main/INFO] [net.neoforged.fml.loading.ImmediateWindowHandler/]: Running graphics bootstrap plugin sodium
+[218月2026 14:55:45.847] [main/INFO] [Sodium-GraphicsAdapterProbe/]: Searching for graphics cards...
+[218月2026 14:55:46.042] [main/INFO] [Sodium-GraphicsAdapterProbe/]: Found graphics adapter: AdapterInfo{vendor=AMD, description='AMD Radeon(TM) Graphics', adapterType=0x00002303, openglIcdFilePath='C:\Windows\System32\DriverStore\FileRepository\u0202642.inf_amd64_870f6b155aa057ce\B026261\atig6pxx.dll', openglIcdVersion=32.0.21045.1000}
+[218月2026 14:55:46.043] [main/INFO] [Sodium-GraphicsAdapterProbe/]: Found graphics adapter: AdapterInfo{vendor=AMD, description='AMD  Radeon RX 7800 XT', adapterType=0x0000230B, openglIcdFilePath='C:\Windows\System32\DriverStore\FileRepository\u0202643.inf_amd64_8835e06f359414be\B026283\atig6pxx.dll', openglIcdVersion=32.0.31035.1003}
+[218月2026 14:55:46.045] [main/WARN] [Sodium-Workarounds/]: Sodium has applied one or more workarounds to prevent crashes or other issues on your system: [AMD_GAME_OPTIMIZATION_BROKEN]
+[218月2026 14:55:46.046] [main/WARN] [Sodium-Workarounds/]: This is not necessarily an issue, but it may result in certain features or optimizations being disabled. You can sometimes fix these issues by upgrading your graphics driver.
+[218月2026 14:55:46.046] [main/INFO] [Sodium-AmdWorkarounds/]: Modifying process environment to apply workarounds for the AMD graphics driver...
+[218月2026 14:55:46.050] [main/INFO] [net.neoforged.fml.loading.ImmediateWindowHandler/]: Loading ImmediateWindowProvider fmlearlywindow
+[218月2026 14:55:47.119] [ForkJoinPool.commonPool-worker-4/INFO] [net.neoforged.fml.loading.moddiscovery.locators.GameLocator/]: Marking unmodified client jar as claimed to prevent loading: D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97\26.1.2-NeoForge_26.1.2.97.jar
+[218月2026 14:55:47.128] [ForkJoinPool.commonPool-worker-4/INFO] [net.neoforged.fml.loading.moddiscovery.locators.GameLocator/]: Failed to find common Minecraft classes and resources on the classpath. Assuming we're launching production.
+[218月2026 14:55:47.154] [fml-loadingscreen/INFO] [net.neoforged.fml.earlydisplay.render.LoadingScreenRenderer/]: GL info: AMD  Radeon RX 7800 XT GL version 3.3.0 Core Profile Context 26.7.1.260716, ATI Technologies Inc.
+[218月2026 14:55:47.507] [ForkJoinPool.commonPool-worker-4/INFO] [net.neoforged.fml.loading.moddiscovery.locators.JarInJarDependencyLocator/]: Found 23 dependencies adding them to mods collection
+[218月2026 14:55:47.508] [ForkJoinPool.commonPool-worker-4/INFO] [net.neoforged.fml.loading.moddiscovery.ModDiscoverer/]: 
+     Mod List:
+		Name Version (Mod Id)
+
+		3d-Skin-Layers 1.11.2 (skinlayers3d)
+		Architectury 20.0.12 (architectury)
+		Carry On 2.10.0 (carryon)
+		Cloth Config v26.1 API 26.1.154 (cloth_config)
+		Dynamic FPS 3.11.7 (dynamic_fps)
+		Dynamic FPS Common 3.11.7 (dynamic_fps_common)
+		ImmediatelyFast 1.15.3+26.1 (immediatelyfast)
+		Iris 1.11.3+mc26.1.2 (iris)
+		LambDynamicLights 4.11.1+26.1.2 (lambdynlights)
+		LambDynamicLights (API) 4.11.1+26.1.2 (lambdynlights_api)
+		LAN World Plug-n-Play 2.0.0 (mcwifipnp)
+		Minecraft 26.1.2 (minecraft)
+		Mouse Tweaks 2.31 (mousetweaks)
+		NeoForge 26.1.2.97 (neoforge)
+		Player Animation Library 1.2.5+mc.26.1 (player_animation_library)
+		Pride Lib 1.6.0+26.1 (pride)
+		Reese's Sodium Options 2.2.3+mc26.1.2 (reeses_sodium_options)
+		Roughly Enough Items (REI) 26.1.819 (roughlyenoughitems)
+		Sodium 0.9.1+mc26.1.2 (sodium)
+		SpruceUI 10.0.0+26.1 (spruceui)
+		Timeless and Classics Zero 1.1.8+neoforge.26.1.2.r20 (tacz)
+		TRansition 1.0.21 (transition)
+		TRender 1.0.15 (trender)
+		Xaero's Minimap 26.4.2 (xaerominimap)
+		XaeroLib 1.7.1 (xaerolib)
+		Yumi Minecraft Libraries: Foundation 1.1.0+26.1 (yumi_mc_core)
+[218月2026 14:55:47.707] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/D:/DOWLOD/.minecraft/libraries/net/fabricmc/sponge-mixin/0.17.3+mixin.0.8.7/sponge-mixin-0.17.3+mixin.0.8.7.jar Service=FML Env=CLIENT
+[218月2026 14:55:47.736] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Loading FML Plugins:
+[218月2026 14:55:47.736] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/iris-neoforge-1.11.3+mc26.1.2.jar > jcpp-1.4.14.jar
+[218月2026 14:55:47.737] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/tacz-1.1.8+neoforge.26.1.2.r20.jar > luaj-jse-3.0.1.jar
+[218月2026 14:55:47.737] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/iris-neoforge-1.11.3+mc26.1.2.jar > glsl-transformer-3.0.0-pre3.jar
+[218月2026 14:55:47.737] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/tacz-1.1.8+neoforge.26.1.2.r20.jar > commons-math3-3.6.1.jar
+[218月2026 14:55:47.738] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/[动态 FPS] dynamic-fps-3.11.7+minecraft-26.1.0-neoforge.jar > battery-2.1.0.jar
+[218月2026 14:55:47.738] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/PlayerAnimationLibMerged-1.2.5+mc.26.1.jar > services-1.2.8.jar
+[218月2026 14:55:47.739] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/iris-neoforge-1.11.3+mc26.1.2.jar > antlr4-runtime-4.13.1.jar
+[218月2026 14:55:47.739] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - mods/ImmediatelyFast-NeoForge-1.15.3+26.1.jar > Reflect-1.6.2.jar
+[218月2026 14:55:47.739] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]:  - ~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar > net.neoforged.neoforge-coremods-26.1.2.97.jar
+[218月2026 14:55:47.834] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Building game content classloader:
+ - architectury (jar(mods/architectury-neoforge-20.0.12.jar))
+ - carryon (jar(mods/[搬运] carryon-neoforge-26.1.2-2.10.0.jar))
+ - cloth_config (jar(mods/cloth-config-26.1.154.jar))
+ - dev.yumi.commons.collections (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > lambdynamiclights-api-4.11.1+26.1.2.jar > yumi-commons-collections-2.0.0.jar))
+ - dev.yumi.commons.core (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > lambdynamiclights-api-4.11.1+26.1.2.jar > yumi-commons-core-2.0.0.jar))
+ - dev.yumi.commons.event (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > lambdynamiclights-api-4.11.1+26.1.2.jar > yumi-commons-event-2.0.0.jar))
+ - dynamic_fps (jar(mods/[动态 FPS] dynamic-fps-3.11.7+minecraft-26.1.0-neoforge.jar))
+ - dynamic_fps_common (jar(mods/[动态 FPS] dynamic-fps-3.11.7+minecraft-26.1.0-neoforge.jar > net.lostluma.dynamic-fps-3.11.7+minecraft-26.1.0-common.jar))
+ - immediatelyfast (jar(mods/ImmediatelyFast-NeoForge-1.15.3+26.1.jar))
+ - iris (jar(mods/iris-neoforge-1.11.3+mc26.1.2.jar))
+ - lambdynlights (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar))
+ - lambdynlights_api (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > lambdynamiclights-api-4.11.1+26.1.2.jar))
+ - mcwifipnp (jar(mods/[更高级联机设置] mcwifipnp-2.0.0-26.1.2-neoforge.jar))
+ - minecraft (jar(~libraries/net/neoforged/minecraft-client-patched/26.1.2.97/minecraft-client-patched-26.1.2.97.jar))
+ - mixinextras.neoforge (jar(~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar > mixinextras-neoforge-0.5.4.jar))
+ - mochafloats (jar(mods/PlayerAnimationLibMerged-1.2.5+mc.26.1.jar > mochafloats-5.0.0.jar))
+ - mousetweaks (jar(mods/[鼠标手势] MouseTweaks-neoforge-mc26.1-2.31.jar))
+ - neoforge (jar(~libraries/net/neoforged/neoforge/26.1.2.97/neoforge-26.1.2.97-universal.jar))
+ - net.neoforged.fml.generated (empty(VirtualJar/net.neoforged.fml.generated))
+ - player_animation_library (jar(mods/PlayerAnimationLibMerged-1.2.5+mc.26.1.jar))
+ - pride (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > pridelib-1.6.0+26.1.jar))
+ - reeses_sodium_options (jar(mods/[Reese的钠视频界面] reeses-sodium-options-neoforge-2.2.3+mc26.1.2.jar))
+ - roughlyenoughitems (jar(mods/[REI物品管理器] RoughlyEnoughItems-26.1.819.jar))
+ - skinlayers3d (jar(mods/[3D 皮肤层] skinlayers3d-neoforge-1.11.2-mc26.1.2.jar))
+ - sodium (jar(mods/[钠] sodium-neoforge-0.9.1+mc26.1.2.jar > net.caffeinemc.sodium-neoforge-0.9.1+mc26.1.2-mod.jar))
+ - spruceui (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > spruceui-10.0.0+26.1.jar))
+ - tacz (jar(mods/tacz-1.1.8+neoforge.26.1.2.r20.jar))
+ - transition (jar(mods/[3D 皮肤层] skinlayers3d-neoforge-1.11.2-mc26.1.2.jar > TRansition-1.0.21-26.1.2-neoforge-SNAPSHOT.jar))
+ - trender (jar(mods/[3D 皮肤层] skinlayers3d-neoforge-1.11.2-mc26.1.2.jar > TRender-1.0.15-26.1.2-neoforge-SNAPSHOT.jar))
+ - xaerolib (jar(mods/[Xaero的小地图] xaerominimap-neoforge-26.1.2-26.4.2.jar > xaerolib-neoforge-26.1.2-1.7.1.jar))
+ - xaerominimap (jar(mods/[Xaero的小地图] xaerominimap-neoforge-26.1.2-26.4.2.jar))
+ - yumi_mc_core (jar(mods/[Lambd的动态光源] lambdynamiclights-4.11.1+26.1.2.jar > yumi-mc-foundation-1.1.0+26.1.jar))
+[218月2026 14:55:47.852] [main/INFO] [net.neoforged.fml.loading.FMLLoader/]: Built game content classloader in 38ms
+[218月2026 14:55:47.885] [main/INFO] [mixin/]: Compatibility level set to JAVA_25
+[218月2026 14:55:47.918] [main/WARN] [mixin/]: Reference map 'xaerolib.refmap.json' for xaerolib.mixins.json could not be read. If this is a development environment you can ignore this message
+[218月2026 14:55:47.920] [main/WARN] [mixin/]: Reference map 'mcwifipnp-refmap.json' for mcwifipnp.mixins.json could not be read. If this is a development environment you can ignore this message
+[218月2026 14:55:47.921] [main/WARN] [mixin/]: Reference map 'iris.refmap.json' for mixins.iris.json could not be read. If this is a development environment you can ignore this message
+[218月2026 14:55:47.921] [main/WARN] [mixin/]: Reference map 'iris.refmap.json' for mixins.iris.vertexformat.json could not be read. If this is a development environment you can ignore this message
+[218月2026 14:55:47.921] [main/WARN] [mixin/]: Reference map 'iris.refmap.json' for mixins.iris.compat.sodium.json could not be read. If this is a development environment you can ignore this message
+[218月2026 14:55:48.002] [main/WARN] [mixin/]: Reference map 'carryon.refmap.json' for carryon.mixins.json could not be read. If this is a development environment you can ignore this message
+[218月2026 14:55:48.008] [main/INFO] [Sodium/]: Loaded configuration file for Sodium: 36 options available, 1 override(s) found
+[218月2026 14:55:48.009] [main/WARN] [mixin/]: Reference map 'skinlayers3d.refmap.mixins.json' for skinlayers3d.mixins.json could not be read. If this is a development environment you can ignore this message
+[218月2026 14:55:48.323] [main/WARN] [mixin/]: Error loading class: com/portingdeadmods/cable_facades/events/GameClientEvents$2 (java.lang.ClassNotFoundException: com.portingdeadmods.cable_facades.events.GameClientEvents$2)
+[218月2026 14:55:48.323] [main/WARN] [mixin/]: Error loading class: com/direwolf20/justdirethings/client/renderers/OurRenderTypes (java.lang.ClassNotFoundException: com.direwolf20.justdirethings.client.renderers.OurRenderTypes)
+[218月2026 14:55:48.324] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/entity/RenderFlame (java.lang.ClassNotFoundException: mekanism.client.render.entity.RenderFlame)
+[218月2026 14:55:48.324] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/armor/MekaSuitArmor (java.lang.ClassNotFoundException: mekanism.client.render.armor.MekaSuitArmor)
+[218月2026 14:55:48.324] [main/WARN] [mixin/]: Error loading class: mekanism/client/render/lib/effect/BillboardingEffectRenderer (java.lang.ClassNotFoundException: mekanism.client.render.lib.effect.BillboardingEffectRenderer)
+[218月2026 14:55:48.325] [main/WARN] [mixin/]: Error loading class: blusunrize/immersiveengineering/client/utils/IEGLShaders (java.lang.ClassNotFoundException: blusunrize.immersiveengineering.client.utils.IEGLShaders)
+[218月2026 14:55:48.390] [main/WARN] [Sodium/]: Force-disabling mixin 'features.render.world.sky.LevelRendererMixin' as rule 'mixin.features.render.world.sky' (added by mods [iris]) disables it and children
+[218月2026 14:55:48.422] [main/WARN] [mixin/]: Error loading class: traben/entity_model_features/models/parts/EMFModelPart (java.lang.ClassNotFoundException: traben.entity_model_features.models.parts.EMFModelPart)
+[218月2026 14:55:48.470] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.5.4).
+[218月2026 14:55:49.302] [Datafixer Bootstrap/INFO] [com.mojang.datafixers.DataFixerBuilder/]: 294 Datafixer optimizations took 251 milliseconds
+[218月2026 14:55:49.461] [main/WARN] [oshi.driver.windows.perfmon.PerfmonDisabled/]: Invalid registry value type detected for PerfOS counters. Should be REG_DWORD. Ignoring: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PerfOS\Performance\Disable Performance Counters.
+[218月2026 14:55:52.339] [pool-18-thread-1/INFO] [dev.yumi.mc.core.impl.YumiFoundationMod/]: Initializing mods (entrypoint yumi:init)...
+[218月2026 14:55:52.482] [modloading-worker-0/INFO] [net.minecraft.server.LoggedPrintStream/]: [STDOUT]: [TRender] Initializing Client...
+[218月2026 14:55:52.494] [modloading-worker-0/INFO] [net.neoforged.neoforge.common.NeoForgeMod/NEOFORGE-MOD]: NeoForge mod loading, version 26.1.2.97, for MC 26.1.2
+[218月2026 14:55:52.500] [modloading-worker-0/INFO] [xaero.hud.minimap.MinimapLogs/]: No Optifine!
+[218月2026 14:55:52.500] [modloading-worker-0/INFO] [xaero.hud.minimap.MinimapLogs/]: Xaero's Minimap: No Vivecraft!
+[218月2026 14:55:52.500] [modloading-worker-0/INFO] [xaero.hud.minimap.MinimapLogs/]: Xaero's Minimap: Iris found!
+[218月2026 14:55:52.525] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Registering common data for channel xaerominimap:main!
+[218月2026 14:55:52.531] [modloading-worker-0/WARN] [Iris/]: Found fine program match for neoforge:pipeline/entity_smooth_cutout_cull: ENTITIES_CUTOUT
+[218月2026 14:55:52.537] [modloading-worker-0/WARN] [Iris/]: Found fine program match for neoforge:pipeline/entity_translucent_cull: ENTITIES_TRANSLUCENT
+[218月2026 14:55:52.537] [modloading-worker-0/WARN] [Iris/]: Found fine program match for neoforge:pipeline/entity_unlit_translucent: ENTITIES_TRANSLUCENT
+[218月2026 14:55:52.543] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Registering client data for channel xaerominimap:main!
+[218月2026 14:55:52.574] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Loading primary common config for channel xaerominimap:main!
+[218月2026 14:55:52.589] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Loading server config profiles for channel xaerominimap:main!
+[218月2026 14:55:52.597] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Loading primary client config for channel xaerominimap:main!
+[218月2026 14:55:52.603] [modloading-worker-0/INFO] [xaero.common.HudMod/]: Loading client config profiles for channel xaerominimap:main!
+[218月2026 14:55:52.616] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Registering common data for channel xaerolib:main!
+[218月2026 14:55:52.617] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Registering client data for channel xaerolib:main!
+[218月2026 14:55:52.618] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading primary common config for channel xaerolib:main!
+[218月2026 14:55:52.620] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: TaCZ NeoForge 26.1.2 port work package ⑥ loading. modId=tacz
+[218月2026 14:55:52.624] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading server config profiles for channel xaerolib:main!
+[218月2026 14:55:52.630] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading primary client config for channel xaerolib:main!
+[218月2026 14:55:52.636] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading client config profiles for channel xaerolib:main!
+[218月2026 14:55:52.651] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_depth_aperture: HAND_CUTOUT
+[218月2026 14:55:52.651] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_depth_aperture to the Iris HAND program.
+[218月2026 14:55:52.651] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_depth_cleanup: HAND_CUTOUT
+[218月2026 14:55:52.651] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_depth_cleanup to the Iris HAND program.
+[218月2026 14:55:52.651] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_etched_reticle: HAND_CUTOUT
+[218月2026 14:55:52.651] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_etched_reticle to the Iris HAND program.
+[218月2026 14:55:52.651] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_visible_reticle: HAND_TRANSLUCENT
+[218月2026 14:55:52.652] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_visible_reticle to the Iris HAND_TRANSLUCENT program.
+[218月2026 14:55:52.652] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_viewmodel_cutout: HAND_CUTOUT
+[218月2026 14:55:52.652] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_viewmodel_cutout to the Iris HAND program.
+[218月2026 14:55:52.652] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_flash_translucent: HAND_TRANSLUCENT
+[218月2026 14:55:52.652] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_flash_translucent to the Iris HAND_TRANSLUCENT program.
+[218月2026 14:55:52.652] [modloading-worker-0/WARN] [Iris/]: Found fine program match for tacz:pipeline/scope_flash_swirl: HAND_TRANSLUCENT
+[218月2026 14:55:52.652] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: [TACZ Iris] Assigned scope_flash_swirl to the Iris HAND_TRANSLUCENT program.
+[218月2026 14:55:52.653] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: TaCZ NeoForge 26.1.2 port work package ⑤ client loading. modId=tacz
+[218月2026 14:55:52.718] [modloading-worker-0/INFO] [REI/]: [REI] Config loaded
+[218月2026 14:55:52.755] [modloading-worker-0/INFO] [REI/]: [REI] Registered plugin provider DefaultPluginImpl [roughlyenoughitems] for REICommonPlugin
+[218月2026 14:55:52.756] [modloading-worker-0/INFO] [REI/]: [REI] Registered plugin provider DefaultRuntimePlugin [roughlyenoughitems] for REICommonPlugin
+[218月2026 14:55:52.761] [modloading-worker-0/INFO] [REI/]: [REI] Registered plugin provider REIPlugin [tacz] for REICommonPlugin
+[218月2026 14:55:52.796] [modloading-worker-0/INFO] [REI/]: [REI] Registered plugin provider DefaultClientPluginImpl [roughlyenoughitems] for REIClientPlugin
+[218月2026 14:55:52.804] [modloading-worker-0/INFO] [REI/]: [REI] Registered plugin provider DefaultClientRuntimePlugin [roughlyenoughitems] for REIClientPlugin
+[218月2026 14:55:52.805] [modloading-worker-0/INFO] [REI/]: [REI] Registered plugin provider HideIngredientsFromTagsPlugin [roughlyenoughitems] for REIClientPlugin
+[218月2026 14:55:52.807] [modloading-worker-0/INFO] [REI/]: [REI] Registered plugin provider REIClientPlugin [tacz] for REIClientPlugin
+[218月2026 14:55:53.161] [Render thread/INFO] [com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService/]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[218月2026 14:55:53.177] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Setting user: GOOSTL
+[218月2026 14:55:53.241] [Render thread/INFO] [LambDynamicLights/]: [LambDynLights] Initializing LambDynamicLights...
+[218月2026 14:55:53.255] [Render thread/INFO] [LambDynamicLights|Config/]: [LambDynLights] Configuration loaded.
+[218月2026 14:55:53.411] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Backend library: LWJGL version 3.4.1+2
+[218月2026 14:55:53.444] [ForkJoinPool.commonPool-worker-2/WARN] [Iris/]: [Iris Update Check] Failed to get update info!
+javax.net.ssl.SSLHandshakeException: (certificate_unknown) PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:130) ~[?:?]
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:376) ~[?:?]
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:319) ~[?:?]
+	at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:314) ~[?:?]
+	at java.base/sun.security.ssl.CertificateMessage$T13CertificateConsumer.checkServerCerts(CertificateMessage.java:1295) ~[?:?]
+	at java.base/sun.security.ssl.CertificateMessage$T13CertificateConsumer.onConsumeCertificate(CertificateMessage.java:1172) ~[?:?]
+	at java.base/sun.security.ssl.CertificateMessage$T13CertificateConsumer.consume(CertificateMessage.java:1115) ~[?:?]
+	at java.base/sun.security.ssl.SSLHandshake.consume(SSLHandshake.java:421) ~[?:?]
+	at java.base/sun.security.ssl.HandshakeContext.dispatch(HandshakeContext.java:477) ~[?:?]
+	at java.base/sun.security.ssl.HandshakeContext.dispatch(HandshakeContext.java:448) ~[?:?]
+	at java.base/sun.security.ssl.TransportContext.dispatch(TransportContext.java:199) ~[?:?]
+	at java.base/sun.security.ssl.SSLTransport.decode(SSLTransport.java:172) ~[?:?]
+	at java.base/sun.security.ssl.SSLSocketImpl.decode(SSLSocketImpl.java:1506) ~[?:?]
+	at java.base/sun.security.ssl.SSLSocketImpl.readHandshakeRecord(SSLSocketImpl.java:1421) ~[?:?]
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:455) ~[?:?]
+	at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:426) ~[?:?]
+	at java.base/sun.net.www.protocol.https.HttpsClient.afterConnect(HttpsClient.java:483) ~[?:?]
+	at java.base/sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:187) ~[?:?]
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1377) ~[?:?]
+	at java.base/sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1302) ~[?:?]
+	at java.base/sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:223) ~[?:?]
+	at java.base/java.net.URL.openStream(URL.java:1263) ~[?:?]
+	at TRANSFORMER/iris@1.11.3+mc26.1.2/net.irisshaders.iris.UpdateChecker.lambda$checkForUpdates$0(UpdateChecker.java:89) ~[?:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1789) [?:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1781) [?:?]
+	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:511) [?:?]
+	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1450) [?:?]
+	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:2019) [?:?]
+	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:187) [?:?]
+Caused by: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:387) ~[?:?]
+	at java.base/sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:270) ~[?:?]
+	at java.base/sun.security.validator.Validator.validate(Validator.java:256) ~[?:?]
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:230) ~[?:?]
+	at java.base/sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:132) ~[?:?]
+	at java.base/sun.security.ssl.CertificateMessage$T13CertificateConsumer.checkServerCerts(CertificateMessage.java:1279) ~[?:?]
+	... 24 more
+Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.build(SunCertPathBuilder.java:148) ~[?:?]
+	at java.base/sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:129) ~[?:?]
+	at java.base/java.security.cert.CertPathBuilder.build(CertPathBuilder.java:299) ~[?:?]
+	at java.base/sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:382) ~[?:?]
+	... 29 more
+[218月2026 14:55:53.618] [Render thread/INFO] [Iris/]: Debug functionality is disabled.
+[218月2026 14:55:53.619] [Render thread/INFO] [Iris/]: ARB_direct_state_access detected, enabling DSA.
+[218月2026 14:55:53.631] [Render thread/INFO] [Iris/]: Shaders are disabled because enableShaders is set to false in iris.properties
+[218月2026 14:55:53.631] [Render thread/INFO] [ImmediatelyFast/]: Initializing ImmediatelyFast 1.15.3+26.1 on AMD  Radeon RX 7800 XT (ATI Technologies Inc.) with OpenGL 3.3.0 Core Profile Context 26.7.1.260716
+[218月2026 14:55:53.631] [Render thread/INFO] [ImmediatelyFast/]: Found Iris 1.11.3+mc26.1.2. Enabling compatibility.
+[218月2026 14:55:53.678] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Using optional rendering extensions: GL_ARB_buffer_storage, GL_KHR_debug, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access, GL_EXT_texture_filter_anisotropic
+[218月2026 14:55:53.685] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP③ onAddPackFinders called with packType=CLIENT_RESOURCES
+[218月2026 14:55:53.800] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP③ RepositorySource.loadPacks invoked for packType=CLIENT_RESOURCES
+[218月2026 14:55:53.802] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: discoverExtensions called with packType=CLIENT_RESOURCES, firstLoad=true
+[218月2026 14:55:53.819] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Start scanning for gun packs in D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97\tacz
+[218月2026 14:55:53.822] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - Cold War from 1947-1991 v0.51.zip, Main namespace: rainforest
+[218月2026 14:55:53.823] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - KhanPowder_v0.8.99_hotfix.zip, Main namespace: murasamet
+[218月2026 14:55:53.824] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - tacz_default_gun, Main namespace: tacz
+[218月2026 14:55:53.825] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - [Tacz1.1.7+]CIBR_GunsPack_v0.3_1.1.7.zip, Main namespace: cib
+[218月2026 14:55:53.825] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Found 4 possible gunpack(s) and added them to resource set.
+[218月2026 14:55:54.220] [Render thread/INFO] [Iris/]: Hardware information:
+[218月2026 14:55:54.220] [Render thread/INFO] [Iris/]: CPU: 16x AMD Ryzen 7 7700 8-Core Processor 
+[218月2026 14:55:54.221] [Render thread/INFO] [Iris/]: GPU: AMD  Radeon RX 7800 XT (Supports OpenGL 3.3.0 Core Profile Context 26.7.1.260716)
+[218月2026 14:55:54.221] [Render thread/INFO] [Iris/]: OS: Windows 11 (10.0)
+[218月2026 14:55:54.586] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib common 1/2!
+[218月2026 14:55:54.586] [modloading-worker-0/INFO] [com.tacz.guns.GunMod/]: WP② registries ready: gun=tacz:modern_kinetic_gun workbench_a=tacz:workbench_a gun_smith_table=tacz:gun_smith_table recipe=tacz:gun_smith_table_crafting
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:shoot_cool_down for minecraft:living_entity
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:melee_cool_down for minecraft:living_entity
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:reload_state for minecraft:living_entity
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:aiming_progress for minecraft:living_entity
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:draw_cool_down for minecraft:living_entity
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:is_aiming for minecraft:living_entity
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:sprint_time for minecraft:living_entity
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:is_bolting for minecraft:living_entity
+[218月2026 14:55:54.604] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/SYNCED_ENTITY_DATA_TAC_COPY]: Registered synced data key tacz:throwable_using for minecraft:living_entity
+[218月2026 14:55:54.606] [modloading-worker-0/INFO] [xaero.minimap.XaeroMinimap/]: Loading Xaero's Minimap - Stage 1/3
+[218月2026 14:55:54.607] [modloading-worker-0/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib client 1/3!
+[218月2026 14:55:54.607] [modloading-worker-0/INFO] [net.minecraft.server.LoggedPrintStream/]: [STDOUT]: [Mouse Tweaks] Main.initialize()
+[218月2026 14:55:54.609] [modloading-worker-0/INFO] [net.minecraft.server.LoggedPrintStream/]: [STDOUT]: [Mouse Tweaks] Initialized.
+[218月2026 14:55:54.620] [NeoForge Version Check/INFO] [net.neoforged.fml.VersionChecker/]: [dynamic_fps] Starting version check at https://api.lostluma.net/updates/dynamic-fps?platform=neoforge
+[218月2026 14:55:55.516] [modloading-worker-0/WARN] [xaero.lib.XaeroLib/]: io exception while checking patreon: Read timed out
+[218月2026 14:55:55.528] [modloading-sync-worker/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:55:55.528] [modloading-sync-worker/WARN] [com.tacz.guns.GunMod/]: [TACZ Iris] Iris cannot classify render pipeline entity_cutout; vanilla pipeline used.
+java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:119) ~[?:?]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[?:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.iris.IrisCompat.assignPipelineToIris(IrisCompat.java:57) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.iris.IrisCompat.assignCommonEntityPipelinesToHandIfNeeded(IrisCompat.java:75) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.shader.ShaderCompat.assignCommonEntityPipelinesToHandIfNeeded(ShaderCompat.java:35) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.client.GunModClient.lambda$onClientSetup$0(GunModClient.java:36) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at net.neoforged.fml.DeferredWorkQueue.lambda$makeRunnable$0(DeferredWorkQueue.java:67) [loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.DeferredWorkQueue.makeRunnable(DeferredWorkQueue.java:62) [loader-11.0.15.jar:11.0]
+	at net.neoforged.fml.DeferredWorkQueue.lambda$runTasks$0(DeferredWorkQueue.java:47) [loader-11.0.15.jar:11.0]
+	at java.base/java.util.concurrent.ConcurrentLinkedDeque.forEach(ConcurrentLinkedDeque.java:1650) [?:?]
+	at net.neoforged.fml.DeferredWorkQueue.runTasks(DeferredWorkQueue.java:47) [loader-11.0.15.jar:11.0]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+Caused by: java.lang.IllegalStateException: Shader already assigned: minecraft:pipeline/entity_cutout: HAND_CUTOUT
+	at TRANSFORMER/iris@1.11.3+mc26.1.2/net.irisshaders.iris.pipeline.IrisPipelines.assignPipeline(IrisPipelines.java:235) ~[iris-neoforge-1.11.3+mc26.1.2.jar:?]
+	at TRANSFORMER/iris@1.11.3+mc26.1.2/net.irisshaders.iris.apiimpl.IrisApiV0Impl.assignPipeline(IrisApiV0Impl.java:83) ~[iris-neoforge-1.11.3+mc26.1.2.jar:?]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[?:?]
+	... 15 more
+[218月2026 14:55:55.529] [modloading-sync-worker/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:55:55.529] [modloading-sync-worker/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:55:55.529] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/]: TaCZ client setup (work package ⑥ ShaderCompat). minecraft=GOOSTL
+[218月2026 14:55:55.535] [modloading-sync-worker/INFO] [xaero.minimap.XaeroMinimap/]: Loading Xaero's Minimap - Stage 2/3
+[218月2026 14:55:56.117] [NeoForge Version Check/INFO] [net.neoforged.fml.VersionChecker/]: [dynamic_fps] Found status: UP_TO_DATE Current: 3.11.7 Target: null
+[218月2026 14:55:56.482] [modloading-sync-worker/WARN] [xaero.hud.minimap.MinimapLogs/]: io exception while checking versions: Read timed out
+[218月2026 14:55:56.483] [modloading-sync-worker/INFO] [xaero.hud.minimap.MinimapLogs/]: Registered player tracker system: minimap_synced
+[218月2026 14:55:56.484] [modloading-sync-worker/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib common 2/2!
+[218月2026 14:55:56.484] [modloading-sync-worker/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib client 2/3!
+[218月2026 14:55:56.524] [modloading-sync-worker/INFO] [com.tacz.guns.GunMod/]: WP③ payloads registered (play + configuration), version=1.0.5
+[218月2026 14:55:56.605] [Render thread/INFO] [net.minecraft.server.packs.resources.ReloadableResourceManager/]: Reloading ResourceManager: tacz_resources, vanilla, mod_resources, mod/sodium, mod/mousetweaks, mod/xaerolib, mod/tacz, mod/roughlyenoughitems, mod/trender, mod/reeses_sodium_options, mod/xaerominimap, mod/neoforge, mod/spruceui, mod/mcwifipnp, mod/dynamic_fps_common, mod/iris, mod/lambdynlights, mod/yumi_mc_core, mod/immediatelyfast, mod/lambdynlights_api, mod/architectury, mod/transition, mod/dynamic_fps, mod/carryon, mod/player_animation_library, mod/cloth_config, mod/skinlayers3d, mod/pride
+[218月2026 14:55:56.820] [Worker-Main-3/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_pua-17.0.01.hex, loading
+[218月2026 14:55:56.821] [Worker-Main-13/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_all_no_pua-17.0.01.hex, loading
+[218月2026 14:55:56.828] [Render thread/INFO] [xaero.minimap.XaeroMinimap/]: Loading Xaero's Minimap - Stage 3/3
+[218月2026 14:55:56.833] [Render thread/INFO] [xaero.lib.XaeroLib/]: Loading XaeroLib client 3/3!
+[218月2026 14:55:56.894] [Render thread/INFO] [com.mojang.blaze3d.systems.RenderSystem/]: Thread[#3,Render thread,10,main]
+[218月2026 14:55:56.894] [Render thread/INFO] [com.mojang.blaze3d.systems.RenderSystem/]: OpenGL Vendor: ATI Technologies Inc.
+[218月2026 14:55:56.894] [Render thread/INFO] [com.mojang.blaze3d.systems.RenderSystem/]: OpenGL Renderer: AMD  Radeon RX 7800 XT
+[218月2026 14:55:56.894] [Render thread/INFO] [com.mojang.blaze3d.systems.RenderSystem/]: OpenGL Version: 3.3.0 Core Profile Context 26.7.1.260716
+[218月2026 14:55:56.923] [Worker-Main-6/INFO] [net.minecraft.client.gui.font.providers.UnihexProvider/]: Found unifont_jp_patch-17.0.01.hex, loading
+[218月2026 14:55:57.721] [Render thread/WARN] [com.mojang.blaze3d.opengl.GlProgram/]: tacz:pipeline/scope_depth_cleanup shader program does not use sampler Sampler0 defined in the pipeline. This might be a bug.
+[218月2026 14:55:57.770] [Render thread/INFO] [com.mojang.blaze3d.audio.Library/]: OpenAL initialized on device OpenAL Soft on 耳机 (High Definition Audio Device)
+[218月2026 14:55:57.771] [Render thread/INFO] [net.minecraft.client.sounds.SoundEngine/SOUNDS]: Sound engine started
+[218月2026 14:55:57.771] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[218月2026 14:55:57.783] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 128x128x0 minecraft:textures/atlas/decorated_pot.png-atlas
+[218月2026 14:55:57.784] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 2048x1024x0 minecraft:textures/atlas/armor_trims.png-atlas
+[218月2026 14:55:57.790] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[218月2026 14:55:57.791] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x512x0 minecraft:textures/atlas/shield_patterns.png-atlas
+[218月2026 14:55:57.791] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 4096x2048x4 minecraft:textures/atlas/blocks.png-atlas
+[218月2026 14:55:57.872] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x512x0 minecraft:textures/atlas/chest.png-atlas
+[218月2026 14:55:57.874] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 256x128x0 minecraft:textures/atlas/celestials.png-atlas
+[218月2026 14:55:57.874] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x512x0 minecraft:textures/atlas/banner_patterns.png-atlas
+[218月2026 14:55:57.874] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x512x0 minecraft:textures/atlas/beds.png-atlas
+[218月2026 14:55:57.875] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x512x0 minecraft:textures/atlas/items.png-atlas
+[218月2026 14:55:57.880] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x1024x0 minecraft:textures/atlas/gui.png-atlas
+[218月2026 14:55:57.883] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 128x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[218月2026 14:55:57.884] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x256x0 minecraft:textures/atlas/signs.png-atlas
+[218月2026 14:55:57.885] [Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 512x512x0 minecraft:textures/atlas/shulker_boxes.png-atlas
+[218月2026 14:55:57.946] [Render thread/INFO] [net.neoforged.neoforge.client.entity.animation.json.AnimationLoader/]: Loaded 0 entity animations
+[218月2026 14:55:58.828] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP④ client gun pack loaded: displays=255 guns=0 ammo=0 attachments=0 blocks=0 recipes=0
+[218月2026 14:55:58.884] [Render thread/INFO] [Iris/]: Creating pipeline for dimension minecraft:overworld
+[218月2026 14:56:05.718] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP③ onAddPackFinders called with packType=SERVER_DATA
+[218月2026 14:56:05.730] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP③ RepositorySource.loadPacks invoked for packType=SERVER_DATA
+[218月2026 14:56:05.730] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: discoverExtensions called with packType=SERVER_DATA, firstLoad=false
+[218月2026 14:56:05.730] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Start scanning for gun packs in D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97\tacz
+[218月2026 14:56:05.731] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - Cold War from 1947-1991 v0.51.zip, Main namespace: rainforest
+[218月2026 14:56:05.731] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - KhanPowder_v0.8.99_hotfix.zip, Main namespace: murasamet
+[218月2026 14:56:05.731] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - tacz_default_gun, Main namespace: tacz
+[218月2026 14:56:05.731] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - [Tacz1.1.7+]CIBR_GunsPack_v0.3_1.1.7.zip, Main namespace: cib
+[218月2026 14:56:05.732] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Found 4 possible gunpack(s) and added them to resource set.
+[218月2026 14:56:06.731] [Worker-Main-5/INFO] [com.tacz.guns.GunMod/]: WP④ CommonAssetsManager listeners registered (gun index fills after reload). placeholderGuns=0
+[218月2026 14:56:06.768] [Worker-Main-12/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'ciblr'
+[218月2026 14:56:06.777] [Worker-Main-12/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'cibs'
+[218月2026 14:56:06.790] [Worker-Main-12/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 7 legacy recipes/ file(s) to recipe/ for namespace 'murasamet'
+[218月2026 14:56:06.802] [Worker-Main-12/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 3 legacy recipes/ file(s) to recipe/ for namespace 'cib'
+[218月2026 14:56:06.807] [Worker-Main-6/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'ciblr'
+[218月2026 14:56:06.811] [Worker-Main-6/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 1 legacy recipes/ file(s) to recipe/ for namespace 'cibs'
+[218月2026 14:56:06.818] [Worker-Main-6/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 7 legacy recipes/ file(s) to recipe/ for namespace 'murasamet'
+[218月2026 14:56:06.823] [Worker-Main-6/INFO] [com.tacz.guns.GunMod/]: [TACZ] Remapped 3 legacy recipes/ file(s) to recipe/ for namespace 'cib'
+[218月2026 14:56:06.903] [Worker-Main-6/INFO] [com.tacz.guns.GunMod/TableRecipeLoader]: Found 281 recipe file(s) in legacy 'recipes/' directory (old gun pack layout), 1711 in 'recipe/'.
+[218月2026 14:56:07.327] [Render thread/INFO] [net.minecraft.world.item.crafting.RecipeManager/]: Loaded 1711 recipes
+[218月2026 14:56:07.336] [Render thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 1617 advancements
+[218月2026 14:56:07.337] [Render thread/INFO] [net.neoforged.neoforge.common.crafting.RecipePriorityManager/]: Loaded 0 recipe priority overrides
+[218月2026 14:56:07.410] [Render thread/WARN] [com.tacz.guns.GunMod/ScriptLoader]: Failed to read script file: murasamet:blunderbuss_gun_logic
+[218月2026 14:56:07.436] [Render thread/INFO] [com.tacz.guns.GunMod/TableRecipeLoader]: Left 1052 vanilla recipe(s) from 'recipes/' to PackResources remapping (RecipeManager registry).
+[218月2026 14:56:07.478] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP④ gun pack loaded: guns=253 ammo=44 attachments=145 blocks=9 recipes=441
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/12g can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/22wmr can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/308 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/30_06 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/338 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/357mag can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/40mm can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/45_70 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/45acp can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/46x30 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/500mag can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/50ae can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/50bmg can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/545x39 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/556x45 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/57x28 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/58x42 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/68x51fury can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x25 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x39 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/762x54 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/792x57 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/9mm can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.546] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:ammo/rpg_rocket can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_fmj can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_he can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_hp can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_i can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/ammo_mod_slug can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/bayonet_6h3 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/bayonet_m9 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/deagle_golden_long_barrel can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_cobra can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_magpul_afg_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_osovets_black can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk0 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk1_b25u can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_rk6 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_se_5 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_td can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_military can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_ranger can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/grip_vertical_talon can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_compact can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_lopro can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.547] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_nightstick can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/laser_peq6 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/light_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_cthulhu can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_cyclone_d2 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_mastiff_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_pioneer can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_timeless50 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_brake_trex can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_choke_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_compensator_trident can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_knight_qd can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_mirage can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_phantom_s1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_ptilopsis can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_sg can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_ursus can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_vulture can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/muzzle_silencer_wraith can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_heavy can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_light can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/oem_stock_tactical can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_1873_6x can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_98k can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_acog_ta31 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_contender can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_elcan_4x can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_hamr can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_lpvo_1_6 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_mk5hd can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_qmk152 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.548] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_retro_2x can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_standard_8x can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/scope_vudu can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/shotgun_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_552 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_acro_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_acro_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_coyote can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_deltapoint_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_deltapoint_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_exp3 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_fastfire_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_fastfire_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_okp7 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_pk06_pistol can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_pk06_rifle can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_rmr_dot can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_sro_dot can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_srs_02 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_t1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_t2 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sight_uh1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_2 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/sniper_extended_mag_3 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_ak12 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_carbon_bone_c5 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_heavy_spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_hk_slim_line can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_m4ss can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_militech_b5 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_moe can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_ripstock can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_sba3 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.549] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_tactical_ar can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.550] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:attachments/stock_tactical_spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/aa12 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ai_awp can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ak47 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/aug can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/b93r can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/cz75 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/db_long can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/db_short can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/deagle can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/deagle_golden can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/fn_evolys can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/fn_fal can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/g36k can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/glock_17 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk416d can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_g3 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_mk23 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/hk_mp5a5 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/kar98 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/lonetrail can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.552] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m1014 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m107 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m16a1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m16a4 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m1911 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m249 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m320 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m4a1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m700 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m870 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m95 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/m9a4 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/minigun can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/mk14 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/p320 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/p90 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/qbz_191 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/qbz_95 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rhino357 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rpg7 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/rpk can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/scar_h can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/scar_l can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/sks_tactical can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/spas_12 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/spr15hb can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/springfield1873 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/taurus500 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/timeless50 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/type_81 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/ump45 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/uzi can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.553] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:gun/vector45 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.554] [Render thread/WARN] [net.minecraft.world.item.crafting.RecipeManager/]: Recipe tacz:misc/blood_strike_1 can't be placed due to empty ingredients and will be ignored
+[218月2026 14:56:07.583] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Starting integrated minecraft server version 26.1.2
+[218月2026 14:56:07.583] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Generating keypair
+[218月2026 14:56:07.765] [Server thread/INFO] [net.minecraft.server.level.progress.LoggingLevelLoadListener/]: Loading 0 persistent chunks...
+[218月2026 14:56:07.765] [Server thread/INFO] [net.minecraft.server.level.progress.LoggingLevelLoadListener/]: 准备生成区域中：16%
+[218月2026 14:56:07.776] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:overworld
+[218月2026 14:56:07.785] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:the_nether
+[218月2026 14:56:07.790] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:the_end
+[218月2026 14:56:07.802] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[218月2026 14:56:07.802] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[218月2026 14:56:07.802] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[218月2026 14:56:07.802] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage: All dimensions are saved
+[218月2026 14:56:07.805] [Server thread/INFO] [net.neoforged.neoforge.server.permission.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[218月2026 14:56:08.023] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP③ onAddPackFinders called with packType=SERVER_DATA
+[218月2026 14:56:08.028] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP③ RepositorySource.loadPacks invoked for packType=SERVER_DATA
+[218月2026 14:56:08.029] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: discoverExtensions called with packType=SERVER_DATA, firstLoad=false
+[218月2026 14:56:08.029] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Start scanning for gun packs in D:\DOWLOD\.minecraft\versions\26.1.2-NeoForge_26.1.2.97\tacz
+[218月2026 14:56:08.029] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - Cold War from 1947-1991 v0.51.zip, Main namespace: rainforest
+[218月2026 14:56:08.029] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - KhanPowder_v0.8.99_hotfix.zip, Main namespace: murasamet
+[218月2026 14:56:08.030] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - tacz_default_gun, Main namespace: tacz
+[218月2026 14:56:08.030] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: - [Tacz1.1.7+]CIBR_GunsPack_v0.3_1.1.7.zip, Main namespace: cib
+[218月2026 14:56:08.030] [Render thread/INFO] [com.tacz.guns.GunMod/GunPackFinder]: Found 4 possible gunpack(s) and added them to resource set.
+[218月2026 14:56:08.126] [Server thread/INFO] [net.minecraft.server.level.progress.LoggingLevelLoadListener/]: Loading 49 chunks for player spawn...
+[218月2026 14:56:08.215] [Server thread/INFO] [net.minecraft.server.level.progress.LoggingLevelLoadListener/]: Time elapsed: 451 ms
+[218月2026 14:56:08.400] [Server thread/INFO] [net.minecraft.server.players.PlayerList/]: GOOSTL[local:E:f1bca4d2] logged in with entity id 5 at (14.103402473224342, -60.0, -5.858865318866285)
+[218月2026 14:56:08.443] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: GOOSTL加入了游戏
+[218月2026 14:56:08.503] [Render thread/INFO] [xaero.hud.minimap.MinimapLogs/]: Minimap required item set to nothing.
+[218月2026 14:56:08.503] [Render thread/INFO] [xaero.hud.minimap.MinimapLogs/]: New Xaero hud session initialized!
+[218月2026 14:56:08.538] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Changing view distance to 12, from 10
+[218月2026 14:56:08.539] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Changing simulation distance to 12, from 0
+[218月2026 14:56:08.601] [Render thread/INFO] [ChunkBuilder/]: Started 10 worker threads
+[218月2026 14:56:08.701] [Render thread/INFO] [com.tacz.guns.GunMod/]: WP④ client gun pack loaded: displays=255 guns=253 ammo=44 attachments=145 blocks=9 recipes=441
+[218月2026 14:56:08.822] [Render thread/WARN] [REI/]: [REI] Found 1 existing reload task(s) after trying to terminate them!
+[218月2026 14:56:08.837] [REI-ReloadPlugins/INFO] [REI/]: [REI] @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+[218月2026 14:56:08.837] [REI-ReloadPlugins/INFO] [REI/]: [REI] REICommonPlugin starting main-reload for START.
+[218月2026 14:56:08.837] [REI-ReloadPlugins/INFO] [REI/]: [REI] Plugins (3):
+[218月2026 14:56:08.837] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (-100.00) DefaultPluginImpl of DefaultPluginImpl [roughlyenoughitems]
+[218月2026 14:56:08.837] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) REIPlugin of REIPlugin [tacz]
+[218月2026 14:56:08.837] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) DefaultRuntimePlugin of DefaultRuntimePlugin [roughlyenoughitems]
+[218月2026 14:56:08.838] [REI-ReloadPlugins/INFO] [REI/]: [REI] @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+[218月2026 14:56:08.841] [Render thread/INFO] [xaero.hud.minimap.MinimapLogs/]: Minimap updated server level id: 809404826 for world ResourceKey[minecraft:dimension / minecraft:overworld]
+[218月2026 14:56:08.847] [Render thread/INFO] [net.minecraft.advancements.AdvancementTree/]: Loaded 137 advancements
+[218月2026 14:56:08.915] [REI-ReloadPlugins/INFO] [REI/]: [REI] ========================================
+[218月2026 14:56:08.915] [REI-ReloadPlugins/INFO] [REI/]: [REI] REIClientPlugin starting main-reload for START.
+[218月2026 14:56:08.915] [REI-ReloadPlugins/INFO] [REI/]: [REI] Plugins (4):
+[218月2026 14:56:08.915] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (-100.00) DefaultClientPluginImpl of DefaultClientPluginImpl [roughlyenoughitems]
+[218月2026 14:56:08.915] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) REIClientPlugin of REIClientPlugin [tacz]
+[218月2026 14:56:08.915] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) HideIngredientsFromTagsPlugin of HideIngredientsFromTagsPlugin [roughlyenoughitems]
+[218月2026 14:56:08.916] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) DefaultClientRuntimePlugin of DefaultClientRuntimePlugin [roughlyenoughitems]
+[218月2026 14:56:08.916] [REI-ReloadPlugins/INFO] [REI/]: [REI] ========================================
+[218月2026 14:56:08.945] [Render thread/INFO] [com.tacz.guns.GunMod/]: [TACZ Recipe Viewer] Refreshing after gun-pack sync (9 table(s), 441 recipe(s)).
+[218月2026 14:56:08.947] [Render thread/WARN] [REI/]: [REI] Trying to start reload plugins of stage null but found 2 existing reload task(s)!
+[218月2026 14:56:08.998] [Render thread/INFO] [com.tacz.guns.GunMod/]: [TACZ Recipe Viewer] JEI/REI refresh completed.
+[218月2026 14:56:09.001] [REI-ReloadPlugins/INFO] [REI/]: [REI] ########################################
+[218月2026 14:56:09.001] [REI-ReloadPlugins/INFO] [REI/]: [REI] REICommonPlugin starting main-reload for START.
+[218月2026 14:56:09.001] [REI-ReloadPlugins/INFO] [REI/]: [REI] Plugins (3):
+[218月2026 14:56:09.001] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (-100.00) DefaultPluginImpl of DefaultPluginImpl [roughlyenoughitems]
+[218月2026 14:56:09.001] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) REIPlugin of REIPlugin [tacz]
+[218月2026 14:56:09.001] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) DefaultRuntimePlugin of DefaultRuntimePlugin [roughlyenoughitems]
+[218月2026 14:56:09.001] [REI-ReloadPlugins/INFO] [REI/]: [REI] ########################################
+[218月2026 14:56:09.003] [REI-ReloadPlugins/INFO] [REI/]: [REI] ========================================
+[218月2026 14:56:09.003] [REI-ReloadPlugins/INFO] [REI/]: [REI] REIClientPlugin starting main-reload for START.
+[218月2026 14:56:09.003] [REI-ReloadPlugins/INFO] [REI/]: [REI] Plugins (4):
+[218月2026 14:56:09.003] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (-100.00) DefaultClientPluginImpl of DefaultClientPluginImpl [roughlyenoughitems]
+[218月2026 14:56:09.003] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) REIClientPlugin of REIClientPlugin [tacz]
+[218月2026 14:56:09.003] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) HideIngredientsFromTagsPlugin of HideIngredientsFromTagsPlugin [roughlyenoughitems]
+[218月2026 14:56:09.003] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) DefaultClientRuntimePlugin of DefaultClientRuntimePlugin [roughlyenoughitems]
+[218月2026 14:56:09.003] [REI-ReloadPlugins/INFO] [REI/]: [REI] ========================================
+[218月2026 14:56:09.048] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 2 reached during a single frame. New capacity will be 4.
+[218月2026 14:56:09.171] [REI-ReloadPlugins/INFO] [REI/]: [REI] REICommonPlugin finished post-reload for START in 622.2 μs, totaling 3.535 ms.
+[218月2026 14:56:09.172] [REI-ReloadPlugins/INFO] [REI/]: [REI] REIClientPlugin finished post-reload for START in 443.7 μs, totaling 168.2 ms.
+[218月2026 14:56:09.174] [REI-ReloadPlugins/INFO] [REI/]: [REI] OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+[218月2026 14:56:09.174] [REI-ReloadPlugins/INFO] [REI/]: [REI] REICommonPlugin starting main-reload for END.
+[218月2026 14:56:09.174] [REI-ReloadPlugins/INFO] [REI/]: [REI] Plugins (3):
+[218月2026 14:56:09.174] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (-100.00) DefaultPluginImpl of DefaultPluginImpl [roughlyenoughitems]
+[218月2026 14:56:09.174] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) REIPlugin of REIPlugin [tacz]
+[218月2026 14:56:09.174] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) DefaultRuntimePlugin of DefaultRuntimePlugin [roughlyenoughitems]
+[218月2026 14:56:09.174] [REI-ReloadPlugins/INFO] [REI/]: [REI] OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+[218月2026 14:56:09.219] [REI-ReloadPlugins/INFO] [REI/]: [REI] @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+[218月2026 14:56:09.219] [REI-ReloadPlugins/INFO] [REI/]: [REI] REIClientPlugin starting main-reload for END.
+[218月2026 14:56:09.219] [REI-ReloadPlugins/INFO] [REI/]: [REI] Plugins (4):
+[218月2026 14:56:09.219] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (-100.00) DefaultClientPluginImpl of DefaultClientPluginImpl [roughlyenoughitems]
+[218月2026 14:56:09.219] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) REIClientPlugin of REIClientPlugin [tacz]
+[218月2026 14:56:09.219] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) HideIngredientsFromTagsPlugin of HideIngredientsFromTagsPlugin [roughlyenoughitems]
+[218月2026 14:56:09.219] [REI-ReloadPlugins/INFO] [REI/]: [REI]  - (0.00) DefaultClientRuntimePlugin of DefaultClientRuntimePlugin [roughlyenoughitems]
+[218月2026 14:56:09.219] [REI-ReloadPlugins/INFO] [REI/]: [REI] @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+[218月2026 14:56:09.238] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 4 reached during a single frame. New capacity will be 8.
+[218月2026 14:56:09.385] [REI-ReloadPlugins/WARN] [com.tacz.guns.GunMod/]: Failed to resolve gun smith table result
+com.google.gson.JsonSyntaxException: Unknown item 'lrtactical:melee'
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItem(CraftingHelper.java:39) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:71) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:33) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.result.GunSmithTableResult.init(GunSmithTableResult.java:78) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.GunSmithTableRecipe.init(GunSmithTableRecipe.java:94) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.rei.REIClientPlugin.registerDisplays(REIClientPlugin.java:62) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:97) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:56) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.api.common.registry.Reloadable.acceptPlugin(Reloadable.java:78) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$2(PluginManagerImpl.java:427) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$pluginSection$0(PluginManagerImpl.java:190) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$1(PluginManagerImpl.java:417) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.pluginSection(PluginManagerImpl.java:188) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.reload(PluginManagerImpl.java:415) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:155) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:144) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:141) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.lambda$reloadPlugins$0(ReloadManagerImpl.java:122) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) [?:?]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) [?:?]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 14:56:09.386] [REI-ReloadPlugins/WARN] [com.tacz.guns.GunMod/]: Failed to resolve gun smith table result
+com.google.gson.JsonSyntaxException: Unknown item 'lrtactical:throwable'
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItem(CraftingHelper.java:39) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:71) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:33) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.result.GunSmithTableResult.init(GunSmithTableResult.java:78) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.GunSmithTableRecipe.init(GunSmithTableRecipe.java:94) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.rei.REIClientPlugin.registerDisplays(REIClientPlugin.java:62) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:97) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:56) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.api.common.registry.Reloadable.acceptPlugin(Reloadable.java:78) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$2(PluginManagerImpl.java:427) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$pluginSection$0(PluginManagerImpl.java:190) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$1(PluginManagerImpl.java:417) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.pluginSection(PluginManagerImpl.java:188) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.reload(PluginManagerImpl.java:415) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:155) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:144) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:141) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.lambda$reloadPlugins$0(ReloadManagerImpl.java:122) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) [?:?]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) [?:?]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 14:56:09.387] [REI-ReloadPlugins/WARN] [com.tacz.guns.GunMod/]: Failed to resolve gun smith table result
+com.google.gson.JsonSyntaxException: Unknown item 'lrtactical:melee'
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItem(CraftingHelper.java:39) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:71) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:33) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.result.GunSmithTableResult.init(GunSmithTableResult.java:78) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.GunSmithTableRecipe.init(GunSmithTableRecipe.java:94) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.rei.REIClientPlugin.registerDisplays(REIClientPlugin.java:62) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:97) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:56) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.api.common.registry.Reloadable.acceptPlugin(Reloadable.java:78) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$2(PluginManagerImpl.java:427) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$pluginSection$0(PluginManagerImpl.java:190) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$1(PluginManagerImpl.java:417) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.pluginSection(PluginManagerImpl.java:188) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.reload(PluginManagerImpl.java:415) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:155) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:144) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:141) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.lambda$reloadPlugins$0(ReloadManagerImpl.java:122) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) [?:?]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) [?:?]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 14:56:09.391] [REI-ReloadPlugins/WARN] [com.tacz.guns.GunMod/]: Failed to resolve gun smith table result
+com.google.gson.JsonSyntaxException: Unknown item 'lrtactical:melee'
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItem(CraftingHelper.java:39) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:71) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:33) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.result.GunSmithTableResult.init(GunSmithTableResult.java:78) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.GunSmithTableRecipe.init(GunSmithTableRecipe.java:94) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.rei.REIClientPlugin.registerDisplays(REIClientPlugin.java:62) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:97) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:56) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.api.common.registry.Reloadable.acceptPlugin(Reloadable.java:78) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$2(PluginManagerImpl.java:427) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$pluginSection$0(PluginManagerImpl.java:190) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$1(PluginManagerImpl.java:417) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.pluginSection(PluginManagerImpl.java:188) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.reload(PluginManagerImpl.java:415) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:155) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:144) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:141) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.lambda$reloadPlugins$0(ReloadManagerImpl.java:122) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) [?:?]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) [?:?]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 14:56:09.395] [REI-ReloadPlugins/WARN] [com.tacz.guns.GunMod/]: Failed to resolve gun smith table result
+com.google.gson.JsonSyntaxException: Unknown item 'lrtactical:throwable'
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItem(CraftingHelper.java:39) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:71) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:33) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.result.GunSmithTableResult.init(GunSmithTableResult.java:78) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.GunSmithTableRecipe.init(GunSmithTableRecipe.java:94) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.rei.REIClientPlugin.registerDisplays(REIClientPlugin.java:62) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:97) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:56) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.api.common.registry.Reloadable.acceptPlugin(Reloadable.java:78) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$2(PluginManagerImpl.java:427) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$pluginSection$0(PluginManagerImpl.java:190) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$1(PluginManagerImpl.java:417) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.pluginSection(PluginManagerImpl.java:188) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.reload(PluginManagerImpl.java:415) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:155) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:144) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:141) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.lambda$reloadPlugins$0(ReloadManagerImpl.java:122) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) [?:?]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) [?:?]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 14:56:09.396] [REI-ReloadPlugins/WARN] [com.tacz.guns.GunMod/]: Failed to resolve gun smith table result
+com.google.gson.JsonSyntaxException: Unknown item 'lrtactical:melee'
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItem(CraftingHelper.java:39) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:71) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:33) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.result.GunSmithTableResult.init(GunSmithTableResult.java:78) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.GunSmithTableRecipe.init(GunSmithTableRecipe.java:94) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.rei.REIClientPlugin.registerDisplays(REIClientPlugin.java:62) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:97) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:56) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.api.common.registry.Reloadable.acceptPlugin(Reloadable.java:78) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$2(PluginManagerImpl.java:427) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$pluginSection$0(PluginManagerImpl.java:190) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$1(PluginManagerImpl.java:417) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.pluginSection(PluginManagerImpl.java:188) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.reload(PluginManagerImpl.java:415) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:155) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:144) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:141) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.lambda$reloadPlugins$0(ReloadManagerImpl.java:122) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) [?:?]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) [?:?]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 14:56:09.397] [REI-ReloadPlugins/WARN] [com.tacz.guns.GunMod/]: Failed to resolve gun smith table result
+com.google.gson.JsonSyntaxException: Unknown item 'lrtactical:melee'
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItem(CraftingHelper.java:39) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:71) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.util.CraftingHelper.getItemStack(CraftingHelper.java:33) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.result.GunSmithTableResult.init(GunSmithTableResult.java:78) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.crafting.GunSmithTableRecipe.init(GunSmithTableRecipe.java:94) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/tacz@1.1.8+neoforge.26.1.2.r20/com.tacz.guns.compat.rei.REIClientPlugin.registerDisplays(REIClientPlugin.java:62) ~[tacz-1.1.8+neoforge.26.1.2.r20.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:97) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.client.registry.display.DisplayRegistryImpl.acceptPlugin(DisplayRegistryImpl.java:56) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.api.common.registry.Reloadable.acceptPlugin(Reloadable.java:78) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$2(PluginManagerImpl.java:427) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$pluginSection$0(PluginManagerImpl.java:190) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.lambda$reload$1(PluginManagerImpl.java:417) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.pluginSection(PluginManagerImpl.java:188) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.PluginManagerImpl.reload(PluginManagerImpl.java:415) ~[%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:155) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:144) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.reloadPlugins0(ReloadManagerImpl.java:141) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at TRANSFORMER/roughlyenoughitems@26.1.819/me.shedaniel.rei.impl.common.plugins.ReloadManagerImpl.lambda$reloadPlugins$0(ReloadManagerImpl.java:122) [%5BREI物品管理器%5D%20RoughlyEnoughItems-26.1.819.jar:?]
+	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1825) [?:?]
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:545) [?:?]
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:328) [?:?]
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:309) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090) [?:?]
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614) [?:?]
+	at java.base/java.lang.Thread.run(Thread.java:1474) [?:?]
+[218月2026 14:56:09.403] [Render thread/INFO] [xaero.hud.minimap.MinimapLogs/]: Reloading radar icon resources...
+[218月2026 14:56:09.414] [Render thread/INFO] [xaero.hud.minimap.MinimapLogs/]: Reloaded radar icon resources!
+[218月2026 14:56:09.449] [Render thread/INFO] [net.minecraft.client.renderer.DynamicUniformStorage/]: Resizing Dynamic Transforms UBO, capacity limit of 8 reached during a single frame. New capacity will be 16.
+[218月2026 14:56:09.986] [REI-ReloadPlugins/INFO] [REI/]: [REI] REICommonPlugin finished post-reload for END in 374.2 μs, totaling 45.67 ms.
+[218月2026 14:56:09.987] [REI-ReloadPlugins/INFO] [REI/]: [REI] REIClientPlugin finished post-reload for END in 1.360 ms, totaling 767.8 ms.
+[218月2026 14:56:11.028] [Render thread/INFO] [REI/]: [REI] [REI Server Display Sync] Received server's request to set 1963 recipes.
+[218月2026 14:56:11.300] [Render thread/WARN] [REI/]: [REI] Detected runtime DisplayRegistry modification, this can be extremely dangerous!
+[218月2026 14:56:14.231] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 192!
+[218月2026 14:56:14.231] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 384!
+[218月2026 14:56:14.231] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 768!
+[218月2026 14:56:14.231] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 1536!
+[218月2026 14:56:14.231] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 3072!
+[218月2026 14:56:14.235] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 192!
+[218月2026 14:56:14.235] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 384!
+[218月2026 14:56:14.235] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 768!
+[218月2026 14:56:14.235] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 1536!
+[218月2026 14:56:14.235] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 3072!
+[218月2026 14:56:14.238] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 6144!
+[218月2026 14:56:14.242] [Render thread/INFO] [xaero.lib.XaeroLib/]: Resized a dynamic immediate buffer to 6144!
+[218月2026 14:56:14.655] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.656] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.656] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.672] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.672] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.672] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.680] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.680] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.680] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.683] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.683] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.683] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.687] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.687] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.687] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.690] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.690] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.690] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.695] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.695] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.695] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.701] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.701] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.701] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.703] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.703] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.703] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.707] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.707] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.707] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.711] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.711] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.711] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.715] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.715] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.715] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.719] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.719] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.719] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.723] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.723] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.723] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.727] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.727] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.727] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.731] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.731] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.731] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.735] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.735] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.735] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.739] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.739] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.739] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.743] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.743] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.743] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.747] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.747] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.747] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.754] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.754] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.754] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.756] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.756] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.756] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.761] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.761] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.761] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.765] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.765] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.765] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.768] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.769] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.769] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.772] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.773] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.773] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.776] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.777] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.777] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.781] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.781] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.781] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.785] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.785] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.785] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.789] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.789] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.789] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.793] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.793] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.793] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.797] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.797] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.797] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.804] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.804] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.804] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.806] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.806] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.806] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.810] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.810] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.810] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.813] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.813] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.813] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.819] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.819] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.819] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.823] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.823] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.823] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.826] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.826] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.826] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.830] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.830] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.830] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.835] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.835] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.835] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.839] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.839] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.839] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.843] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.843] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.843] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.846] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.846] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.846] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.853] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.853] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.853] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.854] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.855] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.855] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.859] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.859] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.859] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.862] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.862] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.862] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.867] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.867] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.867] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.871] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.871] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.871] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.875] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.875] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.875] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.879] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.879] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.879] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.883] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.883] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.883] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.887] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.887] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.887] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.891] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.891] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.891] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.895] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.895] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.895] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.901] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.901] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.902] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.903] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.903] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.903] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.908] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.908] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.908] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.911] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.911] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.911] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.916] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.916] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.916] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.920] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.920] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.920] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.923] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.923] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.923] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.928] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.928] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.928] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.932] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.932] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.932] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.936] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.936] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.936] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.940] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.940] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.940] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.944] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.944] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.944] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.951] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.951] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.951] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.953] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.953] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.953] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.957] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.957] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.957] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.961] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.961] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.961] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.966] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.966] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.966] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.969] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.969] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.969] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.973] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.973] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.973] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.977] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.978] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.978] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.981] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.981] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.981] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.985] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.985] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.985] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.990] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.990] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.990] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:14.993] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_cutout: HAND_CUTOUT
+[218月2026 14:56:14.993] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent: HAND_TRANSLUCENT
+[218月2026 14:56:14.993] [Render thread/WARN] [Iris/]: Found fine program match for minecraft:pipeline/entity_translucent_emissive: HAND_TRANSLUCENT
+[218月2026 14:56:22.859] [Server thread/INFO] [net.minecraft.client.server.IntegratedServer/]: Saving and pausing game...
+[218月2026 14:56:22.873] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:overworld
+[218月2026 14:56:22.887] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:the_nether
+[218月2026 14:56:22.888] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:the_end
+[218月2026 14:56:23.333] [Render thread/INFO] [xaero.hud.minimap.MinimapLogs/]: Xaero hud session finalized.
+[218月2026 14:56:23.358] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Stopping server
+[218月2026 14:56:23.358] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving players
+[218月2026 14:56:23.369] [Server thread/INFO] [net.minecraft.server.network.ServerGamePacketListenerImpl/]: GOOSTL lost connection: 连接中断
+[218月2026 14:56:23.369] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: GOOSTL退出了游戏
+[218月2026 14:56:23.380] [Server thread/INFO] [net.minecraft.server.network.ServerCommonPacketListenerImpl/]: Stopping singleplayer server as player logged out
+[218月2026 14:56:23.381] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving worlds
+[218月2026 14:56:23.428] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:overworld
+[218月2026 14:56:23.443] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:the_nether
+[218月2026 14:56:23.447] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: Saving chunks for level 'ServerLevel[新的世界]'/minecraft:the_end
+[218月2026 14:56:23.455] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[218月2026 14:56:23.455] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[218月2026 14:56:23.455] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[218月2026 14:56:23.455] [Server thread/INFO] [net.minecraft.server.MinecraftServer/]: ThreadedAnvilChunkStorage: All dimensions are saved
+[218月2026 14:56:23.500] [Render thread/INFO] [ChunkBuilder/]: Stopping worker threads
+[218月2026 14:56:23.824] [Render thread/INFO] [net.minecraft.client.Minecraft/]: Stopping!
