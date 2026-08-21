@@ -1,46 +1,57 @@
 # 移植状态
 
-目标版本：Minecraft **26.1.2** + NeoForge **26.1.2.97**（release）。
-当前版本：**1.1.8+neoforge.26.1.2.Beta-1**（r1-r30 为开发历史，Beta-1 起为稳定基线）。
+目标版本：Minecraft **26.2** + NeoForge **26.2.0.64**（release）。
+当前源码版本：**1.1.8+neoforge.26.2.0.r0**。
+状态：**未发布候选；代码/API 静态迁移已落地，生产构建与运行矩阵未完成。**
 
-工作包①②③④⑤⑥已完成（首发范围）。Iris 为可选；无光影时走 vanilla depth-aperture。
+> 最后更新：2026-08-21。本文只记录诚实状态；README 不作为逐包进度日志。
+
+## 26.2 工作包
+
+| 工作包 | 已落地 | 尚缺验收 |
+|---|---|---|
+| WP-262-0 transfer 卫生 | `IItemHandler` for-removal 调用迁到 `ResourceHandler<ItemResource>`；删除死屏幕 | JDK 25 编译确认 removal warning=0 |
+| WP-262-1 构建骨架 | MC 26.2 / NF 26.2.0.64 / Java 25 / r0 / 官方 MDK 对齐 | `compileJava`、`runServer` Mod List / `Done` |
+| WP-262-2 非渲染 | Gui screen 重组、文本颜色、HUD loader event、AT 最小化、common descriptor | 专服枪包装载数字与 26.1.2 对比 |
+| WP-262-3 渲染 | 26.2 pipeline/Feature/PiP/Gizmo/hand API；GL depth-aperture；Vulkan 降级 | JDK 25 编译；OpenGL/Iris/Vulkan GPU 矩阵 |
+| WP-262-4 可选兼容 | 26.2 坐标重钉、Carry On 2.11、FPM/NEA dormant bridge、矩阵文档 | `COMPATIBILITY.md` 全部游戏内项目 |
+| WP-262-5 发布准备 | README/CHANGELOG/LICENSES/状态文档 | **发布 jar 与源码包被上述构建/实测闸门阻塞** |
+
+证据：`docs/WP262_0_EVIDENCE.md` 至 `docs/WP262_5_EVIDENCE.md`。
 
 ## 版本基线
 
-- **Beta-1（当前）**：撤回工作包⑦（LRTactical），功能基线 = r23（cloth/PAL/controllable/shouldersurfing
-  全兼容 + 全部已 PASS 修复）。LR 代码全部移除，踩坑点归档于 `WP07_LRTACTICAL_PLAN.md`。
-- r1-r30：开发历史（详见 git log 与各 WP 文档）。
+- **26.2 r0（当前工作树）**：从 26.1.2 Beta-1 前滚；不是重写。
+- **26.1.2 Beta-1（历史稳定出发点）**：工作包①–⑥功能基线；其用户 PASS 不能自动
+  继承为 26.2 PASS。
+- r1–r30：26.1.2 开发历史，详见一期证据文档与 git 历史。
 
-## 未实现项（诚实清单）
+## 当前明确边界
 
-> 最后更新：Beta-1（2026-08-21）。
+### 图形后端
 
-### ❌ LRTactical 内置（WP⑦）——已撤回，未实现
+- OpenGL depth-aperture：代码与 classfile API 已迁移，**未 GPU 实测**。
+- OpenGL + Iris 1.11.2：API/shader target 已核，**未 GPU 实测**。
+- Vulkan：只实现“不调用 GL + 未掩码瞄具降级”，**未启动实测**。
+- Aperture：未接入。
 
-- r26 立项实施（104 文件 + 31 资源迁入，形态 B），r26→r30 三轮修复后**仍有未定位的启动崩溃**，
-  项目决定撤回全部代码（Beta-1）。
-- **现状**：LR 内容包可被发现（`GunPackLoader` 软 provides 保留），但四个基础物品
-  （throwable/melee/detonator/consumable）与全部行为**不存在**——LR 包装上后道具不可用。
-- 决策记录、撤回原因、**全部踩坑点（13 条，含注册表冻结/ID_MAPPER 私有化/readMap 歧义等）**
-  与重启前置条件：见 `docs/WP07_LRTACTICAL_PLAN.md`。
-- 重启条件：定位 r30 崩溃日志 + 优先 DeferredRegister 完整重写 init 包。
+### 可选 Mod
 
-### 其余兼容层终态
+所有发布文件、source commit、pin 与未实测标记见根目录
+[`COMPATIBILITY.md`](../COMPATIBILITY.md)。当前没有任何 26.2 可选兼容项被标记为用户 PASS。
 
-| 兼容层 | 状态 |
-|---|---|
-| cloth / playeranimator(PAL) / controllable / shouldersurfing | ✅ 活（用户 PASS） |
-| carryon / firstperson / iris / shader / jei / rei / recipeviewer | ✅ 活 |
-| justzoom | ⏸ 有据不做（无上游先例，项目决定不原创） |
-| zoomify | ⏸ NeoForge 无此 mod |
-| immediatelyfast | ⏸ 有据 no-op（26.x 无需集成） |
-| ar | ⏸ 无 26.1.2 版 |
-| **lrtactical** | **❌ 未实现（已撤回，见 WP07 文档）** |
+### LRTactical 内置
 
-## 已验证可用（用户 PASS 清单）
+仍维持 26.1.2 Beta-1 的撤回决定：本仓库不含其四类基础物品和行为。相关历史与重启条件
+见 `docs/WP07_LRTACTICAL_PLAN.md`。这次 26.2 前滚没有重新引入 LRTactical。
 
-- r15：Cloth Config 配置界面（T 键 + Mods 菜单，含无 Cloth 兜底）
-- r16：爆头范围显示（F3+B）线渲染修复
-- r17-r20：PAL 第三人称动画（根因：默认包 3 个动画文件漏拷，r22 修复后 PASS）
-- r23：Shoulder Surfing Reloaded 5.x（插件 + 准星）
-- r24/r25：JustZoom 原创适配后按项目决定撤销
+## 发布阻塞项
+
+在以下全部完成前，不得发布 r0 或声称移植完成：
+
+1. JDK 25：`clean compileJava --warning-mode all`、`build`；
+2. 专服：Mod List 可见 tacz、服务器 `Done`、默认/第三方枪包装载数字回归；
+3. 客户端：无可选 Mod 的基础枪械/工作台/网络/资源回归；
+4. GPU：OpenGL、Iris、Vulkan 降级矩阵；
+5. `COMPATIBILITY.md` 可安装项目逐行用户实测或继续明确“未实测”；
+6. 发布 jar 内 jar-in-jar、metadata、license、源码 tag/归档一致性复核。

@@ -6,32 +6,50 @@
 
 | 组件 | 许可 |
 |---|---|
-| 本仓库代码（NeoForge 26.1.2 移植） | GPL-3.0-only |
+| 本仓库代码（NeoForge 26.2 移植） | GPL-3.0-only |
 | 上游代码谱系 MCModderAnchor/TACZ、Sh1roCu/TACZ-Refabricated、q14433686-arch/TaCZ_Refabricated_Unofficial、MUKSC/TACZ-1.21.1 | GPL-3.0 |
-| 原版枪模资源（模型/贴图/音效，待工作包后续引入） | CC BY-NC-ND 4.0 |
+| 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0 |
 
-## 构建骨架（工作包①）直接使用
+## 构建骨架
 
 | 组件 | 用途 | 许可 / 来源 |
 |---|---|---|
-| NeoForge `26.1.2.97` | 模组加载器 | LGPL-2.1（NeoForged） |
-| Minecraft 26.1.2 | 游戏本体（开发依赖，不 redistributable） | Mojang EULA |
+| NeoForge `26.2.0.64` | 模组加载器 | LGPL-2.1（NeoForged） |
+| Minecraft 26.2 | 游戏本体（开发依赖，不 redistributable） | Mojang EULA |
 | `net.neoforged.moddev` 2.0.144（ModDevGradle） | 构建插件 | NeoForged |
-| MDK-26.1.2-ModDevGradle | 构建脚本模板 | NeoForge MDK template license |
+| MDK-26.2-ModDevGradle | 构建脚本模板 | NeoForge MDK template license |
 | Gradle 9.2.1 Wrapper | 构建 | Apache-2.0 |
-
-工作包①为空 mod，尚未引入 SimpleBedrockModel、luaj、commons-math3 等运行时重打包依赖。后续工作包引入时在此追加。
 
 ## 运行时 Jar-in-Jar（必须打进发布 jar）
 
-`implementation files(...)` 只覆盖 Gradle 开发 classpath。玩家把 mod jar 丢进 `mods/` 时，FML 的模块类加载器看不到这些类，会在 `GunMod` 构造期直接崩：
-
-`java.lang.NoClassDefFoundError: org/luaj/vm2/LuaError`（`ModItems` → `ModernKineticGunItem`）。
-
-因此 `build.gradle` 对下列本地 jar 声明 `implementation`，再经 `jarJarPrepare_*` 盖上 `Automatic-Module-Name` 后 `jarJar`（FML `META-INF/jarjar/`）。ModDevGradle 2 拒绝嵌入没有 JPMS 名的本地文件；这与官方 MDK「local file jarJar」示例一致。
+`implementation files(...)` 只覆盖 Gradle 开发 classpath。玩家把 mod jar 放进 `mods/` 时，
+FML 的模块类加载器看不到这些本地库，会在 `GunMod` 构造期触发
+`NoClassDefFoundError`。因此 `build.gradle` 先为本地 jar 写入
+`Automatic-Module-Name`，再通过 ModDevGradle `jarJar` 放入发布物的 `META-INF/jarjar/`。
 
 | 组件 | 用途 | 许可 / 来源 |
 |---|---|---|
 | `libs/luaj-jse-3.0.1.jar`（`org.luaj.vm2`） | 枪包 Lua 脚本（开火/换弹/动画状态机） | MIT（LuaJ） |
-| `libs/commons-math3-3.6.1.jar` | 后坐力样条插值（`GunRecoil`） | Apache-2.0 |
-| SimpleBedrockModel v1 | 基岩版几何渲染；本仓库以源码形式 vendored（`com.github.mcmodderanchor.simplebedrockmodel`） | 上游 GPL-3.0 谱系 |
+| `libs/commons-math3-3.6.1.jar` | 后坐力样条插值 | Apache-2.0 |
+| SimpleBedrockModel v1（源码 vendored） | 基岩版几何渲染 | 上游 GPL-3.0 谱系 |
+
+## 可选 compile-only / 运行时兼容
+
+这些 Mod 不会被打进 TaCZ jar；玩家按需单独安装。版本、artifact 与验证状态见
+[`COMPATIBILITY.md`](COMPATIBILITY.md)。
+
+| 组件 | 许可 |
+|---|---|
+| Cloth Config | LGPL-3.0 |
+| Player Animation Library | MIT |
+| Controllable | MIT |
+| Shoulder Surfing Reloaded | MIT |
+| JEI | MIT |
+| REI | MIT |
+| Architectury API | LGPL-3.0 |
+| Iris | LGPL-3.0 |
+| Carry On | LGPL-3.0 |
+| First-person Model | MIT |
+
+实际发布前仍需对最终解析到的 artifact 内许可文件做一次归档核对；本文不是对第三方许可
+条款的替代。

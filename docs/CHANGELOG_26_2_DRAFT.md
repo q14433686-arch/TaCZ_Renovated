@@ -58,3 +58,10 @@
   NeoForge 26.2 发布文件，因此桥保持 dormant，不宣称可安装兼容。
 - 新增 `COMPATIBILITY.md`，逐项区分“发布/API 已核”与“未实机”，并列出最终用户矩阵。
 - 所有可选 Mod 运行矩阵仍未执行，不声明 PASS。
+
+### WP-262-5（发布准备，受阻）
+
+- 新建根 `CHANGELOG.md` 的 Unreleased r0 条目；README、LICENSES、PORTING_STATUS 更新到
+  26.2，且显式保留“未构建/未实测/未发布”状态。
+- README 不再充当逐工作包进度表；详细状态只放 `docs/PORTING_STATUS.md`。
+- 没有生成或发布 jar：JDK 25 Gradle、专服、GPU 与可选 Mod 矩阵未通过，发布闸门保持关闭。
