@@ -96,31 +96,15 @@ public class CameraSetupEvent {
             if (livingEntity instanceof LocalPlayer localPlayer) {
                 IClientPlayerGunOperator gunOperator = IClientPlayerGunOperator.fromLocalPlayer(localPlayer);
                 float aimingProgress = gunOperator.getClientAimingProgress((float) event.getPartialTick());
-                float fov = WORLD_FOV_DYNAMICS.update((float) MathUtil.magnificationToFov(1 + (zoom - 1) * aimingProgress, baseScopeFov(event, aimingProgress)));
+                float fov = WORLD_FOV_DYNAMICS.update((float) MathUtil.magnificationToFov(1 + (zoom - 1) * aimingProgress, event.getFOV()));
                 event.setFOV(fov);
             } else {
                 IGunOperator gunOperator = IGunOperator.fromLivingEntity(livingEntity);
                 float aimingProgress = gunOperator.getSynAimingProgress();
-                float fov = WORLD_FOV_DYNAMICS.update((float) MathUtil.magnificationToFov(1 + (zoom - 1) * aimingProgress, baseScopeFov(event, aimingProgress)));
+                float fov = WORLD_FOV_DYNAMICS.update((float) MathUtil.magnificationToFov(1 + (zoom - 1) * aimingProgress, event.getFOV()));
                 event.setFOV(fov);
             }
         }
-    }
-
-    /**
-     * 进入开镜（aimingProgress > 0）时，把 Just Zoom 已折入事件 FOV 的缩放除回，
-     * 避免镜倍率与 JustZoom 双重叠加（对齐上游对 Zoomify 的处理语义）；
-     * 未瞄准时不干预，JustZoom 正常生效。
-     */
-    private static double baseScopeFov(ViewportEvent.ComputeFov event, float aimingProgress) {
-        double fov = event.getFOV();
-        if (aimingProgress > 0) {
-            float divisor = com.tacz.guns.compat.justzoom.JustZoomCompat.getZoomFovDivisor();
-            if (divisor != 1.0F) {
-                return fov / divisor;
-            }
-        }
-        return fov;
     }
 
     public static void applyGunModelFovModifying(ViewportEvent.ComputeFov event) {

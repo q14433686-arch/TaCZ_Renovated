@@ -141,7 +141,6 @@ public class ClientSetupEvent {
         ARCompat.init();
         ZoomifyCompat.init();
         ImmediatelyFastCompat.init();
-        com.tacz.guns.compat.justzoom.JustZoomCompat.init();
     }
 
     public static void registerItemRenderers() {
