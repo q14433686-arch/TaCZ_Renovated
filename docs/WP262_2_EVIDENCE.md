@@ -129,7 +129,7 @@ java-parser 3.0.1 on changed Java files: all PARSE OK
 git diff --check: success
 ```
 
-## 外部编译反馈与未完成验收
+## 外部编译与多人验收
 
 2026-08-21，用户在 Windows 的真实 JDK 25 / Gradle 9.2.1 环境运行 `gradlew build`：
 NeoForm 成功下载并处理 Minecraft 26.2，随后 `compileJava` 报 9 个错误。本轮逐项处理：
@@ -140,10 +140,7 @@ NeoForm 成功下载并处理 Minecraft 26.2，随后 `compileJava` 报 9 个错
 - `AvatarRenderer#renderRightHand/#renderLeftHand` 改用 26.2 五参 descriptor，并把末参恢复为
   对应 sleeve model-part 是否显示，而不是旧代码误传的 slim/player 参数。
 
-commit `15e4a35` 落地上述修复后，用户对 commit `c40dab9` 报告 JDK 25
-`compileJava` / `build` **PASS**。该结果确认这些非渲染修复成立；之后的 scope-mask
-替换仍需重建。专服 `Done` 与枪包装载数字尚未实跑，仍需执行：
-
-```bash
-./gradlew runServer --no-configuration-cache
-```
+上述修复、scope-mask 替换和 R1 多人修复均进入当前候选后，用户报告
+`docs/DEDICATED_SERVER_TEST.md` **L0-L3 全部 PASS**：当前 build、`runServer`、真实生产专服
+和双客户端联机基础矩阵关闭。冻结回执：
+`docs/records/SERVER_TEST_20260821_262_R0.md`。L2.5 未被单独点名，继续保持待确认。

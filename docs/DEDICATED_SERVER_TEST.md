@@ -7,6 +7,10 @@
 
 执行者：项目发起人的 JDK 25 / GPU 环境；结果必须记录当前 commit 与完整版本矩阵。
 
+> 当前执行状态（2026-08-21）：用户报告当前候选 **L0-L3 全部 PASS**。本回执没有附带
+> 逐行日志，因此 L3 中 PAL/F3+B/高延迟等可选行不单独外推为对应兼容项 PASS；L2.5 也
+> 继续等待明确确认。冻结记录：`docs/records/SERVER_TEST_20260821_262_R0.md`。
+
 ---
 
 ## L0. 构建后静态自检（1 分钟，不用起游戏）
@@ -50,7 +54,7 @@ unzip -p "$JAR" META-INF/neoforge.mods.toml | grep -E "version=|modId="
 
 ```bash
 # 1. 官方安装器装服务端（版本必须为 26.2.0.64 release）
-java -jar neoforge-26.2.0.64-installer.jar --install-server srv
+java -jar neoforge-26.2.0.64-installer.jar --installServer srv
 # 2. 部署
 cp build/libs/tacz-*.jar srv/mods/
 echo "eula=true" > srv/eula.txt
@@ -144,7 +148,7 @@ R1 证据：`docs/records/SERVER_TEST_20260821_GUNPACK.md`。
 | 优先级 | 形态 | 独有故障面 | 怎么测 | 状态 |
 |---|---|---|---|---|
 | **1** | 内置服务器 + LAN/本地隧道 | 双客户端基础同步 | 跑 L3 全矩阵 | ❌ 26.2 未测；26.1.2 R1 基线见 records #1/#2 |
-| **2** | **真实专用服务器**（NeoForge 安装器 `--install-server`） | 生产类加载、dedicated dist、jar 内资源导出、纯远程同步 | 本预案 **L2** + 两客户端 **L3** | ❌ 26.2 未测；R1 基线见 records #3/#4 |
+| **2** | **真实专用服务器**（NeoForge 安装器 `--installServer`） | 生产类加载、dedicated dist、jar 内资源导出、纯远程同步 | 本预案 **L2** + 两客户端 **L3** | ✅ 26.2 用户报告 PASS；见 `SERVER_TEST_20260821_262_R0.md` |
 | 3 | 面板服/托管商 | 受限内存/面板注入的启动脚本与 JVM 参数 | 任选一家面板装同一 jar，重点看启动内存与枪包导出目录写权限 | ❌ 未测 |
 | 4 | 离线模式混跑（online-mode=false） | UUID 体系差异 → 按 UUID 键控的玩家持久化数据（弹匣余弹/配件） | 同一玩家离线名/正版各进一次，检查数据不串号 | ⚠️ 本轮 LAN 实为离线模式，未专项验证 |
 | 5 | 代理网络（Velocity modern forwarding 后挂 NeoForge 后端） | 握手/自定义 payload 过代理、跨服切换后的枪包重同步 | Velocity + 两个后端服，切服后开工作台/开枪 | ❌ 未测 |

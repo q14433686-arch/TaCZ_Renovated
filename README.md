@@ -7,10 +7,9 @@
 Timeless and Classics Zero 的 NeoForge 26.2 前滚移植。代码最初从 26.1.2 Beta-1 起步，
 现已同步 26.1.2 R1 的多人网络、专服类加载与模板构建修复；本仓库保持公开源码与可审计谱系。
 
-**当前 r0 尚未发布：** 用户曾对 commit `c40dab9` 报告生产 JDK 25 `compileJava` / `build`
-PASS；此后当前分支按 refab 26.2 语义把 GL-only depth-aperture 替换为离屏目镜掩码，
-因此当前 HEAD 必须重新构建。专服、OpenGL/Iris/Vulkan 和可选 Mod 游戏矩阵仍待执行；
-未实测内容不会标成 PASS。
+**当前 r0 尚未发布：** 用户已对当前 R1-fix 回流后的 26.2 候选报告 JDK 25 build 与
+`docs/DEDICATED_SERVER_TEST.md` L0-L3 **PASS**。OpenGL/Iris/Vulkan 完整 GPU 矩阵、L2.5
+第三方枪包专项的单独确认及可选 Mod 逐项实测仍待完成；未实测内容不会标成 PASS。
 
 ## 谱系与许可
 

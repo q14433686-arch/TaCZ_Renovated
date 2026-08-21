@@ -15,27 +15,16 @@
 
 ## 尚未通过，故发布被阻塞
 
-当前沙盒仍没有生产 JDK 25 依赖下载通道或 GPU。2026-08-21 用户在 Windows 的真实
-JDK 25 / Gradle 9.2.1 环境首次运行 `gradlew build`，随后报告 9 个错误。本分支依据该
-真实输出修复 AT、FOV pass、HUD tick 与 AvatarRenderer descriptor 后，用户对 commit
-`c40dab9` 报告 `compileJava` / `build` 重跑 **PASS**。此后当前分支按用户裁决将 scope
-渲染替换为 refab 26.2 离屏 ocular mask，因此该 PASS 不再覆盖当前 HEAD。
+用户已在 Windows JDK 25 / Gradle 9.2.1 环境对当前候选报告 L0-L3 **PASS**，覆盖当前
+build、jar 基础内容、`runServer`、真实生产专服和双客户端基础联机矩阵。冻结回执：
+`docs/records/SERVER_TEST_20260821_262_R0.md`。
 
 以下发布闸门仍未通过：
 
-```bash
-./gradlew clean compileJava --warning-mode all --no-configuration-cache
-./gradlew build --no-configuration-cache
-./gradlew runServer --no-configuration-cache
-./gradlew runClient --no-configuration-cache
-```
-
-也没有：
-
-- 用户构建产物的 jar-in-jar / metadata / license 最终二进制检查；
-- 专服 `Done` 与枪包装载数；
-- OpenGL / Iris / Vulkan GPU 矩阵；
-- `COMPATIBILITY.md` 用户 PASS。
+- L2.5 第三方枪包专项未被本次回执单独确认；
+- OpenGL / Iris / Vulkan 完整 GPU 矩阵；
+- `COMPATIBILITY.md` 可选 Mod 逐项用户 PASS；
+- metadata/license 与对应源码 tag/source archive 的最终一致性检查。
 
 ## 发布结论
 

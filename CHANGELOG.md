@@ -48,9 +48,9 @@
 
 ### Known limitations / verification
 
-- User-reported production JDK 25 `compileJava` and `build`: **PASS for commit `c40dab9`**.
-  The subsequent scope-mask replacement changes the current HEAD and requires a fresh build.
-- Dedicated-server `Done`, gun-pack load counts and the built jar's final contents are not yet verified.
+- User-reported current-candidate JDK 25 build and dedicated test plan L0-L3: **PASS**
+  (`docs/records/SERVER_TEST_20260821_262_R0.md`).
+- L2.5 third-party gun-pack confirmation and the final source/tag/archive inspection remain open.
 - NeoForge's open ELS/Vulkan startup bug (`NeoForge#3230`) requires
   `config/fml.toml: earlyWindowControl=false`; the user reports Vulkan startup PASS with it disabled.
 - The first Vulkan scope test exposed low-power reticles losing their mask when sight-body clipping was
