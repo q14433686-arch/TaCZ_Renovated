@@ -4,7 +4,7 @@
 # Note that there are a couple of TOML lists in this file.
 # Find more information on toml format here:  https://github.com/toml-lang/toml
 #
-# Template source: official NeoForge MDK-26.1.2-ModDevGradle (no moddedmc.mod.json in that MDK).
+# Template source: official NeoForge MDK-26.2-ModDevGradle (no moddedmc.mod.json in that MDK).
 # Do not add mappings/parchment. 26.1+ is unobfuscated.
 
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
@@ -36,17 +36,17 @@ displayName="${mod_name}" #mandatory
 #logoFile="logo.png" #optional
 
 # A text field displayed in the mod UI
-credits="Original TaCZ: Serene Wave Studio / Timeless Squad. Unofficial ports: Sh1roCu (Fabric 1.21.1), q14433686-arch (Fabric 26.x), MUKSC (NeoForge 1.21.1). This tree is an unofficial NeoForge 26.1.2 port."
+credits="Original TaCZ: Serene Wave Studio / Timeless Squad. Unofficial ports: Sh1roCu (Fabric 1.21.1), q14433686-arch (Fabric 26.x), MUKSC (NeoForge 1.21.1). This tree is an unofficial NeoForge 26.2 port."
 
 # The authors of the mod, displayed in the mod UI (optional)
-authors="Serene Wave Studio | Timeless Squad (original); unofficial NeoForge 26.1.2 port"
+authors="Serene Wave Studio | Timeless Squad (original); unofficial NeoForge 26.2 port"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Unofficial NeoForge 26.1.2 port of Timeless and Classics Zero (TaCZ).
+Unofficial NeoForge 26.2 port of Timeless and Classics Zero (TaCZ).
 
 THIS IS UNOFFICIAL. Do not report bugs to the original authors (MCModderAnchor / Serene Wave Studio).
-Work packages ①–⑥: registries, networking, gun packs, depth-aperture rendering, ShaderCompat (optional Iris).
+Forward-ported from the audited NeoForge 26.1.2 baseline; OpenGL depth-aperture scope rendering remains the primary path.
 '''
 
 [[mixins]]

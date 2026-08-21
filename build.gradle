@@ -54,7 +54,7 @@ base {
     archivesName = mod_id
 }
 
-// Mojang ships Java 25 to end users in 26.1.2, so mods should target Java 25.
+// Mojang ships Java 25 to end users in 26.2; the official 26.2 MDK keeps this toolchain.
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 sourceSets {
@@ -67,7 +67,7 @@ sourceSets {
 
 neoForge {
     // enable {} is the ModDevGradle 2.x settings object (ModdingVersionSettings).
-    // disableRecompilation skips Vineflower (-Xmx4g by default in neoform-26.1.2-1),
+    // disableRecompilation skips Vineflower (-Xmx4g by default in NeoForm 26.2),
     // which OOMs this 2 GiB sandbox. Dev machines with RAM can set it back to false
     // to get Minecraft sources attached in the IDE.
     enable {
@@ -116,7 +116,7 @@ neoForge {
             // Recommended logging level for the console
             logLevel = org.slf4j.event.Level.INFO
 
-            // Vanilla 26.1.2 ships -Xms2G -Xmx4G. Override for low-memory CI/sandboxes.
+            // Vanilla 26.2 ships with a multi-gigabyte default heap. Override for low-memory CI/sandboxes.
             jvmArguments.addAll '-Xms128M', '-Xmx640M'
         }
     }
