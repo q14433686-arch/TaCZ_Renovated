@@ -34,12 +34,13 @@ public class AttachmentItem extends Item implements AttachmentItemDataAccessor {
 
     @Override
     @Nonnull
-    @OnlyIn(Dist.CLIENT)
+    // 双端公共方法，禁用 client 索引（26.1 不剥 @OnlyIn 成员，dedicated 必崩）。
+    // 详见 AbstractGunItem#getName 注释与 records/SERVER_TEST_20260821_DEDICATED.md。
     public Component getName(@Nonnull ItemStack stack) {
         Identifier attachmentId = this.getAttachmentId(stack);
-        Optional<ClientAttachmentIndex> attachmentIndex = TimelessAPI.getClientAttachmentIndex(attachmentId);
-        if (attachmentIndex.isPresent()) {
-            return Component.translatable(attachmentIndex.get().getName());
+        var attachmentIndex = TimelessAPI.getCommonAttachmentIndex(attachmentId);
+        if (attachmentIndex.isPresent() && attachmentIndex.get().getPojo().getName() != null) {
+            return Component.translatable(attachmentIndex.get().getPojo().getName());
         }
         return super.getName(stack);
     }

@@ -37,12 +37,14 @@ public class GunSmithTableItem extends BlockItem implements BlockItemDataAccesso
 
     @Override
     @Nonnull
-    @OnlyIn(Dist.CLIENT)
+    // 双端公共方法，禁用 client 索引（26.1 不剥 @OnlyIn 成员，dedicated 必崩——
+    // 本文件即 2026-08-21 专服 /give 崩溃的第一现场）。
+    // 详见 AbstractGunItem#getName 注释与 records/SERVER_TEST_20260821_DEDICATED.md。
     public Component getName(@Nonnull ItemStack stack) {
         Identifier blockId = this.getBlockId(stack);
-        Optional<ClientBlockIndex> blockIndex = TimelessAPI.getClientBlockIndex(blockId);
-        if (blockIndex.isPresent()) {
-            return Component.translatable(blockIndex.get().getName());
+        var blockIndex = TimelessAPI.getCommonBlockIndex(blockId);
+        if (blockIndex.isPresent() && blockIndex.get().getPojo().getName() != null) {
+            return Component.translatable(blockIndex.get().getPojo().getName());
         }
         return super.getName(stack);
     }

@@ -5,6 +5,12 @@
 
 ## 未发布
 
+- **修复（专服致命）**：四个物品类（枪/弹药/配件/工作台）的 `getName` 覆写调用
+  client 索引——`/give` 等服务端路径触发即 `NoClassDefFoundError` 崩服。26.1 起
+  NeoForge 不再按 `@OnlyIn` 剥离成员，上游祖传写法失效。改走 common 索引（同一
+  翻译键，双端安全）。详见 `docs/records/SERVER_TEST_20260821_DEDICATED.md`
+  （含全仓库同类病灶清查；Fabric 姊妹项目同样潜伏，待回报）。
+
 - **修复（联机致命）**：`ServerMessageGunDraw` 空 ItemStack 编码崩溃——玩家加入/空手切枪
   即把视野内所有玩家踢下线。两字段改 `ItemStack.OPTIONAL_STREAM_CODEC`
   （上游 1.21.1 与 refab 26.1.2 同款；实测记录 `docs/records/SERVER_TEST_20260821_LAN.md`）。
