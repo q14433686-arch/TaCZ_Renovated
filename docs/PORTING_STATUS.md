@@ -19,6 +19,10 @@
 
 证据：`docs/WP262_0_EVIDENCE.md` 至 `docs/WP262_5_EVIDENCE.md`。
 
+2026-08-21 的首次用户 JDK 25 `gradlew build` 已成功完成 26.2 artifact 配置并到达
+`compileJava`，随后暴露 9 个源码错误；当前分支已按真实编译器反馈修复，但尚待用户重跑，
+因此仍不标记 compile/build PASS。修复与 descriptor 见 `docs/WP262_2_EVIDENCE.md`。
+
 ## 版本基线
 
 - **26.2 r0（当前工作树）**：从 26.1.2 Beta-1 前滚；不是重写。

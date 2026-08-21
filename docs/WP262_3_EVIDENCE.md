@@ -71,7 +71,11 @@ clone，顶点 shader 继续取源 pipeline，因此无需复制旧 vertex shade
 - `RenderPipeline` patch 提供 26.2 多 target/bind-group 数据结构及 NeoForge stencil 扩展；
 - `RegisterPictureInPictureRenderersEvent#register` factory 从
   `Function<BufferSource, Renderer>` 改为 `Supplier<Renderer>`；
-- `RegisterGuiLayersEvent` / `RenderLivingEvent` 相关调用面保持可用。
+- `RegisterGuiLayersEvent` / `RenderLivingEvent` 相关调用面保持可用；
+- 26.2 `Camera.java.patch` 已直接发布并应用 `ViewportEvent.ComputeCameraAngles`，因此旧
+  `CameraMixin` 的重复发布已删除；同一 patch 在 world/HUD 共用的
+  `modifyFovBasedOnDeathOrFluid(FF)F` 内发布 `ComputeFov`，但 26.2 event 删除了原 pass
+  boolean，故 mixin 只为两个 caller 建立精确上下文。
 
 ### ② 官方 primer
 
@@ -168,6 +172,11 @@ restore 仍是直接采样写回，不需数值变换。
   registration method reference 现在满足 `Supplier`；
 - 爆头 AABB 改用 `submitShapeOutline`，保留 2.5 px 线宽与黄色；
 - 第一人称 mixin 改为 `submitHandsWithItems -> submitArmWithItem` 精确 call site；
+- 用户首次 JDK 25 编译进一步纠正直接手臂提交：
+  `AvatarRenderer#renderRightHand/#renderLeftHand(PoseStack,SubmitNodeCollector,int,Identifier,boolean)V`
+  是五参方法；末参是对应 sleeve 是否显示。`RenderHelper` 现通过
+  `EntityRenderDispatcher#getPlayerRenderer(AbstractClientPlayer)` 取得 renderer，并传
+  `PlayerModelPart.RIGHT_SLEEVE/LEFT_SLEEVE` 状态，不再传已删除的 entity 参数；
 - `GameRenderer#mainCamera()` 替代两处旧 getter；
 - Bedrock 在役路径已是 `SubmitNodeCollector#submitCustomGeometry`；全仓没有实际
   `MultiBufferSource`、直接 immediate upload 或已删除 RenderSystem setter；

@@ -53,11 +53,9 @@ import java.text.DecimalFormat;
  *       {@code scale} 只接受两个分量。</li>
  * </ul>
  *
- * <p><b>tick 来源</b>：上游用 {@code mc.gui.getGuiTicks()}。注意 26.1.2 与该 API
- * 同名同签名（{@code Gui#getGuiTicks()} 公开，已对 26.1.2 jar 字节码确认）；
- * 「{@code Gui#hud} + {@code Hud#getGuiTicks()}」的拆分是<b>26.2 才有</b>的重构，
- * 26.2 补丁里的 {@code mc.gui.hud.getGuiTicks()} 写法在 26.1.2 编译不过，回本移植已改回。
- * 用 GUI tick 而不是 {@code player.tickCount}
+ * <p><b>tick 来源</b>：上游旧版本用 {@code mc.gui.getGuiTicks()}。26.2 将该方法搬到
+ * {@code Hud}（{@code Gui#hud} 字段与 {@code Hud#getGuiTicks()} 均公开），故使用
+ * {@code mc.gui.hud.getGuiTicks()}。用 GUI tick 而不是 {@code player.tickCount}
  * 才能保证暂停时闪烁停下，与上游一致。</p>
  */
 public class HeatBarOverlay {
@@ -105,7 +103,7 @@ public class HeatBarOverlay {
         if (heatScale > scaleValue - 0.03f && heatScale < scaleValue + 0.055f) heatScale = scaleValue;
 
         boolean locked = iGun.isOverheatLocked(stack);
-        int tickCount = mc.gui.getGuiTicks();
+        int tickCount = mc.gui.hud.getGuiTicks();
 
         Matrix3x2fStack poseStack = graphics.pose();
         poseStack.pushMatrix();

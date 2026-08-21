@@ -14,7 +14,7 @@
 - Forward-ported the audited NeoForge 26.1.2 Beta-1 codebase to Minecraft/NeoForge 26.2.
 - Migrated legacy NeoForge item handlers to transactional `ResourceHandler<ItemResource>` APIs.
 - Migrated current-screen access to `Minecraft.gui`, retained NeoForge GUI-layer registration, and
-  reduced the access transformer to the one private `RenderType(String, RenderSetup)` constructor.
+  revalidated the minimal access transformer against the NeoForge 26.2 transformed compile classpath.
 - Migrated custom rendering to 26.2 bind-group layouts, GPU formats, multiple color targets, vertex
   bindings, primitive topology, PreparedRenderType, Feature Rendering, PiP collectors, and shape outlines.
 - Retained the OpenGL depth-aperture scope architecture, including Iris hand-pipeline classification

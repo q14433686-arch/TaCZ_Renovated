@@ -48,6 +48,29 @@ public class CameraSetupEvent {
     private static long shootTimeStamp = -1L;
     private static double xRotO = 0;
     private static double yRotO = 0;
+    private static final ThreadLocal<FovPass> ACTIVE_FOV_PASS = new ThreadLocal<>();
+
+    private enum FovPass {
+        WORLD,
+        ITEM
+    }
+
+    /**
+     * NeoForge 26.2 removed {@code ComputeFov#usedConfiguredFov()}, although the event is still
+     * posted from the helper shared by Camera's world and HUD/item FOV calculations. CameraMixin
+     * brackets those two callers so this listener can preserve their distinct behavior.
+     */
+    public static void beginWorldFovPass() {
+        ACTIVE_FOV_PASS.set(FovPass.WORLD);
+    }
+
+    public static void beginItemFovPass() {
+        ACTIVE_FOV_PASS.set(FovPass.ITEM);
+    }
+
+    public static void endFovPass() {
+        ACTIVE_FOV_PASS.remove();
+    }
 
     public static void applyLevelCameraAnimation(ViewportEvent.ComputeCameraAngles event) {
         if (!Minecraft.getInstance().options.bobView().get()) {
@@ -81,7 +104,7 @@ public class CameraSetupEvent {
     }
 
     public static void applyScopeMagnification(ViewportEvent.ComputeFov event) {
-        if (!event.usedConfiguredFov()) {
+        if (ACTIVE_FOV_PASS.get() != FovPass.WORLD) {
             return; // 只修改世界渲染的 fov，因此如果是手部渲染 fov 事件，则返回
         }
         Entity entity = event.getCamera().entity();
@@ -108,7 +131,7 @@ public class CameraSetupEvent {
     }
 
     public static void applyGunModelFovModifying(ViewportEvent.ComputeFov event) {
-        if (event.usedConfiguredFov()) {
+        if (ACTIVE_FOV_PASS.get() != FovPass.ITEM) {
             return; // 只修改手部物品的 fov，因此如果是世界渲染 fov 事件，则返回
         }
         Entity entity = event.getCamera().entity();

@@ -26,7 +26,10 @@
   `RegisterParticleProvidersEvent#registerSpecial(ParticleType, ParticleProvider)` 无签名变化；
 - `RegisterPictureInPictureRenderersEvent` 有 factory 变化，留给 WP-262-3 与 vanilla PiP
   签名一起处理；
-- `ViewportEvent.ComputeFov` 构造参数减少，但本仓只消费 event getter，不构造事件；
+- `ViewportEvent.ComputeFov` 构造参数减少，并删除了区分 world/HUD 的
+  `usedConfiguredFov()`；外部 JDK 25 首次编译据此报错。现由 `CameraMixin` 精确包围
+  `Camera#calculateFov(F)F` 与 `#calculateHudFov(F)F`，在 NeoForge 仍于共享 helper
+  内发事件时恢复 pass 身份；不从 FOV 数值猜测；
 - `ItemTooltipEvent` 构造参数增加，但本仓只订阅并读取原有 getter。
 
 ## Gui 重组
@@ -68,17 +71,21 @@ TextColor#getValue() : int
 
 ## Access Transformer 逐条重验
 
-26.2 classfile 结果：
+最初的静态检查误读了 refab Loom 已应用 access widener 的 merged jar，把三个被 AW
+开放的成员当成了原版 public。用户在真实 JDK 25 + ModDevGradle 2.0.144 + NeoForge
+26.2.0.64 transformed compile classpath 上的首次 `compileJava` 纠正了这一点。refab 26.2
+自己的 `tacz.accesswidener` 也明确保留同三个入口。
 
-| 原 AT 项 | 26.2 descriptor / access | 处理 |
+| AT 项 | 26.2 descriptor / 实际 access | 处理 |
 |---|---|---|
 | `RenderType.<init>` | `(String, RenderSetup)V`，`private` | **保留**，签名未变 |
-| `MultiPlayerGameMode#ensureHasSentCarriedItem` | `()V`，`public final` | 删除冗余 AT |
-| `Minecraft#startUseItem` | `()V`，`public final` | 删除冗余 AT |
-| `LivingEntity#jumping` | `Z`，`public` | 删除冗余 AT |
-| `RenderPipelines#register` | `(RenderPipeline)RenderPipeline`，`public static` | 删除冗余 AT |
+| `MultiPlayerGameMode#ensureHasSentCarriedItem` | `()V`，NeoForge patched source 为 `private` | **恢复** `public` AT |
+| `Minecraft#startUseItem` | `()V`，真实 compile 为 `private` | **恢复** `public` AT |
+| `LivingEntity#jumping` | `Z`，真实 compile 为 `protected` | **恢复** `public-f` AT |
+| `RenderPipelines#register` | `(RenderPipeline)RenderPipeline`，`public static` | 仍删除；本仓已改用 NeoForge pipeline event |
 
-AT 现在只包含一个确实需要 widening 的精确 descriptor，减少启动期签名漂移风险。
+AT 现在包含四个在役源码访问所必需的精确目标；没有恢复已不用的
+`RenderPipelines#register`。这与 refab AW 的前三项语义一致，但采用 NeoForge AT 表面。
 
 ## 其他非渲染核验
 
@@ -107,13 +114,22 @@ java-parser 3.0.1 on changed Java files: all PARSE OK
 git diff --check: success
 ```
 
-## 未完成的动态验收
+## 外部编译反馈与未完成验收
 
-本沙盒仍因无可下载的 JDK 25 / Gradle 依赖而不能执行 `compileJava` 或 `runServer`。
-因此没有声称专服已出现 `Done`，枪包装载数字也尚未与 26.1.2 实跑对比。需要在可联网
-环境补跑：
+2026-08-21，用户在 Windows 的真实 JDK 25 / Gradle 9.2.1 环境运行 `gradlew build`：
+NeoForm 成功下载并处理 Minecraft 26.2，随后 `compileJava` 报 9 个错误。本轮逐项处理：
+
+- 恢复上述三个必须的 AT；
+- `Gui#getGuiTicks()` 改为 26.2 的 `Gui#hud` → `Hud#getGuiTicks()I`；
+- `ComputeFov#usedConfiguredFov()` 改为 Camera world/HUD caller context；
+- `AvatarRenderer#renderRightHand/#renderLeftHand` 改用 26.2 五参 descriptor，并把末参恢复为
+  对应 sleeve model-part 是否显示，而不是旧代码误传的 slim/player 参数。
+
+这只是对编译器反馈的修复，**尚未收到重跑成功结果**，故不写 compile PASS。专服 `Done`
+与枪包装载数字也尚未实跑。需要用户在更新后的 commit 补跑：
 
 ```bash
 ./gradlew clean compileJava --warning-mode all --no-configuration-cache
+./gradlew build --no-configuration-cache
 ./gradlew runServer --no-configuration-cache
 ```

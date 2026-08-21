@@ -13,17 +13,14 @@
 - `COMPATIBILITY.md` 保持每行“API 已核 / 未实测”的明确区分。
 - `mod_version` 仍为 `1.1.8+neoforge.26.2.0.r0`，没有引入 `-` prerelease。
 
-## 未执行，故发布被阻塞
+## 尚未通过，故发布被阻塞
 
-当前沙盒：
+当前沙盒仍没有生产 JDK 25 依赖下载通道或 GPU。2026-08-21 用户在 Windows 的真实
+JDK 25 / Gradle 9.2.1 环境首次运行 `gradlew build`，26.2 artifact 生成成功并到达
+`compileJava`，随后报告 9 个错误。本分支已依据该真实输出修复 AT、FOV pass、HUD tick
+与 AvatarRenderer descriptor，但**修复后尚未重跑**。
 
-1. 初始无 Java；通过 npm 临时取得的 JRE/JDK 仅用于 scratch 静态检查，不是 JDK 25
-   生产工具链；
-2. Gradle wrapper / Maven / NeoForge 下载端点被环境 TLS egress 中断；
-3. 无 GPU / 显示环境；
-4. 当前 GitHub 连接对上游仓库显示只读，不能依靠推送临时 CI workflow 代跑。
-
-因此以下发布闸门没有通过：
+因此以下发布闸门仍没有通过：
 
 ```bash
 ./gradlew clean compileJava --warning-mode all --no-configuration-cache
