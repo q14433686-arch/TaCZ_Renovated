@@ -48,6 +48,11 @@ repositories {
         name = "BlameJared"
         url = "https://maven.blamejared.com"
     }
+    // ZigyTheBird Player Animation Library (PAL) — optional third-person compat.
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+    }
 }
 
 base {
@@ -184,6 +189,11 @@ dependencies {
     compileOnly "curse.maven:roughly-enough-items-310111:${rei_neoforge_file}"
     compileOnly "dev.architectury:architectury-neoforge:${rei_architectury_version}"
     compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rei_cloth_config_version}"
+
+    // ZigyTheBird Player Animation Library (PAL 1.2.5) — optional at runtime
+    // (modid player_animation_library); drives TACZ third-person gun animations.
+    // Same artifact the Fabric 26.1.2 port compiles against.
+    compileOnly "maven.modrinth:player-animation-library:${player_animation_lib}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

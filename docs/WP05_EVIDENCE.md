@@ -8,6 +8,7 @@
 | 调用 | 证据 |
 |---|---|
 | `AddClientReloadListenersEvent#addListener(Identifier, PreparableReloadListener)` | ② `AddClientReloadListenersEvent.java` / `SortedReloadListenerEvent` |
+| PAL API（`com.zigythebird.playeranim[core]`）：`PlayerAnimationFactory.ANIMATION_DATA_FACTORY#registerFactory`、`PlayerAnimationAccess#getPlayerAnimationLayer`、`PlayerAnimationController#setFirstPersonMode/replaceAnimationWithFade/triggerAnimation/stop/removeModifierIf`、`AbstractFadeModifier.standardFadeIn`、`UniversalAnimLoader#loadAnimations`、`AdjustmentModifier.PartModifier`、`EasingType/PlayState/FirstPersonMode/Vec3f` | ④ refab 26.1.2 `compat/playeranimator/pal/**`（对 PAL 1.2.5 真实编译运行过的用法；沙箱内 modrinth/kosmx maven 不可达，未能直接核 PAL 源码，运行验证留给 r17 实测） |
 | **26.1 线渲染格式 = `DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH`：`RenderTypes.lines()` 管线要求每个线顶点都写 `VertexConsumer#setLineWidth(float)`，缺失即抛 `IllegalStateException: Missing elements in vertex: LineWidth`**（r15 开"显示爆头范围"即崩，crash 2026-08-21 13:46） | ① 26.1 反编译源 `DebugScreenOverlay.java:110-123`（格式名 + 每顶点 setLineWidth 习语）、`ShapeRenderer#renderShape`（`addVertex().setColor().setNormal().setLineWidth(w)` ×2）；② NF `VertexConsumerWrapper#setLineWidth` |
 | 线宽取值 2.5F = 原版 F3+B 碰撞箱默认（`GizmoStyle.DEFAULT_WIDTH`，`stroke(argb)` 默认宽度） | ① 26.1 反编译源 `net/minecraft/gizmos/GizmoStyle.java:6-9`；原版实体碰撞箱走 `Gizmos.cuboid` + `EntityHitboxDebugRenderer` |
 | `RegisterKeyMappingsEvent#register` / `#registerCategory` | ② `RegisterKeyMappingsEvent.java` |
@@ -39,6 +40,17 @@
   属上游遗留而非移植引入）。全仓库排查：`RenderTypes.lines()` 仅此一处，
   其余 `submitCustomGeometry` 全为面渲染类型（`entityTranslucent`/emissive，无 LineWidth 元素），
   无直接 `new BufferBuilder`——同类"缺顶点元素"崩溃无第二处。
+- **PAL（ZigyTheBird Player Animation Library，modid `player_animation_library`）第三人称兼容已恢复**：
+  `compat/playeranimator/**` 取自 refab 26.1.2（pal 四类 + AnimationName + 门面），NeoForge 适配三点——
+  `ModList#isLoaded` 判装、PalAssetManager 去 `IdentifiableResourceReloadListener` 改经
+  `AddClientReloadListenersEvent#addListener(ID, listener)` 注册、事件订阅由 Fabric `CALLBACK.register`
+  改 `NeoForge.EVENT_BUS.addListener`（事件本就 post 在 game bus）。compileOnly
+  `maven.modrinth:player-animation-library:1.2.5`（refab 同款坐标）。内建规避 PAL 1.2.5 两处坑
+  （fadeOut 永久哑化、AdjustmentModifier NPE，见 PalAnimationManager/SafeAdjustmentModifier 注释）。
+- 兼容层状态盘点（r17）：cloth（活）、playeranimator（活，本次）、carryon（活，反射桥）、
+  firstperson（活）、shouldersurfing（活）、iris/shader（活，反射）、jei/rei/recipeviewer（活）、
+  ar（禁用——AR 无 26.1.2 Feature Rendering 版）、controllable/zoomify/immediatelyfast（no-op stub，
+  待后续：refab 有 ControllableInner 但需 26.1.2 NeoForge 文件号核实）。
 - S2C 仍走 `ClientPacketBridge`；dedicated 常量池不引用 `LocalPlayer`。
 
 ## 冒烟
