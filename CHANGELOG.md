@@ -13,7 +13,10 @@
   `registerNetwork`，对齐 refab 接线。
 - **修复（Iris）**：Iris 1.11.3 已自动分类 entity 管线时，重复 assignPipeline 的
   "Shader already assigned" 不再告警，视为成功并保留 Iris 分类。
-- 上述修复**待用户复测**（复测清单见实测记录）；通过后建议合并发布为 Beta-2。
+- **修复（构建）**：mods.toml 模板注释中的字面量 dollar-brace 导致 `generateModMetadata`
+  失败（Groovy 模板引擎连注释一起处理）。
+- 上述联机修复已于 2026-08-21 LAN 复测 **PASS**（`docs/records/SERVER_TEST_20260821_LAN_R2.md`）；
+  专用服务器（生产 jar）场景仍未测。建议凑齐 L2 后发布为 Beta-2。
 - **项目更名：TaCZ: Renovated**（原"TaCZ NeoForge 26.1.2（非官方移植）"）。
   只改显示名，**modId 仍为 `tacz`**，版本号不变，枪包兼容不受影响。
   决策记录：`docs/records/NAMING_DECISION.md`。

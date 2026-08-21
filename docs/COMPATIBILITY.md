@@ -32,8 +32,9 @@
 
 ## 已知问题
 
-- **专用服务器未完成实测**：现有 ✅ 均来自单机客户端场景；生产部署与联机矩阵
-  的测试预案见 [`DEDICATED_SERVER_TEST.md`](DEDICATED_SERVER_TEST.md)。
+- **联机覆盖面**：LAN/内置服务器场景已实测通过（2026-08-21）；真实专用服务器、
+  面板服、代理网络、混合服未测试，进度见
+  [`DEDICATED_SERVER_TEST.md`](DEDICATED_SERVER_TEST.md) L4 形态矩阵。
 - 启动日志中原版 `RecipeManager` 对工作台配方报 `empty ingredients` 警告：无害，
   实际合成走 mod 内部管线。
 - 发现新问题请按 [README](../README.md#反馈-bug) 的格式反馈。

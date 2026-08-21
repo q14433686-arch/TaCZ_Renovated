@@ -131,9 +131,10 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 
 ## 6. 当前已知边界
 
-- **专用服务器场景未完成实测**（开发期 headless 冒烟通过，但生产 jar 部署与
-  双客户端联机矩阵未跑；测试预案见
-  [docs/DEDICATED_SERVER_TEST.md](docs/DEDICATED_SERVER_TEST.md)）。
+- **联机**：内置服务器 + 局域网场景已通过实测（2026-08-21，含双客户端加入与基础游玩）；
+  **真实专用服务器（生产 jar 部署）尚未实测**，混合服（Youer/Arclight 等）、代理网络
+  （Velocity）等形态未测试。测试预案与形态矩阵见
+  [docs/DEDICATED_SERVER_TEST.md](docs/DEDICATED_SERVER_TEST.md)。
 - LRTactical 未内置（第 2 节）。
 - 启动日志中原版 `RecipeManager` 对工作台配方报 `empty ingredients` 警告：无害，
   实际合成走 mod 内部管线。
