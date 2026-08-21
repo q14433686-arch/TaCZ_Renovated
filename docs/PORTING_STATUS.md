@@ -19,7 +19,13 @@
 | r18 | 随 r17 一起发布 | 同上 |
 | r19 | PAL 改 CurseMaven 8454167；Controllable 用配置期 GitHub Releases 下载 | 用户构建在**配置期**崩：`PKIX path building failed`（Gradle JVM 不认代理环境下的 github.com 证书链） |
 | r20 | 两个依赖全部改为 CurseMaven 坐标 + `libs/` 本地 jar 逃生舱，配置期零网络 | **构建通过**（r20 日志：PAL 1.2.5 已加载、4 枪包发现、displays=255），但第三人称仍无任何 PAL 效果 |
-| r21 | 链路诊断日志（见下） | 待用户复测 |
+| r21 | 链路诊断日志（见下） | 日志（15:10）切开断点：`installed=true`、listener 注册、**5 个第三方包动画加载成功**，唯 `tacz:rifle_default.player_animation is NOT loaded`——默认包引用在、文件不在 |
+| r22 | **根因修复**：默认枪包漏拷 3 个 PAL 动画文件，已从 refab bundle 逐字节还原 | 待用户复测 |
+
+**根因（r21 日志定位 + bundle 实证）**：移植时默认枪包 `tacz_default_gun` 丢了整个 `player_animator/` 目录
+（`rifle_default/pistol_default/minigun.player_animation.json` 三件套）。display 里的 `player_animator_3rd`
+引用指向不存在的文件 → `contains()==false` → 每帧静默回落原版动画。全量对比（refab bundle 3322 文件
+vs 本仓库 3319 文件）证明**缺的只有这 3 个**，已逐字节还原。
 
 r20 运行日志（main latest.log）已排除的环节：PAL mod 加载 ✓（modid 正确）、枪包扫描 ✓、客户端 reload 链 ✓（`displays=255` 证明 `AddClientReloadListenersEvent` 处理器完整执行 → `init()` 已跑、`installed=true`）、`PlayerModelMixin`/`InnerThirdPersonManager` 挂载点在位 ✓、Cold War 包**确有** PAL 数据（`assets/rainforest/player_animator/*.player_animation.json` + display `player_animator_3rd` 字段，仓库内 zip 实证）。
 
