@@ -1,34 +1,65 @@
 package com.tacz.guns.compat.cloth;
 
+import com.tacz.guns.compat.cloth.client.KeyClothConfig;
+import com.tacz.guns.compat.cloth.client.RenderClothConfig;
+import com.tacz.guns.compat.cloth.client.ResourceClothConfig;
+import com.tacz.guns.compat.cloth.client.SoundClothConfig;
+import com.tacz.guns.compat.cloth.client.ZoomClothConfig;
+import com.tacz.guns.compat.cloth.common.AmmoClothConfig;
+import com.tacz.guns.compat.cloth.common.GunClothConfig;
+import com.tacz.guns.compat.cloth.common.OtherClothConfig;
+import com.tacz.guns.config.ClientConfig;
+import com.tacz.guns.config.CommonConfig;
+import me.shedaniel.clothconfig2.api.ConfigBuilder;
+import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.fml.IExtensionPoint;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import javax.annotation.Nullable;
 
 /**
- * Client configuration entry point: NeoForge's native {@link ConfigurationScreen},
- * constructed exactly the way its class javadoc recommends
- * ({@code new ConfigurationScreen(container, parent)} — the same screen Carry On
- * uses on 26.1.2).
+ * TACZ classic Cloth Config screen: eight categories (Key/Render/Resource/Sound/Zoom
+ * + Gun/Ammo/Other), aligned with MUKSC/TACZ-1.21.1 (NeoForge idiom) and
+ * TaCZ_Refabricated_Unofficial 26.1.2 (game semantics; the only content delta
+ * is 26.1.2's extra {@code scope_mask_enable} entry, kept).
  *
- * <p>Do NOT hand-roll a {@code Screen} subclass for this again: in 26.1.2 the
- * vanilla {@code Screen#extractRenderState} default already extracts the
- * (blurred) background, and calling {@code extractBackground} manually on top
- * triggers {@code IllegalStateException: Can only blur once per frame}
- * (crash log 2026-08-21 13:21, TaczConfigHomeScreen.java:87, since removed).</p>
- *
- * <p>Lang keys already follow the native scheme ({@code tacz.configuration.title},
- * {@code tacz.configuration.section.<file>.toml[.title]}), so all existing
- * translations carry over unchanged. The native screen lists every registered
- * config type and disables SERVER/STARTUP entries with a tooltip whenever they
- * cannot be edited in the current context (e.g. while online).</p>
+ * <p>Cloth Config is an OPTIONAL runtime dependency (modid {@code cloth_config});
+ * compile classpath is {@code me.shedaniel.cloth:cloth-config-neoforge:26.1.154}.
+ * The T-key entry point sends a clickable download hint instead when absent
+ * (see ConfigKey), the Mods-menu falls back to ClothConfigScreen.</p>
  */
-public final class MenuIntegration {
-    private MenuIntegration() {
+public class MenuIntegration implements IExtensionPoint {
+    public static ConfigBuilder getConfigBuilder() {
+        ConfigBuilder root = ConfigBuilder.create().setTitle(Component.literal("Timeless and Classics Guns"));
+        root.setSavingRunnable(() -> {
+            CommonConfig.spec.save();
+            ClientConfig.spec.save();
+        });
+        root.setGlobalized(true);
+        root.setGlobalizedExpanded(false);
+        ConfigEntryBuilder entryBuilder = root.entryBuilder();
+
+        KeyClothConfig.init(root, entryBuilder);
+        RenderClothConfig.init(root, entryBuilder);
+        ResourceClothConfig.init(root, entryBuilder);
+        SoundClothConfig.init(root, entryBuilder);
+        ZoomClothConfig.init(root, entryBuilder);
+
+        GunClothConfig.init(root, entryBuilder);
+        AmmoClothConfig.init(root, entryBuilder);
+        OtherClothConfig.init(root, entryBuilder);
+
+        return root;
     }
 
-    public static Screen getConfigScreen(ModContainer container, @Nullable Screen parent) {
-        return new ConfigurationScreen(container, parent);
+    public static void registerModsPage(ModContainer container) {
+        container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) -> getConfigScreen(screen));
+    }
+
+    public static Screen getConfigScreen(@Nullable Screen parent) {
+        return MenuIntegration.getConfigBuilder().setParentScreen(parent).build();
     }
 }

@@ -1,5 +1,6 @@
 package com.tacz.guns.client.gui.compat;
 
+import com.tacz.guns.init.CompatRegistry;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -9,6 +10,9 @@ import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.apache.commons.lang3.StringUtils;
 
 public class ClothConfigScreen extends Screen {
@@ -19,6 +23,16 @@ public class ClothConfigScreen extends Screen {
     protected ClothConfigScreen(Screen lastScreen) {
         super(Component.literal("Cloth Config API"));
         this.lastScreen = lastScreen;
+    }
+
+    /**
+     * Mods-menu fallback when Cloth Config is absent (MUKSC/TACZ-1.21.1 idiom).
+     * Shows a download hint instead of the config screen.
+     */
+    public static void registerNoClothConfigPage(ModContainer container) {
+        if (!ModList.get().isLoaded(CompatRegistry.CLOTH_CONFIG)) {
+            container.registerExtensionPoint(IConfigScreenFactory.class, (modContainer, screen) -> new ClothConfigScreen(screen));
+        }
     }
 
     @Override
@@ -38,7 +52,9 @@ public class ClothConfigScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor gui, int pMouseX, int pMouseY, float pPartialTick) {
-        this.extractBackground(gui, pMouseX, pMouseY, pPartialTick);
+        // 26.1.2: vanilla Screen#extractRenderState already extracts the (blurred)
+        // background exactly once per frame — never call extractBackground manually
+        // here (r13 crash: "Can only blur once per frame").
         int centerX = this.width / 2;
         int centerY = this.height / 4 - 20;
         int lineY = centerY;
