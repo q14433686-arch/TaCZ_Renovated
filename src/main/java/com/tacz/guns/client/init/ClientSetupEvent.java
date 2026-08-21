@@ -126,9 +126,6 @@ public class ClientSetupEvent {
         PlayerAnimatorCompat.init();
         PlayerAnimatorCompat.registerReloadListener(event::addListener);
         ClientAssetsManager.INSTANCE.reloadAndRegister(event);
-        // WP⑦ LRTactical 的 display 加载器 —— 排在 TACZ 侧之后注册（其内部声明了
-        // 对 TACZ 模型/动画/脚本加载的先后依赖）。
-        me.xjqsh.lrtactical.client.init.ModEntitiesRender.registerReloadListeners(event::addListener);
     }
 
     @SubscribeEvent
@@ -138,9 +135,6 @@ public class ClientSetupEvent {
 
     public static void onClientSetup() {
         ThirdPersonManager.registerDefault();
-        // WP⑦ LR 的动态渲染器登记：必须在 RegisterEvent 之后（物品已实例化），
-        // FMLClientSetupEvent.enqueueWork 时点满足。
-        me.xjqsh.lrtactical.client.init.ModEntitiesRender.registerItemRenderers();
         FirstPersonAnimationCompat.init();
         ShoulderSurfingCompat.init();
         ControllableCompat.init();

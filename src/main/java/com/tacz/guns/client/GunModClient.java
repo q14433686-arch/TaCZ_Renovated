@@ -16,31 +16,10 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod(value = GunMod.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = GunMod.MOD_ID, value = Dist.CLIENT)
 public class GunModClient {
-    public GunModClient(net.neoforged.bus.api.IEventBus modEventBus, ModContainer container) {
+    public GunModClient(ModContainer container) {
         ScopeRenderTypes.init();
-        // LR 的 mod bus 注册：物品模型类型/条件属性（经事件，早于物品 JSON 解码）、
-        // 实体渲染器（缺则进视野 NPE）、粒子 provider、HUD 覆盖层。
-        modEventBus.addListener(me.xjqsh.lrtactical.client.init.ModEntitiesRender::registerItemModels);
-        modEventBus.addListener(me.xjqsh.lrtactical.client.init.ModEntitiesRender::registerConditionalProperties);
-        modEventBus.addListener(me.xjqsh.lrtactical.client.init.ModEntitiesRender::registerEntityRenderers);
-        modEventBus.addListener(me.xjqsh.lrtactical.client.init.ModEntitiesRender::registerParticles);
-        modEventBus.addListener(me.xjqsh.lrtactical.client.init.ModEntitiesRender::registerHudOverlays);
-        // LR 的 game bus 注册：近战左右键、冷却/动画 tick、耳鸣声驱动。
-        var bus = net.neoforged.neoforge.common.NeoForge.EVENT_BUS;
-        bus.addListener(me.xjqsh.lrtactical.client.input.MeleeAttackKeys::onMousePress);
-        bus.addListener((net.neoforged.neoforge.client.event.ClientTickEvent.Pre event) -> {
-            var mc = Minecraft.getInstance();
-            me.xjqsh.lrtactical.init.ModCapabilities.onClientPlayerTick(mc.player);
-            me.xjqsh.lrtactical.client.event.LrTickAnimationEvent.tickAnimation(mc);
-        });
-        bus.addListener((net.neoforged.neoforge.client.event.ClientTickEvent.Post event) -> {
-            me.xjqsh.lrtactical.client.event.LrTickAnimationEvent.tickAnimation(Minecraft.getInstance());
-            me.xjqsh.lrtactical.client.audio.DeafenState.tick(Minecraft.getInstance());
-        });
-        bus.addListener((net.neoforged.neoforge.client.event.RenderFrameEvent event) ->
-                me.xjqsh.lrtactical.client.event.LrTickAnimationEvent.tickAnimation(event));
-        // TACZ 侧的 Cloth Config / Controllable 兼容注册。
-        // cloth present -> cloth UI, absent -> download-hint screen. Registration mirrors MUKSC's CompatRegistry.
+        // TACZ classic Cloth Config screen (MUKSC idiom): cloth present -> cloth UI,
+        // absent -> download-hint screen. Registration mirrors MUKSC's CompatRegistry.
         if (net.neoforged.fml.ModList.get().isLoaded(com.tacz.guns.init.CompatRegistry.CLOTH_CONFIG)) {
             com.tacz.guns.compat.cloth.MenuIntegration.registerModsPage(container);
         } else {

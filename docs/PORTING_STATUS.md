@@ -1,104 +1,46 @@
 # 移植状态
 
 目标版本：Minecraft **26.1.2** + NeoForge **26.1.2.97**（release）。
+当前版本：**1.1.8+neoforge.26.1.2.Beta-1**（r1-r30 为开发历史，Beta-1 起为稳定基线）。
 
 工作包①②③④⑤⑥已完成（首发范围）。Iris 为可选；无光影时走 vanilla depth-aperture。
 
-## 未完成 / 未验证项（诚实清单）
+## 版本基线
 
-> 本节记录**尚未达成**的兼容项，避免"文档说已完成、实际不工作"的落差。
-> 最后更新：r26（2026-08-21）。
+- **Beta-1（当前）**：撤回工作包⑦（LRTactical），功能基线 = r23（cloth/PAL/controllable/shouldersurfing
+  全兼容 + 全部已 PASS 修复）。LR 代码全部移除，踩坑点归档于 `WP07_LRTACTICAL_PLAN.md`。
+- r1-r30：开发历史（详见 git log 与各 WP 文档）。
 
-### 🔶 WP⑦ LRTactical 内置（阶段一完成，r26）——骨架+接线已入库，**未编译验证、未实测**
+## 未实现项（诚实清单）
 
-阶段一内容（r26）：`me.xjqsh.lrtactical` 104 个 Java 文件 + 31 个资源（26 json + 5 lua，零美术）
-从 refab 26.1.2 逐字节迁入；NeoForge 适配已完成——
-Fabric `provides` → GunPackLoader 软特判（r23 前已有）；`@Environment` 删除；
-网络三段式 → `RegisterPayloadHandlersEvent`+`PayloadRegistrar`（CODEC 字段保留 FriendlyByteBuf 泛型，协变合法）；
-`IEntityAdditionalSpawnData` → 26.1 原生 `IEntityWithComplexSpawn`（getAddEntityPacket 覆写删除，参数改 RegistryFriendlyByteBuf）；
-`AttackEntityCallback` → `AttackEntityEvent` 适配器（FAIL→setCanceled）；
-`PlayerTickEvent.START` → `tick.PlayerTickEvent.Pre`；`SYNC_DATA_PACK_CONTENTS` → `OnDatapackSyncEvent`；
-`AFTER_RESPAWN` → `PlayerEvent.PlayerRespawnEvent`；`EntityRendererRegistry` → `EntityRenderersEvent.RegisterRenderers`；
-`ParticleProviderRegistry` → `RegisterParticleProvidersEvent#registerSpriteSet`；`HudElementRegistry` → `RegisterGuiLayersEvent`；
-`FabricParticleTypes.simple` → `new SimpleParticleType(true)`；`IdentifiableResourceReloadListener` 移除（BiConsumer 注册）；
-`IItem` 收进 `me.xjqsh.lrtactical.api.extension`；`RenderTickEvent` → `RenderFrameEvent`；
-`lrtactical.mixins.json` 独立配置 + neoforge.mods.toml `[[mixins]]` 声明；
-接线：GunMod 构造期 `EquipmentMod.init(modEventBus)`，GunModClient 构造期客户端注册，ClientSetupEvent.reload 挂 LR display listener。
-静态校验：108 文件语法全过、tacz 类引用闭包全存在、Fabric/cn.sh1rocu 零残留。
-API 证据：AttackEntityEvent/PlayerTickEvent/PlayerEvent/RegisterParticleProvidersEvent/EntityRenderersEvent/InputEvent.MouseButton.action
-均对照 NeoForge `26.1.2-stable` 源码核实。
-**待办**：用户侧 gradlew build 编译验证（沙箱无 gradle）→ 阶段四实测（投掷物/近战/消耗品/引爆器）。
+> 最后更新：Beta-1（2026-08-21）。
 
-### 其余兼容层状态
+### ❌ LRTactical 内置（WP⑦）——已撤回，未实现
 
-### ❌ Player Animation Library（PAL，第三人称动画）——四次尝试均未落地
+- r26 立项实施（104 文件 + 31 资源迁入，形态 B），r26→r30 三轮修复后**仍有未定位的启动崩溃**，
+  项目决定撤回全部代码（Beta-1）。
+- **现状**：LR 内容包可被发现（`GunPackLoader` 软 provides 保留），但四个基础物品
+  （throwable/melee/detonator/consumable）与全部行为**不存在**——LR 包装上后道具不可用。
+- 决策记录、撤回原因、**全部踩坑点（13 条，含注册表冻结/ID_MAPPER 私有化/readMap 歧义等）**
+  与重启前置条件：见 `docs/WP07_LRTACTICAL_PLAN.md`。
+- 重启条件：定位 r30 崩溃日志 + 优先 DeferredRegister 完整重写 init 包。
 
-用户实测结论：**未恢复兼容**（r17 报告一次，r20 后再次报告"依旧没做好"）。
+### 其余兼容层终态
 
-| 轮次 | 做法 | 结果 |
-|---|---|---|
-| r17 | `compileOnly maven.modrinth:player-animation-library:1.2.5` | 死坐标（该项目 Modrinth version number 是 `1.2.5+26.1` 格式），PAL 类从未上编译 classpath |
-| r18 | 随 r17 一起发布 | 同上 |
-| r19 | PAL 改 CurseMaven 8454167；Controllable 用配置期 GitHub Releases 下载 | 用户构建在**配置期**崩：`PKIX path building failed`（Gradle JVM 不认代理环境下的 github.com 证书链） |
-| r20 | 两个依赖全部改为 CurseMaven 坐标 + `libs/` 本地 jar 逃生舱，配置期零网络 | **构建通过**（r20 日志：PAL 1.2.5 已加载、4 枪包发现、displays=255），但第三人称仍无任何 PAL 效果 |
-| r21 | 链路诊断日志（见下） | 日志（15:10）切开断点：`installed=true`、listener 注册、**5 个第三方包动画加载成功**，唯 `tacz:rifle_default.player_animation is NOT loaded`——默认包引用在、文件不在 |
-| r22 | **根因修复**：默认枪包漏拷 3 个 PAL 动画文件，已从 refab bundle 逐字节还原 | 待用户复测 |
-
-**根因（r21 日志定位 + bundle 实证）**：移植时默认枪包 `tacz_default_gun` 丢了整个 `player_animator/` 目录
-（`rifle_default/pistol_default/minigun.player_animation.json` 三件套）。display 里的 `player_animator_3rd`
-引用指向不存在的文件 → `contains()==false` → 每帧静默回落原版动画。全量对比（refab bundle 3322 文件
-vs 本仓库 3319 文件）证明**缺的只有这 3 个**，已逐字节还原。
-
-r20 运行日志（main latest.log）已排除的环节：PAL mod 加载 ✓（modid 正确）、枪包扫描 ✓、客户端 reload 链 ✓（`displays=255` 证明 `AddClientReloadListenersEvent` 处理器完整执行 → `init()` 已跑、`installed=true`）、`PlayerModelMixin`/`InnerThirdPersonManager` 挂载点在位 ✓、Cold War 包**确有** PAL 数据（`assets/rainforest/player_animator/*.player_animation.json` + display `player_animator_3rd` 字段，仓库内 zip 实证）。
-
-剩余两个候选断点（均无日志，r21 已加诊断切开）：
-1. `display.getPlayerAnimator3rd()` 解析为 null
-2. `PalAssetManager` 未加载到动画文件（listener 注册/资源扫描问题）
-
-**r21 诊断日志解读表**（跑一轮后按行定位）：
-| 日志行 | 含义 |
+| 兼容层 | 状态 |
 |---|---|
-| `[TACZ PAL] init: installed=true` | 判装成功 |
-| `[TACZ PAL] reload listener registered as tacz:pal_asset_manager` | listener 已注册 |
-| `[TACZ PAL] player_animator assets loaded: N file(s)` | N=0 → 资源扫描断（查枪包挂载）；N>0 → 加载成功 |
-| `[TACZ PAL] animation file X is NOT loaded` | display 引用了 X 但没加载到 → 资源路径/id 不匹配 |
-| `[TACZ PAL] display X has no player_animator_3rd data` | 该 display 无 PAL 引用（正常，走原版动画） |
-| `[TACZ PAL] compat inactive` | isLoaded 失败（不应出现） |
+| cloth / playeranimator(PAL) / controllable / shouldersurfing | ✅ 活（用户 PASS） |
+| carryon / firstperson / iris / shader / jei / rei / recipeviewer | ✅ 活 |
+| justzoom | ⏸ 有据不做（无上游先例，项目决定不原创） |
+| zoomify | ⏸ NeoForge 无此 mod |
+| immediatelyfast | ⏸ 有据 no-op（26.x 无需集成） |
+| ar | ⏸ 无 26.1.2 版 |
+| **lrtactical** | **❌ 未实现（已撤回，见 WP07 文档）** |
 
-已核实的事实（不必重查）：
-- PAL 26.1 发布是 **merged Fabric+NeoForge jar**（`PlayerAnimationLibMerged-*`），CurseForge 文件 8454167 = `1.2.5+26.1`（支持 26.1.2+2）；最新为 8674772 = `1.2.6+26.1`
-- modid 两加载器均为 `player_animation_library`（源码库 `ZigyTheBird/PlayerAnimationLibrary` 分支 `26.1` 的 fabric.mod.json 与 neoforge.mods.toml 核实）
-- 代码侧 `compat/playeranimator/**` 取自 refab 26.1.2，加载器适配三点已完成；挂载点（PlayerModelMixin / InnerThirdPersonManager / 9 个按键钩子）自移植初期就在位
-- 用户 JVM 可达 cursemaven.com（REI 依赖自 WP03 起一直正常解析）
-
-**当前未知（需用户提供才能继续）：**
-1. r20 的 `gradlew build` 是否成功？失败请贴完整报错（尤其 `Could not find curse.maven:...` 字样）
-2. 若构建成功：游戏里装的是哪个 PAL 文件（版本号/文件名）？`latest.log` 中搜索 `player_animation_library` 与 `tacz` 的加载行
-3. 第三人称观察其他玩家持枪是否有任何 PAL 动画迹象
-
-### ⚠️ Controllable（手柄绑定+震动）——未实测
-
-代码（r18 起）与编译坐标（r20 起）就绪，API 对照 `MrCrayfish/Controllable@multiloader/26.1.2` 逐条验证过；但与 PAL 同链路，**在 PAL 问题水落石出之前不宣称可用**。CurseForge 文件页存在第三方分发警告，若 CurseMaven 拒发，需手动下载官方 jar 放 `libs/`（见 build.gradle 注释）。
-
-### ✅ 已验证可用（用户 PASS）
+## 已验证可用（用户 PASS 清单）
 
 - r15：Cloth Config 配置界面（T 键 + Mods 菜单，含无 Cloth 兜底）
 - r16：爆头范围显示（F3+B）线渲染修复
-- r17 前：配置界面崩溃（双 blur）修复等
-
-### ✅ Shoulder Surfing Reloaded（越肩视角重制）——r23 恢复完整兼容
-
-三件套 + 插件 JSON（refab 26.1.2 语义，全部 API 对照 `Exopandora/ShoulderSurfing@26.1.2` 源码验证）：
-`ShoulderSurfingCompat`（判装 + **5.x API 探测**，26.1.2 线还有 4.x 旧版流通、fail-closed）、
-`ShoulderSurfingCompatInner`（`Perspective.current()==SHOULDER_SURFING && !FREE_LOOK.isDown()` 准星判断）、
-`ShoulderSurfingPlugin`（持枪/副手持枪 → SSR 自适应瞄准相机）+ `shouldersurfing_plugin.json`
-（**NeoForge 版 PluginLoader 同样扫描该 JSON**，机制跨加载器统一，源码 `PluginLoaderNeoForge` 实证）。
-编译：CurseForge 8596489（5.0.10 NeoForge 26.1.2）via CurseMaven + libs/ 逃生舱。运行时可选（modid `shouldersurfing`）。
-此前 r17 之前的残件只有反射版准星判断，无插件注册（自适应相机缺失）。
-
-### 其余兼容层状态
-
-- **justzoom（Just Zoom）**：r24 曾做过原创 FOV 适配，**r25 按项目决定撤销**——上游（原版 1.20.1 /
-  MUKSC / refab 26.1.2 与 26.2）均无 JustZoom 兼容，本移植不做无上游先例的原创兼容。
-
-见 `docs/WP05_EVIDENCE.md` 兼容层盘点；其中 immediatelyfast（有据 no-op）、zoomify（NeoForge 无此 mod）、ar（无 26.1.2 版）为终态结论，非待办。
+- r17-r20：PAL 第三人称动画（根因：默认包 3 个动画文件漏拷，r22 修复后 PASS）
+- r23：Shoulder Surfing Reloaded 5.x（插件 + 准星）
+- r24/r25：JustZoom 原创适配后按项目决定撤销

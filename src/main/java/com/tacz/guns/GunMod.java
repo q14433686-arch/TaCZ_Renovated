@@ -66,10 +66,6 @@ public class GunMod {
 
         registerDefaultExtraGunPack();
         AttachmentPropertyManager.registerModifier();
-        // WP⑦ 附属模块 LRTactical：与主 mod 同 jar 共生（代码 GPL-3.0，美术 ARR 不随包分发）。
-        // 详见 docs/WP07_LRTACTICAL_PLAN.md。
-        me.xjqsh.lrtactical.EquipmentMod.init(modEventBus);
-
         LOGGER.info("TaCZ NeoForge 26.1.2 port work package ⑥ loading. modId={}", MOD_ID);
     }
 
