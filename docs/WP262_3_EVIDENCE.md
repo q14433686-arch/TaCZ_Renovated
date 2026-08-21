@@ -144,14 +144,14 @@ Iris 1.11.2 source commit
   做 scratch `javac`：PASS；
 - `git diff --check`：PASS。
 
-以上不是生产 Gradle 或 GPU PASS。用户此前的 JDK 25 build PASS 对应 depth-aperture commit
-`c40dab9`；替换为 mask 后必须重新执行 build 与下列运行矩阵。
+后续用户已对包含离屏 mask、低倍状态拆分与 R1 基线修复的定名前同代码候选报告 build
+和 L0-L3 PASS。最终版本 metadata 改名为 R1 后，只需重新确认 build/L0/L1；该结果仍不等于
+GPU 视觉 PASS。
 
-## 必须重跑
+## R1 快速复核与 GPU 矩阵
 
 ```bash
-./gradlew clean compileJava --warning-mode all --no-configuration-cache
-./gradlew build --no-configuration-cache
+./gradlew clean build --no-configuration-cache
 ./gradlew runServer --no-configuration-cache
 ./gradlew runClient --no-configuration-cache
 ```

@@ -26,7 +26,8 @@ check_file() {
     fi
 }
 
-check_file README.md 1
+# README: current-version line, support table and installation/version sections.
+check_file README.md 3
 check_file CHANGELOG.md 1
 
 echo "--- metadata placeholders"

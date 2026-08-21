@@ -1,8 +1,8 @@
 # 移植状态
 
 目标版本：Minecraft **26.2** + NeoForge **26.2.0.64**（release）。
-当前源码版本：**1.1.8+neoforge.26.2.0.r0**。
-状态：**未发布候选；当前 26.2 候选 build 与 L0-L3 已获用户 PASS，剩余专项矩阵未完成。**
+当前源码版本：**1.1.8+neoforge.26.2.0.R1**。
+状态：**未发布 R1 候选；定名前同代码 L0-L3 用户 PASS，R1 metadata 产物待快速复核。**
 
 > 最后更新：2026-08-21。本文只记录诚实状态；README 不作为逐包进度日志。
 
@@ -10,23 +10,23 @@
 
 | 工作包 | 已落地 | 尚缺验收 |
 |---|---|---|
-| WP-262-0 transfer 卫生 | `IItemHandler` for-removal 调用迁到 `ResourceHandler<ItemResource>`；删除死屏幕；当前编译 PASS | removal warning 明细可留档 |
-| WP-262-1 构建骨架 | MC 26.2 / NF 26.2.0.64 / Java 25 / r0；build / `runServer` / 真实专服 PASS | 无基础构建阻塞 |
-| WP-262-2 非渲染 | Gui/HUD/AT；R1 network/getName 回流；当前 L0-L3 用户 PASS | L2.5 单独确认 |
-| WP-262-3 渲染 | 26.2 stage-boundary ocular mask、Feature/PiP/Gizmo/hand API、Iris bridge；编译 PASS | OpenGL/Iris/Vulkan 完整 GPU 矩阵 |
+| WP-262-0 transfer 卫生 | `IItemHandler` for-removal 调用迁到 `ResourceHandler<ItemResource>`；删除死屏幕 | R1 最终 compile warning 复核 |
+| WP-262-1 构建骨架 | MC 26.2 / NF 26.2.0.64 / Java 25；定名前同代码 build/专服 PASS | R1 版本展开后的 L0/L1 快速复核 |
+| WP-262-2 非渲染 | Gui/HUD/AT；R1 network/getName 回流；定名前同代码 L0-L3 用户 PASS | L2.5 单独确认 |
+| WP-262-3 渲染 | stage-boundary ocular mask、Feature/PiP/Gizmo/hand API、Iris bridge；编译通过 | OpenGL/Iris/Vulkan 完整 GPU 矩阵 |
 | WP-262-4 可选兼容 | 26.2 坐标重钉、Carry On 2.11、FPM/NEA dormant bridge、矩阵文档 | `COMPATIBILITY.md` 全部游戏内项目 |
 | WP-262-5 发布准备 | README/CHANGELOG/LICENSES/状态文档 | **发布 jar 与源码包被上述构建/实测闸门阻塞** |
 
 证据：`docs/WP262_0_EVIDENCE.md` 至 `docs/WP262_5_EVIDENCE.md`。
 
-首次 JDK 25 build 暴露的 9 个编译错误、后续离屏 scope-mask 与 26.1.2 R1 修复均已进入
-当前候选。用户现已报告当前测试指引对应 HEAD 的 build、L0、L1、L2 与 L3 **PASS**；
-冻结回执见 `docs/records/SERVER_TEST_20260821_262_R0.md`。该结果不外推到未单独确认的
-L2.5、GPU 或可选 Mod 矩阵。
+首次 JDK 25 build 暴露的 9 个编译错误、离屏 scope-mask 与 26.1.2 R1 修复均已进入
+当前代码。用户已对定名前同代码候选报告 build、L0-L3 **PASS**；随后只将版本 metadata
+从开发标签改名为 `1.1.8+neoforge.26.2.0.R1`。冻结回执见
+`docs/records/SERVER_TEST_20260821_262_R1.md`。逻辑结论不变，但最终 R1 jar 的版本展开需复核。
 
 ## 版本基线
 
-- **26.2 r0（当前工作树）**：最初从 Beta-1 前滚，现已 cherry-pick 26.1.2 R1 的三组
+- **26.2 R1（当前工作树）**：最初从 Beta-1 前滚，现已 cherry-pick 26.1.2 R1 的三组
   必要代码修复；不是重写。
 - **26.1.2 R1（完整功能基线）**：LAN、真实专服与枪包专项实测通过；记录已同步到
   `docs/records/`。其 PASS 不能自动继承为 26.2 PASS。
@@ -54,10 +54,11 @@ L2.5、GPU 或可选 Mod 矩阵。
 
 ## 发布阻塞项
 
-在以下项目全部完成前，仍不得发布 r0 或声称移植完成：
+在以下项目全部完成前，仍不得发布 R1 或声称移植完成：
 
-1. 枪包：单独确认 L2.5 默认包/第三方包、双端不对称安装、`/tacz reload` 与 F3+T；
-2. 客户端：补齐无可选 Mod 的完整枪械/资源回归记录；
-3. GPU：OpenGL、Iris、Vulkan scope-mask 矩阵；
-4. `COMPATIBILITY.md` 可安装项目逐行用户实测或继续明确“未实测”；
-5. 发布 jar 的 metadata/license 与对应源码 tag/归档一致性最终复核。
+1. R1 产物：重跑 build + L0，并快速确认 Mod List 版本与 `Done`；
+2. 枪包：单独确认 L2.5 默认包/第三方包、双端不对称安装、`/tacz reload` 与 F3+T；
+3. 客户端：补齐无可选 Mod 的完整枪械/资源回归记录；
+4. GPU：OpenGL、Iris、Vulkan scope-mask 矩阵；
+5. `COMPATIBILITY.md` 可安装项目逐行用户实测或继续明确“未实测”；
+6. 发布 jar 的 metadata/license 与对应源码 tag/归档一致性最终复核。

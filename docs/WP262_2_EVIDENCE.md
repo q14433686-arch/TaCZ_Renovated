@@ -143,4 +143,4 @@ NeoForm 成功下载并处理 Minecraft 26.2，随后 `compileJava` 报 9 个错
 上述修复、scope-mask 替换和 R1 多人修复均进入当前候选后，用户报告
 `docs/DEDICATED_SERVER_TEST.md` **L0-L3 全部 PASS**：当前 build、`runServer`、真实生产专服
 和双客户端联机基础矩阵关闭。冻结回执：
-`docs/records/SERVER_TEST_20260821_262_R0.md`。L2.5 未被单独点名，继续保持待确认。
+`docs/records/SERVER_TEST_20260821_262_R1.md`。L2.5 未被单独点名，继续保持待确认。

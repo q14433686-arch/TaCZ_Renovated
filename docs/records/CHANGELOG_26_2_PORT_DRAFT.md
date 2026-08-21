@@ -2,7 +2,11 @@
 
 > 仅记录已经落入本分支的改动。未执行的实机/兼容矩阵不得写成 PASS。
 
-## Unreleased — `1.1.8+neoforge.26.2.0.r0`
+> **冻结过程记录**：本文件保留 WP-262 分包迁移过程，不作为当前发行说明。
+> 对外版本变更以根 `CHANGELOG.md` 为准；当前状态以 `docs/PORTING_STATUS.md` 为准。
+> 文中“待重建”等措辞反映当时阶段，已被后续 L0-L3 用户 PASS 取代；最终版本随后定名 R1。
+
+## Unreleased — `1.1.8+neoforge.26.2.0.R1`
 
 ### WP-262-0（仍基于 26.1.2）
 
@@ -16,7 +20,7 @@
 ### WP-262-1
 
 - 构建目标前滚到 Minecraft 26.2 + NeoForge 26.2.0.64（release）。
-- 版本设为 `1.1.8+neoforge.26.2.0.r0`，保持 `1.1.8` SemVer core 与枪包依赖兼容。
+- 版本设为 `1.1.8+neoforge.26.2.0.R1`，保持 `1.1.8` SemVer core 与枪包依赖兼容。
 - 对齐官方 MDK-26.2：Gradle 9.2.1、ModDevGradle 2.0.144、Foojay 1.0.0、
   Java 25、`[26.2]` 精确游戏范围，并修正 `gradlew` 可执行位。
 - 瞄具主路径已改为 26.2 阶段边界离屏 ocular mask；当前 HEAD 构建与服务端启动待重跑。
@@ -60,7 +64,7 @@
 
 ### WP-262-5（发布准备，受阻）
 
-- 新建根 `CHANGELOG.md` 的 Unreleased r0 条目；README、LICENSES、PORTING_STATUS 更新到
+- 新建根 `CHANGELOG.md` 的 Unreleased R1 条目；README、LICENSES、PORTING_STATUS 更新到
   26.2，且显式保留当前 HEAD“待重建/未实测/未发布”状态。
 - README 不再充当逐工作包进度表；详细状态只放 `docs/PORTING_STATUS.md`。
 - 没有发布 jar：当前 scope-mask HEAD、专服、GPU 与可选 Mod 矩阵未通过，发布闸门保持关闭。

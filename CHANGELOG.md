@@ -1,61 +1,73 @@
-# Changelog
+# 更新日志
 
-## Unreleased — 1.1.8+neoforge.26.2.0.r0
+版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
+`>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
-### Target
+## Unreleased — 1.1.8+neoforge.26.2.0.R1
+
+### 目标环境
 
 - Minecraft 26.2
-- NeoForge 26.2.0.64 (release)
+- NeoForge 26.2.0.64 release
 - Java 25
 - Gradle 9.2.1 / ModDevGradle 2.0.144
 
-### Changed
+### 修复
 
-- Forward-ported the NeoForge 26.1.2 codebase to Minecraft/NeoForge 26.2, including the R1
-  multiplayer fixes recovered after the original Beta-1 branch point.
-- Changed both naturally-empty stacks in `ServerMessageGunDraw` to
-  `ItemStack.OPTIONAL_STREAM_CODEC`, preventing tracking broadcasts from disconnecting players.
-- Added `AttachmentsTagManager` and `RecipeFilterManager` to the network-cache listener list so
-  attachment rules and block recipe filters reach multiplayer clients.
-- Treats Iris' `Shader already assigned` response as successful existing classification.
-- Moved gun, ammo, attachment and workbench `Item#getName(ItemStack)` overrides from client indices
-  to common indices, preventing dedicated `/give` and display-name paths from loading client classes.
-- Hardened the metadata template against unknown literal dollar-brace expressions in comments.
-- Migrated legacy NeoForge item handlers to transactional `ResourceHandler<ItemResource>` APIs.
-- Migrated current-screen access to `Minecraft.gui`, retained NeoForge GUI-layer registration, and
-  revalidated the minimal access transformer against the NeoForge 26.2 transformed compile classpath.
-- Migrated custom rendering to 26.2 bind-group layouts, GPU formats, multiple color targets, vertex
-  bindings, primitive topology, PreparedRenderType, Feature Rendering, PiP collectors, and shape outlines.
-- Replaced the interim OpenGL depth-aperture port with refab 26.2's stage-boundary off-screen ocular
-  mask semantics, adapted to NeoForge pipeline and GUI-layer registration.
-- Added backend-neutral mask target rendering, convex-hull ocular fill, sight/scope channel gating,
-  unclipped ocular-ring redraw, inverse-clipped reticles, and shared gun/attachment/muzzle-flash clipping.
-- Replaced the Iris depth-restore bridge with the refab linked-fragment mask branch and per-draw
-  uniform/texture binding; shader replacements without a verified bridge fail open to ordinary rendering.
-- Re-pinned optional 26.2 artifacts for Cloth, PAL, Controllable, Shoulder Surfing, JEI, REI and
-  their compile dependencies.
-- Updated Carry On compatibility to 2.11's `ItemStackTemplate#create()` rendering path.
-- Added reflection-only First-person Model / Not Enough Animations handoff guards. Neither project
-  currently publishes a NeoForge 26.2 file, so these guards are dormant rather than advertised support.
-- Added `COMPATIBILITY.md` with source commits, artifacts and an explicit untested matrix.
+- 修复 26.2 首次生产编译暴露的 FOV event、HUD tick、AvatarRenderer descriptor 与三个
+  transformed member AT 问题。
+- 回流 26.1.2 R1 多人修复：`ServerMessageGunDraw` 的可空栈改 optional stream codec，
+  防止首次/空手切枪的 tracking 广播踢出玩家。
+- 将 `AttachmentsTagManager` 与 `RecipeFilterManager` 接入 network-cache listener，恢复
+  RECIPE_FILTER / ATTACHMENT_TAGS 的联机同步。
+- 四个双端 `Item#getName(ItemStack)` 改用 common index，避免 dedicated `/give` 路径加载
+  client 类并崩服。
+- Iris 已自动分类 pipeline 时，将 `Shader already assigned` 视为成功而不是兼容失败。
+- 修复 `neoforge.mods.toml` 注释中的未知 dollar-brace 被 Groovy template engine 求值的问题。
+- 低倍 sight 的 reticle containment 与 full-viewmodel clipping 拆分：低倍使用
+  reticle-only mask，高倍使用完整镜身/枪身/配件/火光 mask。
 
-### Removed
+### 变更
 
-- Removed dead `GunPackProgressScreen`.
-- Removed all use of NeoForge's deprecated-for-removal `IItemHandler` family.
-- Removed the old raw-depth scope classes/mixins/shaders and their private `RenderType` constructor AT;
-  retained only the three transformed gameplay members required by active 26.2 code.
+- 从完整的 NeoForge 26.1.2 R1 多人稳定基线前滚到 26.2；不是重写。
+- 将已 removal 的 `IItemHandler` 路径迁到事务式 `ResourceHandler<ItemResource>`。
+- 当前 screen 访问迁到 `Minecraft.gui`；HUD、文本颜色、PiP、shape outline、hand API 与
+  Feature Rendering 对齐 26.2。
+- 用 refab 26.2 已验证的阶段边界离屏 ocular mask 取代临时 OpenGL raw-depth 方案：
+  convex-hull fill、sight/scope 分组、`ocular_ring` 普通重画、反向准星裁切、视模与火光裁切。
+- 普通 mask 只使用 `TextureTarget` / `RenderPass` backend 抽象，可进入 OpenGL/Vulkan。
+- Iris 改用 HAND pipeline 分类、linked-fragment dormant branch 与逐 draw uniform/texture binding。
+- 版本 metadata 定名为 `1.1.8+neoforge.26.2.0.R1`。
 
-### Known limitations / verification
+### 可选兼容
 
-- User-reported current-candidate JDK 25 build and dedicated test plan L0-L3: **PASS**
-  (`docs/records/SERVER_TEST_20260821_262_R0.md`).
-- L2.5 third-party gun-pack confirmation and the final source/tag/archive inspection remain open.
-- NeoForge's open ELS/Vulkan startup bug (`NeoForge#3230`) requires
-  `config/fml.toml: earlyWindowControl=false`; the user reports Vulkan startup PASS with it disabled.
-- The first Vulkan scope test exposed low-power reticles losing their mask when sight-body clipping was
-  disabled; reticle containment and full-viewmodel clipping are now independent, pending rebuild/retest.
-- Optional compatibility entries are source/API-audited but not user PASS.
-- Aperture and LRTactical are not included.
+- 重钉 Cloth Config、PAL、Controllable、Shoulder Surfing、JEI、REI、Architectury 的 26.2
+  artifact。
+- Carry On 对齐 2.11 的 `ItemStackTemplate#create()` 渲染路径。
+- First-person Model / Not Enough Animations 只有反射 handoff 预留；核验日没有 NeoForge
+  26.2 发布文件，不作为可安装兼容宣传。
+- ImmediatelyFast hook 为明确 no-op；Accelerated Rendering 强制关闭；Aperture 未硬依赖接入。
 
-This entry must remain **Unreleased** until all gates in `docs/PORTING_STATUS.md` pass.
+### 移除
+
+- 删除无引用的 `GunPackProgressScreen`。
+- 删除旧 `IItemHandler` family 使用。
+- 删除 raw-depth scope 状态机、GL encoder mixin、旧 shader 与 private `RenderType` 构造器 AT。
+
+### 验证
+
+- 用户对**定名前同代码候选**报告 JDK 25 build 与专服/多人 L0-L3 PASS；冻结记录：
+  `docs/records/SERVER_TEST_20260821_262_R1.md`。
+- NeoForge Vulkan 需在 `config/fml.toml` 设置 `earlyWindowControl=false` 绕过仍开放的
+  NeoForge#3230 ELS 问题；关闭后用户报告 Vulkan 启动 PASS。
+- 最终 R1 只改变 version metadata 与文档；逻辑层 L1-L3 结论不变。
+
+### 发布前仍需完成
+
+- 最终 R1 jar 的 build、L0 与 Mod List 版本快速复核；
+- L2.5 第三方枪包专项明确确认；
+- OpenGL / Iris / Vulkan 完整 GPU scope-mask 矩阵；
+- 可选 Mod 逐项用户结果；
+- metadata、license、source tag 与 source archive 最终一致性检查。
+
+本条目必须保持 **Unreleased**，直到检查清单关闭并收到项目发起人的明确发布命令。

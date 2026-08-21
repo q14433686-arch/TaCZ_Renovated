@@ -9,7 +9,7 @@
 Minecraft **26.2** + NeoForge **26.2.0.64** + Java **25** 的非官方 GPL-3.0 移植。
 
 - modId 永远是 `tacz`；枪包依赖已绑定该 id。
-- 当前版本：`1.1.8+neoforge.26.2.0.r0`，仍为 Unreleased candidate。
+- 当前版本：`1.1.8+neoforge.26.2.0.R1`，仍为 Unreleased candidate。
 - 代码谱系基线：26.1.2 R1 分支
   `arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0`，不能再把 Beta-1 `4d2edc1`
   当作完整功能基线。
@@ -62,9 +62,12 @@ bash scripts/check_release_consistency.sh --strict
 
 | 文件 | 性质 |
 |---|---|
-| `README.md` / `CHANGELOG.md` / `COMPATIBILITY.md` | 活文档 |
+| `README.md` / `CHANGELOG.md` / `COMPATIBILITY.md` | 用户入口、发行说明、兼容状态 |
+| `docs/README.md` | 文档索引与类型说明 |
+| `docs/DEVELOPMENT.md` | 构建、运行、权威边界与开发纪律 |
 | `docs/PORTING_STATUS.md` | 当前候选状态与发布闸门 |
-| `docs/DEDICATED_SERVER_TEST.md` | 26.2 的 L0-L4 验收预案 |
+| `docs/DEDICATED_SERVER_TEST.md` / `docs/GUNPACKS.md` | L0-L4 验收与枪包指南 |
+| `docs/RELEASE_CHECKLIST.md` | R1 发布前逐项门禁 |
 | `docs/WP262_*_EVIDENCE.md` | 26.2 工作包证据 |
 | `docs/records/` | 冻结审计快照及 26.1.2 R1 回流证据 |
 | `CHARTER.md` / 本文件 | 规则 |

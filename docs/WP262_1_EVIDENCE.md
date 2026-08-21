@@ -62,14 +62,14 @@ neo_version=26.2.0.64
 ## 版本语义
 
 ```properties
-mod_version=1.1.8+neoforge.26.2.0.r0
+mod_version=1.1.8+neoforge.26.2.0.R1
 ```
 
-`1.1.8` 是 SemVer core；`+neoforge.26.2.0.r0` 是 build metadata，不参与枪包
+`1.1.8` 是 SemVer core；`+neoforge.26.2.0.R1` 是 build metadata，不参与枪包
 `>=1.1.8` 的先后比较。没有使用 `-neoforge...` prerelease。
 
 `neoforge.mods.toml` 的展示文字与模板来源注释已更新为 26.2；Iris 仍是 optional，
-本包没有把渲染后端改为 Aperture/Vulkan。
+没有硬依赖 Aperture。Vulkan 为 26.2 实验 backend，另按 WP-262-3 矩阵验收。
 
 ## 静态验证
 
@@ -81,15 +81,20 @@ Gradle wrapper / ModDevGradle / Foojay / Java toolchain 与 MDK 表逐项相同
 # checked
 ```
 
-## 尚未通过的动态闸门
+## 动态验收与 R1 定名
 
-当前执行沙盒初始无 JDK，且对 Gradle/Maven 下载端点的 TLS 连接被 egress 策略关闭；
-所以尚未完成本包要求的 `runServer` Mod List / `Done` 验收。这里不把静态对齐写成
-“服务端已通过”。在具备联网 JDK 25 环境时必须执行：
+用户已对定名前同代码候选报告 build、`runServer`、生产专服与 L0-L3 PASS。随后只把
+version metadata 定名为 R1，逻辑代码不变。最终 R1 产物仍需快速执行：
 
 ```bash
-./gradlew clean compileJava --no-configuration-cache
+./gradlew clean build --no-configuration-cache
 ./gradlew runServer --no-configuration-cache
 ```
 
-预期 Mod List 版本：`Timeless and Classics Zero 1.1.8+neoforge.26.2.0.r0 (tacz)`。
+确认 Mod List 为：
+
+```text
+Timeless and Classics Zero 1.1.8+neoforge.26.2.0.R1 (tacz)
+```
+
+并检查最终 jar 文件名和 `neoforge.mods.toml` 均已展开 R1。

@@ -1,7 +1,9 @@
 # 给 26.2 前滚 AGENT 的同步说明（复制本文全文给他即可）
 
-> 更新：2026-08-21（R1 定名后）。本会话（01a023bf）保持开启，**本分支可直接读取，
+> 更新：2026-08-21（26.1.2 R1 定名后）。本会话（01a023bf）保持开启，**本分支可直接读取，
 > 不必等 PR #6 合并**。
+>
+> 26.2 后续也定名为 R1；本文中的目标版本示例已统一为最终 26.2 R1 metadata，分支名保持原样。
 
 ## 0. 你要同步的源
 
@@ -32,7 +34,7 @@ git fetch origin arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
 | `3b19477` | 四个物品类 `getName` 改走 common 索引（原引用 client 索引，专服 `/give` 即 NoClassDefFoundError 崩服） | **必须** |
 
 另有版本号提交 `5d2358d`（Beta-2）与 `b9de5e0`（定名 R1）只影响 26.1.2 线元数据，
-你不用 pick——你的版本串直接从 `1.1.8+neoforge.26.2.0.r0` 起步。
+你不用 pick——你的版本串直接从 `1.1.8+neoforge.26.2.0.R1` 起步。
 
 ## 2. 三条经验（比提交更重要，前滚时会反复踩）
 
@@ -56,5 +58,5 @@ git fetch origin arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
 
 ## 4. 版本号红线
 
-起步 `1.1.8+neoforge.26.2.0.r0`；`+` 后是 build metadata，**禁止 `-`**。
+起步 `1.1.8+neoforge.26.2.0.R1`；`+` 后是 build metadata，**禁止 `-`**。
 改 `gradle.properties` 后跑 `bash scripts/check_release_consistency.sh --strict`。

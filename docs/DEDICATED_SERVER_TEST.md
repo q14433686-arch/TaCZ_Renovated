@@ -7,9 +7,10 @@
 
 执行者：项目发起人的 JDK 25 / GPU 环境；结果必须记录当前 commit 与完整版本矩阵。
 
-> 当前执行状态（2026-08-21）：用户报告当前候选 **L0-L3 全部 PASS**。本回执没有附带
-> 逐行日志，因此 L3 中 PAL/F3+B/高延迟等可选行不单独外推为对应兼容项 PASS；L2.5 也
-> 继续等待明确确认。冻结记录：`docs/records/SERVER_TEST_20260821_262_R0.md`。
+> 当前执行状态（2026-08-21）：用户报告定名前同代码候选 **L0-L3 全部 PASS**。最终版本
+> 随后只定名为 R1；需重跑 L0 并快速确认 Mod List/`Done`。本回执未附逐行日志，因此
+> PAL/F3+B/高延迟等可选行不单独外推为 PASS；L2.5 也继续等待明确确认。冻结记录：
+> `docs/records/SERVER_TEST_20260821_262_R1.md`。
 
 ---
 
@@ -17,7 +18,7 @@
 
 ```bash
 ./gradlew build
-JAR=build/libs/tacz-1.1.8+neoforge.26.2.0.r0.jar   # 以实际文件名为准
+JAR=build/libs/tacz-1.1.8+neoforge.26.2.0.R1.jar   # 以实际文件名为准
 unzip -l "$JAR" | grep -E "META-INF/jarjar/|luaj|commons-math3"
 unzip -l "$JAR" | grep -E "tacz.*mixins.json|accesstransformer.cfg"
 unzip -p "$JAR" META-INF/neoforge.mods.toml | grep -E "version=|modId="
@@ -39,7 +40,7 @@ unzip -p "$JAR" META-INF/neoforge.mods.toml | grep -E "version=|modId="
 
 判据（对照 `docs/records/` 各期冒烟口径）：
 
-- [ ] Mod List 出现 `Timeless and Classics Zero 1.1.8+neoforge.26.2.0.r0 (tacz)`；
+- [ ] Mod List 出现 `Timeless and Classics Zero 1.1.8+neoforge.26.2.0.R1 (tacz)`；
 - [ ] 日志有 payload 注册行与枪包装载行（R1 参考：`guns=54 ammo=24 attachments=99 blocks=3 recipes=173`；26.2 数字变了要能解释）；
 - [ ] 到 `Done`，`stop` 干净退出；
 - [ ] 全程无 `NoClassDefFoundError`（dedicated classpath 没有
@@ -111,7 +112,7 @@ R1 证据：`docs/records/SERVER_TEST_20260821_GUNPACK.md`。
 
 ### D. 版本谓词
 
-包内 `gunpack.meta.json` 声明 `tacz >= 1.1.8` 的，26.2 r0（`+` build metadata）
+包内 `gunpack.meta.json` 声明 `tacz >= 1.1.8` 的，26.2 R1（`+` build metadata）
 应照常通过；遇到写了奇怪谓词的包，记录其完整谓词再下结论。
 
 ### 已知遗留（备案）
@@ -148,7 +149,7 @@ R1 证据：`docs/records/SERVER_TEST_20260821_GUNPACK.md`。
 | 优先级 | 形态 | 独有故障面 | 怎么测 | 状态 |
 |---|---|---|---|---|
 | **1** | 内置服务器 + LAN/本地隧道 | 双客户端基础同步 | 跑 L3 全矩阵 | ❌ 26.2 未测；26.1.2 R1 基线见 records #1/#2 |
-| **2** | **真实专用服务器**（NeoForge 安装器 `--installServer`） | 生产类加载、dedicated dist、jar 内资源导出、纯远程同步 | 本预案 **L2** + 两客户端 **L3** | ✅ 26.2 用户报告 PASS；见 `SERVER_TEST_20260821_262_R0.md` |
+| **2** | **真实专用服务器**（NeoForge 安装器 `--installServer`） | 生产类加载、dedicated dist、jar 内资源导出、纯远程同步 | 本预案 **L2** + 两客户端 **L3** | ✅ 定名前同代码用户 PASS；R1 版本快速复核待做 |
 | 3 | 面板服/托管商 | 受限内存/面板注入的启动脚本与 JVM 参数 | 任选一家面板装同一 jar，重点看启动内存与枪包导出目录写权限 | ❌ 未测 |
 | 4 | 离线模式混跑（online-mode=false） | UUID 体系差异 → 按 UUID 键控的玩家持久化数据（弹匣余弹/配件） | 同一玩家离线名/正版各进一次，检查数据不串号 | ⚠️ 本轮 LAN 实为离线模式，未专项验证 |
 | 5 | 代理网络（Velocity modern forwarding 后挂 NeoForge 后端） | 握手/自定义 payload 过代理、跨服切换后的枪包重同步 | Velocity + 两个后端服，切服后开工作台/开枪 | ❌ 未测 |
