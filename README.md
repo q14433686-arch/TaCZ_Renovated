@@ -1,61 +1,54 @@
-# TaCZ NeoForge 26.1.2（非官方移植）
+# Timeless and Classics Zero — NeoForge 26.1.2（非官方移植）
 
-> **非官方。请勿向原作者（MCModderAnchor / Serene Wave Studio）报 bug。**
-> 首发目标：**Minecraft 26.1.2 + NeoForge 26.1.2.x（release 通道）**。
-> 1.21.11 与 26.2 不在本阶段范围内。
+TaCZ（Timeless and Classics Zero）枪械 mod 的 **Minecraft 26.1.2 + NeoForge** 非官方移植。
+代码开源（GPL-3.0-only），谱系可审计。
 
-Timeless and Classics Zero 的 NeoForge 26.1.2 移植。公开源码、谱系可审计。当前处于 **工作包⑥完成（26.1.2 首发）**：depth-aperture 瞄具、第一人称 Feature Rendering、可选 Iris ShaderCompat。
+> Unofficial NeoForge 26.1.2 port of TaCZ. Documentation is in Chinese; the mod itself ships the upstream localizations.
 
-## 谱系（GPL-3.0）
+> **⚠️ 非官方版本。** 一切问题请到[本仓库 Issues](https://github.com/q14433686-arch/tacz-1.1.8-neoforge.26.1.2.r0-sources/issues) 反馈，
+> **不要**向原作者（MCModderAnchor / Serene Wave Studio）报 bug。
 
-```
-MCModderAnchor/TACZ                 1.20.1 Forge 官方源
-        │
-        ├── Sh1roCu/TACZ-Refabricated          1.21.1 Fabric
-        │         └── q14433686-arch/TaCZ_Refabricated_Unofficial
-        │                   26.x Fabric（本移植的游戏语义权威）
-        │
-        └── MUKSC/TACZ-1.21.1 (neoforge/1.21.1)
-                  1.21.1 NeoForge（加载器习语权威；禁止抄其渲染）
-                            │
-                            └── 本仓库  NeoForge 26.1.2
-```
+## 安装
 
-衍生合法，义务是：发布二进制必须同步提供完整对应源码，保留原作者版权声明。
+| 要求 | 版本 |
+|---|---|
+| Minecraft | 26.1.2 |
+| NeoForge | 26.1.2.x（release 通道；开发基于 26.1.2.97） |
 
-- 代码：GPL-3.0-only
-- 资源：CC BY-NC-ND 4.0（原版资产许可，沿用上游）
+把 mod jar 放进 `mods/` 即可，**无必装前置**。首次启动会把默认枪包解压到 `游戏目录/tacz/`。
 
-## 工作包进度
+按 TaCZ 1.1.8 制作的枪包可以直接用（`>=1.1.8` 版本检查照常通过）。
 
-| # | 工作包 | 状态 |
-|---|---|---|
-| ① | 构建骨架（ModDevGradle + 空 mod） | 完成（`./gradlew build` + `runServer` Mod List 可见 `tacz`） |
-| ② | 注册与数据层 | 完成（物品/方块/创造标签/RecipeCompat codec；`tacz:workbench_a` 与 `tacz:modern_kinetic_gun` 已进注册表） |
-| ③ | 网络与同步 | 完成（PayloadRegistrar 全量注册；C2S 开火/换弹转播 S2C；专用服务端可启动） |
-| ④ | 非渲染游戏逻辑 | 完成（弹道/枪包/IGunOperator mixin；专用服务端冒烟） |
-| ⑤ | 渲染层 | 完成（depth-aperture、第一人称 SubmitNodeCollector、BER） |
-| ⑥ | 兼容层（ShaderCompat） | 完成（可选 Iris mixin + 反射；无 Iris 不加载） |
+可选搭配（图形配置界面要 Cloth Config，光影要 Iris，第三人称动画要 Player Animation Library 等）：
+完整的可选 mod 矩阵、验证过的版本号和已知限制见 **[docs/COMPATIBILITY.md](docs/COMPATIBILITY.md)**。
 
-规则见 [`CHARTER.md`](CHARTER.md)。API 证据见 [`docs/WP01_EVIDENCE.md`](docs/WP01_EVIDENCE.md)。
+## 与其它 TaCZ 版本的差异
 
-## 开发环境
+- 瞄具采用 26.1 线 depth-aperture 方案；装 Iris 时自动走兼容分支，不装则完全不加载 Iris 相关代码。
+- **未内置 LRTactical**（近战/投掷物框架）：依赖 `lrtactical` 的枪包能装载、枪械部分可用，
+  但近战/投掷等 LR 道具不可用。
 
-- JDK **25**（Minecraft 26.1.2 / NeoForge 官方要求）
-- Gradle Wrapper 9.2.1（仓库自带）
-- **不要配置 mappings / parchment / Yarn**。26.1+ 游戏本体未混淆。
+## 反馈 bug
+
+发 [Issues](https://github.com/q14433686-arch/tacz-1.1.8-neoforge.26.1.2.r0-sources/issues)，请附：
+
+1. `logs/latest.log`（必带；崩溃再附 crash report）
+2. mod 列表与枪包列表
+3. 复现步骤
+
+## 从源码构建
 
 ```bash
-./gradlew build
-./gradlew runClient
+./gradlew build      # 需要 JDK 25，产物在 build/libs/
 ```
 
-## 版本号
+开发环境、项目规则与文档结构见 **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**。
+版本历史见 **[CHANGELOG.md](CHANGELOG.md)**。
 
-`mod_version` 必须写成 `1.1.8+neoforge...`（SemVer **build metadata**）。
+## 许可
 
-**禁止**写成 `1.1.8-neoforge...`（那是 pre-release，会导致枪包的 `>=1.1.8` 检查静默失败）。
+- 代码：**GPL-3.0-only**。发布二进制必须随附完整对应源码，保留原作者版权声明。
+- 原版枪模资源：**CC BY-NC-ND 4.0**（沿用上游）。
 
-## 洁净室
-
-禁止接触 CurseForge 项目 `tacz-port`（作者 guilhermez1989）的 jar。不下载、不反编译、不参考。
+上游谱系（MCModderAnchor → Sh1roCu → q14433686-arch Fabric 26.x → 本仓库）与第三方依赖清单见
+[LICENSES.md](LICENSES.md)。

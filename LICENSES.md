@@ -8,9 +8,9 @@
 |---|---|
 | 本仓库代码（NeoForge 26.1.2 移植） | GPL-3.0-only |
 | 上游代码谱系 MCModderAnchor/TACZ、Sh1roCu/TACZ-Refabricated、q14433686-arch/TaCZ_Refabricated_Unofficial、MUKSC/TACZ-1.21.1 | GPL-3.0 |
-| 原版枪模资源（模型/贴图/音效，待工作包后续引入） | CC BY-NC-ND 4.0 |
+| 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0 |
 
-## 构建骨架（工作包①）直接使用
+## 构建与开发依赖
 
 | 组件 | 用途 | 许可 / 来源 |
 |---|---|---|
@@ -19,8 +19,6 @@
 | `net.neoforged.moddev` 2.0.144（ModDevGradle） | 构建插件 | NeoForged |
 | MDK-26.1.2-ModDevGradle | 构建脚本模板 | NeoForge MDK template license |
 | Gradle 9.2.1 Wrapper | 构建 | Apache-2.0 |
-
-工作包①为空 mod，尚未引入 SimpleBedrockModel、luaj、commons-math3 等运行时重打包依赖。后续工作包引入时在此追加。
 
 ## 运行时 Jar-in-Jar（必须打进发布 jar）
 
