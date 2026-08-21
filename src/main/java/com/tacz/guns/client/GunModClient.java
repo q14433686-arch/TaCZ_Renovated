@@ -9,7 +9,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 /**
@@ -20,7 +19,8 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 public class GunModClient {
     public GunModClient(ModContainer container) {
         ScopeRenderTypes.init();
-        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        container.registerExtensionPoint(IConfigScreenFactory.class,
+                (modContainer, parent) -> com.tacz.guns.compat.cloth.MenuIntegration.getConfigScreen(parent));
         GunMod.LOGGER.info("TaCZ NeoForge 26.1.2 port work package ⑤ client loading. modId={}", GunMod.MOD_ID);
     }
 

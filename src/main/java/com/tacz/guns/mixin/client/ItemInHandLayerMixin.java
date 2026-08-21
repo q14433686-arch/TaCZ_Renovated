@@ -62,8 +62,13 @@ public class ItemInHandLayerMixin {
 
         // 上游语义：主手持枪时，取消“副手”物品的常规渲染，改由 HumanoidOffhandRender 以背挂姿态绘制。
         // 注意必须用 mainArm 判定副手，不能硬编码 LEFT（左利手玩家主手即为 LEFT）。
+        // 副手槽位里的枪无论主手是什么都走背挂，否则左利手把枪放到副手（右手）时
+        // 会同时出现“右手握枪”和“背上背枪”。
         ItemStack mainHand = state.getMainHandItemStack();
-        if (mainHand != null && IGun.getIGunOrNull(mainHand) != null && arm != state.mainArm) {
+        boolean offhand = arm != state.mainArm;
+        boolean thisIsGun = IGun.getIGunOrNull(itemStack) != null;
+        boolean mainIsGun = mainHand != null && IGun.getIGunOrNull(mainHand) != null;
+        if (offhand && (thisIsGun || mainIsGun)) {
             GunItemRendererWrapper.IS_MAIN_HAND_SUBMIT = false;
             ci.cancel();
             return;

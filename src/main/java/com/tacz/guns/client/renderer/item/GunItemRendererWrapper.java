@@ -350,7 +350,11 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
             // 该标志的读写严格同步：ItemStackRenderState#submit 内部是<b>直接</b>调用
             // SpecialModelRenderer#submit（字节码确认，无延迟队列），
             // 也就是本方法就在 mixin 的 HEAD/TAIL 之间执行，不存在跨帧残留。
-            if (transformType == THIRD_PERSON_LEFT_HAND && !IS_MAIN_HAND_SUBMIT) {
+            // 副手枪一律不按“握在手里”画，改由 HumanoidOffhandRender 背挂。
+            // 必须同时覆盖 LEFT_HAND 与 RIGHT_HAND：左利手玩家的副手是右手，
+            // display context 是 THIRD_PERSON_RIGHT_HAND，只判断 LEFT 会漏掉。
+            if ((transformType == THIRD_PERSON_LEFT_HAND || transformType == THIRD_PERSON_RIGHT_HAND)
+                    && !IS_MAIN_HAND_SUBMIT) {
                 return;
             }
             // GUI 特殊渲染

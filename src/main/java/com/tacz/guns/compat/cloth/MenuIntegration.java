@@ -1,28 +1,23 @@
 package com.tacz.guns.compat.cloth;
 
-import com.tacz.guns.GunMod;
+import com.tacz.guns.client.gui.compat.TaczConfigHomeScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 
 import javax.annotation.Nullable;
 
 /**
- * Client configuration entry point for the NeoForge port.
+ * Client configuration entry point.
  *
- * <p>The original Fabric project builds this screen through the optional Cloth Config API.
- * NeoForge 26.1.2 already provides a native configuration UI for every
- * {@code ModConfigSpec} registered by the mod, so this port must not return a null screen
- * or require a Fabric/Cloth integration just to open its own configuration.</p>
+ * <p>Landing page is NeoForge's native configuration UI (same widget style as Carry On
+ * on 26.1.2), restricted to Client + Common so every listed option is editable in-game.
+ * Server configs are omitted: they are world-locked / remote-disabled, and Fabric/upstream
+ * Cloth never put them on the T-key screen either.</p>
  */
 public final class MenuIntegration {
     private MenuIntegration() {
     }
 
-    @Nullable
     public static Screen getConfigScreen(@Nullable Screen parent) {
-        if (GunMod.container == null) {
-            return null;
-        }
-        return new ConfigurationScreen(GunMod.container, parent);
+        return new TaczConfigHomeScreen(parent);
     }
 }
