@@ -283,10 +283,10 @@ public abstract class AbstractGunItem extends Item implements IGun, IAnimationIt
     @Override
     @Nonnull
     // 2026-08-21 专服实测崩溃修复：getName 是双端公共方法（/give 回显、容器标题、聊天
-    // hover 等服务端路径都会调）。26.1 dist cleaner 不再按 @OnlyIn 剥离成员（records/WP04），
-    // 方法体引用 client 索引类在 dedicated 上必抛 NoClassDefFoundError。
-    // 改走 common 索引：与 client 索引读同一份 index json，翻译键一致，双端安全
-    // （docs/records/SERVER_TEST_20260821_DEDICATED.md）。
+    // hover 等服务端路径都会调）。26.1+ 不再依赖 @OnlyIn 剥离成员，方法体引用 client
+    // 索引类在 dedicated 上会抛 NoClassDefFoundError。改走 common 索引：与 client 索引
+    // 读同一份 index json，翻译键一致，双端安全。
+    // 证据：docs/records/SERVER_TEST_20260821_DEDICATED.md。
     public Component getName(@Nonnull ItemStack stack) {
         Identifier gunId = this.getGunId(stack);
         var gunIndex = TimelessAPI.getCommonGunIndex(gunId);

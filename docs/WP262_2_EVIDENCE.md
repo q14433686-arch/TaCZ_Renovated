@@ -87,6 +87,21 @@ TextColor#getValue() : int
 AT 现在只包含三个在役源码访问所必需的精确目标；`RenderType` 构造器与已不用的
 `RenderPipelines#register` 均不再开放。这与 refab AW 的前三项语义一致，但采用 NeoForge AT 表面。
 
+## 26.1.2 R1 多人修复回流
+
+26.2 最初切自 Beta-1，后续读取 R1 分支
+`arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0` 并回流三个必要提交：
+
+- `ServerMessageGunDraw` 两个天然可空栈改用 `ItemStack.OPTIONAL_STREAM_CODEC`；
+- `AttachmentsTagManager` / `RecipeFilterManager` 改走 `registerNetwork`；
+- Iris already-assigned 视为已有成功分类；
+- 四个双端 `Item#getName(ItemStack)` 改查 common index；
+- mods.toml 注释不再包含未知 dollar-brace 模板表达式。
+
+来源提交、26.2 descriptor、LAN/专服根因与冻结测试记录见
+`docs/records/R1_SYNC_26_2_20260821.md`。R1 的测试 PASS 不外推到 26.2；当前 HEAD 按
+`docs/DEDICATED_SERVER_TEST.md` 重跑 L0-L3 与 L2.5。
+
 ## 其他非渲染核验
 
 - 26.1.2 与 26.2 的 Minecraft class member 名集合做差，再对本仓实际调用进行匹配；

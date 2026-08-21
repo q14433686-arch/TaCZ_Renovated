@@ -4,8 +4,8 @@
 > 目标：**Minecraft 26.2 + NeoForge 26.2.0.x（release）+ Java 25**。
 > 当前源码版本：**`1.1.8+neoforge.26.2.0.r0`**。
 
-Timeless and Classics Zero 的 NeoForge 26.2 前滚移植。26.1.2 Beta-1 是唯一代码出发点；
-本仓库保持公开源码与可审计谱系。
+Timeless and Classics Zero 的 NeoForge 26.2 前滚移植。代码最初从 26.1.2 Beta-1 起步，
+现已同步 26.1.2 R1 的多人网络、专服类加载与模板构建修复；本仓库保持公开源码与可审计谱系。
 
 **当前 r0 尚未发布：** 用户曾对 commit `c40dab9` 报告生产 JDK 25 `compileJava` / `build`
 PASS；此后当前分支按 refab 26.2 语义把 GL-only depth-aperture 替换为离屏目镜掩码，

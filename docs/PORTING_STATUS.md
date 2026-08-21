@@ -12,7 +12,7 @@
 |---|---|---|
 | WP-262-0 transfer 卫生 | `IItemHandler` for-removal 调用迁到 `ResourceHandler<ItemResource>`；删除死屏幕 | 当前 HEAD 重新编译 |
 | WP-262-1 构建骨架 | MC 26.2 / NF 26.2.0.64 / Java 25 / r0 / 官方 MDK 对齐 | 当前 HEAD `build`；`runServer` Mod List / `Done` |
-| WP-262-2 非渲染 | Gui screen 重组、文本颜色、HUD loader event、AT 最小化、common descriptor | 专服枪包装载数字与 26.1.2 对比 |
+| WP-262-2 非渲染 | Gui/HUD/AT；R1 OPTIONAL Draw codec、filter/tag 网络同步与双端 getName 已回流 | 当前 HEAD L0-L3、L2.5 多人/专服矩阵 |
 | WP-262-3 渲染 | 26.2 stage-boundary ocular mask、Feature/PiP/Gizmo/hand API、Iris bridge | 当前 HEAD 编译；OpenGL/Iris/Vulkan GPU 矩阵 |
 | WP-262-4 可选兼容 | 26.2 坐标重钉、Carry On 2.11、FPM/NEA dormant bridge、矩阵文档 | `COMPATIBILITY.md` 全部游戏内项目 |
 | WP-262-5 发布准备 | README/CHANGELOG/LICENSES/状态文档 | **发布 jar 与源码包被上述构建/实测闸门阻塞** |
@@ -26,10 +26,11 @@ build PASS 不再覆盖当前 HEAD。新实现证据与重跑矩阵见 `docs/WP2
 
 ## 版本基线
 
-- **26.2 r0（当前工作树）**：从 26.1.2 Beta-1 前滚；不是重写。
-- **26.1.2 Beta-1（历史稳定出发点）**：工作包①–⑥功能基线；其用户 PASS 不能自动
-  继承为 26.2 PASS。
-- r1–r30：26.1.2 开发历史，详见一期证据文档与 git 历史。
+- **26.2 r0（当前工作树）**：最初从 Beta-1 前滚，现已 cherry-pick 26.1.2 R1 的三组
+  必要代码修复；不是重写。
+- **26.1.2 R1（完整功能基线）**：LAN、真实专服与枪包专项实测通过；记录已同步到
+  `docs/records/`。其 PASS 不能自动继承为 26.2 PASS。
+- **Beta-1 / r1–r30**：历史开发基线，不再作为 26.2 完整起点。
 
 ## 当前明确边界
 
@@ -48,7 +49,7 @@ build PASS 不再覆盖当前 HEAD。新实现证据与重跑矩阵见 `docs/WP2
 
 ### LRTactical 内置
 
-仍维持 26.1.2 Beta-1 的撤回决定：本仓库不含其四类基础物品和行为。相关历史与重启条件
+仍继承 26.1.2 R1（自 Beta-1 起）的撤回决定：本仓库不含其四类基础物品和行为。相关历史与重启条件
 见 `docs/WP07_LRTACTICAL_PLAN.md`。这次 26.2 前滚没有重新引入 LRTactical。
 
 ## 发布阻塞项
@@ -56,8 +57,10 @@ build PASS 不再覆盖当前 HEAD。新实现证据与重跑矩阵见 `docs/WP2
 在以下项目全部完成前，仍不得发布 r0 或声称移植完成：
 
 1. JDK 25：对 scope-mask 替换后的当前 HEAD 重跑 `clean compileJava` 与 `build`；
-2. 专服：Mod List 可见 tacz、服务器 `Done`、默认/第三方枪包装载数字回归；
-3. 客户端：无可选 Mod 的基础枪械/工作台/网络/资源回归；
-4. GPU：OpenGL、Iris、Vulkan scope-mask 矩阵；
-5. `COMPATIBILITY.md` 可安装项目逐行用户实测或继续明确“未实测”；
-6. 发布 jar 内 jar-in-jar、metadata、license、源码 tag/归档一致性复核。
+2. 多人/专服：执行 `docs/DEDICATED_SERVER_TEST.md` L0-L3，包含 Mod List、`Done`、
+   EMPTY Draw、filter/tag 同步、四类 `/give` 与断线重连；
+3. 枪包：执行 L2.5 默认包/第三方包、双端不对称安装、`/tacz reload` 与 F3+T；
+4. 客户端：无可选 Mod 的基础枪械/工作台/网络/资源回归；
+5. GPU：OpenGL、Iris、Vulkan scope-mask 矩阵；
+6. `COMPATIBILITY.md` 可安装项目逐行用户实测或继续明确“未实测”；
+7. 发布 jar 内 jar-in-jar、metadata、license、源码 tag/归档一致性复核。
