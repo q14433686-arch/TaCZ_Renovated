@@ -71,6 +71,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.DETONATOR);
                     })
                     .build();
+    }
 
     private static void addBuiltinTestStacks(CreativeModeTab.Output output) {
         for (net.minecraft.resources.Identifier id : BUILTIN_TEST_THROWABLES) {
