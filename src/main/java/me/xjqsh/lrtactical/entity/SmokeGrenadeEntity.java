@@ -56,7 +56,7 @@ public class SmokeGrenadeEntity extends ThrowableItemEntity {
 
     @Override
     protected Item getDefaultItem() {
-        return me.xjqsh.lrtactical.init.ModItems.THROWABLE;
+        return me.xjqsh.lrtactical.init.ModItems.THROWABLE.get();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class SmokeGrenadeEntity extends ThrowableItemEntity {
             double offsetZ = this.random.triangle(0, 5.5);
             // 26.2: addParticle 需要两个 boolean —— overrideLimiter 与 alwaysShow。
             // 烟雾是战术道具，必须无视客户端粒子数量设置，故 overrideLimiter=true。
-            this.level().addParticle(ModParticleTypes.SMOKE_CLOUD, true, false,
+            this.level().addParticle(ModParticleTypes.SMOKE_CLOUD.get(), true, false,
                     x + offsetX, y + offsetY, z + offsetZ, 0.0D, 0.0D, 0.0D);
         }
     }

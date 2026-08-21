@@ -1,8 +1,6 @@
 package me.xjqsh.lrtactical.client.audio;
 
 import me.xjqsh.lrtactical.init.ModEffects;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -35,7 +33,6 @@ import net.minecraft.world.effect.MobEffectInstance;
  * <p>这也顺带解决了上游要特判 {@code TickableSoundInstance} 的问题 ——
  * 我们不碰任何 {@code SoundInstance}，只改最终数值。
  */
-@Environment(EnvType.CLIENT)
 public final class DeafenState {
     /** 耳鸣最重时保留的音量比例（0.01 = 几乎全聋）。 */
     private static final float MIN_VOLUME_FACTOR = 0.01f;

@@ -1,6 +1,6 @@
 package me.xjqsh.lrtactical.api.animation;
 
-import cn.sh1rocu.tacz.api.extension.IMoveDistTracker;
+import me.xjqsh.lrtactical.api.extension.IMoveDistTracker;
 import com.tacz.guns.client.animation.statemachine.ItemAnimationStateContext;
 import me.xjqsh.lrtactical.api.item.IThrowable;
 import me.xjqsh.lrtactical.api.melee.MeleeAction;

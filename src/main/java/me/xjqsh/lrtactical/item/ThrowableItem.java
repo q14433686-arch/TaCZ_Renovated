@@ -64,7 +64,7 @@ import java.util.Optional;
  *       冷却遮罩均走 26.2 extracted-GUI 路径。</li>
  * </ul>
  */
-public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api.item.IAnimationItem, cn.sh1rocu.tacz.api.extension.IItem {
+public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api.item.IAnimationItem, me.xjqsh.lrtactical.api.item.ILrItemExtension {
     public ThrowableItem(Properties properties) {
         // 【本轮修复】不再 stacksTo(1)。
         //
@@ -224,7 +224,7 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
         //   - 一个起爆器可重复引爆自己投出的多颗 C4；
         //   - 起爆器使用后不消失，避免廉价的一次性物品体验。
         if (remoteDetonation && player != null && !level.isClientSide() && !hasDetonator(player)) {
-            ItemStack detonator = new ItemStack(ModItems.DETONATOR);
+            ItemStack detonator = new ItemStack(ModItems.DETONATOR.get());
             if (stack.isEmpty()) {
                 player.setItemInHand(InteractionHand.MAIN_HAND, detonator);
             } else if (!player.getInventory().add(detonator)) {
@@ -297,13 +297,13 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
     }
 
     private static boolean hasDetonator(Player player) {
-        if (player.getMainHandItem().is(ModItems.DETONATOR) || player.getOffhandItem().is(ModItems.DETONATOR)) {
+        if (player.getMainHandItem().is(ModItems.DETONATOR.get()) || player.getOffhandItem().is(ModItems.DETONATOR.get())) {
             return true;
         }
         var inventory = player.getInventory();
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             ItemStack itemStack = inventory.getItem(i);
-            if (itemStack.is(ModItems.DETONATOR)) {
+            if (itemStack.is(ModItems.DETONATOR.get())) {
                 return true;
             }
         }
@@ -381,8 +381,7 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
      * <p>说明与注意事项见 {@link MeleeItem#getCustomRenderer()}。
      */
     @Override
-    @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
-    public cn.sh1rocu.tacz.compat.fabric.BuiltinItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
+    public me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
         return me.xjqsh.lrtactical.client.renderer.item.ThrowableItemRendererWrapper.INSTANCE.get();
     }
 

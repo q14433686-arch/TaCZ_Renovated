@@ -48,7 +48,7 @@ import java.util.Optional;
  * 它<b>与渲染层无耦合</b>，因此即便本移植跳过自定义渲染器也应当实现 ——
  * 否则 TACZ 的动画状态机会把「切换到另一把刀」误判为同一把。
  */
-public class MeleeItem extends Item implements IAnimationItem, IMeleeWeapon, cn.sh1rocu.tacz.api.extension.IItem {
+public class MeleeItem extends Item implements IAnimationItem, IMeleeWeapon, me.xjqsh.lrtactical.api.item.ILrItemExtension {
     public MeleeItem(Properties properties) {
         // 【26.2】不再有 setNoRepair() —— 该方法已随「修复语义反转」一起移除。
         //
@@ -107,7 +107,7 @@ public class MeleeItem extends Item implements IAnimationItem, IMeleeWeapon, cn.
      *
      * <p>{@code IItem} 是本仓库为 Fabric 补的扩展接口（NeoForge 侧对应
      * {@code IClientItemExtensions#getCustomRenderer}）。返回的实例会在
-     * {@code TaCZFabricClient} 里被登记进 {@code BuiltinItemRendererRegistry}，
+     * {@code TaCZFabricClient} 里被登记进 {@code LrItemRendererRegistry}，
      * 再由客户端物品模型 {@code lrtactical:dynamic_item} 的 SpecialModelRenderer 调用。
      *
      * <p><b>没装内容包时不会走到这里</b> —— {@code items/melee.json} 用
@@ -115,8 +115,7 @@ public class MeleeItem extends Item implements IAnimationItem, IMeleeWeapon, cn.
      * 条件为假时直接用原版占位模型。详见 {@code HasCustomDisplayProperty}。
      */
     @Override
-    @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
-    public cn.sh1rocu.tacz.compat.fabric.BuiltinItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
+    public me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
         return me.xjqsh.lrtactical.client.renderer.item.MeleeItemRenderer.INSTANCE.get();
     }
 

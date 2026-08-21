@@ -64,7 +64,7 @@ import static net.minecraft.world.item.ItemDisplayContext.GUI;
  *       <td>{@code renderToBuffer(pose, buffer, light, overlay, r,g,b,a)} 四个 float，
  *           且必须包在 {@code collector.submitCustomGeometry} 里</td></tr>
  *   <tr><td>{@code IClientItemExtensions.of(stack).getCustomRenderer()}</td>
- *       <td>{@code BuiltinItemRendererRegistry.INSTANCE.get(item)}（Fabric）</td></tr>
+ *       <td>{@code LrItemRendererRegistry.INSTANCE.get(item)}（Fabric）</td></tr>
  *   <tr><td>第一人称由 NeoForge {@code RenderHandEvent} 驱动</td>
  *       <td>由 {@code ItemInHandRendererMixin#submitArmWithItem} 拦截驱动</td></tr>
  * </table>

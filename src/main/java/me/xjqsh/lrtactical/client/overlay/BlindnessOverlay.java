@@ -1,8 +1,6 @@
 package me.xjqsh.lrtactical.client.overlay;
 
 import me.xjqsh.lrtactical.init.ModEffects;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
@@ -33,7 +31,6 @@ import net.minecraft.world.effect.MobEffectInstance;
  * 上游有个 {@code ClientConfig.BLACK_FLASH} 开关可切黑色；
  * 配置层尚未移植，此处固定白色（与上游默认值一致）。
  */
-@Environment(EnvType.CLIENT)
 public final class BlindnessOverlay {
     /** 超过这个剩余时长就是全不透明；之后开始线性淡出。 */
     private static final float FADE_START_TICKS = 100f;

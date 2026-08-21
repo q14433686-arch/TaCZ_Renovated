@@ -36,6 +36,9 @@ config="tacz.iris.mixins.json"
 [[mixins]]
 config="tacz.carryon.mixins.json"
 
+[[mixins]]
+config="lrtactical.mixins.json"
+
 [[accessTransformers]]
 file="META-INF/accesstransformer.cfg"
 

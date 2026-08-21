@@ -99,7 +99,7 @@ public class GrenadeEntity extends ThrowableItemEntity {
      */
     @Override
     protected Item getDefaultItem() {
-        return me.xjqsh.lrtactical.init.ModItems.THROWABLE;
+        return me.xjqsh.lrtactical.init.ModItems.THROWABLE.get();
     }
 
     @Override

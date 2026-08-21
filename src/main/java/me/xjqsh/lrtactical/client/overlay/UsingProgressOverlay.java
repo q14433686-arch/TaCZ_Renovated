@@ -5,8 +5,6 @@ import me.xjqsh.lrtactical.api.item.IConsumable;
 import me.xjqsh.lrtactical.api.item.ICustomItem;
 import me.xjqsh.lrtactical.api.item.IThrowable;
 import me.xjqsh.lrtactical.init.ModCapabilities;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
@@ -15,7 +13,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 
 /** 26.2 extracted-HUD port of LRTactical's use/cook/melee progress feedback. */
-@Environment(EnvType.CLIENT)
 public final class UsingProgressOverlay {
     private UsingProgressOverlay() {
     }

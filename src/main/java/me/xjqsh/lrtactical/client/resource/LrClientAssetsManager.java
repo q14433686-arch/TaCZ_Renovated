@@ -8,9 +8,7 @@ import me.xjqsh.lrtactical.client.resource.display.MeleeDisplayInstance;
 import me.xjqsh.lrtactical.client.resource.display.ThrowableDisplayInstance;
 import me.xjqsh.lrtactical.client.resource.manager.MeleeDisplayManager;
 import me.xjqsh.lrtactical.client.resource.manager.ThrowableDisplayManager;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,7 +54,6 @@ import java.util.function.Consumer;
  * 故这里不手写字符串字面量，而是在 {@link #taczListenerId} 里复刻 TACZ
  * {@code JsonDataManager} 的 id 生成规则。
  */
-@Environment(EnvType.CLIENT)
 public enum LrClientAssetsManager {
     INSTANCE;
 
@@ -121,13 +118,18 @@ public enum LrClientAssetsManager {
      * 重复 new 会让已经缓存的 display 全部丢失，而资源重载本身会调用
      * {@code apply} 重新填充，无需换实例。
      */
-    public void reloadAndRegister(Consumer<IdentifiableResourceReloadListener> register) {
+    /**
+     * WP-LR2：Fabric IdentifiableResourceReloadListener → NeoForge
+     * {@code AddClientReloadListenersEvent#addListener(Identifier, PreparableReloadListener)}
+     * （PAL 兼容层同款迁移，records/WP05）。
+     */
+    public void reloadAndRegister(java.util.function.BiConsumer<Identifier, PreparableReloadListener> register) {
         if (throwableDisplay == null) {
             throwableDisplay = new ThrowableDisplayManager(GSON);
             meleeDisplay = new MeleeDisplayManager(GSON);
         }
-        register.accept(throwableDisplay);
-        register.accept(meleeDisplay);
+        register.accept(me.xjqsh.lrtactical.EquipmentMod.id("throwable_display"), throwableDisplay);
+        register.accept(me.xjqsh.lrtactical.EquipmentMod.id("melee_display"), meleeDisplay);
     }
 
     @Nullable

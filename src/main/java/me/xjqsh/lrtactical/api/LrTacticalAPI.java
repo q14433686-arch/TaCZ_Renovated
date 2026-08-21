@@ -86,7 +86,6 @@ public final class LrTacticalAPI {
      * @return 该物品不是投掷物、或内容包没有为它提供 display 时返回 empty
      *         （此时渲染器应回退到原版物品模型，而不是不画）
      */
-    @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
     public static Optional<me.xjqsh.lrtactical.client.resource.display.ThrowableDisplayInstance>
     getThrowableDisplay(ItemStack stack) {
         if (!(stack.getItem() instanceof IThrowable item)) {
@@ -101,7 +100,6 @@ public final class LrTacticalAPI {
      *
      * @return 该物品不是近战武器、或内容包没有为它提供 display 时返回 empty
      */
-    @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
     public static Optional<me.xjqsh.lrtactical.client.resource.display.MeleeDisplayInstance>
     getMeleeDisplay(ItemStack stack) {
         if (!(stack.getItem() instanceof me.xjqsh.lrtactical.api.item.IMeleeWeapon item)) {

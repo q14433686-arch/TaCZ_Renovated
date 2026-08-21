@@ -1,13 +1,11 @@
 package me.xjqsh.lrtactical.client.event;
 
-import cn.sh1rocu.simplebedrockmodel.api.event.RenderTickEvent;
-import cn.sh1rocu.tacz.compat.fabric.BuiltinItemRendererRegistry;
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
+import me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry;
 import com.tacz.guns.client.animation.statemachine.GunAnimationConstant;
 import com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer;
 import me.xjqsh.lrtactical.client.renderer.item.MeleeItemRenderer;
 import me.xjqsh.lrtactical.client.renderer.item.ThrowableItemRendererWrapper;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -35,10 +33,9 @@ import net.minecraft.world.item.ItemStack;
  *       故照抄。注意<b>不能</b>改用 {@code input.up/down/...} ——
  *       那些字段已被 {@code keyPresses} 取代。</li>
  *   <li>上游用 {@code IClientItemExtensions.of(stack).getCustomRenderer()} 取渲染器；
- *       Fabric 侧改为 {@code BuiltinItemRendererRegistry.INSTANCE.get(item)}。</li>
+ *       Fabric 侧改为 {@code LrItemRendererRegistry.INSTANCE.get(item)}。</li>
  * </ul>
  */
-@Environment(EnvType.CLIENT)
 public final class LrTickAnimationEvent {
     private LrTickAnimationEvent() {
     }
@@ -55,7 +52,7 @@ public final class LrTickAnimationEvent {
         if (!isLrAnimatedItem(mainHandItem)) {
             return;
         }
-        var renderer = BuiltinItemRendererRegistry.INSTANCE.get(mainHandItem.getItem());
+        var renderer = LrItemRendererRegistry.INSTANCE.get(mainHandItem.getItem());
         if (!(renderer instanceof AnimateGeoItemRenderer<?, ?> geoRenderer)) {
             return;
         }
@@ -88,8 +85,10 @@ public final class LrTickAnimationEvent {
      * 否则第三人称看别的玩家（或自己切到第三人称）时动画不动、音效也不响
      * （{@code visualUpdate} 负责播放动画关键帧上的音效）。
      */
-    public static void tickAnimation(RenderTickEvent event) {
-        if (event.phase == RenderTickEvent.Phase.END) {
+    public static void tickAnimation(RenderFrameEvent event) {
+        // WP-LR2：RenderTickEvent 垫片 → 原生 RenderFrameEvent（C 表；与 tacz
+        // TickAnimationEvent 同习语）。Phase.END 语义 = 只在 Pre 相位执行。
+        if (event instanceof RenderFrameEvent.Post) {
             return;
         }
         if (Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
@@ -103,10 +102,10 @@ public final class LrTickAnimationEvent {
         if (!isLrAnimatedItem(mainHandItem)) {
             return;
         }
-        if (BuiltinItemRendererRegistry.INSTANCE.get(mainHandItem.getItem())
+        if (LrItemRendererRegistry.INSTANCE.get(mainHandItem.getItem())
                 instanceof AnimateGeoItemRenderer<?, ?> renderer) {
             if (renderer.needReInit(mainHandItem)) {
-                renderer.tryInit(mainHandItem, player, event.renderTickTime);
+                renderer.tryInit(mainHandItem, player, event.getPartialTick().getGameTimeDeltaPartialTick(false));
             }
             renderer.visualUpdate(mainHandItem);
         }
@@ -121,7 +120,7 @@ public final class LrTickAnimationEvent {
      * 两边都处理会导致状态机<b>每 tick 被 trigger 两次</b>）。
      */
     private static boolean isLrAnimatedItem(ItemStack stack) {
-        var renderer = BuiltinItemRendererRegistry.INSTANCE.get(stack.getItem());
+        var renderer = LrItemRendererRegistry.INSTANCE.get(stack.getItem());
         return renderer instanceof MeleeItemRenderer || renderer instanceof ThrowableItemRendererWrapper;
     }
 }

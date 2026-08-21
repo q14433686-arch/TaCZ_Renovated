@@ -3,6 +3,14 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 未发布（1.1.8+neoforge.26.1.2.LR-dev — WP-LR2 测试线）
+
+- **新增（测试中）**：LRTactical 内置层重启（WP-LR2）——四类基础物品、五类投掷行为、
+  数据装载与反馈层（tooltip/使用进度 HUD/分类冷却遮罩），全量 DeferredRegister +
+  NeoForge 事件面改写，联机同步经独立载荷通道（registrar `lr1`）。
+  flash_shield 不含；原作美术零打包。**未过 LR2-5..7 验收前不构成任何支持承诺**；
+  验收通过后收版 R2。工单 `docs/WP_LR2_BRIEF.md`，台账 `docs/records/LR2_INVENTORY.md`。
+
 ## 1.1.8+neoforge.26.1.2.R1 — 2026-08-21
 
 多人联机稳定版，首个建议公开发布的版本。三轮实测（LAN → LAN 复测 → 专用服务器

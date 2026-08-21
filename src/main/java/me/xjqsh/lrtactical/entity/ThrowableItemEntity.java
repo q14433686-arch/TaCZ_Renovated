@@ -1,6 +1,6 @@
 package me.xjqsh.lrtactical.entity;
 
-import cn.sh1rocu.tacz.api.extension.IEntityAdditionalSpawnData;
+import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -78,7 +78,7 @@ import java.util.function.Predicate;
  * 应改走带注册表的通道，而不是在这里猜参数。
  */
 public abstract class ThrowableItemEntity extends Projectile
-        implements IEntityAdditionalSpawnData, net.minecraft.world.entity.projectile.ItemSupplier {
+        implements IEntityWithComplexSpawn, net.minecraft.world.entity.projectile.ItemSupplier {
     private static final EntityDataAccessor<ItemStack> DATA_ITEM_STACK =
             SynchedEntityData.defineId(ThrowableItemEntity.class, EntityDataSerializers.ITEM_STACK);
 
@@ -102,10 +102,8 @@ public abstract class ThrowableItemEntity extends Projectile
         super(type, level);
     }
 
-    @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket(@NotNull ServerEntity entity) {
-        return IEntityAdditionalSpawnData.getEntitySpawningPacket(this);
-    }
+    // WP-LR2：IEntityAdditionalSpawnData 垫片 → 原生 IEntityWithComplexSpawn（WP07 C 表）。
+    // 原生接口由 NeoForge 自动在 spawn 包后追加自定义数据，无需覆写 getAddEntityPacket。
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -465,7 +463,7 @@ public abstract class ThrowableItemEntity extends Projectile
     // ---------------- 生成数据同步 ----------------
 
     @Override
-    public void writeSpawnData(FriendlyByteBuf buffer) {
+    public void writeSpawnData(net.minecraft.network.RegistryFriendlyByteBuf buffer) {
         buffer.writeInt(life);
         buffer.writeFloat(gravity);
         buffer.writeDouble(bounceFactor);
@@ -484,7 +482,7 @@ public abstract class ThrowableItemEntity extends Projectile
     }
 
     @Override
-    public void readSpawnData(FriendlyByteBuf buffer) {
+    public void readSpawnData(net.minecraft.network.RegistryFriendlyByteBuf buffer) {
         life = buffer.readInt();
         gravity = buffer.readFloat();
         bounceFactor = buffer.readDouble();

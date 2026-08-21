@@ -61,9 +61,7 @@ sourceSets {
     main {
         java {
             // Work package ⑤: compile client animation/gltf APIs.
-            // WP-LR2 安全阀：LR 内置层适配期间暂不参与编译，保证本分支随时可构建
-            // （行为 = R1）。LR2-4 接线阶段摘除本行。详见 docs/WP_LR2_BRIEF.md。
-            exclude 'me/xjqsh/**'
+            // WP-LR2：LR 内置层已接线（安全阀已摘除，LR2-4）。
         }
     }
 }

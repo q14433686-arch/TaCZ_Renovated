@@ -78,7 +78,7 @@ public class StunGrenadeEntity extends ThrowableItemEntity {
 
     @Override
     protected Item getDefaultItem() {
-        return me.xjqsh.lrtactical.init.ModItems.THROWABLE;
+        return me.xjqsh.lrtactical.init.ModItems.THROWABLE.get();
     }
 
     public StunThrowableData.StunData getData() {

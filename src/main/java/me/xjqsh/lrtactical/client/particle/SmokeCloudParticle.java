@@ -1,7 +1,5 @@
 package me.xjqsh.lrtactical.client.particle;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -46,7 +44,6 @@ import org.jetbrains.annotations.NotNull;
  *   <li>内容包若想换成自己的贴图，覆盖同名 json 即可。</li>
  * </ul>
  */
-@Environment(EnvType.CLIENT)
 public class SmokeCloudParticle extends SingleQuadParticle {
     private final SpriteSet spriteSet;
 
@@ -100,7 +97,6 @@ public class SmokeCloudParticle extends SingleQuadParticle {
     /**
      * 26.2: {@code createParticle} 末尾新增 {@code RandomSource} 参数（字节码确认）。
      */
-    @Environment(EnvType.CLIENT)
     public record Provider(SpriteSet spriteSet) implements ParticleProvider<SimpleParticleType> {
         @Override
         public Particle createParticle(@NotNull SimpleParticleType type, @NotNull ClientLevel level,

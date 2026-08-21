@@ -2,8 +2,6 @@ package me.xjqsh.lrtactical.client.audio;
 
 import me.xjqsh.lrtactical.EquipmentMod;
 import me.xjqsh.lrtactical.init.ModEffects;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
@@ -37,7 +35,6 @@ import net.minecraft.world.effect.MobEffectInstance;
  * <p>音源：用户提供的 Freesound 公开素材，已转为 OGG Vorbis
  * （MC 不接受 wav/mp3）并做等功率交叉淡化处理成可循环片段。
  */
-@Environment(EnvType.CLIENT)
 public class StunRingingSound extends AbstractTickableSoundInstance {
     public static final Identifier RINGING_ID =
             Identifier.fromNamespaceAndPath(EquipmentMod.MOD_ID, "entity.stun_grenade.ringing");

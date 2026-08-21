@@ -1,13 +1,11 @@
 package me.xjqsh.lrtactical.client.input;
 
-import cn.sh1rocu.tacz.api.event.InputEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
 import me.xjqsh.lrtactical.api.item.IMeleeWeapon;
 import me.xjqsh.lrtactical.api.melee.MeleeAction;
 import me.xjqsh.lrtactical.init.ModCapabilities;
 import me.xjqsh.lrtactical.network.ClientMessagePrepareMeleeAttack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import com.tacz.guns.network.NetworkHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
@@ -51,7 +49,6 @@ import static com.tacz.guns.util.InputExtraCheck.isInGame;
  * 真正的结算统一走本类 → C2S 包 → {@code CombatProperties#preAttack}。
  * 服务端 {@code preAttack} 自带冷却校验，即便两条路都发了包也只会生效一次。
  */
-@Environment(EnvType.CLIENT)
 public final class MeleeAttackKeys {
     private MeleeAttackKeys() {
     }
@@ -118,13 +115,13 @@ public final class MeleeAttackKeys {
         // 这类由其它输入触发的动画正常，唯独左右键攻击没有内容包动作。
         triggerAttackAnimation(stack, action);
         // 通知服务端做权威结算
-        ClientPlayNetworking.send(new ClientMessagePrepareMeleeAttack(action, origin, direction));
+        NetworkHandler.sendToServer(new ClientMessagePrepareMeleeAttack(action, origin, direction));
         // 挥手动画（纯表现）
         player.swing(InteractionHand.MAIN_HAND);
     }
 
     private static void triggerAttackAnimation(ItemStack stack, MeleeAction action) {
-        var renderer = cn.sh1rocu.tacz.compat.fabric.BuiltinItemRendererRegistry.INSTANCE.get(stack.getItem());
+        var renderer = me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry.INSTANCE.get(stack.getItem());
         if (renderer instanceof com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer<?, ?> animated) {
             animated.triggerAnimation(stack, action.getId());
         }

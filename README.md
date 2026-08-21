@@ -9,7 +9,7 @@
 本仓库把 TaCZ 移植到 **Minecraft 26.1.2 NeoForge**。游戏语义来自姊妹项目
 [TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
 （Fabric 26.x / 1.21.11 移植）的 26.1.2 分支；本仓库当前源码版本为
-**`1.1.8+neoforge.26.1.2.R1`**。
+**`1.1.8+neoforge.26.1.2.LR-dev`**。
 
 [问题反馈](https://github.com/q14433686-arch/TaCZ-Renovated/issues)
 · [姊妹项目（Fabric）](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
@@ -33,7 +33,7 @@
 | 加载器 | **NeoForge 26.1.2.x**（release 通道；开发基于 26.1.2.97） |
 | Java | 游戏侧随 NeoForge 安装器（源码构建需 JDK 25） |
 | 硬依赖 | **无**（不需要 Fabric API / Forge Config API Port，配置走 NeoForge 原生） |
-| 本 mod | **`1.1.8+neoforge.26.1.2.R1`** |
+| 本 mod | **`1.1.8+neoforge.26.1.2.LR-dev`** |
 
 可选集成（Cloth Config 图形配置、Iris 光影、Player Animation Library 第三人称动画、
 Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
@@ -114,7 +114,7 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 
 ### 版本约束
 
-本仓库的完整版本号 `1.1.8+neoforge.26.1.2.R1` 中，`1.1.8` 是 SemVer 核心，
+本仓库的完整版本号 `1.1.8+neoforge.26.1.2.LR-dev` 中，`1.1.8` 是 SemVer 核心，
 `+` 之后是构建元数据，不参与版本先后比较——因此枪包常见的 `tacz >= 1.1.8` 谓词照常通过。
 一个枪包最终是否通过检查，取决于它写下的完整谓词，不能笼统理解为"所有旧包都兼容"。
 
