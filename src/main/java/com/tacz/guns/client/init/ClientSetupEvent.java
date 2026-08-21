@@ -126,6 +126,9 @@ public class ClientSetupEvent {
         PlayerAnimatorCompat.init();
         PlayerAnimatorCompat.registerReloadListener(event::addListener);
         ClientAssetsManager.INSTANCE.reloadAndRegister(event);
+        // WP⑦ LRTactical 的 display 加载器 —— 排在 TACZ 侧之后注册（其内部声明了
+        // 对 TACZ 模型/动画/脚本加载的先后依赖）。
+        me.xjqsh.lrtactical.client.init.ModEntitiesRender.registerReloadListeners(event::addListener);
     }
 
     @SubscribeEvent

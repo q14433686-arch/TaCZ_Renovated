@@ -7,7 +7,29 @@
 ## 未完成 / 未验证项（诚实清单）
 
 > 本节记录**尚未达成**的兼容项，避免"文档说已完成、实际不工作"的落差。
-> 最后更新：r20（2026-08-21）。
+> 最后更新：r26（2026-08-21）。
+
+### 🔶 WP⑦ LRTactical 内置（阶段一完成，r26）——骨架+接线已入库，**未编译验证、未实测**
+
+阶段一内容（r26）：`me.xjqsh.lrtactical` 104 个 Java 文件 + 31 个资源（26 json + 5 lua，零美术）
+从 refab 26.1.2 逐字节迁入；NeoForge 适配已完成——
+Fabric `provides` → GunPackLoader 软特判（r23 前已有）；`@Environment` 删除；
+网络三段式 → `RegisterPayloadHandlersEvent`+`PayloadRegistrar`（CODEC 字段保留 FriendlyByteBuf 泛型，协变合法）；
+`IEntityAdditionalSpawnData` → 26.1 原生 `IEntityWithComplexSpawn`（getAddEntityPacket 覆写删除，参数改 RegistryFriendlyByteBuf）；
+`AttackEntityCallback` → `AttackEntityEvent` 适配器（FAIL→setCanceled）；
+`PlayerTickEvent.START` → `tick.PlayerTickEvent.Pre`；`SYNC_DATA_PACK_CONTENTS` → `OnDatapackSyncEvent`；
+`AFTER_RESPAWN` → `PlayerEvent.PlayerRespawnEvent`；`EntityRendererRegistry` → `EntityRenderersEvent.RegisterRenderers`；
+`ParticleProviderRegistry` → `RegisterParticleProvidersEvent#registerSpriteSet`；`HudElementRegistry` → `RegisterGuiLayersEvent`；
+`FabricParticleTypes.simple` → `new SimpleParticleType(true)`；`IdentifiableResourceReloadListener` 移除（BiConsumer 注册）；
+`IItem` 收进 `me.xjqsh.lrtactical.api.extension`；`RenderTickEvent` → `RenderFrameEvent`；
+`lrtactical.mixins.json` 独立配置 + neoforge.mods.toml `[[mixins]]` 声明；
+接线：GunMod 构造期 `EquipmentMod.init(modEventBus)`，GunModClient 构造期客户端注册，ClientSetupEvent.reload 挂 LR display listener。
+静态校验：108 文件语法全过、tacz 类引用闭包全存在、Fabric/cn.sh1rocu 零残留。
+API 证据：AttackEntityEvent/PlayerTickEvent/PlayerEvent/RegisterParticleProvidersEvent/EntityRenderersEvent/InputEvent.MouseButton.action
+均对照 NeoForge `26.1.2-stable` 源码核实。
+**待办**：用户侧 gradlew build 编译验证（沙箱无 gradle）→ 阶段四实测（投掷物/近战/消耗品/引爆器）。
+
+### 其余兼容层状态
 
 ### ❌ Player Animation Library（PAL，第三人称动画）——四次尝试均未落地
 
