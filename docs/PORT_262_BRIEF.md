@@ -182,8 +182,13 @@ HUD 拆出独立 `Hud` 类，`Options.hideGui`→`Hud#isHidden`。
 
 ## 6. 版本号与分支（红线）
 
+- 项目显示名已于 2026-08-21 更名 **TaCZ: Renovated**（modId 仍为 `tacz`，
+  见 `records/NAMING_DECISION.md`）；26.2 发布物料直接用新名，README 版本导航表
+  在 WP-262-5 加 26.2 行。
 - `mod_version` = `1.1.8+neoforge.26.2.0.r0` 起步。**`+` 后是 build metadata；
   禁止 `-`**（pre-release 会让枪包 `>=1.1.8` 检查静默失败，宪章 §7.4）。
+- 改版本号必须同步 README/CHANGELOG 并通过
+  `scripts/check_release_consistency.sh --strict`（AGENTS.md §1）。
 - 26.1.2 线转维护分支还是就地冻结，由发起人在 WP-262-1 前定案；工单默认：
   为 26.2 开新分支，26.1.2 分支只收 bugfix。
 

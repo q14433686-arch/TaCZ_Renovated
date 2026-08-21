@@ -14,13 +14,15 @@ displayURL="https://github.com/q14433686-arch/tacz-1.1.8-neoforge.26.1.2.r0-sour
 credits="Original TaCZ: Serene Wave Studio / Timeless Squad. Unofficial ports: Sh1roCu (Fabric 1.21.1), q14433686-arch (Fabric 26.x), MUKSC (NeoForge 1.21.1). This tree is an unofficial NeoForge 26.1.2 port."
 authors="Serene Wave Studio | Timeless Squad (original); unofficial NeoForge 26.1.2 port"
 description='''
-Unofficial NeoForge 26.1.2 port of Timeless and Classics Zero (TaCZ).
+TaCZ: Renovated — Unofficial NeoForge port of Timeless and Classics Zero (TaCZ).
 
 THIS IS UNOFFICIAL. Do not report bugs to the original authors
 (MCModderAnchor / Serene Wave Studio). Report issues at the URL above.
 
 Gun packs made for TaCZ 1.1.8 work as-is. Optional integrations: Cloth Config,
 Iris, Player Animation Library, Controllable, Shoulder Surfing, JEI/REI.
+
+Sibling project (Fabric 26.x / 1.21.11): TaCZ Refabricated Unofficial.
 '''
 
 [[mixins]]

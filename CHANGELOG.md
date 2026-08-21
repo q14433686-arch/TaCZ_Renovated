@@ -3,6 +3,15 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 未发布
+
+- **项目更名：TaCZ: Renovated**（原"TaCZ NeoForge 26.1.2（非官方移植）"）。
+  只改显示名，**modId 仍为 `tacz`**，版本号不变，枪包兼容不受影响。
+  决策记录：`docs/records/NAMING_DECISION.md`。
+- 文档体系对齐姊妹项目 TaCZ_Refabricated_Unofficial 的规范：README 重写
+  （版本导航/枪包指引/许可精确表述）、新增根 `AGENTS.md`（AI 协作规则）与
+  `scripts/check_release_consistency.sh`（版本号一致性自检）。
+
 ## 1.1.8+neoforge.26.1.2.Beta-1 — 2026-08-21
 
 首个稳定基线。此前的 r0–r30 为开发迭代，历史见 git log，各阶段验收证据见 `docs/records/`。

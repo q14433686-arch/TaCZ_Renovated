@@ -1,7 +1,8 @@
 # 开发指南
 
 面向想构建、修改或贡献本仓库的开发者。玩家请看 [README](../README.md) 与
-[COMPATIBILITY.md](COMPATIBILITY.md)。
+[COMPATIBILITY.md](COMPATIBILITY.md)。**AI 协作者先读根目录 [`AGENTS.md`](../AGENTS.md)**
+（会话级强制规则），再读本文与 [`../CHARTER.md`](../CHARTER.md)。
 
 ## 环境与构建
 
@@ -44,24 +45,37 @@
 ## 进度与记录约定
 
 - **进度不进 README。** 历史看 git log 与 `CHANGELOG.md`；发版时更新 changelog。
-- `docs/records/WPxx_*.md` 是各工作包完成时的**冻结审计快照**（API 证据、冒烟日志、
-  决策与踩坑记录），完成后不回头改写；其中的交叉引用可能指向当时的旧文件名。
+- **改 `mod_version` 必须同步 README 与 CHANGELOG**，自检：
+  `bash scripts/check_release_consistency.sh`（发布/合并前加 `--strict`）。
+  检查点清单见 [`../AGENTS.md`](../AGENTS.md) §1。
+- `docs/records/` 是**冻结审计快照**（API 证据、冒烟日志、决策与踩坑记录），
+  完成后不回头改写；其中的交叉引用可能指向当时的旧文件名。
 - 面向人的活文档只有：README、CHANGELOG、`docs/COMPATIBILITY.md`、本文件。
   改动影响到玩家可见行为时同步更新前三者。
 
 ## 谱系
 
+双亲结构：语义主线来自姊妹项目（Fabric），加载器习语参考 MUKSC（辅，26.2 起退场）。
+
 ```
-MCModderAnchor/TACZ                 1.20.1 Forge 官方源
+MCModderAnchor/TACZ  (1.20.1 Forge, 官方源头)
         │
-        ├── Sh1roCu/TACZ-Refabricated          1.21.1 Fabric
-        │         └── q14433686-arch/TaCZ_Refabricated_Unofficial
-        │                   26.x Fabric（游戏语义权威）
-        │
-        └── MUKSC/TACZ-1.21.1 (neoforge/1.21.1)
-                  1.21.1 NeoForge（加载器习语权威；禁止抄其渲染）
+        └── Sh1roCu/TACZ-Refabricated  (1.21.1 Fabric)
+                  │
+                  └── q14433686-arch/TaCZ_Refabricated_Unofficial
+                      (Fabric 26.2 / 26.1.2 / 1.21.11 —— 姊妹项目)
                             │
-                            └── 本仓库  NeoForge 26.1.2
+                            │  游戏语义（主）
+                            ▼
+                ┌─────────────────────────────────┐
+                │  本仓库  TaCZ: Renovated         │
+                │  (NeoForge 26.1.2，modId=tacz)  │
+                └─────────────────────────────────┘
+                            ▲
+                            │  加载器习语参考（辅；渲染代码零采用）
+                  MUKSC/TACZ-1.21.1  (NeoForge 1.21.1)
 ```
 
 全谱系 GPL-3.0：衍生合法，义务是发布二进制必须同步提供完整对应源码并保留版权声明。
+项目显示名 **TaCZ: Renovated** 只是品牌；modId、包名、版本号串不随名字变
+（命名决策：[`records/NAMING_DECISION.md`](records/NAMING_DECISION.md)）。
