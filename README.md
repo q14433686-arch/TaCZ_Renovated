@@ -7,9 +7,9 @@
 Timeless and Classics Zero 的 NeoForge 26.2 前滚移植。26.1.2 Beta-1 是唯一代码出发点；
 本仓库保持公开源码与可审计谱系。
 
-**当前 r0 尚未发布：** 26.2 classfile、NeoForge/Iris/兼容 Mod 源码与静态 API 检查已完成，
-但本执行环境无法运行生产 JDK 25 Gradle 构建，也没有 GPU。`compileJava`、专服 `Done`、
-OpenGL/Iris/Vulkan 与可选 Mod 游戏矩阵全部仍待执行。未实测内容不会标成 PASS。
+**当前 r0 尚未发布：** 26.2 classfile、NeoForge/Iris/兼容 Mod 源码与静态 API 检查已完成；
+用户已在生产 JDK 25 / Gradle 9.2.1 环境报告更新后的 `compileJava` 与 `build` PASS。
+专服 `Done`、OpenGL/Iris/Vulkan 和可选 Mod 游戏矩阵仍待执行；未实测内容不会标成 PASS。
 
 ## 谱系与许可
 

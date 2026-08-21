@@ -125,11 +125,10 @@ NeoForm 成功下载并处理 Minecraft 26.2，随后 `compileJava` 报 9 个错
 - `AvatarRenderer#renderRightHand/#renderLeftHand` 改用 26.2 五参 descriptor，并把末参恢复为
   对应 sleeve model-part 是否显示，而不是旧代码误传的 slim/player 参数。
 
-这只是对编译器反馈的修复，**尚未收到重跑成功结果**，故不写 compile PASS。专服 `Done`
-与枪包装载数字也尚未实跑。需要用户在更新后的 commit 补跑：
+commit `15e4a35` 落地上述修复后，用户已报告请求的 JDK 25 `compileJava` / `build`
+重跑 **PASS**。该结果只关闭生产编译/构建闸门；专服 `Done` 与枪包装载数字尚未实跑，
+仍需执行：
 
 ```bash
-./gradlew clean compileJava --warning-mode all --no-configuration-cache
-./gradlew build --no-configuration-cache
 ./gradlew runServer --no-configuration-cache
 ```

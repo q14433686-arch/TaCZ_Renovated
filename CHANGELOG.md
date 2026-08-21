@@ -32,12 +32,12 @@
 
 - Removed dead `GunPackProgressScreen`.
 - Removed all use of NeoForge's deprecated-for-removal `IItemHandler` family.
-- Removed redundant AT entries for members already public in 26.2.
+- Removed the unused `RenderPipelines#register` AT; retained the four transformed members required by active 26.2 code.
 
 ### Known limitations / verification
 
-- **No production JDK 25 Gradle build has run in this execution environment.**
-- Dedicated-server `Done`, gun-pack load counts and the release jar are not yet verified.
+- User-reported production JDK 25 `compileJava` and `build`: **PASS** after the 26.2 compile fixes.
+- Dedicated-server `Done`, gun-pack load counts and the built jar's final contents are not yet verified.
 - OpenGL, Iris and Vulkan require GPU testing; Vulkan has no depth-aperture effect.
 - Optional compatibility entries are source/API-audited but not user PASS.
 - Aperture and LRTactical are not included.

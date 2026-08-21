@@ -16,23 +16,20 @@
 ## 尚未通过，故发布被阻塞
 
 当前沙盒仍没有生产 JDK 25 依赖下载通道或 GPU。2026-08-21 用户在 Windows 的真实
-JDK 25 / Gradle 9.2.1 环境首次运行 `gradlew build`，26.2 artifact 生成成功并到达
-`compileJava`，随后报告 9 个错误。本分支已依据该真实输出修复 AT、FOV pass、HUD tick
-与 AvatarRenderer descriptor，但**修复后尚未重跑**。
+JDK 25 / Gradle 9.2.1 环境首次运行 `gradlew build`，随后报告 9 个错误。本分支依据该
+真实输出修复 AT、FOV pass、HUD tick 与 AvatarRenderer descriptor 后，用户已报告请求的
+`compileJava` / `build` 重跑 **PASS**。
 
-因此以下发布闸门仍没有通过：
+该 PASS 不覆盖以下仍未通过的发布闸门：
 
 ```bash
-./gradlew clean compileJava --warning-mode all --no-configuration-cache
-./gradlew build --no-configuration-cache
 ./gradlew runServer --no-configuration-cache
 ./gradlew runClient --no-configuration-cache
 ```
 
 也没有：
 
-- `build/libs/tacz-1.1.8+neoforge.26.2.0.r0.jar`；
-- jar-in-jar / metadata / license 的最终二进制检查；
+- 用户构建产物的 jar-in-jar / metadata / license 最终二进制检查；
 - 专服 `Done` 与枪包装载数；
 - OpenGL / Iris / Vulkan GPU 矩阵；
 - `COMPATIBILITY.md` 用户 PASS。
