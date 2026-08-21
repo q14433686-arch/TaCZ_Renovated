@@ -35,6 +35,11 @@ bash scripts/check_release_consistency.sh --strict   # 发布/合并门禁，不
 
 `--strict` 返回非 0 时**不得声称任务完成，也不得发布**。
 
+CI 模板位于 [`docs/publish/ci/consistency.yml`](docs/publish/ci/consistency.yml)
+（一致性门禁 + 文档链接核验），需由**仓库所有者**复制到
+`.github/workflows/consistency.yml`——AI 助手的 token 无 `workflows` 权限，无法代劳
+（2026-08-21 推送被拒实证，与姊妹项目 AGENTS 记载一致）。
+
 ## 2. 【强制】不得声称未实际实现的东西
 
 写 CHANGELOG、Release notes、README 或对外文案时：
