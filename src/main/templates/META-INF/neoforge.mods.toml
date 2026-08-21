@@ -1,11 +1,9 @@
-# This is an example neoforge.mods.toml file. It contains the data relating to the loading mods.
-# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
-# The overall format is standard TOML format, v0.5.0.
-# Note that there are a couple of TOML lists in this file.
-# Find more information on toml format here:  https://github.com/toml-lang/toml
-#
-# Template source: official NeoForge MDK-26.2-ModDevGradle (no moddedmc.mod.json in that MDK).
-# Do not add mappings/parchment. 26.1+ is unobfuscated.
+# FML mod metadata. Template source: official NeoForge MDK-26.2-ModDevGradle.
+# Placeholders (dollar-brace, e.g. mod_id and mod_version) are expanded by
+# generateModMetadata from gradle.properties.
+# TRAP: this whole file -- comments included -- goes through the Groovy template
+# engine. Never write a literal dollar-brace here unless it names a real property.
+# Do not add mappings/parchment anywhere in this project: 26.1+ is unobfuscated.
 
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
@@ -46,7 +44,7 @@ description='''
 Unofficial NeoForge 26.2 port of Timeless and Classics Zero (TaCZ).
 
 THIS IS UNOFFICIAL. Do not report bugs to the original authors (MCModderAnchor / Serene Wave Studio).
-Forward-ported from the audited NeoForge 26.1.2 baseline; OpenGL depth-aperture scope rendering remains the primary path.
+Forward-ported from the audited NeoForge 26.1.2 R1 baseline; 26.2 scope rendering uses the stage-boundary off-screen ocular mask.
 '''
 
 [[mixins]]
