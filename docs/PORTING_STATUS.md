@@ -37,8 +37,8 @@ build PASS 不再覆盖当前 HEAD。新实现证据与重跑矩阵见 `docs/WP2
 
 - OpenGL ocular mask：stage-boundary target / body-reticle-viewmodel clip 已接入，**未 GPU 实测**。
 - OpenGL + Iris 1.11.2：linked fragment / per-draw uniform bridge 已接入，**未 GPU 实测**。
-- Vulkan：用户启动在 GLFW window-surface 创建阶段 **FAIL**，尚未进入首帧/TACZ mask；
-  日志指向隐式 Vulkan layers/驱动/渲染 Mod 隔离项，不能记作 scope-mask 运行结果。
+- Vulkan：NeoForge ELS 已知问题导致 GLFW surface 创建 **FAIL**，尚未进入 TACZ mask；
+  先在实例 `config/fml.toml` 设置 `earlyWindowControl=false`，再执行 scope-mask 矩阵。
 - 其他 shader replacement / Aperture：没有已核 bridge 时未掩码回退。
 
 ### 可选 Mod

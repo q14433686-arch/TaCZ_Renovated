@@ -185,9 +185,23 @@ Minecraft.<init>
 调用帧，也没有进入第一帧。因此该次结果记为：
 
 - Vulkan 启动：**FAIL（surface 创建阶段）**；
-- TACZ Vulkan scope-mask：**未执行，不能归因也不能标 PASS**；
-- 环境证据：加载了 `RTSSVkLayer64.dll`，Vulkan loader 同时报 Epic EOS overlay JSON
-  缺失与 `mediasdkhook/game_detour_64.dll` 缺失；两块 AMD GPU 驱动版本不同，进程中出现
-  两个不同版本的 `amdvlk64.dll`；
-- 精确失败类还被 Sodium Extra 的 `MixinVulkanGpuSurface`/`MixinWindow` 修改，故必须先做
-  无隐式 Vulkan layer、最小 Mod 集与驱动清理的隔离测试，不能在 TACZ 中伪造 workaround。
+- TACZ Vulkan scope-mask：**未执行，不能归因也不能标 PASS**。
+
+用户随后以无其他 Mod 的 NeoForge/Fabric 对照确认：只有 NeoForge Vulkan 失败。该结果与
+NeoForge 已公开且仍为 OPEN 的 issue
+[`neoforged/NeoForge#3230`](https://github.com/neoforged/NeoForge/issues/3230)
+完全一致；NeoForge contributor 已将原因定为 ELS（Early Loading Screen），官方临时方案是
+在实例 `config/fml.toml` 设置：
+
+```toml
+earlyWindowControl = false
+```
+
+源码链也闭合：FML `DisplayWindow` 创建 ELS 时显式设置
+`GLFW_CLIENT_API = GLFW_OPENGL_API`；NeoForge 的 `Window.java.patch` 在 vanilla 初始化时
+无条件 `takeOverGlfwWindow()` 复用该窗口；而 Vulkan `glfwCreateWindowSurface` 要求窗口以
+`GLFW_NO_API` 创建。Fabric 不复用 FML 的 OpenGL ELS 窗口，因此同机 Vulkan 可启动。
+
+因此上一版日志中 RTSS/EOS/mediasdkhook/双 AMD DLL 只能算同时出现的噪声，不再列为首要
+归因。TACZ 无法在 mod 初始化阶段修改更早发生的 FML ELS 窗口创建，不能内置一个声称修复
+NeoForge 的伪 workaround；验证 Vulkan scope-mask 前必须先关闭 `earlyWindowControl`。

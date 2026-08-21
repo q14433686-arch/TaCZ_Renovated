@@ -39,7 +39,8 @@ MCModderAnchor/TACZ                         1.20.1 Forge 官方源
 - **OpenGL + Iris 1.11.x**：自定义 pipeline 归类到 HAND，并通过默认关闭的 fragment
   uniform branch 绑定同一 mask；仍待 GPU 实测。
 - **Vulkan（实验）**：普通 mask 路径不调用 GL API，使用同一 `TextureTarget` /
-  `RenderPass` 抽象；仍须验证 target 切换无 device loss。
+  `RenderPass` 抽象；NeoForge#3230 的 ELS 启动问题要求先在实例 `config/fml.toml` 设置
+  `earlyWindowControl=false`，之后仍须验证 target 切换无 device loss。
 - **其他 shader replacement**：没有已核 bridge 时走普通未掩码回退；Aperture 未硬依赖接入。
 
 这意味着 r0 仍不应在 GPU 矩阵完成前描述成“Vulkan/光影已兼容”。
