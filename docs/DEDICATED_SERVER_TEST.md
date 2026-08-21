@@ -87,7 +87,7 @@ cd srv && java -Xmx2G -jar <安装器生成的启动 jar 或 run.sh> nogui
    - `Found N possible gunpack(s)`，N 含新包；
    - `gun pack loaded: guns=... ammo=...` 计数增量与包内容一致；
    - **无 BLOCK_INDEX / RECIPE_FILTER 解析错误**（第三方包的自定义工作台方块
-     正好压在 Beta-2 修复的同步路径上，是最好的回归探针）。
+     正好压在 R1 修复的同步路径上，是最好的回归探针）。
 3. 进服判据：创造物品栏/配方查看器可见包内枪械；`/give` 包内枪不崩、
    聊天回显正确译名（验 common 同步 + getName 修复）；开枪有伤害（服务端逻辑）、
    有模型音效（客户端资产）；包内配方可在工作台合成。
@@ -102,13 +102,12 @@ cd srv && java -Xmx2G -jar <安装器生成的启动 jar 或 run.sh> nogui
 ### C. 在线热重载（已实测确认）
 
 - 服务端侧：双客户端在线时 `/tacz reload` 干净重载并全员重同步，无踢出、无解析错误。
-- **客户端本地新增包不支持热加载**：游戏运行中向 `.minecraft/tacz/` 加包，
-  `/tacz reload` 无效（它只管服务端与 common 同步）；已确认需**重启客户端**。
-  F3+T（客户端资源重载）理论上应免重启，**待验证**——验过再改本行。
+- 客户端本地新增包：`/tacz reload` 不管这件事（它只管服务端与 common 同步）；
+  **按 F3+T（客户端资源重载）即可加载，无需重启**（已实测确认，records #5 追记）。
 
 ### D. 版本谓词
 
-包内 `gunpack.meta.json` 声明 `tacz >= 1.1.8` 的，Beta-2（`+` build metadata）
+包内 `gunpack.meta.json` 声明 `tacz >= 1.1.8` 的，R1（`+` build metadata）
 应照常通过；遇到写了奇怪谓词的包，记录其完整谓词再下结论。
 
 ### 已知遗留（备案）

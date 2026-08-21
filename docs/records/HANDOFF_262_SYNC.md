@@ -1,7 +1,7 @@
 # 给 26.2 前滚分支（01a023e5）的同步说明 —— 2026-08-21
 
-> 本文件面向执行 26.2 前滚的 AGENT。你的基线如果早于 Beta-2（提交 `5d2358d`），
-> 就缺少三轮多人联机实测抓出的全部修复。**26.2 必须从 Beta-2 起跳，不是 Beta-1。**
+> 本文件面向执行 26.2 前滚的 AGENT。你的基线如果早于 R1（原 Beta-2，提交 `5d2358d`），
+> 就缺少三轮多人联机实测抓出的全部修复。**26.2 必须从 R1 起跳，不是 Beta-1。**
 
 ## 一、最快同步路径
 
@@ -34,14 +34,14 @@ git merge 'origin/main(26.1.2)'     # 或 rebase，取决于你的分支纪律
 3. **单机跑通 ≠ 完成。** 本轮四个致命 bug 全部只在多人下现形。26.2 的验收必须
    包含 `docs/DEDICATED_SERVER_TEST.md` 的 L0-L2（headless 可做）+ L3 实机矩阵。
 
-## 三、你可能还没见过的文档（都在 Beta-2 基线里）
+## 三、你可能还没见过的文档（都在 R1 基线里）
 
 - `docs/PORT_262_BRIEF.md`——**你的工单**（差异映射、权威边界、WP-262 切分）
 - `AGENTS.md`——会话级规则（版本号一致性门禁、不得声称未实现）
 - `docs/records/SERVER_TEST_20260821_*.md`——四份联机实测记录（根因与证据链）
-- `CHANGELOG.md` Beta-2 条目——修复全景
+- `CHANGELOG.md` R1 条目——修复全景
 
 ## 四、版本号
 
-你的起步版本串应为 `1.1.8+neoforge.26.2.0.r0`，基于 **Beta-2** 的代码。
+你的起步版本串应为 `1.1.8+neoforge.26.2.0.r0`，基于 **R1** 的代码。
 改 `gradle.properties` 后跑 `bash scripts/check_release_consistency.sh --strict`。

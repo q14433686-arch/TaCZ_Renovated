@@ -154,7 +154,7 @@ HUD 拆出独立 `Hud` 类，`Options.hideGui`→`Hud#isHidden`。
 
 26.1.2 基线编译带 **19 条 `@Deprecated(forRemoval)` transfer API 警告**
 （records/WP05 记录在案）。26.2 是 removal 最可能落地的版本——这 19 条在 bump 后
-即成编译错误。**建议作为前置卫生在 26.1.2 基线上先清零**（成果可直接发 26.1.2 Beta-2）。
+即成编译错误。**建议作为前置卫生在 26.1.2 基线上先清零**（成果可直接发 26.1.2 维护版（R 序列））。
 同类：`LoadingModList.get()` 已 forRemoval（records/WP06，本仓库已用替代路径，验一遍）。
 
 ### J.【验】非渲染杂项
@@ -173,7 +173,7 @@ HUD 拆出独立 `Hud` 类，`Options.hideGui`→`Hud#isHidden`。
 
 | 包 | 内容 | 验收 |
 |---|---|---|
-| WP-262-0 前置卫生（**仍在 26.1.2 上做**） | 清零 19 条 forRemoval 警告；顺手删 `gui/GunPackProgressScreen` 死代码（records/WP04 遗留） | 26.1.2 构建零 removal 警告，可发 Beta-2 |
+| WP-262-0 前置卫生（**仍在 26.1.2 上做**） | 清零 19 条 forRemoval 警告；顺手删 `gui/GunPackProgressScreen` 死代码（records/WP04 遗留） | 26.1.2 构建零 removal 警告，可发 26.1.2 维护版 |
 | WP-262-1 构建骨架 bump | gradle.properties 三版本号、MDK-26.2 对齐、`mod_version=1.1.8+neoforge.26.2.0.r0` | `runServer` Mod List 可见 `tacz` |
 | WP-262-2 非渲染编译修复 | 第 4 节 I/J/G(非渲染面)/AT 重验(C) | 专用服务端 `Done`，枪包装载数字与 26.1.2 一致 |
 | WP-262-3 渲染层 | B/D/E/F/H，GL-only；瞄具决策 A 在本包开头定案 | `compileJava` 过 + 有 GPU 环境实机矩阵 |

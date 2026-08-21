@@ -9,7 +9,7 @@
 本仓库把 TaCZ 移植到 **Minecraft 26.1.2 NeoForge**。游戏语义来自姊妹项目
 [TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
 （Fabric 26.x / 1.21.11 移植）的 26.1.2 分支；本仓库当前源码版本为
-**`1.1.8+neoforge.26.1.2.Beta-2`**。
+**`1.1.8+neoforge.26.1.2.R1`**。
 
 [问题反馈](https://github.com/q14433686-arch/TaCZ-Renovated/issues)
 · [姊妹项目（Fabric）](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
@@ -33,7 +33,7 @@
 | 加载器 | **NeoForge 26.1.2.x**（release 通道；开发基于 26.1.2.97） |
 | Java | 游戏侧随 NeoForge 安装器（源码构建需 JDK 25） |
 | 硬依赖 | **无**（不需要 Fabric API / Forge Config API Port，配置走 NeoForge 原生） |
-| 本 mod | **`1.1.8+neoforge.26.1.2.Beta-2`** |
+| 本 mod | **`1.1.8+neoforge.26.1.2.R1`** |
 
 可选集成（Cloth Config 图形配置、Iris 光影、Player Animation Library 第三人称动画、
 Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
@@ -114,7 +114,7 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 
 ### 版本约束
 
-本仓库的完整版本号 `1.1.8+neoforge.26.1.2.Beta-2` 中，`1.1.8` 是 SemVer 核心，
+本仓库的完整版本号 `1.1.8+neoforge.26.1.2.R1` 中，`1.1.8` 是 SemVer 核心，
 `+` 之后是构建元数据，不参与版本先后比较——因此枪包常见的 `tacz >= 1.1.8` 谓词照常通过。
 一个枪包最终是否通过检查，取决于它写下的完整谓词，不能笼统理解为"所有旧包都兼容"。
 
@@ -124,7 +124,7 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
   客户端 `tacz/` 提供显示资产（模型/贴图/音效/语言文件）。
 - 只装服务端：枪能用但客户端显示紫黑方块、名字为原始翻译键；只装客户端：无效果。
 - 服务端加包后 OP 执行 `/tacz reload` 即可生效并全员重同步；
-  **客户端**新增的包需重启游戏才会加载（游戏运行中放入的包不会被热加载）。
+  **客户端**新增的包按 **F3+T** 重载资源即可加载，无需重启游戏。
 
 ### 不受支持的内容
 
@@ -140,7 +140,7 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 ## 6. 当前已知边界
 
 - **联机**：局域网与**真实专用服务器**（生产 jar 部署 + 双客户端）均已实测通过
-  （2026-08-21，Beta-2）；混合服（Youer/Arclight 等）、代理网络（Velocity）、
+  （2026-08-21，R1）；混合服（Youer/Arclight 等）、代理网络（Velocity）、
   面板服等形态未测试。测试预案与形态矩阵见
   [docs/DEDICATED_SERVER_TEST.md](docs/DEDICATED_SERVER_TEST.md)。
 - LRTactical 未内置（第 2 节）。
