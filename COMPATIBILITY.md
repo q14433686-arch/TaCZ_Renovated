@@ -71,7 +71,7 @@
 |---|---|
 | OpenGL（无 Iris） | 阶段边界离屏 ocular mask 已接入；GPU 未实测 |
 | OpenGL + Iris 1.11.2 | HAND pipeline 分类、linked-fragment dormant branch 与逐 draw mask uniform bridge 已接入；GPU 未实测 |
-| Vulkan | 普通 mask 路径只用 26.2 `TextureTarget`/`RenderPass`；NeoForge ELS 已知问题令默认启动在 surface 创建阶段 FAIL，须先设 `config/fml.toml: earlyWindowControl=false`，TACZ mask 尚未执行 |
+| Vulkan | `earlyWindowControl=false` 后用户启动 PASS；低倍准星 containment 报告 FAIL，已拆分 reticle-only/full-viewmodel mask 修复，当前 HEAD 待复测 |
 | 其他 shader replacement / Aperture | 没有已核 bridge 时走普通未掩码回退；未作为硬依赖接入 |
 
 ## 其他兼容层

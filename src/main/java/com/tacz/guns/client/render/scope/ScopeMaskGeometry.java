@@ -51,6 +51,12 @@ public final class ScopeMaskGeometry {
     }
 
     private static final List<Entry> ENTRIES = new ArrayList<>();
+    /**
+     * Whether this frame's mask should also clip the gun body, non-scope attachments and muzzle
+     * flash. Low-power sight channels still need the mask for reticle containment, but upstream
+     * renderSight leaves the sight/viewmodel body unmasked.
+     */
+    private static boolean viewmodelClipEnabled;
 
     private ScopeMaskGeometry() {
     }
@@ -70,7 +76,17 @@ public final class ScopeMaskGeometry {
         return ENTRIES.isEmpty();
     }
 
+    /** Enables outside-mask clipping for the rest of this viewmodel submission (OR semantics). */
+    public static void enableViewmodelClip() {
+        viewmodelClipEnabled = true;
+    }
+
+    public static boolean isViewmodelClipEnabled() {
+        return viewmodelClipEnabled;
+    }
+
     public static void clear() {
         ENTRIES.clear();
+        viewmodelClipEnabled = false;
     }
 }

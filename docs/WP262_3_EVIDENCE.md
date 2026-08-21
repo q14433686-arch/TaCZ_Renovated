@@ -205,3 +205,17 @@ earlyWindowControl = false
 因此上一版日志中 RTSS/EOS/mediasdkhook/双 AMD DLL 只能算同时出现的噪声，不再列为首要
 归因。TACZ 无法在 mod 初始化阶段修改更早发生的 FML ELS 窗口创建，不能内置一个声称修复
 NeoForge 的伪 workaround；验证 Vulkan scope-mask 前必须先关闭 `earlyWindowControl`。
+
+用户关闭 ELS 后报告 Vulkan 启动 **PASS**，随后发现低倍 sight 的准星没有正确裁进镜片。
+代码定位为一个明确的状态耦合错误：`ScopeSightClipFix` 为了对齐上游 `renderSight` 的“不裁
+镜身”，把唯一的 `maskable` 整体设为 false；这同时错误关闭了 ocular 几何登记与准星
+`SCOPE_MASK_INVERT`。
+
+修复后拆成两个独立状态：
+
+- `reticleMaskable`：低倍 sight 与高倍 scope 都登记 ocular，并约束准星；
+- `bodyMaskable`：只在高倍 scope 通道裁镜身/枪身/配件/火光；
+- `ScopeMaskGeometry#viewmodelClipEnabled`：让全局视模调用点区分“reticle-only mask”与
+  “full viewmodel mask”；`clear()` 与几何同时重置，避免跨帧泄漏。
+
+该修复保留低倍镜框完整，同时不再让低倍准星溢出镜片；当前 HEAD 仍待用户重建复测。

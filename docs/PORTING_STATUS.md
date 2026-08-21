@@ -37,8 +37,8 @@ build PASS 不再覆盖当前 HEAD。新实现证据与重跑矩阵见 `docs/WP2
 
 - OpenGL ocular mask：stage-boundary target / body-reticle-viewmodel clip 已接入，**未 GPU 实测**。
 - OpenGL + Iris 1.11.2：linked fragment / per-draw uniform bridge 已接入，**未 GPU 实测**。
-- Vulkan：NeoForge ELS 已知问题导致 GLFW surface 创建 **FAIL**，尚未进入 TACZ mask；
-  先在实例 `config/fml.toml` 设置 `earlyWindowControl=false`，再执行 scope-mask 矩阵。
+- Vulkan：设置 `config/fml.toml: earlyWindowControl=false` 后用户启动 **PASS**；低倍准星
+  mask 报告 FAIL，已拆分 reticle/body mask 状态修复，当前 HEAD 待复测。
 - 其他 shader replacement / Aperture：没有已核 bridge 时未掩码回退。
 
 ### 可选 Mod

@@ -42,9 +42,10 @@
 - User-reported production JDK 25 `compileJava` and `build`: **PASS for commit `c40dab9`**.
   The subsequent scope-mask replacement changes the current HEAD and requires a fresh build.
 - Dedicated-server `Done`, gun-pack load counts and the built jar's final contents are not yet verified.
-- OpenGL and Iris scope-mask paths require GPU testing. NeoForge's open ELS/Vulkan startup bug
-  (`NeoForge#3230`) blocks the first Vulkan frame unless `config/fml.toml` sets
-  `earlyWindowControl=false`; the Vulkan TACZ mask path remains unexecuted.
+- NeoForge's open ELS/Vulkan startup bug (`NeoForge#3230`) requires
+  `config/fml.toml: earlyWindowControl=false`; the user reports Vulkan startup PASS with it disabled.
+- The first Vulkan scope test exposed low-power reticles losing their mask when sight-body clipping was
+  disabled; reticle containment and full-viewmodel clipping are now independent, pending rebuild/retest.
 - Optional compatibility entries are source/API-audited but not user PASS.
 - Aperture and LRTactical are not included.
 

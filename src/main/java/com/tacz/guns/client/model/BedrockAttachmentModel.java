@@ -569,34 +569,40 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
         // 否则腰射状态下瞄具中间就是个洞，这不是上游的行为。
         // 上游同样把裁剪半径乘上 aimingProgress（renderOcularAndDivision:
         // `rad *= getClientAimingProgress(...)`），进度为 0 时半径归零 = 不裁剪。
-        boolean maskable = transformType != null && transformType.firstPerson()
+        // The ocular mask has two independent consumers:
+        //   1. reticle containment (both low-power sights and magnified scopes), and
+        //   2. outside-mask viewmodel clipping (magnified scope channels only).
+        // Keeping one boolean for both was the cause of the low-power reticle leak: the
+        // ScopeSightClipFix correctly disabled body clipping, but accidentally disabled mask
+        // generation and inverse-clipped reticles at the same time.
+        boolean reticleMaskable = RenderConfig.SCOPE_MASK_ENABLE != null
+                && RenderConfig.SCOPE_MASK_ENABLE.get()
+                && transformType != null && transformType.firstPerson()
                 && !ocularParts.isEmpty()
                 && currentAimingProgress() > AIM_CLIP_START;
-        // 【案例⑨ 第二轮 · sight（低倍/红点通道）激活时镜身不做掩码裁剪】
-        // 上游事实（SCOPE_UPSTREAM_TRUTH §4，逐行核对 renderSight / renderBoth）：
-        // 低倍链【没有】圆形 INVERT 模板、scope_body 无条件绘制；组合镜只对筒镜组
-        // 走筒镜逻辑。我们的掩码若在 sight 通道激活时裁剪镜身，瞄具自己的内框/边缘
-        // （普通镜身几何，红点类没有 ocular_ring 骨骼可摘）会在镜片投影内被啃出
-        // 缺口——用户报告的慢性病灶「低倍镜（含组合镜低倍组）的边的内部某些部分
-        // 被错误裁切」即此。sight 组目镜本就被 shouldDrawOcularBlackout 恒隐藏
-        // （恒掏空 = 透视窗），撤掉镜身裁剪后观感 = 上游 r34 语义：窗内是世界、
-        // 窗框完整，两者都不依赖掩码。开关 false = 旧行为（sight 也裁）。
-        if (maskable && RenderConfig.SCOPE_SIGHT_CLIP_FIX != null
+        boolean bodyMaskable = reticleMaskable;
+
+        // Upstream renderSight leaves the sight body unmasked. This gate must affect only body,
+        // gun, attachment and flash clipping; the low-power reticle still uses the ocular mask.
+        if (bodyMaskable && RenderConfig.SCOPE_SIGHT_CLIP_FIX != null
                 && RenderConfig.SCOPE_SIGHT_CLIP_FIX.get()
                 && !activeGroupIsScope()) {
-            maskable = false;
+            bodyMaskable = false;
         }
-        // 光影开启时禁用 26.2 的离屏掩码裁剪，退回普通瞄具几何。
-        //
-        // 现象：Iris/Sulkan 类光影包会接管主世界的若干 pass（发光实体、天气/雾、后处理等），
-        // 而我们的 scope mask/clip 是一套独立的自定义 RenderPipeline + 离屏 target。
-        // 两者同时启用时，镜内会缺失经验球、蜘蛛/末影人眼睛等自发光层与雾效，甚至镜身本身被裁没。
-        // 这不是崩溃类问题，但比“镜内见到镜筒内壁”的降级更糟，所以有光影时先走安全回退。
+
+        // Shader replacements without a verified bridge fail open for both consumers.
         boolean shaderMaskUnsafe = IrisCompat.shouldDisableScopeMaskUnderShaderPack();
-        if (maskable && !shaderMaskUnsafe) {
+        if (shaderMaskUnsafe) {
+            reticleMaskable = false;
+            bodyMaskable = false;
+        }
+        if (reticleMaskable) {
             registerOcularMaskGeometry(poseStack);
-        } else if (shaderMaskUnsafe) {
-            maskable = false;
+            if (bodyMaskable) {
+                // Other viewmodel components query this separately from geometry presence, so a
+                // low-power reticle mask does not punch the gun/attachments/flash out of the lens.
+                ScopeMaskGeometry.enableViewmodelClip();
+            }
         }
 
         // 目镜（ocular*）参与 super.submit 时，要按上游规则决定<b>画不画黑片</b>。
@@ -634,9 +640,9 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
         // RenderType 重画；普通 opaque cutout 天然回写深度（邻链的「重写入镜框深度
         // 防水/雾/透明粒子覆盖」语义在本架构免费成立，无需额外步骤）。
         // 开关 ScopeOcularRingFix = false 即整体回到旧行为（摘除+重画全部跳过）。
-        // 无 ocular_ring 骨骼的第三方模型、腰射、第三人称、Iris 回退路径（maskable=false）
-        // 均不受影响——此时 detaching=false，走原来的主提交。
-        boolean detachOcularRing = maskable && ocularRingPart != null && ocularRingPart.visible
+        // 无 ocular_ring 骨骼的第三方模型、腰射、第三人称、shader 回退与低倍 sight
+        // 均不受影响——此时 bodyMaskable=false，走原来的主提交。
+        boolean detachOcularRing = bodyMaskable && ocularRingPart != null && ocularRingPart.visible
                 && RenderConfig.SCOPE_OCULAR_RING_FIX != null && RenderConfig.SCOPE_OCULAR_RING_FIX.get();
         List<BedrockPart> hiddenOculars = new ArrayList<>();
         if (transformType != null && transformType.firstPerson()) {
@@ -652,7 +658,7 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
         }
         try {
             super.submit(poseStack, transformType, collector,
-                    resolveBodyRenderType(renderType, texture, maskable), light, overlay);
+                    resolveBodyRenderType(renderType, texture, bodyMaskable), light, overlay);
         } finally {
             if (detachOcularRing) {
                 ocularRingPart.visible = true;
@@ -682,8 +688,8 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
                 //
                 // 注意方向别搞反：镜身是「盖到就 discard」，准星是「没盖到才 discard」。
                 // 两者共用同一张掩码、同一份 shader，靠 SCOPE_MASK_INVERT 区分。
-                RenderType reticleType = resolveReticleRenderType(renderType, texture, maskable);
-                RenderType illuminatedReticleType = resolveIlluminatedReticleRenderType(renderType, texture, maskable);
+                RenderType reticleType = resolveReticleRenderType(renderType, texture, reticleMaskable);
+                RenderType illuminatedReticleType = resolveIlluminatedReticleRenderType(renderType, texture, reticleMaskable);
                 // maskActive：本帧准星是否真的走了反向裁剪。
                 // EtchedReticleRenderer 依赖它决定敢不敢画 division（内含大块遮光板）。
                 boolean maskActive = reticleType != renderType;
@@ -809,12 +815,12 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
      *
      * @param original 调用方给的原始 RenderType（{@code RenderTypes.entityCutout(贴图)}）
      * @param texture  该瞄具的贴图；为 {@code null} 时无法构造等价的裁剪版，直接退回
-     * @param maskable 本帧是否登记了目镜几何（第一人称 + 该瞄具确实有目镜）
+     * @param bodyMaskable 本帧是否应裁切镜身/视模；低倍 sight 即使有 reticle mask 也为 false
      */
     private RenderType resolveBodyRenderType(RenderType original,
                                              @Nullable Identifier texture,
-                                             boolean maskable) {
-        if (!maskable) {
+                                             boolean bodyMaskable) {
+        if (!bodyMaskable) {
             // 第三人称，或这个配件压根没有目镜（如握把、消音器）—— 不需要裁剪。
             return original;
         }
@@ -839,14 +845,14 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
     /**
      * 决定准星用哪个 RenderType：被约束在镜内的，还是原样。
      *
-     * <p>前置条件与 {@link #resolveBodyRenderType} <b>完全相同</b>，只是最终
-     * 换成反向裁剪的那一版。两者必须同进同退：若镜身裁了而准星没裁，
-     * 准星会飘在镜外；若准星裁了而镜身没裁，镜内又会被镜身糊住。
+     * <p>Reticle containment is intentionally independent from body clipping. Low-power sights
+     * follow upstream {@code renderSight} and keep their body unmasked, while their reticle still
+     * needs the inverse ocular mask so it cannot leak beyond the lens/frame.</p>
      */
     private RenderType resolveReticleRenderType(RenderType original,
                                                 @Nullable Identifier texture,
-                                                boolean maskable) {
-        if (!maskable || texture == null || !RenderConfig.SCOPE_MASK_ENABLE.get()) {
+                                                boolean reticleMaskable) {
+        if (!reticleMaskable || texture == null || !RenderConfig.SCOPE_MASK_ENABLE.get()) {
             return original;
         }
         if (!ScopeMaskTextureHandle.syncToMaskTarget()) {
@@ -858,11 +864,11 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
     /** 发光准星使用不受方向光影响的专用 RenderType，避免随玩家朝向变亮/变暗。 */
     private RenderType resolveIlluminatedReticleRenderType(RenderType original,
                                                           @Nullable Identifier texture,
-                                                          boolean maskable) {
+                                                          boolean reticleMaskable) {
         if (texture == null) {
             return original;
         }
-        if (!maskable || !RenderConfig.SCOPE_MASK_ENABLE.get()) {
+        if (!reticleMaskable || !RenderConfig.SCOPE_MASK_ENABLE.get()) {
             return ScopeBodyRenderTypes.emissive(texture);
         }
         if (!ScopeMaskTextureHandle.syncToMaskTarget()) {
