@@ -232,7 +232,7 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
             if (IrisCompat.isHandRendererActive()) {
                 handCameraRotation.identity();
             } else {
-                handCameraRotation.set(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
+                handCameraRotation.set(Minecraft.getInstance().gameRenderer.mainCamera().rotation());
             }
             // 逆转原版施加在手上的延滞效果，改为写入模型动画数据中
             float xRotOffset = Mth.lerp(partialTick, player.xBobO, player.xBob);

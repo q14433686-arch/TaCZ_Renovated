@@ -1,7 +1,6 @@
 package com.tacz.guns.client;
 
 import com.tacz.guns.GunMod;
-import com.tacz.guns.client.render.scope.ScopeRenderTypes;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -11,13 +10,12 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 /**
- * Physical-client entry. Scope pipelines must register before ShaderManager's first reload.
+ * Physical-client entry. Scope pipelines register through RegisterRenderPipelinesEvent before ShaderManager's first reload.
  */
 @Mod(value = GunMod.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = GunMod.MOD_ID, value = Dist.CLIENT)
 public class GunModClient {
     public GunModClient(ModContainer container) {
-        ScopeRenderTypes.init();
         // TACZ classic Cloth Config screen (MUKSC idiom): cloth present -> cloth UI,
         // absent -> download-hint screen. Registration mirrors MUKSC's CompatRegistry.
         if (net.neoforged.fml.ModList.get().isLoaded(com.tacz.guns.init.CompatRegistry.CLOTH_CONFIG)) {

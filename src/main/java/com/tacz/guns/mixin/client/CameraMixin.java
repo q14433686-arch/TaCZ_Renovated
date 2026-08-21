@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * NeoForge 26.1.2.97 already fires {@link ViewportEvent.ComputeFov} from
+ * NeoForge 26.2.0.64 already fires {@link ViewportEvent.ComputeFov} from
  * {@code ClientHooks#getFieldOfView} for both world and HUD/item FOV. Posting a second HUD
  * event here made the smoothing state advance twice and produced an incorrect hand/camera
  * distance during ADS. Camera angles are not posted by NeoForge, so only that hook is injected.

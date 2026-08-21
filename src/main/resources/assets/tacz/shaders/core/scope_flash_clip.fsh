@@ -1,12 +1,12 @@
 #version 330
 
-// TACZ viewmodel clipping shader: verbatim clone of minecraft:shaders/core/entity.fsh (26.1.2)
+// TACZ viewmodel clipping shader: verbatim clone of minecraft:shaders/core/entity.fsh (26.2)
 // with an outside-ocular screen-space mask prepended to main(). Each cloned source pipeline keeps
 // its original defines and render states, so gun cutouts and both flash layers are unchanged outside
 // the lens.
 //
 // Mode 2 is enabled only for a first-person gun submission that queued an ocular aperture. Pixels
-// where apertureDepth < worldDepth - epsilon are inside that true projected aperture and discard;
+// where apertureDepth > worldDepth + epsilon are inside that true projected aperture and discard;
 // mode 0 is a fail-open path that renders the ordinary unmasked effect.
 
 #moj_import <minecraft:fog.glsl>

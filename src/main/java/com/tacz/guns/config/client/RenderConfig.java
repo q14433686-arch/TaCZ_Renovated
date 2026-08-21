@@ -49,7 +49,8 @@ public class RenderConfig {
         builder.comment("Whether or not to display the head shot's hitbox");
         HEAD_SHOT_DEBUG_HITBOX = builder.define("HeadShotDebugHitbox", false);
         SCOPE_MASK_ENABLE = builder
-                .comment("Whether to open the first-person scope body with the ocular depth aperture.")
+                .comment("Whether to open first-person scopes with the OpenGL ocular depth aperture. "
+                        + "Minecraft's experimental Vulkan backend uses an unmasked fallback.")
                 .define("ScopeMaskEnable", true);
 
         builder.comment("Whether or not to display the gun's HUD");

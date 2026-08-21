@@ -1,30 +1,41 @@
 package com.tacz.guns.client.render.scope;
 
+import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.pipeline.BindGroupLayout;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.CompareOp;
-import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.tacz.guns.GunMod;
-import com.tacz.guns.compat.iris.IrisCompat;
+import com.tacz.guns.compat.shader.ShaderCompat;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
+import net.minecraft.client.renderer.rendertype.PreparedRenderType;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.TextureTransform;
 import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/** Render types for the depth-aperture scope fallback used on Minecraft 26.1.2. */
+/**
+ * OpenGL-only depth-aperture scope render types for Minecraft 26.2.
+ *
+ * <p>26.2 removed {@code RenderType#draw}. Operation boundaries are therefore associated with
+ * the prepared pipeline and intercepted in {@code PreparedRenderTypeScopeDepthCopyMixin}.
+ * Vulkan deliberately bypasses this path and uses the transparent, unmasked fallback.</p>
+ */
 public final class ScopeRenderTypes {
     private static final RenderSetup FAKE_SETUP = RenderSetup.builder(RenderPipelines.GUI_TEXTURED)
             .createRenderSetup();
 
+    private static final Map<RenderPipeline, ScopeDepthCopyState.Operation> PIPELINE_OPERATIONS =
+            new IdentityHashMap<>();
     private static final Map<RenderType, RenderType> APERTURE_COPY_BODIES = new IdentityHashMap<>();
     private static final Map<Identifier, RenderType> DEPTH_APERTURES = new HashMap<>();
     private static final Map<Identifier, RenderType> DEPTH_CLEANUPS = new HashMap<>();
@@ -34,6 +45,16 @@ public final class ScopeRenderTypes {
     private static final Map<Identifier, RenderType> FLASH_TRANSLUCENT_TYPES = new HashMap<>();
     private static final Map<Identifier, RenderType> FLASH_SWIRL_TYPES = new HashMap<>();
 
+    private static final BindGroupLayout DEPTH_CLEANUP_SAMPLERS = BindGroupLayout.builder()
+            .withSampler(ScopeDepthCopyState.SAMPLER_UNIFORM)
+            .withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM)
+            .withSampler(ScopeDepthCopyState.POST_BODY_SAMPLER_UNIFORM)
+            .build();
+    private static final BindGroupLayout DEPTH_MASK_SAMPLERS = BindGroupLayout.builder()
+            .withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM)
+            .withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM)
+            .build();
+
     /** Set during extraction when this first-person gun submission actually queued an ocular aperture. */
     private static boolean apertureScheduledForViewmodel;
 
@@ -41,37 +62,87 @@ public final class ScopeRenderTypes {
      * Writes ocular geometry to the existing hand depth attachment without touching color.
      * Scope-body fragments behind that geometry fail their ordinary depth test, leaving world color visible.
      */
-    private static final RenderPipeline DEPTH_APERTURE_PIPELINE = createDepthAperturePipeline();
+    private static RenderPipeline APERTURE_COPY_PIPELINE;
+    private static RenderPipeline DEPTH_APERTURE_PIPELINE;
 
     /** Restores the aperture region from the exact world-depth backup before later translucent world passes. */
-    private static final RenderPipeline DEPTH_CLEANUP_PIPELINE = createDepthCleanupPipeline();
+    private static RenderPipeline DEPTH_CLEANUP_PIPELINE;
 
     /**
      * Etched reticles sample the world-depth backup and the ocular aperture depth per pixel
-     * and only survive where ocularDepth &lt; worldDepth - epsilon.
+     * and only survive where ocularDepth &gt; worldDepth + epsilon.
      */
-    private static final RenderPipeline ETCHED_RETICLE_PIPELINE = createEtchedReticlePipeline();
+    private static RenderPipeline ETCHED_RETICLE_PIPELINE;
 
     /**
      * Small illuminated reticles use the same screen-space ocular mask and still write near hand
      * depth to protect their surviving pixels from later world translucency.
      */
-    private static final RenderPipeline VISIBLE_RETICLE_PIPELINE = createVisibleReticlePipeline();
+    private static RenderPipeline VISIBLE_RETICLE_PIPELINE;
 
     /** Entity cutout plus an outside-aperture mask for the gun body and non-scope attachments. */
-    private static final RenderPipeline VIEWMODEL_CUTOUT_PIPELINE = createViewmodelCutoutPipeline();
+    private static RenderPipeline VIEWMODEL_CUTOUT_PIPELINE;
 
     /** Ordinary entity translucency plus an outside-aperture fragment mask for the flash quad. */
-    private static final RenderPipeline FLASH_TRANSLUCENT_PIPELINE = createFlashTranslucentPipeline();
+    private static RenderPipeline FLASH_TRANSLUCENT_PIPELINE;
 
     /** Vanilla energy-swirl states plus the same outside-aperture mask for the glow layer. */
-    private static final RenderPipeline FLASH_SWIRL_PIPELINE = createFlashSwirlPipeline();
+    private static RenderPipeline FLASH_SWIRL_PIPELINE;
+    private static volatile boolean pipelinesRegistered;
 
     private ScopeRenderTypes() {
     }
 
-    /** Forces registration before ShaderManager's initial resource reload. */
-    public static void init() {
+    /**
+     * Builds GL-only pipelines during NeoForge's registration event. Vulkan never constructs
+     * them, so its shader compiler cannot encounter the raw-GL depth uniforms.
+     */
+    public static synchronized void init() {
+        if (DEPTH_APERTURE_PIPELINE != null || !ScopeDepthCopyState.isOpenGlBackend()) {
+            return;
+        }
+        APERTURE_COPY_PIPELINE = createApertureCopyPipeline();
+        DEPTH_APERTURE_PIPELINE = createDepthAperturePipeline();
+        DEPTH_CLEANUP_PIPELINE = createDepthCleanupPipeline();
+        ETCHED_RETICLE_PIPELINE = createEtchedReticlePipeline();
+        VISIBLE_RETICLE_PIPELINE = createVisibleReticlePipeline();
+        VIEWMODEL_CUTOUT_PIPELINE = createViewmodelCutoutPipeline();
+        FLASH_TRANSLUCENT_PIPELINE = createFlashTranslucentPipeline();
+        FLASH_SWIRL_PIPELINE = createFlashSwirlPipeline();
+    }
+
+    /** Registers all GL-only pipelines through NeoForge's 26.2 custom-pipeline event. */
+    public static synchronized void registerPipelines(RegisterRenderPipelinesEvent event) {
+        if (pipelinesRegistered) {
+            return;
+        }
+        init();
+        if (DEPTH_APERTURE_PIPELINE == null) {
+            return;
+        }
+        event.registerPipeline(APERTURE_COPY_PIPELINE);
+        event.registerPipeline(DEPTH_APERTURE_PIPELINE);
+        event.registerPipeline(DEPTH_CLEANUP_PIPELINE);
+        event.registerPipeline(ETCHED_RETICLE_PIPELINE);
+        event.registerPipeline(VISIBLE_RETICLE_PIPELINE);
+        event.registerPipeline(VIEWMODEL_CUTOUT_PIPELINE);
+        event.registerPipeline(FLASH_TRANSLUCENT_PIPELINE);
+        event.registerPipeline(FLASH_SWIRL_PIPELINE);
+        pipelinesRegistered = true;
+    }
+
+    public static boolean supportsDepthAperture() {
+        return pipelinesRegistered && ScopeDepthCopyState.isOpenGlBackend();
+    }
+
+    public static ScopeDepthCopyState.Operation operationFor(PreparedRenderType prepared) {
+        return PIPELINE_OPERATIONS.getOrDefault(prepared.pipeline(), ScopeDepthCopyState.Operation.NONE);
+    }
+
+    private static RenderPipeline registerOperation(RenderPipeline pipeline,
+                                                     ScopeDepthCopyState.Operation operation) {
+        PIPELINE_OPERATIONS.put(pipeline, operation);
+        return pipeline;
     }
 
     /** Starts extraction of one first-person gun; prevents a previous frame's aperture from clipping fire. */
@@ -93,6 +164,9 @@ public final class ScopeRenderTypes {
     }
 
     public static RenderType depthAperture(Identifier texture) {
+        if (!supportsDepthAperture() || DEPTH_APERTURE_PIPELINE == null) {
+            throw new IllegalStateException("Depth-aperture pipeline requested before GL pipeline registration");
+        }
         // This method is called while extracting an active first-person ocular, before the gun's
         // functional muzzle-flash node is visited. The flag only selects a masked RenderType;
         // draw-time validation still fails open when a depth copy is unavailable.
@@ -139,11 +213,11 @@ public final class ScopeRenderTypes {
     }
 
     private static RenderType createApertureCopyType(RenderType base) {
-        return new DepthCopyRenderType(
-                "tacz_scope_body_aperture_copy",
-                base,
-                ScopeDepthCopyState.Operation.APERTURE_COPY
-        );
+        if (APERTURE_COPY_PIPELINE == null || base.pipeline() != RenderPipelines.ENTITY_CUTOUT) {
+            return base;
+        }
+        return new PipelineOverrideRenderType(
+                "tacz_scope_body_aperture_copy", base, APERTURE_COPY_PIPELINE);
     }
 
     private static RenderType createDepthApertureType(Identifier texture) {
@@ -152,12 +226,7 @@ public final class ScopeRenderTypes {
                 .useLightmap()
                 .useOverlay()
                 .createRenderSetup();
-        RenderType base = RenderType.create("tacz_scope_depth_aperture_base", setup);
-        return new DepthCopyRenderType(
-                "tacz_scope_depth_aperture",
-                base,
-                ScopeDepthCopyState.Operation.BACKUP
-        );
+        return RenderType.create("tacz_scope_depth_aperture", setup);
     }
 
     private static RenderType createDepthCleanupType(Identifier texture) {
@@ -171,12 +240,7 @@ public final class ScopeRenderTypes {
                 .useLightmap()
                 .useOverlay()
                 .createRenderSetup();
-        RenderType base = RenderType.create("tacz_scope_depth_cleanup_base", setup);
-        return new DepthCopyRenderType(
-                "tacz_scope_depth_cleanup",
-                base,
-                ScopeDepthCopyState.Operation.RESTORE
-        );
+        return RenderType.create("tacz_scope_depth_cleanup", setup);
     }
 
     private static RenderType createEtchedReticleType(Identifier texture) {
@@ -189,12 +253,7 @@ public final class ScopeRenderTypes {
                 .useLightmap()
                 .useOverlay()
                 .createRenderSetup();
-        RenderType base = RenderType.create("tacz_scope_etched_reticle_base", setup);
-        return new DepthCopyRenderType(
-                "tacz_scope_etched_reticle",
-                base,
-                ScopeDepthCopyState.Operation.MASK
-        );
+        return RenderType.create("tacz_scope_etched_reticle", setup);
     }
 
     private static RenderType createVisibleReticleType(Identifier texture) {
@@ -208,12 +267,7 @@ public final class ScopeRenderTypes {
                 .sortOnUpload()
                 .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
                 .createRenderSetup();
-        RenderType base = RenderType.create("tacz_scope_visible_reticle_base", setup);
-        return new DepthCopyRenderType(
-                "tacz_scope_visible_reticle",
-                base,
-                ScopeDepthCopyState.Operation.MASK
-        );
+        return RenderType.create("tacz_scope_visible_reticle", setup);
     }
 
     private static RenderType createViewmodelCutoutType(Identifier texture) {
@@ -228,12 +282,7 @@ public final class ScopeRenderTypes {
                 .affectsCrumbling()
                 .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
                 .createRenderSetup();
-        RenderType base = RenderType.create("tacz_scope_viewmodel_cutout_base", setup);
-        return new DepthCopyRenderType(
-                "tacz_scope_viewmodel_cutout",
-                base,
-                ScopeDepthCopyState.Operation.MASK_OUTSIDE
-        );
+        return RenderType.create("tacz_scope_viewmodel_cutout", setup);
     }
 
     private static RenderType createFlashTranslucentType(Identifier texture) {
@@ -249,12 +298,7 @@ public final class ScopeRenderTypes {
                 .sortOnUpload()
                 .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
                 .createRenderSetup();
-        RenderType base = RenderType.create("tacz_scope_flash_translucent_base", setup);
-        return new DepthCopyRenderType(
-                "tacz_scope_flash_translucent",
-                base,
-                ScopeDepthCopyState.Operation.MASK_OUTSIDE
-        );
+        return RenderType.create("tacz_scope_flash_translucent", setup);
     }
 
     private static RenderType createFlashSwirlType(Identifier texture) {
@@ -269,12 +313,18 @@ public final class ScopeRenderTypes {
                 .useOverlay()
                 .sortOnUpload()
                 .createRenderSetup();
-        RenderType base = RenderType.create("tacz_scope_flash_swirl_base", setup);
-        return new DepthCopyRenderType(
-                "tacz_scope_flash_swirl",
-                base,
-                ScopeDepthCopyState.Operation.MASK_OUTSIDE
-        );
+        return RenderType.create("tacz_scope_flash_swirl", setup);
+    }
+
+    private static RenderPipeline createApertureCopyPipeline() {
+        RenderPipeline pipeline = registerOperation(
+                clonePipeline(
+                        RenderPipelines.ENTITY_CUTOUT,
+                        Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_aperture_copy"))
+                        .build(),
+                ScopeDepthCopyState.Operation.APERTURE_COPY);
+        ShaderCompat.assignPipeline(pipeline, "HAND", "scope_aperture_copy");
+        return pipeline;
     }
 
     private static RenderPipeline createDepthAperturePipeline() {
@@ -285,15 +335,17 @@ public final class ScopeRenderTypes {
         ColorTargetState sourceColor = source.getColorTargetState();
         builder.withColorTargetState(new ColorTargetState(
                 sourceColor.blendFunction(),
+                sourceColor.format(),
                 ColorTargetState.WRITE_NONE
         ));
         DepthStencilState sourceDepth = source.getDepthStencilState();
-        CompareOp depthTest = sourceDepth == null ? CompareOp.LESS_THAN_OR_EQUAL : sourceDepth.depthTest();
+        CompareOp depthTest = sourceDepth == null ? CompareOp.GREATER_THAN_OR_EQUAL : sourceDepth.depthTest();
         // Pull the invisible ocular very slightly toward the camera to avoid coplanar scope-body leakage.
-        builder.withDepthStencilState(new DepthStencilState(depthTest, true, -1.0F, -1.0F));
+        builder.withDepthStencilState(new DepthStencilState(depthTest, true, 1.0F, 1.0F));
 
-        RenderPipeline pipeline = RenderPipelines.register(builder.build());
-        IrisCompat.assignPipelineToIris(pipeline, "HAND", "scope_depth_aperture");
+        RenderPipeline pipeline = registerOperation(
+                builder.build(), ScopeDepthCopyState.Operation.BACKUP);
+        ShaderCompat.assignPipeline(pipeline, "HAND", "scope_depth_aperture");
         return pipeline;
     }
 
@@ -303,20 +355,20 @@ public final class ScopeRenderTypes {
                 Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_depth_cleanup"));
         builder.withFragmentShader(Identifier.fromNamespaceAndPath(
                 GunMod.MOD_ID, "core/scope_depth_cleanup"));
-        builder.withSampler(ScopeDepthCopyState.SAMPLER_UNIFORM);
-        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
-        builder.withSampler(ScopeDepthCopyState.POST_BODY_SAMPLER_UNIFORM);
+        builder.withBindGroupLayout(DEPTH_CLEANUP_SAMPLERS);
 
         ColorTargetState sourceColor = source.getColorTargetState();
         builder.withColorTargetState(new ColorTargetState(
                 sourceColor.blendFunction(),
+                sourceColor.format(),
                 ColorTargetState.WRITE_NONE
         ));
         // Cleanup geometry rasterizes only the ocular footprint and writes exact sampled world depth.
         builder.withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true));
 
-        RenderPipeline pipeline = RenderPipelines.register(builder.build());
-        IrisCompat.assignPipelineToIris(pipeline, "HAND", "scope_depth_cleanup");
+        RenderPipeline pipeline = registerOperation(
+                builder.build(), ScopeDepthCopyState.Operation.RESTORE);
+        ShaderCompat.assignPipeline(pipeline, "HAND", "scope_depth_cleanup");
         return pipeline;
     }
 
@@ -327,14 +379,14 @@ public final class ScopeRenderTypes {
         // entity.fsh clone plus the ocular screen-space mask branch at the top of main().
         builder.withFragmentShader(Identifier.fromNamespaceAndPath(
                 GunMod.MOD_ID, "core/scope_reticle_mask"));
-        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
-        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
+        builder.withBindGroupLayout(DEPTH_MASK_SAMPLERS);
         // Large blackout panels are still removed on the CPU; the retained thin marks render after
         // the exact depth restore and the mask clips them to the ocular footprint.
         builder.withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true));
 
-        RenderPipeline pipeline = RenderPipelines.register(builder.build());
-        IrisCompat.assignPipelineToIris(pipeline, "HAND", "scope_etched_reticle");
+        RenderPipeline pipeline = registerOperation(
+                builder.build(), ScopeDepthCopyState.Operation.MASK);
+        ShaderCompat.assignPipeline(pipeline, "HAND", "scope_etched_reticle");
         return pipeline;
     }
 
@@ -345,13 +397,13 @@ public final class ScopeRenderTypes {
         // Same entity.fsh clone plus ocular mask; under Iris the equivalent branch is injected.
         builder.withFragmentShader(Identifier.fromNamespaceAndPath(
                 GunMod.MOD_ID, "core/scope_reticle_mask"));
-        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
-        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
+        builder.withBindGroupLayout(DEPTH_MASK_SAMPLERS);
         // The ocular depth writer must not hide the small dot/cross geometry placed behind the lens.
         builder.withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true));
 
-        RenderPipeline pipeline = RenderPipelines.register(builder.build());
-        IrisCompat.assignPipelineToIris(pipeline, "HAND_TRANSLUCENT", "scope_visible_reticle");
+        RenderPipeline pipeline = registerOperation(
+                builder.build(), ScopeDepthCopyState.Operation.MASK);
+        ShaderCompat.assignPipeline(pipeline, "HAND_TRANSLUCENT", "scope_visible_reticle");
         return pipeline;
     }
 
@@ -361,11 +413,11 @@ public final class ScopeRenderTypes {
                 Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_viewmodel_cutout"));
         builder.withFragmentShader(Identifier.fromNamespaceAndPath(
                 GunMod.MOD_ID, "core/scope_flash_clip"));
-        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
-        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
+        builder.withBindGroupLayout(DEPTH_MASK_SAMPLERS);
 
-        RenderPipeline pipeline = RenderPipelines.register(builder.build());
-        IrisCompat.assignPipelineToIris(pipeline, "HAND", "scope_viewmodel_cutout");
+        RenderPipeline pipeline = registerOperation(
+                builder.build(), ScopeDepthCopyState.Operation.MASK_OUTSIDE);
+        ShaderCompat.assignPipeline(pipeline, "HAND", "scope_viewmodel_cutout");
         return pipeline;
     }
 
@@ -375,11 +427,11 @@ public final class ScopeRenderTypes {
                 Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_flash_translucent"));
         builder.withFragmentShader(Identifier.fromNamespaceAndPath(
                 GunMod.MOD_ID, "core/scope_flash_clip"));
-        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
-        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
+        builder.withBindGroupLayout(DEPTH_MASK_SAMPLERS);
 
-        RenderPipeline pipeline = RenderPipelines.register(builder.build());
-        IrisCompat.assignPipelineToIris(pipeline, "HAND_TRANSLUCENT", "scope_flash_translucent");
+        RenderPipeline pipeline = registerOperation(
+                builder.build(), ScopeDepthCopyState.Operation.MASK_OUTSIDE);
+        ShaderCompat.assignPipeline(pipeline, "HAND_TRANSLUCENT", "scope_flash_translucent");
         return pipeline;
     }
 
@@ -389,11 +441,11 @@ public final class ScopeRenderTypes {
                 Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_flash_swirl"));
         builder.withFragmentShader(Identifier.fromNamespaceAndPath(
                 GunMod.MOD_ID, "core/scope_flash_clip"));
-        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
-        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
+        builder.withBindGroupLayout(DEPTH_MASK_SAMPLERS);
 
-        RenderPipeline pipeline = RenderPipelines.register(builder.build());
-        IrisCompat.assignPipelineToIris(pipeline, "HAND_TRANSLUCENT", "scope_flash_swirl");
+        RenderPipeline pipeline = registerOperation(
+                builder.build(), ScopeDepthCopyState.Operation.MASK_OUTSIDE);
+        ShaderCompat.assignPipeline(pipeline, "HAND_TRANSLUCENT", "scope_flash_swirl");
         return pipeline;
     }
 
@@ -404,19 +456,25 @@ public final class ScopeRenderTypes {
                 .withFragmentShader(source.getFragmentShader())
                 .withPolygonMode(source.getPolygonMode())
                 .withCull(source.isCull())
-                .withVertexFormat(source.getVertexFormat(), source.getVertexFormatMode());
+                .withPrimitiveTopology(source.getPrimitiveTopology());
 
         source.getShaderDefines().flags().forEach(builder::withShaderDefine);
         source.getShaderDefines().values().forEach((name, value) -> copyDefine(builder, name, value));
-        source.getSamplers().forEach(builder::withSampler);
-        source.getUniforms().forEach(uniform -> {
-            if (uniform.textureFormat() == null) {
-                builder.withUniform(uniform.name(), uniform.type());
-            } else {
-                builder.withUniform(uniform.name(), uniform.type(), uniform.textureFormat());
+        source.getBindGroupLayouts().forEach(builder::withBindGroupLayout);
+
+        VertexFormat[] vertexFormats = source.getVertexFormatBindings();
+        for (int i = 0; i < vertexFormats.length; i++) {
+            if (vertexFormats[i] != null) {
+                builder.withVertexBinding(i, vertexFormats[i]);
             }
-        });
-        builder.withColorTargetState(source.getColorTargetState());
+        }
+        ColorTargetState[] colorTargets = source.getColorTargetStates();
+        for (int i = 0; i < colorTargets.length; i++) {
+            if (colorTargets[i] != null) {
+                builder.withColorTargetState(i, colorTargets[i]);
+            }
+        }
+
         DepthStencilState sourceDepth = source.getDepthStencilState();
         if (sourceDepth == null) {
             builder.withDepthStencilState(Optional.empty());
@@ -438,27 +496,18 @@ public final class ScopeRenderTypes {
         }
     }
 
-    /** Marks the synchronous delegated draw so GlCommandEncoder can back up or restore the active depth FBO. */
-    private static final class DepthCopyRenderType extends RenderType {
+    /**
+     * Delegates texture/setup preparation to an existing render type, but substitutes a cloned,
+     * operation-tagged pipeline. This replaces the removed 26.1 {@code RenderType#draw} wrapper.
+     */
+    private static final class PipelineOverrideRenderType extends RenderType {
         private final RenderType wrapped;
-        private final ScopeDepthCopyState.Operation operation;
+        private final RenderPipeline operationPipeline;
 
-        private DepthCopyRenderType(String name,
-                                    RenderType wrapped,
-                                    ScopeDepthCopyState.Operation operation) {
+        private PipelineOverrideRenderType(String name, RenderType wrapped, RenderPipeline operationPipeline) {
             super(name, FAKE_SETUP);
             this.wrapped = wrapped;
-            this.operation = operation;
-        }
-
-        @Override
-        public void draw(MeshData meshData) {
-            ScopeDepthCopyState.begin(this.operation);
-            try {
-                this.wrapped.draw(meshData);
-            } finally {
-                ScopeDepthCopyState.end();
-            }
+            this.operationPipeline = operationPipeline;
         }
 
         @Override
@@ -472,8 +521,14 @@ public final class ScopeRenderTypes {
         }
 
         @Override
-        public int bufferSize() {
-            return this.wrapped.bufferSize();
+        public PreparedRenderType prepare() {
+            PreparedRenderType prepared = this.wrapped.prepare();
+            return new PreparedRenderType(
+                    this.operationPipeline,
+                    prepared.outputTarget(),
+                    prepared.dynamicTransforms(),
+                    prepared.scissorState(),
+                    prepared.textures());
         }
 
         @Override
@@ -482,8 +537,8 @@ public final class ScopeRenderTypes {
         }
 
         @Override
-        public VertexFormat.Mode mode() {
-            return this.wrapped.mode();
+        public PrimitiveTopology primitiveTopology() {
+            return this.wrapped.primitiveTopology();
         }
 
         @Override
@@ -498,7 +553,7 @@ public final class ScopeRenderTypes {
 
         @Override
         public RenderPipeline pipeline() {
-            return this.wrapped.pipeline();
+            return this.operationPipeline;
         }
 
         @Override

@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
  * <p>Only first-person HAND programs are patched. Injecting dormant {@code discard}/{@code gl_FragDepth}
  * into world gbuffers makes some NVIDIA drivers compile those programs differently.</p>
  *
- * Semantic source: Fabric 26.1.2 {@code IrisDepthRestoreShaderMixin} (game shader text, not MUKSC).
+ * Semantic source: Fabric 26.2 semantics adapted from the 26.1.2 {@code IrisDepthRestoreShaderMixin} (game shader text, not MUKSC).
  */
 @Mixin(targets = "net.irisshaders.iris.pipeline.programs.ShaderCreator", remap = false)
 public abstract class IrisDepthRestoreShaderMixin {
@@ -86,7 +86,7 @@ public abstract class IrisDepthRestoreShaderMixin {
                 + "        vec2 tacz_maskApertureUv = gl_FragCoord.xy / max(vec2(textureSize(tacz_ApertureDepthSampler, 0)), vec2(1.0));\n"
                 + "        float tacz_maskWorldDepth = texture(depthtex2, tacz_maskWorldUv).r;\n"
                 + "        float tacz_maskApertureDepth = texture(tacz_ApertureDepthSampler, tacz_maskApertureUv).r;\n"
-                + "        bool tacz_insideOcular = tacz_maskApertureDepth < tacz_maskWorldDepth - 1.0e-6;\n"
+                + "        bool tacz_insideOcular = tacz_maskApertureDepth > tacz_maskWorldDepth + 1.0e-6;\n"
                 + "        if ((tacz_ScopeMaskMode == 1 && !tacz_insideOcular)\n"
                 + "                || (tacz_ScopeMaskMode == 2 && tacz_insideOcular)) {\n"
                 + "            discard;\n"

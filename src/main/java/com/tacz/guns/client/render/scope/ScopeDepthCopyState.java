@@ -25,7 +25,7 @@ import java.util.List;
  * 5. RESTORE       cleanup geometry writes the original world depth back
  * 6. MASK          reticle draws sample BOTH depths at gl_FragCoord:
  *                  the original world depth and the ocular aperture depth
- * 7.               only pixels where ocularDepth &lt; worldDepth - epsilon may draw
+ * 7.               only pixels where ocularDepth &gt; worldDepth + epsilon may draw
  * 8.               every other pixel discards
  * </pre>
  *
@@ -98,6 +98,7 @@ public final class ScopeDepthCopyState {
     private static boolean loggedSelectiveRestoreActive;
     private static boolean loggedMaskActiveIris;
     private static boolean loggedMaskActiveVanilla;
+    private static boolean loggedUnsupportedBackend;
 
     private static final List<OverriddenUnit> OVERRIDDEN_UNITS = new ArrayList<>(3);
     private static boolean loggedActive;
@@ -109,6 +110,34 @@ public final class ScopeDepthCopyState {
     private static final java.util.Set<String> LOGGED_FAILURES = new java.util.HashSet<>();
 
     private ScopeDepthCopyState() {
+    }
+
+    /**
+     * The depth-copy implementation uses explicit OpenGL framebuffer and texture operations.
+     * 26.2's Vulkan backend therefore takes the documented no-depth fallback instead.
+     */
+    public static boolean isOpenGlBackend() {
+        final String backend;
+        try {
+            backend = RenderSystem.getDevice().getDeviceInfo().backendName();
+        } catch (RuntimeException | LinkageError deviceNotReady) {
+            // The pipeline registration event may run before the render device is published.
+            // In that case the feature stays disabled and the unmasked fallback remains safe.
+            return false;
+        }
+        boolean openGl = "OpenGL".equalsIgnoreCase(backend);
+        if (!openGl && !loggedUnsupportedBackend) {
+            loggedUnsupportedBackend = true;
+            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+            Object preferred = minecraft == null || minecraft.options == null
+                    ? "unknown"
+                    : minecraft.options.preferredGraphicsBackend().get();
+            GunMod.LOGGER.warn(
+                    "[TACZ Scope] Depth-aperture is OpenGL-only (active backend={}, preferred={}); "
+                            + "using the unmasked scope fallback.",
+                    backend, preferred);
+        }
+        return openGl;
     }
 
     public static void begin(Operation operation) {

@@ -15,6 +15,7 @@
     "client.AbstractButtonMixin",
     "client.CameraMixin",
     "client.GameRendererMixin",
+    "client.PreparedRenderTypeScopeDepthCopyMixin",
     "client.GlCommandEncoderScopeDepthCopyMixin",
     "client.ItemInHandLayerMixin",
     "client.ItemInHandRendererMixin",

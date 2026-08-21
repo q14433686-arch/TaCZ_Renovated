@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** 26.1.2 bob hooks. RenderFrameEvent is already fired by NeoForge ClientHooks. */
+/** 26.2 bob hooks. RenderFrameEvent is already fired by NeoForge ClientHooks. */
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
     @Shadow @Final private Minecraft minecraft;

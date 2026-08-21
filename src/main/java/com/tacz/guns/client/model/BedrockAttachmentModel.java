@@ -461,7 +461,7 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
     /**
      * Captures one named part with its complete parent transform while preserving its shared
      * visibility flag. This mirrors upstream renderTempPart(), but produces immutable geometry for
-     * the 26.1.2 delayed collector instead of drawing immediately.
+     * the 26.2 feature collector instead of drawing immediately.
      */
     private static BedrockRenderSnapshot captureStandalonePart(BedrockPart part,
                                                                 PoseStack rootPose,
@@ -528,10 +528,13 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
         this.attachmentItem = attachmentItem;
 
         boolean scopeMaskEnabled = RenderConfig.SCOPE_MASK_ENABLE == null || RenderConfig.SCOPE_MASK_ENABLE.get();
-        boolean apertureActive = scopeMaskEnabled
+        boolean firstPersonScopeView = scopeMaskEnabled
                 && transformType != null && transformType.firstPerson()
                 && !ocularParts.isEmpty()
                 && currentAimingProgress() > AIM_CLIP_START;
+        // The raw framebuffer copy is intentionally GL-only. Vulkan still hides the opaque ocular
+        // so the sight remains usable, but skips depth masking/restoration and uses ordinary types.
+        boolean apertureActive = firstPersonScopeView && ScopeRenderTypes.supportsDepthAperture();
 
         // ocular_ring is the physical black rim, not the aperture. Upstream draws it with stencil
         // disabled. Freeze it separately so the depth writer cannot clip it out of the body batch.
@@ -576,7 +579,7 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
         }
         if (transformType != null && transformType.firstPerson()) {
             for (BedrockPart ocular : ocularParts) {
-                boolean hideForAperture = apertureActive && isOcularInActiveGroup(ocular);
+                boolean hideForAperture = firstPersonScopeView && isOcularInActiveGroup(ocular);
                 boolean hideByNormalVisibilityRule = !shouldDrawOcularBlackout(ocular);
                 if (ocular.visible && (hideForAperture || hideByNormalVisibilityRule)) {
                     ocular.visible = false;
@@ -645,17 +648,17 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
             IReticleRenderer reticle = ReticleRendererRegistry.select(active);
             if (reticle != null && !active.isEmpty()) {
                 boolean etchedOnly = active.hasEtched() && !active.hasIlluminated() && texture != null;
-                RenderType baseReticleType = etchedOnly
+                RenderType baseReticleType = apertureActive && etchedOnly
                         ? ScopeRenderTypes.etchedReticle(texture)
                         : renderType;
-                RenderType baseIlluminatedType = texture == null
-                        ? renderType
-                        : ScopeRenderTypes.visibleReticle(texture);
+                RenderType baseIlluminatedType = apertureActive && texture != null
+                        ? ScopeRenderTypes.visibleReticle(texture)
+                        : renderType;
 
                 // Pure etched trees are CPU-filtered to retain thin marks and discard large blackout panels.
                 // Both etched and illuminated reticles render after the exact world-depth restore, sample the
                 // world-depth backup and the ocular aperture copy per pixel, and only keep fragments where
-                // ocularDepth < worldDepth - epsilon — the true screen-space ocular mask. Surviving pixels
+                // ocularDepth > worldDepth + epsilon — the true screen-space ocular mask. Surviving pixels
                 // still write near hand depth so later water/fog/particle passes cannot cover them.
                 reticle.submitReticle(new IReticleRenderer.Context(
                         poseStack, collector.order(SCOPE_RETICLE_ORDER),

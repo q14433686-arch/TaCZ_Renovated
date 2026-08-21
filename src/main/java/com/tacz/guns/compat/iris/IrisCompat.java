@@ -11,7 +11,7 @@ import net.neoforged.fml.ModList;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Optional Iris integration for the Minecraft 26.1.2 OpenGL renderer. Reflection-only. */
+/** Optional Iris 1.11.x integration for the Minecraft 26.2 OpenGL renderer. Reflection-only. */
 public final class IrisCompat {
     private static final Set<RenderPipeline> ASSIGNED_SCOPE_PIPELINES = new HashSet<>();
     private static boolean loggedScopePipelineFailure;
@@ -23,7 +23,16 @@ public final class IrisCompat {
     }
 
     public static boolean isRenderShadow() {
-        return false;
+        if (!ModList.get().isLoaded(CompatRegistry.IRIS)) {
+            return false;
+        }
+        try {
+            Class<?> apiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+            Object api = apiClass.getMethod("getInstance").invoke(null);
+            return (Boolean) apiClass.getMethod("isRenderingShadowPass").invoke(api);
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     public static boolean isUsingRenderPack() {
@@ -52,6 +61,10 @@ public final class IrisCompat {
             Class<?> apiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
             Class<?> programClass = Class.forName("net.irisshaders.iris.api.v0.IrisProgram");
             Object api = apiClass.getMethod("getInstance").invoke(null);
+            int minorRevision = (Integer) apiClass.getMethod("getMinorApiRevision").invoke(api);
+            if (minorRevision < 3) {
+                throw new IllegalStateException("Iris API revision " + minorRevision + " has no assignPipeline");
+            }
             @SuppressWarnings({"unchecked", "rawtypes"})
             Object irisProgram = Enum.valueOf((Class<? extends Enum>) programClass.asSubclass(Enum.class), irisProgramName);
             apiClass.getMethod("assignPipeline", RenderPipeline.class, programClass).invoke(api, pipeline, irisProgram);

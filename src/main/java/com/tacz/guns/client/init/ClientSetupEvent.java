@@ -27,6 +27,7 @@ import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.tacz.guns.client.renderer.item.GunItemRendererWrapper;
 import com.tacz.guns.client.renderer.item.GunSmithTableItemRenderer;
 import com.tacz.guns.client.renderer.item.TaczDynamicItemModel;
+import com.tacz.guns.client.render.scope.ScopeRenderTypes;
 import com.tacz.guns.client.resource.ClientAssetsManager;
 import com.tacz.guns.client.tooltip.ClientAmmoBoxTooltip;
 import com.tacz.guns.client.tooltip.ClientAttachmentItemTooltip;
@@ -54,6 +55,7 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterItemModelsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
@@ -117,6 +119,11 @@ public class ClientSetupEvent {
     @SubscribeEvent
     public static void onRegisterPip(RegisterPictureInPictureRenderersEvent event) {
         event.register(GunPreviewRenderState.class, GunPreviewRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void onRegisterRenderPipelines(RegisterRenderPipelinesEvent event) {
+        ScopeRenderTypes.registerPipelines(event);
     }
 
     @SubscribeEvent

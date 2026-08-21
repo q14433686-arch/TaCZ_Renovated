@@ -32,3 +32,18 @@
   删除四个 26.2 已公开成员的冗余 widening。
 - Mixin compatibility level 对齐 Java 25；注册与 common mixin 目标完成静态 descriptor 核验。
 - 专服 `Done` 与枪包装载数字仍待可运行环境验证。
+
+### WP-262-3
+
+- 将自定义 pipeline 迁到 26.2 的 `BindGroupLayout`、多 color target、vertex binding、
+  `PrimitiveTopology` 与 `GpuFormat` API，并通过 NeoForge `RegisterRenderPipelinesEvent` 注册。
+- 保留 OpenGL depth-aperture；`RenderType#draw` operation 边界迁到
+  `PreparedRenderType` + 26.2 八参数 GL encoder draw 边界。
+- 对齐 26.2 reversed-Z compare、depth bias 与 GLSL aperture 深度判据。
+- Vulkan 下不构造 GL-only pipeline，瞄具改走隐藏 opaque ocular 的未掩码降级，并记录一次 warning；
+  不声明 Vulkan depth/光影或 Aperture 支持。
+- PiP 改为框架传入 `SubmitNodeCollector`；爆头框改走官方 shape-outline feature；
+  第一人称 hand 方法、GameRenderer camera getter 全部对齐 26.2 descriptor。
+- Iris 1.11.x 反射入口按 26.2 source 重验，恢复 shadow-pass 查询，并保留
+  HAND/HAND_TRANSLUCENT pipeline 分类与 hand fragment depth 分支。
+- 当前只有静态 classfile/API 检查；JDK 25 全仓构建及 OpenGL/Iris/Vulkan GPU 矩阵未执行。

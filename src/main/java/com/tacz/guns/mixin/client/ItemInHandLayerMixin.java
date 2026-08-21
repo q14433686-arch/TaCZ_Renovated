@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  *       并不等于副手 —— 左利手玩家的主手就是 {@code LEFT}。上游用的是
  *       "主手持枪 &amp;&amp; 当前 arm 不是主手"。这里改为按 {@code state.mainArm} 判定，
  *       修复左利手玩家<b>主手枪械不渲染</b>的问题。</li>
- *   <li><b>{@code isSelf} 只置 false 从不置 true。</b> 上游在 {@code renderArmWithItem} 的 HEAD
+ *   <li><b>{@code isSelf} 只置 false 从不置 true。</b> 上游在对应 arm-with-item 提交的 HEAD
  *       会对"渲染对象是本地玩家"置 {@code true}，旧移植把这段丢了，导致第三人称下
  *       抛壳/枪口火焰的自机判定恒为 false。已按上游补回。</li>
  *   <li><b>{@code HumanoidOffhandRender.renderGun} 是空实现。</b> 已按 26.2 的

@@ -59,7 +59,7 @@ public interface IReticleRenderer {
      * 一帧内准星绘制所需的全部上下文。
      *
      * @param poseStack      当前矩阵（已包含瞄具自身的变换）
-     * @param collector      26.1.2 的提交收集器
+     * @param collector      26.2 的提交收集器
      * @param displayContext 显示上下文（第一人称 / 第三人称 / GUI…）
      * @param baseRenderType 瞄具本体使用的 RenderType（贴图已绑定）
      * @param light          继承的光照

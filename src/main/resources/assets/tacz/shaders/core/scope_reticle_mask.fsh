@@ -1,6 +1,6 @@
 #version 330
 
-// TACZ reticle shader: verbatim clone of minecraft:shaders/core/entity.fsh (26.1.2) with the
+// TACZ reticle shader: verbatim clone of minecraft:shaders/core/entity.fsh (26.2) with the
 // ocular screen-space mask branch prepended to main(). The cloned pipeline supplies the same
 // shader defines (EMISSIVE / ALPHA_CUTOUT / NO_OVERLAY / PER_FACE_LIGHTING / DISSOLVE) and
 // uniform blocks, so non-mask shading behavior is identical to the source pipeline.
@@ -9,7 +9,7 @@
 // owns a fresh ocular aperture copy enables it and passes:
 //   tacz_WorldDepthSampler    the pre-ocular world-depth backup (step 1)
 //   tacz_ApertureDepthSampler the aperture depth copied before the body draw (step 3)
-// Only pixels where apertureDepth < worldDepth - epsilon keep the reticle; everything else
+// Only pixels where apertureDepth > worldDepth + epsilon keep the reticle; everything else
 // discards, clipping the reticle to the true ocular footprint without any stencil attachment.
 
 #moj_import <minecraft:fog.glsl>
