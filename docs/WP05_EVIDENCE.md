@@ -8,6 +8,8 @@
 | 调用 | 证据 |
 |---|---|
 | `AddClientReloadListenersEvent#addListener(Identifier, PreparableReloadListener)` | ② `AddClientReloadListenersEvent.java` / `SortedReloadListenerEvent` |
+| **26.1 线渲染格式 = `DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH`：`RenderTypes.lines()` 管线要求每个线顶点都写 `VertexConsumer#setLineWidth(float)`，缺失即抛 `IllegalStateException: Missing elements in vertex: LineWidth`**（r15 开"显示爆头范围"即崩，crash 2026-08-21 13:46） | ① 26.1 反编译源 `DebugScreenOverlay.java:110-123`（格式名 + 每顶点 setLineWidth 习语）、`ShapeRenderer#renderShape`（`addVertex().setColor().setNormal().setLineWidth(w)` ×2）；② NF `VertexConsumerWrapper#setLineWidth` |
+| 线宽取值 2.5F = 原版 F3+B 碰撞箱默认（`GizmoStyle.DEFAULT_WIDTH`，`stroke(argb)` 默认宽度） | ① 26.1 反编译源 `net/minecraft/gizmos/GizmoStyle.java:6-9`；原版实体碰撞箱走 `Gizmos.cuboid` + `EntityHitboxDebugRenderer` |
 | `RegisterKeyMappingsEvent#register` / `#registerCategory` | ② `RegisterKeyMappingsEvent.java` |
 | `RegisterGuiLayersEvent#registerAboveAll` / `GuiLayer#render(GuiGraphicsExtractor, DeltaTracker)` | ② |
 | `RegisterItemModelsEvent#register(Identifier, MapCodec)` | ② `RegisterItemModelsEvent.java`（`ItemModels.ID_MAPPER` 私有） |
@@ -33,6 +35,10 @@
 - ShaderCompat 接口预留：`com.tacz.guns.compat.shader.ShaderCompat`，Iris 仅反射。
 - 工作台 `RenderShape.INVISIBLE` + BER 已恢复。
 - 动画/gltf API 已取消 `sourceSets` exclude。
+- `RenderHeadShotAABB`：26.1 线渲染补 `setLineWidth(2.5F)`（refab 26.1.2 同源文件同 bug，
+  属上游遗留而非移植引入）。全仓库排查：`RenderTypes.lines()` 仅此一处，
+  其余 `submitCustomGeometry` 全为面渲染类型（`entityTranslucent`/emissive，无 LineWidth 元素），
+  无直接 `new BufferBuilder`——同类"缺顶点元素"崩溃无第二处。
 - S2C 仍走 `ClientPacketBridge`；dedicated 常量池不引用 `LocalPlayer`。
 
 ## 冒烟
