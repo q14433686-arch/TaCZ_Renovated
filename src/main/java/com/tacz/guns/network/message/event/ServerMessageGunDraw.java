@@ -21,8 +21,16 @@ public class ServerMessageGunDraw implements CustomPacketPayload {
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, ServerMessageGunDraw> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.INT, message -> message.entityId,
-        ItemStack.STREAM_CODEC, message -> message.previousGunItem,
-        ItemStack.STREAM_CODEC, message -> message.currentGunItem,
+        // 必须用 OPTIONAL_STREAM_CODEC：previous/current 天然可能为 ItemStack.EMPTY
+        // （首次切枪无"上一把"、空手切换、丢弃手持物）。ItemStack.STREAM_CODEC 遇 EMPTY
+        // 直接抛 EncoderException("Empty ItemStack not allowed")，且本消息 sendToTracking
+        // 广播，一次空栈会把视野内所有玩家踢下线（2026-08-21 LAN 实测：双端断连，
+        // docs/records/SERVER_TEST_20260821_LAN.md）。
+        // 证据：③ refab 26.1.2 ServerMessageGunDraw#write（javadoc 详载同一回归，
+        // 并逐字核对上游 1.21.1 用 OPTIONAL）；同目录 Fire/FireSelect/Melee/Reload/Shoot
+        // 上游即非 OPTIONAL（必携真实枪械），不得一并改动。
+        ItemStack.OPTIONAL_STREAM_CODEC, message -> message.previousGunItem,
+        ItemStack.OPTIONAL_STREAM_CODEC, message -> message.currentGunItem,
         ServerMessageGunDraw::new
     );
 

@@ -133,10 +133,17 @@ public class CommonAssetsManager implements ICommonResourceProvider {
 
         gunData = registerNetwork(new CommonDataManager<>(DataType.GUN_DATA, GunData.class, GSON, "data/guns", "GunDataLoader"), register);
         attachmentData = registerNetwork(new AttachmentDataManager(), register);
-        attachmentsTagManager = new AttachmentsTagManager();
-        register.accept(attachmentsTagManager);
-        recipeFilterManager = new RecipeFilterManager();
-        register.accept(recipeFilterManager);
+        // 2026-08-21 LAN 实测回归修复：这两个管理器实现了 INetworkCacheReloadListener，
+        // 但此前只 register.accept、未入 listeners —— ATTACHMENT_TAGS 与 RECIPE_FILTER
+        // 从不进 getNetworkCache() 同步包。客户端缺 RecipeFilter 时，BLOCK_INDEX 的
+        // CommonBlockIndex.checkData 第二个 Precondition 必炸（"there is no corresponding
+        // data file"，默认包 tacz:gun_smith_table 也不能幸免）；缺 ATTACHMENT_TAGS 则
+        // 客户端配件允装判断静默失效。
+        // 证据：③ refab 26.1.2 CommonAssetsManager#reloadAndRegister —— 其 register(...)
+        // 助手把 attachmentsTagManager 与 recipeFilterManager 一并加入 listeners（全同步），
+        // 仅 lootInjectionManager 与 scriptManager 不同步。本处对齐该接线。
+        attachmentsTagManager = registerNetwork(new AttachmentsTagManager(), register);
+        recipeFilterManager = registerNetwork(new RecipeFilterManager(), register);
         lootInjectionManager = new LootInjectionManager();
         register.accept(lootInjectionManager);
         blockData = registerNetwork(new CommonDataManager<>(DataType.BLOCK_DATA, BlockData.class, GSON, "data/blocks", "BlockDataLoader"), register);

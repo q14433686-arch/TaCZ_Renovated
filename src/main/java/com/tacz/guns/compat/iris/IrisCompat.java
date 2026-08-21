@@ -72,6 +72,22 @@ public final class IrisCompat {
             GunMod.LOGGER.info("[TACZ Iris] Assigned {} to the Iris {} program.", debugName, irisProgramName);
             return true;
         } catch (Throwable t) {
+            // Iris 1.11.3+mc26.1.2 起会对常见 entity 管线做自动分类（日志
+            // "Found fine program match ..."），此时重复 assign 会抛
+            // IllegalStateException("Shader already assigned")。Iris 已分类 = 目的已达成，
+            // 视为成功，不再告警（2026-08-21 LAN 实测日志，docs/records/SERVER_TEST_20260821_LAN.md）。
+            Throwable cause = t;
+            while (cause != null) {
+                if (cause instanceof IllegalStateException
+                        && cause.getMessage() != null
+                        && cause.getMessage().startsWith("Shader already assigned")) {
+                    ASSIGNED_SCOPE_PIPELINES.add(pipeline);
+                    GunMod.LOGGER.info("[TACZ Iris] {} already classified by Iris ({}); keeping Iris assignment.",
+                            debugName, cause.getMessage());
+                    return true;
+                }
+                cause = cause.getCause();
+            }
             if (!loggedScopePipelineFailure) {
                 loggedScopePipelineFailure = true;
                 GunMod.LOGGER.warn("[TACZ Iris] Iris cannot classify render pipeline {}; vanilla pipeline used.",

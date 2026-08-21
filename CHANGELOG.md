@@ -11,7 +11,13 @@
 
 ### Changed
 
-- Forward-ported the audited NeoForge 26.1.2 Beta-1 codebase to Minecraft/NeoForge 26.2.
+- Forward-ported the NeoForge 26.1.2 codebase to Minecraft/NeoForge 26.2, including the R1
+  multiplayer fixes recovered after the original Beta-1 branch point.
+- Changed both naturally-empty stacks in `ServerMessageGunDraw` to
+  `ItemStack.OPTIONAL_STREAM_CODEC`, preventing tracking broadcasts from disconnecting players.
+- Added `AttachmentsTagManager` and `RecipeFilterManager` to the network-cache listener list so
+  attachment rules and block recipe filters reach multiplayer clients.
+- Treats Iris' `Shader already assigned` response as successful existing classification.
 - Migrated legacy NeoForge item handlers to transactional `ResourceHandler<ItemResource>` APIs.
 - Migrated current-screen access to `Minecraft.gui`, retained NeoForge GUI-layer registration, and
   revalidated the minimal access transformer against the NeoForge 26.2 transformed compile classpath.
