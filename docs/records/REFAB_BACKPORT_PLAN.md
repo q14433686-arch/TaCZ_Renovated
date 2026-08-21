@@ -91,3 +91,53 @@ public Component getName(ItemStack stack) {
 2. 26.2(main) 修复 + 全树审计 → R3；
 3. cherry-pick/平移到 26.1.2、1.21.11，各自实机验证 → R3；
 4. 三分支 README/Release 按一致性脚本收尾。
+
+## 六、追记（2026-08-21 深夜）：修复后暴露的第二层问题——专服物品全部"无数据化"
+
+> 作者实测反馈：getName 修复后专服不崩了，但 `/give`/拿取的枪全是紫黑**平面贴图**
+> （连模型都没有）、名字只剩 `.name` 尾巴；工作台只有枪械工作台正常，其余显示
+> `tacz.XXX` 原始键；LR 手雷只能拿到无功能的"测试手雷"。单机/局域网均正常。
+
+### 定性：getName 修复是**起了作用的**
+
+修复前这条路径是**直接崩服**（NoClassDefFoundError）——崩溃把一切下游问题都遮住了。
+现在不崩，才第一次看到 refab 专服路径的真实状态。这不是修复失效，是揭盖。
+
+### 根因判断（证据齐全，指向单点）
+
+**症状组合 = 无数据 ItemStack（dataless）**，三条症状同源：
+
+1. TaCZ 架构里枪/工作台变体/LR 道具都是"一个注册物品 + 数据组件（GunId/BlockId/…）"。
+   裸物品没有 id 组件 → `tacz:dynamic_item` 动态模型无从取显示 → **平面缺失贴图
+   （不是紫黑模型，正因为连模型都查不到）**；getName 查不到索引 → 原始键；
+   LR 手雷回落到注册基体"测试手雷"，自然无功能。
+2. "只有枪械工作台正常" 是自证：它是工作台方块物品的**无数据默认形态**
+   （`getBlockId` 无 NBT 时回落 `EMPTY_BLOCK_ID` → 默认=枪械工作台），
+   其余工作台是 BLOCK_INDEX 变体、必须带 BlockId——裸拿必炸型。
+3. **为什么只有专服炸**：物品的正确形态来自创造物品栏（`fillItemCategory` →
+   `getAllCommonXxxIndex()`）。单机/局域网时 `CommonAssetsManager.INSTANCE`
+   在同一 JVM，标签构建时数据就位。专服时客户端标签在**枪包网络缓存到达之前**
+   就构建完了（且 refab `doSync` 对远程连接先 `clearInstance()`）——标签里装进
+   的全是裸注册物品；之后 REI/创造栏拿取、乃至"give"（REI 作弊给予给的就是
+   标签里的那个栈）全部继承 dataless。
+4. **实锤对照**（2026-08-21 拉取 `26.2(main)` 源码逐行核实）：refab
+   `ServerMessageSyncGunPack#doSync` = clearInstance → fromNetwork →
+   ClientIndexManager.reload → RecipeViewer 刷新，**缺少创造标签重建**；
+   NeoForge 姊妹项目同处理器多出 `CreativeModeTabs.tryRebuildTabContents` 段
+   （`ClientPacketHandlers.onSyncGunPack:181-198`），并有实现细节：
+   `tryRebuildTabContents` 对相同输入会**静默跳过**，需先翻转一次 permission
+   入参使旧构建失效、再按真实权限重建。NeoForge 专服 L2/L3 全 PASS 正是
+   建立在这段之上。
+
+### 给 refab 侧的诊断清单（先证后改）
+
+1. **10 秒定案**：F3+H 高级提示，比对专服拿到的枪 vs 单机拿到的枪的组件/NBT——
+   专服的应缺 GunId。缺 = dataless 路线确认。
+2. `doSync` 后打印缓存计数（gunIndex 条数）：>0 说明同步本身健康、纯属标签
+   过期；=0 则还要查 Fabric 侧发送链路（`SYNC_DATA_PACK_CONTENTS` →
+   sendToClientPlayer 在专服 join 时是否触发）。
+3. 交叉验证：专服上用枪械工作台**合成**一把枪（配方数据走服务端）——合成的枪
+   应完全正常，与 /give 的坏枪对照，即证"栈数据"根因而非渲染管线。
+4. 修复方向（由 refab 侧自行实施）：`doSync` 末尾补创造标签重建；参考实现
+   注意 permission 翻转技巧，否则重建静默 no-op。LR 物品同机制受益，
+   修完后单独复验 LR 数据同步通道。
