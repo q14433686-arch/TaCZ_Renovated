@@ -229,6 +229,19 @@ dependencies {
     } else {
         compileOnly "curse.maven:shoulder-surfing-reloaded-243190:${shoulder_surfing_neoforge_file}"
     }
+
+    // Keksuccino's Just Zoom 2.1.4 — optional at runtime (modid justzoom).
+    // TACZ scopes divide its FOV modifier back out while aiming (see
+    // CameraSetupEvent#baseScopeFov). API references only — JustZoom is
+    // DSMSLv3-licensed, nothing of it is embedded or redistributed.
+    // CurseForge file 7876229 = justzoom_neoforge_2.1.4 (MC 26.1.1/26.1.2).
+    // Escape hatch: drop justzoom_neoforge_*.jar into libs/ to override.
+    def localJustZoom = fileTree(dir: 'libs', include: 'justzoom_neoforge*.jar')
+    if (!localJustZoom.isEmpty()) {
+        compileOnly localJustZoom
+    } else {
+        compileOnly "curse.maven:just-zoom-561885:${just_zoom_neoforge_file}"
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

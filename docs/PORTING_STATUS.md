@@ -74,6 +74,18 @@ r20 运行日志（main latest.log）已排除的环节：PAL mod 加载 ✓（m
 编译：CurseForge 8596489（5.0.10 NeoForge 26.1.2）via CurseMaven + libs/ 逃生舱。运行时可选（modid `shouldersurfing`）。
 此前 r17 之前的残件只有反射版准星判断，无插件注册（自适应相机缺失）。
 
+### ✅ Just Zoom（Keksuccino，justzoom）——r24 新增适配
+
+无任何上游先例（原版/MUKSC/refab 均无 JustZoom 兼容），为本移植原创。机制（对照
+`Keksuccino/JustZoom@26.1.1` 源码验证）：JustZoom 2.x mixin vanilla
+`AbstractClientPlayer#getFieldOfViewModifier`（spyglass 同路），其缩放先折入
+`ViewportEvent.ComputeFov` 事件的输入 FOV；TACZ 开镜倍率再叠其上 → 双重放大。
+适配（对齐上游对 Zoomify 的处理语义）：`CameraSetupEvent#baseScopeFov` 在
+`aimingProgress > 0` 时把 `ZoomHandler.getFovModifier()`（带 `isZooming()` 守卫与
+合法性检查）除回——镜优先，JustZoom 让位；未瞄准时完全不动 JustZoom。
+API 仅编译期引用（DSMSLv3，不嵌入不再分发）。编译：CurseForge 7876229（2.1.4
+NeoForge，26.1.1/26.1.2）via CurseMaven + libs/ 逃生舱。运行时可选（modid `justzoom`）。
+
 ### 其余兼容层状态
 
 见 `docs/WP05_EVIDENCE.md` 兼容层盘点；其中 immediatelyfast（有据 no-op）、zoomify（NeoForge 无此 mod）、ar（无 26.1.2 版）为终态结论，非待办。
