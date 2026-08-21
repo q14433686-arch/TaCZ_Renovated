@@ -73,9 +73,12 @@ public final class EquipmentMod {
         // 数据包重载时加载 index/throwable|melee|consumable/*.json —— 与 TACZ 自身
         // 的 CommonAssetsManager 走同一个服务端 reload 事件，时机一致。
         NeoForge.EVENT_BUS.addListener((AddServerReloadListenersEvent event) -> {
-            event.addListener(me.xjqsh.lrtactical.resource.CommonAssetsManager.get().getThrowableIndexManager());
-            event.addListener(me.xjqsh.lrtactical.resource.CommonAssetsManager.get().getMeleeIndexManager());
-            event.addListener(me.xjqsh.lrtactical.resource.CommonAssetsManager.get().getConsumableIndexManager());
+            // SortedReloadListenerEvent#addListener 是双参 (Identifier, listener)——
+            // 与主 mod CommonAssetsManager#reloadAndRegister 的 keyOf 习语一致。
+            var manager = me.xjqsh.lrtactical.resource.CommonAssetsManager.get();
+            event.addListener(manager.getThrowableIndexManager().ID, manager.getThrowableIndexManager());
+            event.addListener(manager.getMeleeIndexManager().ID, manager.getMeleeIndexManager());
+            event.addListener(manager.getConsumableIndexManager().ID, manager.getConsumableIndexManager());
         });
 
         // 网络层：载荷 + 收发器一并注册（两端都会执行）。
