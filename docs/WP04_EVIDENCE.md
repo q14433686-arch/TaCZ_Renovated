@@ -26,6 +26,8 @@
 | `TagsUpdatedEvent.ServerDataLoad` | ② |
 | `EventBusSubscriber` 仅 `value()`/`modid()`（无 `Bus`） | ② loader javap |
 | `IEventBus#post(T)` 返回事件 | ② bus-8.0.5 |
+| `ConfigurationScreen.ConfigurationSectionScreen(Screen, ModConfig.Type, ModConfig, Component)`（26.1 起收注册的 `ModConfig`，不再收 `ModConfigSpec`） | ② `ConfigurationScreen.java`（NF tag `26.1.2-stable`；编译错误 "ModConfigSpec无法转换为ModConfig" 反证） |
+| `ModConfigs#getConfigSet(Type)`、`ModConfig#getModId()/getSpec()`（反查 spec 对应的注册 config） | ② 同上（NF 自家 `ConfigurationScreen#addOptions()` 同款查找路径） |
 
 ## 实现要点
 
@@ -36,6 +38,8 @@
 - S2C 客户端应用走 `ClientPacketBridge` 反射 → `ClientPacketHandlers`（dedicated 常量池无 `LocalPlayer`）。
 - 弹道：`EntityKineticBullet` + `ModDamageTypes` + `LivingKnockBackEvent`。
 - 配件 modifier：`AttachmentPropertyManager.registerModifier()`。
+- `TaczConfigHomeScreen`：用 `ModConfigs#getConfigSet(Type)` 按 spec 反查注册的 `ModConfig`
+  再传给 `ConfigurationSectionScreen`；查不到（config 未注册）则隐藏该入口。
 
 ## 冒烟（dedicated server）
 

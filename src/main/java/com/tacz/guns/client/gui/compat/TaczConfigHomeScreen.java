@@ -8,8 +8,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfigs;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.common.ModConfigSpec;
+
+import javax.annotation.Nullable;
 
 /**
  * In-game config landing page matching NeoForge's native {@link ConfigurationScreen}
@@ -45,11 +48,35 @@ public class TaczConfigHomeScreen extends Screen {
                 .build());
     }
 
+    /**
+     * Resolves the live {@link ModConfig} that FML registered for the given spec.
+     *
+     * <p>26.1.2's {@code ConfigurationSectionScreen(Screen, Type, ModConfig, Component)}
+     * takes the registered {@link ModConfig} (it reads the mod id and config data
+     * from it), not the {@link ModConfigSpec} — mirroring how NeoForge's own
+     * {@code ConfigurationScreen#addOptions()} looks configs up via
+     * {@code ModConfigs#getConfigSet(Type)}.</p>
+     */
+    @Nullable
+    private static ModConfig resolveConfig(ModConfig.Type type, ModConfigSpec spec) {
+        for (ModConfig config : ModConfigs.getConfigSet(type)) {
+            if (config.getSpec() == spec) {
+                return config;
+            }
+        }
+        return null;
+    }
+
     private int addConfigButton(int y, String translationKey, ModConfig.Type type, ModConfigSpec spec) {
+        ModConfig modConfig = resolveConfig(type, spec);
+        if (modConfig == null) {
+            // Config not registered (or not yet loaded) — nothing to edit, hide the entry.
+            return y;
+        }
         Component name = Component.translatable(translationKey);
         this.addRenderableWidget(Button.builder(name, button ->
                         this.minecraft.setScreen(new ConfigurationScreen.ConfigurationSectionScreen(
-                                this, type, spec, name)))
+                                this, type, modConfig, name)))
                 .bounds(this.width / 2 - 100, y, 200, 20)
                 .build());
         return y + 24;
