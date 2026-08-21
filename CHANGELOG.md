@@ -3,32 +3,38 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 未发布
+## 1.1.8+neoforge.26.1.2.Beta-2 — 2026-08-21
 
-- **修复（专服致命）**：四个物品类（枪/弹药/配件/工作台）的 `getName` 覆写调用
-  client 索引——`/give` 等服务端路径触发即 `NoClassDefFoundError` 崩服。26.1 起
-  NeoForge 不再按 `@OnlyIn` 剥离成员，上游祖传写法失效。改走 common 索引（同一
-  翻译键，双端安全）。详见 `docs/records/SERVER_TEST_20260821_DEDICATED.md`
-  （含全仓库同类病灶清查；Fabric 姊妹项目同样潜伏，待回报）。
+多人联机稳定版。三轮实测（LAN → LAN 复测 → 专用服务器 L2+L3）全部通过，
+记录见 `docs/records/SERVER_TEST_20260821_*.md`。
 
-- **修复（联机致命）**：`ServerMessageGunDraw` 空 ItemStack 编码崩溃——玩家加入/空手切枪
-  即把视野内所有玩家踢下线。两字段改 `ItemStack.OPTIONAL_STREAM_CODEC`
-  （上游 1.21.1 与 refab 26.1.2 同款；实测记录 `docs/records/SERVER_TEST_20260821_LAN.md`）。
-- **修复（联机功能）**：RECIPE_FILTER 与 ATTACHMENT_TAGS 漏出网络同步包——联机客户端
-  全部方块索引解析失败（工作台不可用）、配件允装判断静默失效。两管理器接回
-  `registerNetwork`，对齐 refab 接线。
-- **修复（Iris）**：Iris 1.11.3 已自动分类 entity 管线时，重复 assignPipeline 的
-  "Shader already assigned" 不再告警，视为成功并保留 Iris 分类。
-- **修复（构建）**：mods.toml 模板注释中的字面量 dollar-brace 导致 `generateModMetadata`
-  失败（Groovy 模板引擎连注释一起处理）。
-- 上述联机修复已于 2026-08-21 LAN 复测 **PASS**（`docs/records/SERVER_TEST_20260821_LAN_R2.md`）；
-  专用服务器（生产 jar）场景仍未测。建议凑齐 L2 后发布为 Beta-2。
+### 更名
+
 - **项目更名：TaCZ: Renovated**（原"TaCZ NeoForge 26.1.2（非官方移植）"）。
-  只改显示名，**modId 仍为 `tacz`**，版本号不变，枪包兼容不受影响。
+  只改显示名，**modId 仍为 `tacz`**，枪包兼容不受影响。
   决策记录：`docs/records/NAMING_DECISION.md`。
-- 文档体系对齐姊妹项目 TaCZ_Refabricated_Unofficial 的规范：README 重写
-  （版本导航/枪包指引/许可精确表述）、新增根 `AGENTS.md`（AI 协作规则）与
-  `scripts/check_release_consistency.sh`（版本号一致性自检）。
+
+### 修复
+
+- **专服致命**：四个物品类（枪/弹药/配件/工作台）的 `getName` 覆写调用 client 索引，
+  `/give` 等服务端路径触发即 `NoClassDefFoundError` 崩服（26.1 起 NeoForge 不再按
+  `@OnlyIn` 剥离成员，上游祖传写法失效）。改走 common 索引，同一翻译键，双端安全。
+- **联机致命**：`ServerMessageGunDraw` 空 ItemStack 编码崩溃——加入/空手切枪把视野内
+  所有玩家踢下线。改 `ItemStack.OPTIONAL_STREAM_CODEC`（上游 1.21.1 与 refab 同款）。
+- **联机功能**：RECIPE_FILTER 与 ATTACHMENT_TAGS 漏出网络同步包——联机客户端方块索引
+  全部解析失败（工作台不可用）、配件允装判断静默失效。接回 `registerNetwork`。
+- **Iris**：Iris 1.11.3 已自动分类 entity 管线时不再误报 WARN，保留 Iris 分类。
+- **构建**：mods.toml 模板注释中的字面量 dollar-brace 炸毁 `generateModMetadata`。
+
+### 文档
+
+- 文档体系对齐姊妹项目规范：README 重写、`AGENTS.md`、一致性自检脚本、
+  专用服务器测试预案（`docs/DEDICATED_SERVER_TEST.md`，含 L4 形态矩阵）。
+
+### 已知事项
+
+- Fabric 姊妹项目（refab）存在同款 getName 潜伏崩溃，待回报上游。
+- 面板服/代理网络/混合服未测试（L4 矩阵在案，非本版阻塞项）。
 
 ## 1.1.8+neoforge.26.1.2.Beta-1 — 2026-08-21
 

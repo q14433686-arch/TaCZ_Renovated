@@ -101,7 +101,7 @@ cd srv && java -Xmx2G -jar <安装器生成的启动 jar 或 run.sh> nogui
 | 优先级 | 形态 | 独有故障面 | 怎么测 | 状态 |
 |---|---|---|---|---|
 | — | 内置服务器 + LAN/本地隧道 | 双客户端基础同步 | 已按 L3 前哨执行 | ✅ 基础通过（2026-08-21，records #2；完整 11 行矩阵未逐行打钩） |
-| **1** | **真实专用服务器**（NeoForge 安装器 `--install-server`） | 生产类加载（jarJar/mixin/AT）、dedicated dist 无客户端类、jar 内资源导出、无宿主玩家的纯远程同步 | 本预案 **L2** + 连两个客户端跑 **L3 全矩阵** | ❌ 未测（**最重要的缺口**） |
+| **1** | **真实专用服务器**（NeoForge 安装器 `--install-server`） | 生产类加载（jarJar/mixin/AT)、dedicated dist 无客户端类、jar 内资源导出、无宿主玩家的纯远程同步 | 本预案 **L2** + 连两个客户端跑 **L3 全矩阵** | ✅ **通过**（2026-08-21，records #3 抓到 getName 崩溃→修复→records #4 全 PASS） |
 | 2 | 面板服/托管商 | 受限内存/面板注入的启动脚本与 JVM 参数 | 任选一家面板装同一 jar，重点看启动内存与枪包导出目录写权限 | ❌ 未测 |
 | 3 | 离线模式混跑（online-mode=false） | UUID 体系差异 → 按 UUID 键控的玩家持久化数据（弹匣余弹/配件） | 同一玩家离线名/正版各进一次，检查数据不串号 | ⚠️ 本轮 LAN 实为离线模式，未专项验证 |
 | 4 | 代理网络（Velocity modern forwarding 后挂 NeoForge 后端） | 握手/自定义 payload 过代理、跨服切换后的枪包重同步 | Velocity + 两个后端服，切服后开工作台/开枪 | ❌ 未测 |
