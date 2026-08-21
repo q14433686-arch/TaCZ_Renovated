@@ -1,8 +1,7 @@
 # 上游回报文案存档（2026-08-21）
 
-> 目标：q14433686-arch/TaCZ_Refabricated_Unofficial（Fabric 姊妹项目）新建 issue。
-> 措辞已按对方 AGENTS.md §2 纪律自审：NeoForge 侧为实证事实，Fabric 侧明确标注未实测。
-> 以下为可直接粘贴的 issue 正文。
+> **已被 [`REFAB_BACKPORT_PLAN.md`](REFAB_BACKPORT_PLAN.md) 取代**（refab 与本仓库同属一人，
+> 无需 issue 口径；新计划含三分支逐文件核查结果与分版本建议）。以下原文仅存档。
 
 ---
 

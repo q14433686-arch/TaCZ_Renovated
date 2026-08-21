@@ -1,47 +1,60 @@
-# 给 26.2 前滚分支（01a023e5）的同步说明 —— 2026-08-21
+# 给 26.2 前滚 AGENT 的同步说明（复制本文全文给他即可）
 
-> 本文件面向执行 26.2 前滚的 AGENT。你的基线如果早于 R1（原 Beta-2，提交 `5d2358d`），
-> 就缺少三轮多人联机实测抓出的全部修复。**26.2 必须从 R1 起跳，不是 Beta-1。**
+> 更新：2026-08-21（R1 定名后）。本会话（01a023bf）保持开启，**本分支可直接读取，
+> 不必等 PR #6 合并**。
 
-## 一、最快同步路径
+## 0. 你要同步的源
 
-PR #6（`arena/01a023bf-...` → `main(26.1.2)`）合并后：
-
-```bash
-git fetch origin
-git merge 'origin/main(26.1.2)'     # 或 rebase，取决于你的分支纪律
+```
+仓库：q14433686-arch/TaCZ-Renovated
+分支：arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0   ← 26.1.2 线的 R1 基线（最新提交即是）
 ```
 
-若你改动已大、只想拿代码修复，cherry-pick 这三个（按序）：
+```bash
+git fetch origin arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
+```
+
+你的基线如果切自 `4d2edc1`（Beta-1 时代的 main），就缺少三轮多人联机实测抓出的
+全部修复。**26.2 必须从 R1 起跳**（R1 = 该分支 `5d2358d` 切版 + 后续文档收尾，
+开发期曾用标签 Beta-2，代码同物）。
+
+## 1. 同步方式二选一
+
+**A（推荐）**：把你的 26.2 分支直接 rebase / merge 到本分支最新提交上——
+文档、脚本、修复一次拿齐。
+
+**B（你已大改、怕冲突）**：只 cherry-pick 三个代码修复，再手动抄文档：
 
 | 提交 | 内容 | 26.2 上是否仍适用 |
 |---|---|---|
-| `09a0edd` | ① `ServerMessageGunDraw` 两字段改 `ItemStack.OPTIONAL_STREAM_CODEC`（空栈踢全员）；② `AttachmentsTagManager`/`RecipeFilterManager` 接回 `registerNetwork`（否则联机客户端方块索引全灭、配件允装失效）；③ IrisCompat "already assigned" 视为成功 | ①② **必须**；③ 视 Iris 26.2 版行为再验 |
-| `eea0b59` | mods.toml 模板注释里不得出现字面量 dollar-brace（Groovy 模板引擎连注释一起求值） | **必须**（26.2 MDK 同机制） |
-| `3b19477` | 四个物品类 `getName` 覆写改走 common 索引（原引用 client 索引，专服 `/give` 即 `NoClassDefFoundError` 崩服） | **必须** |
+| `09a0edd` | ① `ServerMessageGunDraw` 两字段 `ItemStack.OPTIONAL_STREAM_CODEC`（空栈踢全员）；② `AttachmentsTagManager`/`RecipeFilterManager` 接回 `registerNetwork`（否则联机客户端方块索引全灭、配件允装失效）；③ IrisCompat "already assigned" 视为成功 | ①② **必须**；③ 视 Iris 26.2 版行为再验 |
+| `eea0b59` | mods.toml 模板注释禁写字面量 dollar-brace（Groovy 引擎连注释一起求值） | **必须** |
+| `3b19477` | 四个物品类 `getName` 改走 common 索引（原引用 client 索引，专服 `/give` 即 NoClassDefFoundError 崩服） | **必须** |
 
-## 二、比提交更重要的三条经验（前滚时会反复踩）
+另有版本号提交 `5d2358d`（Beta-2）与 `b9de5e0`（定名 R1）只影响 26.1.2 线元数据，
+你不用 pick——你的版本串直接从 `1.1.8+neoforge.26.2.0.r0` 起步。
 
-1. **26.1+ 上 `@OnlyIn(Dist.CLIENT)` 只是文档，不是保护。** 老 Forge dist cleaner
-   会剥离成员，NeoForge 26.1 起只警告。你在 26.2 前滚渲染/GUI 时会大量搬运带
-   @OnlyIn 的覆写——凡覆写 vanilla 双端方法的，一律按无注解审查方法体里的
-   client 类引用。审计命令：
+## 2. 三条经验（比提交更重要，前滚时会反复踩）
+
+1. **26.1+ 上 `@OnlyIn(Dist.CLIENT)` 只是文档，不是保护**（dist cleaner 不再剥离成员）。
+   你前滚渲染/GUI 会大量搬带注解的覆写——凡覆写 vanilla 双端方法的，一律按无注解
+   审查方法体内的 client 类引用。审计命令：
    `grep -rn "TimelessAPI.getClient\|ClientIndexManager" src/main/java --include="*.java"`
-   （排除 client 包后逐个判断执行路径；详见 records/SERVER_TEST_20260821_DEDICATED.md）
-2. **新写/搬运网络消息时，ItemStack 字段先问一句：会不会是 EMPTY？**
-   会 → `OPTIONAL_STREAM_CODEC`。上游哪些消息该用哪个，refab 26.1.2
-   `ServerMessageGunDraw#write` javadoc 有逐条对照。
-3. **单机跑通 ≠ 完成。** 本轮四个致命 bug 全部只在多人下现形。26.2 的验收必须
-   包含 `docs/DEDICATED_SERVER_TEST.md` 的 L0-L2（headless 可做）+ L3 实机矩阵。
+2. **网络消息里的 ItemStack 字段先问一句：会不会是 EMPTY？** 会 → OPTIONAL codec。
+   refab `ServerMessageGunDraw#write` javadoc 有上游逐条对照。
+3. **单机跑通 ≠ 完成。** 26.1.2 线的四个致命 bug 全部只在多人下现形。26.2 的验收
+   必须包含本分支 `docs/DEDICATED_SERVER_TEST.md` 的 L0-L2（headless 可做）
+   + L2.5 枪包专项 + L3 实机矩阵。
 
-## 三、你可能还没见过的文档（都在 R1 基线里）
+## 3. 必读文档（都在本分支）
 
-- `docs/PORT_262_BRIEF.md`——**你的工单**（差异映射、权威边界、WP-262 切分）
-- `AGENTS.md`——会话级规则（版本号一致性门禁、不得声称未实现）
-- `docs/records/SERVER_TEST_20260821_*.md`——四份联机实测记录（根因与证据链）
-- `CHANGELOG.md` R1 条目——修复全景
+- `docs/PORT_262_BRIEF.md` —— 你的工单（差异映射、权威边界、WP-262 切分）
+- `AGENTS.md` —— 会话规则（版本一致性门禁、不得声称未实现）
+- `docs/DEDICATED_SERVER_TEST.md` —— 测试预案（L0-L4 + L2.5）
+- `docs/records/SERVER_TEST_20260821_*.md` —— 五份实测记录（根因与证据链）
+- `CHANGELOG.md` R1 条目 —— 修复全景
 
-## 四、版本号
+## 4. 版本号红线
 
-你的起步版本串应为 `1.1.8+neoforge.26.2.0.r0`，基于 **R1** 的代码。
+起步 `1.1.8+neoforge.26.2.0.r0`；`+` 后是 build metadata，**禁止 `-`**。
 改 `gradle.properties` 后跑 `bash scripts/check_release_consistency.sh --strict`。
