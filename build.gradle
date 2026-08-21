@@ -194,6 +194,11 @@ dependencies {
     // (modid player_animation_library); drives TACZ third-person gun animations.
     // Same artifact the Fabric 26.1.2 port compiles against.
     compileOnly "maven.modrinth:player-animation-library:${player_animation_lib}"
+
+    // MrCrayfish's Controllable 0.26.0 — optional at runtime (modid controllable);
+    // controller bindings + gun-fire rumble. 7943194 = NeoForge 26.1.2 file
+    // (the Fabric port compiles against sibling file 7943192).
+    compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

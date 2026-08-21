@@ -9,6 +9,7 @@
 |---|---|
 | `AddClientReloadListenersEvent#addListener(Identifier, PreparableReloadListener)` | ② `AddClientReloadListenersEvent.java` / `SortedReloadListenerEvent` |
 | PAL API（`com.zigythebird.playeranim[core]`）：`PlayerAnimationFactory.ANIMATION_DATA_FACTORY#registerFactory`、`PlayerAnimationAccess#getPlayerAnimationLayer`、`PlayerAnimationController#setFirstPersonMode/replaceAnimationWithFade/triggerAnimation/stop/removeModifierIf`、`AbstractFadeModifier.standardFadeIn`、`UniversalAnimLoader#loadAnimations`、`AdjustmentModifier.PartModifier`、`EasingType/PlayState/FirstPersonMode/Vec3f` | ④ refab 26.1.2 `compat/playeranimator/pal/**`（对 PAL 1.2.5 真实编译运行过的用法；沙箱内 modrinth/kosmx maven 不可达，未能直接核 PAL 源码，运行验证留给 r17 实测） |
+| Controllable API（`com.mrcrayfish.controllable.*`，全在 multiloader common 模块）：`ButtonBinding(int,String,String,BindingContext,ButtonHandler)`、`OnPressAndReleaseHandler#create(Function,Function)`、`InGameContext(Identifier)`（protected，子类可 super）+ `#priority()`、`BindingRegistry#register`、`Controllable#getBindingRegistry/#getController`、`Controller#isButtonPressed(int)/#rumble(float,float,int)`、`ButtonBinding#getButton`、`Buttons.{LEFT_TRIGGER,RIGHT_TRIGGER,B,X,LEFT_THUMB_STICK,DPAD_LEFT}` | ② MrCrayfish/Controllable 分支 `multiloader/26.1.2`（= CurseForge 文件 7943194 / Controllable 0.26.0 NeoForge 26.1.2 的源码线）`common/.../binding/**`、`input/{Controller,Buttons}.java`、`Controllable.java`；文件号经 CurseForge 文件页核实（web） |
 | **26.1 线渲染格式 = `DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH`：`RenderTypes.lines()` 管线要求每个线顶点都写 `VertexConsumer#setLineWidth(float)`，缺失即抛 `IllegalStateException: Missing elements in vertex: LineWidth`**（r15 开"显示爆头范围"即崩，crash 2026-08-21 13:46） | ① 26.1 反编译源 `DebugScreenOverlay.java:110-123`（格式名 + 每顶点 setLineWidth 习语）、`ShapeRenderer#renderShape`（`addVertex().setColor().setNormal().setLineWidth(w)` ×2）；② NF `VertexConsumerWrapper#setLineWidth` |
 | 线宽取值 2.5F = 原版 F3+B 碰撞箱默认（`GizmoStyle.DEFAULT_WIDTH`，`stroke(argb)` 默认宽度） | ① 26.1 反编译源 `net/minecraft/gizmos/GizmoStyle.java:6-9`；原版实体碰撞箱走 `Gizmos.cuboid` + `EntityHitboxDebugRenderer` |
 | `RegisterKeyMappingsEvent#register` / `#registerCategory` | ② `RegisterKeyMappingsEvent.java` |
@@ -47,10 +48,14 @@
   改 `NeoForge.EVENT_BUS.addListener`（事件本就 post 在 game bus）。compileOnly
   `maven.modrinth:player-animation-library:1.2.5`（refab 同款坐标）。内建规避 PAL 1.2.5 两处坑
   （fadeOut 永久哑化、AdjustmentModifier NPE，见 PalAnimationManager/SafeAdjustmentModifier 注释）。
-- 兼容层状态盘点（r17）：cloth（活）、playeranimator（活，本次）、carryon（活，反射桥）、
+- 兼容层状态盘点（r18）：cloth（活）、playeranimator（活，r17）、**controllable（活，r18**：refab 26.1.2
+  `ControllableInner` 移植，Fabric END_CLIENT_TICK → `ClientTickEvent.Post`；输入钩子
+  `onXxxControllerPress/shootControllerTick` 本就在位）、carryon（活，反射桥）、
   firstperson（活）、shouldersurfing（活）、iris/shader（活，反射）、jei/rei/recipeviewer（活）、
-  ar（禁用——AR 无 26.1.2 Feature Rendering 版）、controllable/zoomify/immediatelyfast（no-op stub，
-  待后续：refab 有 ControllableInner 但需 26.1.2 NeoForge 文件号核实）。
+  ar（禁用——AR 无 26.1.2 Feature Rendering 版）、
+  **immediatelyfast（有据 no-op**：IF 有 26.1.2 NeoForge 版 1.15.3，但 26.x 渲染经 collector，
+  旧 HUD batching API 已不存在，上游 26.2 同样保留空实现）、
+  **zoomify（无的放矢 no-op**：Zoomify 26.1 仅有 Fabric/Quilt 构建，NeoForge 无法安装该 mod）。
 - S2C 仍走 `ClientPacketBridge`；dedicated 常量池不引用 `LocalPlayer`。
 
 ## 冒烟
