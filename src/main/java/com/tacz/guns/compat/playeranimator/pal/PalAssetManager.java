@@ -115,6 +115,8 @@ public final class PalAssetManager extends SimplePreparableReloadListener<Map<Id
                                       ProfilerFiller profiler) {
         animations.clear();
         animations.putAll(prepared);
+        com.tacz.guns.GunMod.LOGGER.info("[TACZ PAL] player_animator assets loaded: {} file(s){}", animations.size(),
+                animations.keySet().stream().findFirst().map(id -> " (e.g. " + id + ")").orElse(" (none found in any pack)"));
     }
 
     private static Map<String, Animation> normalize(Map<String, Animation> source) {

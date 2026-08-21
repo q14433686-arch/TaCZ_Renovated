@@ -18,7 +18,24 @@
 | r17 | `compileOnly maven.modrinth:player-animation-library:1.2.5` | 死坐标（该项目 Modrinth version number 是 `1.2.5+26.1` 格式），PAL 类从未上编译 classpath |
 | r18 | 随 r17 一起发布 | 同上 |
 | r19 | PAL 改 CurseMaven 8454167；Controllable 用配置期 GitHub Releases 下载 | 用户构建在**配置期**崩：`PKIX path building failed`（Gradle JVM 不认代理环境下的 github.com 证书链） |
-| r20 | 两个依赖全部改为 CurseMaven 坐标 + `libs/` 本地 jar 逃生舱，配置期零网络 | **用户反馈依旧没做好兼容**（缺构建/运行日志，失败环节未知） |
+| r20 | 两个依赖全部改为 CurseMaven 坐标 + `libs/` 本地 jar 逃生舱，配置期零网络 | **构建通过**（r20 日志：PAL 1.2.5 已加载、4 枪包发现、displays=255），但第三人称仍无任何 PAL 效果 |
+| r21 | 链路诊断日志（见下） | 待用户复测 |
+
+r20 运行日志（main latest.log）已排除的环节：PAL mod 加载 ✓（modid 正确）、枪包扫描 ✓、客户端 reload 链 ✓（`displays=255` 证明 `AddClientReloadListenersEvent` 处理器完整执行 → `init()` 已跑、`installed=true`）、`PlayerModelMixin`/`InnerThirdPersonManager` 挂载点在位 ✓、Cold War 包**确有** PAL 数据（`assets/rainforest/player_animator/*.player_animation.json` + display `player_animator_3rd` 字段，仓库内 zip 实证）。
+
+剩余两个候选断点（均无日志，r21 已加诊断切开）：
+1. `display.getPlayerAnimator3rd()` 解析为 null
+2. `PalAssetManager` 未加载到动画文件（listener 注册/资源扫描问题）
+
+**r21 诊断日志解读表**（跑一轮后按行定位）：
+| 日志行 | 含义 |
+|---|---|
+| `[TACZ PAL] init: installed=true` | 判装成功 |
+| `[TACZ PAL] reload listener registered as tacz:pal_asset_manager` | listener 已注册 |
+| `[TACZ PAL] player_animator assets loaded: N file(s)` | N=0 → 资源扫描断（查枪包挂载）；N>0 → 加载成功 |
+| `[TACZ PAL] animation file X is NOT loaded` | display 引用了 X 但没加载到 → 资源路径/id 不匹配 |
+| `[TACZ PAL] display X has no player_animator_3rd data` | 该 display 无 PAL 引用（正常，走原版动画） |
+| `[TACZ PAL] compat inactive` | isLoaded 失败（不应出现） |
 
 已核实的事实（不必重查）：
 - PAL 26.1 发布是 **merged Fabric+NeoForge jar**（`PlayerAnimationLibMerged-*`），CurseForge 文件 8454167 = `1.2.5+26.1`（支持 26.1.2+2）；最新为 8674772 = `1.2.6+26.1`
