@@ -192,22 +192,31 @@ dependencies {
     // compile classpath matches the runtime NeoForge build exactly.
     // NOTE: the maven.modrinth coordinate used by the Fabric port
     // ("player-animation-library:1.2.5") does NOT resolve — Modrinth version
-    // numbers for this project are "1.2.5+26.1"-style, which is why r17/r18
-    // silently shipped without working PAL support.
-    compileOnly "curse.maven:player-animation-library-1283899:${player_animation_lib_file}"
+    // numbers for this project are "1.2.5+26.1"-style.
+    // Escape hatch: drop the downloaded jar (PlayerAnimationLibMerged-*.jar)
+    // into libs/ and Gradle will use it instead of CurseMaven.
+    def localPal = fileTree(dir: 'libs', include: 'PlayerAnimationLib*.jar')
+    if (!localPal.isEmpty()) {
+        compileOnly localPal
+    } else {
+        compileOnly "curse.maven:player-animation-library-1283899:${player_animation_lib_file}"
+    }
 
     // MrCrayfish's Controllable 0.26.0 — optional at runtime (modid controllable);
-    // controller bindings + gun-fire rumble. Controllable disables CurseForge
-    // third-party sharing, so CurseMaven cannot serve it; instead fetch the
-    // official signed jar from GitHub Releases (same build as CurseForge file
-    // 7943194). Downloaded once into build/compat and cached.
-    def controllableJar = new File(rootDir, "build/compat/controllable-neoforge-0.26.0+26.1.2-signed.jar")
-    if (!controllableJar.exists()) {
-        controllableJar.parentFile.mkdirs()
-        new URL("https://github.com/MrCrayfish/Controllable/releases/download/v0.26.0%2B26.1.2/controllable-neoforge-0.26.0%2B26.1.2-signed.jar")
-                .withInputStream { input -> controllableJar.withOutputStream { output -> output << input } }
+    // controller bindings + gun-fire rumble. CurseForge file 7943194 =
+    // controllable-neoforge-26.1.2-0.26.0.jar. No configure-time downloads here
+    // (r19 fetched GitHub Releases at configure time and crashed behind
+    // TLS-inspecting proxies: "PKIX path building failed").
+    // Escape hatch: if CurseMaven ever refuses this file, download
+    // controllable-neoforge-0.26.0+26.1.2-signed.jar from
+    // https://github.com/MrCrayfish/Controllable/releases/tag/v0.26.0%2B26.1.2
+    // (or the CurseForge file page) into libs/ and Gradle will use it instead.
+    def localControllable = fileTree(dir: 'libs', include: 'controllable-neoforge*.jar')
+    if (!localControllable.isEmpty()) {
+        compileOnly localControllable
+    } else {
+        compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
     }
-    compileOnly files(controllableJar)
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
