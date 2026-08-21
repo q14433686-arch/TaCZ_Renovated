@@ -16,10 +16,13 @@ import java.util.function.BiConsumer;
  * ZigyTheBird's Player Animation Library (PAL 1.2.5), following
  * TaCZ_Refabricated_Unofficial 26.1.2 (game semantics).
  *
- * <p>PAL is an OPTIONAL runtime dependency (modid {@code player_animation_library});
- * compile classpath is {@code maven.modrinth:player-animation-library:1.2.5}.
- * The old stub comment claimed "PAL has no 26.1.2 API" - that was wrong: PAL
- * publishes 26.1.2 builds and the Fabric port already integrates with it.</p>
+ * <p>PAL is an OPTIONAL runtime dependency (modid {@code player_animation_library},
+ * identical on both loaders of the merged 26.1 jar); compile classpath is
+ * CurseForge file 8454167 ("1.2.5+26.1", merged Fabric+NeoForge jar) via
+ * CurseMaven. The old stub comment claimed "PAL has no 26.1.2 API" - that was
+ * wrong. (r17/r18 first tried {@code maven.modrinth:player-animation-library:1.2.5},
+ * which never resolves: Modrinth version numbers for this project are
+ * "1.2.5+26.1"-style — the compat was effectively dead on arrival.)</p>
  */
 public final class PlayerAnimatorCompat {
     public static final Identifier LOWER_ANIMATION = Identifier.fromNamespaceAndPath("tacz", "lower_animation");

@@ -48,11 +48,6 @@ repositories {
         name = "BlameJared"
         url = "https://maven.blamejared.com"
     }
-    // ZigyTheBird Player Animation Library (PAL) — optional third-person compat.
-    maven {
-        name = "Modrinth"
-        url = "https://api.modrinth.com/maven"
-    }
 }
 
 base {
@@ -190,15 +185,29 @@ dependencies {
     compileOnly "dev.architectury:architectury-neoforge:${rei_architectury_version}"
     compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rei_cloth_config_version}"
 
-    // ZigyTheBird Player Animation Library (PAL 1.2.5) — optional at runtime
+    // ZigyTheBird Player Animation Library (PAL) — optional at runtime
     // (modid player_animation_library); drives TACZ third-person gun animations.
-    // Same artifact the Fabric 26.1.2 port compiles against.
-    compileOnly "maven.modrinth:player-animation-library:${player_animation_lib}"
+    // CurseForge file 8454167 = "1.2.5+26.1" (game versions 26.1.2+2): a merged
+    // Fabric+NeoForge jar — the same file installs on both loaders, so this
+    // compile classpath matches the runtime NeoForge build exactly.
+    // NOTE: the maven.modrinth coordinate used by the Fabric port
+    // ("player-animation-library:1.2.5") does NOT resolve — Modrinth version
+    // numbers for this project are "1.2.5+26.1"-style, which is why r17/r18
+    // silently shipped without working PAL support.
+    compileOnly "curse.maven:player-animation-library-1283899:${player_animation_lib_file}"
 
     // MrCrayfish's Controllable 0.26.0 — optional at runtime (modid controllable);
-    // controller bindings + gun-fire rumble. 7943194 = NeoForge 26.1.2 file
-    // (the Fabric port compiles against sibling file 7943192).
-    compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
+    // controller bindings + gun-fire rumble. Controllable disables CurseForge
+    // third-party sharing, so CurseMaven cannot serve it; instead fetch the
+    // official signed jar from GitHub Releases (same build as CurseForge file
+    // 7943194). Downloaded once into build/compat and cached.
+    def controllableJar = new File(rootDir, "build/compat/controllable-neoforge-0.26.0+26.1.2-signed.jar")
+    if (!controllableJar.exists()) {
+        controllableJar.parentFile.mkdirs()
+        new URL("https://github.com/MrCrayfish/Controllable/releases/download/v0.26.0%2B26.1.2/controllable-neoforge-0.26.0%2B26.1.2-signed.jar")
+                .withInputStream { input -> controllableJar.withOutputStream { output -> output << input } }
+    }
+    compileOnly files(controllableJar)
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
