@@ -1,7 +1,9 @@
 # FML mod metadata. Template source: official NeoForge MDK-26.1.2-ModDevGradle
-# (no moddedmc.mod.json in that MDK). ${...} placeholders are expanded by
-# generateModMetadata from gradle.properties. Do not add mappings/parchment
-# anywhere in this project: 26.1+ is unobfuscated.
+# (no moddedmc.mod.json in that MDK). Placeholders (dollar-brace, e.g. mod_id,
+# mod_version) are expanded by generateModMetadata from gradle.properties.
+# TRAP: this whole file -- comments included -- goes through the Groovy template
+# engine. Never write a literal dollar-brace here unless it names a real property.
+# Do not add mappings/parchment anywhere in this project: 26.1+ is unobfuscated.
 
 license="${mod_license}"
 issueTrackerURL="https://github.com/q14433686-arch/TaCZ-Renovated/issues"
