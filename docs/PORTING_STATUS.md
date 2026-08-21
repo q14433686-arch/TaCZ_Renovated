@@ -76,4 +76,7 @@ r20 运行日志（main latest.log）已排除的环节：PAL mod 加载 ✓（m
 
 ### 其余兼容层状态
 
+- **justzoom（Just Zoom）**：r24 曾做过原创 FOV 适配，**r25 按项目决定撤销**——上游（原版 1.20.1 /
+  MUKSC / refab 26.1.2 与 26.2）均无 JustZoom 兼容，本移植不做无上游先例的原创兼容。
+
 见 `docs/WP05_EVIDENCE.md` 兼容层盘点；其中 immediatelyfast（有据 no-op）、zoomify（NeoForge 无此 mod）、ar（无 26.1.2 版）为终态结论，非待办。
