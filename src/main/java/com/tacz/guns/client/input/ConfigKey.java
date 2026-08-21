@@ -2,10 +2,12 @@ package com.tacz.guns.client.input;
 
 import net.neoforged.neoforge.client.event.InputEvent;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.tacz.guns.GunMod;
 import com.tacz.guns.compat.cloth.MenuIntegration;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.neoforged.fml.ModList;
 import org.lwjgl.glfw.GLFW;
 
 import static com.tacz.guns.util.InputExtraCheck.isInGame;
@@ -24,7 +26,8 @@ public class ConfigKey {
                 return;
             }
             Minecraft minecraft = Minecraft.getInstance();
-            minecraft.setScreen(MenuIntegration.getConfigScreen(minecraft.screen));
+            ModList.get().getModContainerById(GunMod.MOD_ID)
+                    .ifPresent(container -> minecraft.setScreen(MenuIntegration.getConfigScreen(container, minecraft.screen)));
         }
     }
 }

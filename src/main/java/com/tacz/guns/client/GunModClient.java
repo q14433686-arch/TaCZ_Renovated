@@ -20,7 +20,7 @@ public class GunModClient {
     public GunModClient(ModContainer container) {
         ScopeRenderTypes.init();
         container.registerExtensionPoint(IConfigScreenFactory.class,
-                (modContainer, parent) -> com.tacz.guns.compat.cloth.MenuIntegration.getConfigScreen(parent));
+                (modContainer, parent) -> com.tacz.guns.compat.cloth.MenuIntegration.getConfigScreen(modContainer, parent));
         GunMod.LOGGER.info("TaCZ NeoForge 26.1.2 port work package ⑤ client loading. modId={}", GunMod.MOD_ID);
     }
 
