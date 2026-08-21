@@ -87,7 +87,7 @@ public class LocalPlayerMelee {
         if (prepareMelee()) {
             SoundPlayManager.playMeleeBayonetSound(player, display);
             // 发送执行近战的数据包，通知服务器
-            ClientPacketDistributor.sendToServer(new ClientMessagePlayerMelee());
+            ClientPacketDistributor.sendToServer(ClientMessagePlayerMelee.INSTANCE);
             // 动画状态机转移状态
             AnimationStateMachine<?> animationStateMachine = display.getAnimationStateMachine();
             if (animationStateMachine != null) {
@@ -100,7 +100,7 @@ public class LocalPlayerMelee {
         if (prepareMelee()) {
             SoundPlayManager.playMeleeStockSound(player, display);
             // 发送执行近战的数据包，通知服务器
-            ClientPacketDistributor.sendToServer(new ClientMessagePlayerMelee());
+            ClientPacketDistributor.sendToServer(ClientMessagePlayerMelee.INSTANCE);
             // 动画状态机转移状态
             AnimationStateMachine<?> animationStateMachine = display.getAnimationStateMachine();
             if (animationStateMachine != null) {
@@ -114,7 +114,7 @@ public class LocalPlayerMelee {
             // 播放音效
             SoundPlayManager.playMeleePushSound(player, display);
             // 发送执行近战的数据包，通知服务器
-            ClientPacketDistributor.sendToServer(new ClientMessagePlayerMelee());
+            ClientPacketDistributor.sendToServer(ClientMessagePlayerMelee.INSTANCE);
             // 动画状态机转移状态
             AnimationStateMachine<?> animationStateMachine = display.getAnimationStateMachine();
             if (animationStateMachine != null) {

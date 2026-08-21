@@ -78,4 +78,24 @@ public class ServerMessageGunHurt implements CustomPacketPayload {
         context.enqueueWork(() -> com.tacz.guns.network.ClientPacketBridge.invoke("onGunHurt", new Class[]{com.tacz.guns.network.message.event.ServerMessageGunHurt.class}, message));
     }
 
+    public Identifier getGunId() {
+        return gunId;
+    }
+
+    public Identifier getGunDisplayId() {
+        return gunDisplayId;
+    }
+
+    public float getAmount() {
+        return amount;
+    }
+
+    public boolean isHeadShot() {
+        return isHeadShot;
+    }
+
+    public float getHeadshotMultiplier() {
+        return headshotMultiplier;
+    }
+
 }

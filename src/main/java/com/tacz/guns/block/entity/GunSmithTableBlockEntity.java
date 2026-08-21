@@ -1,6 +1,5 @@
 package com.tacz.guns.block.entity;
 
-import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.init.ModBlocks;
 
 import net.minecraft.core.BlockPos;
@@ -54,7 +53,9 @@ public class GunSmithTableBlockEntity extends BlockEntity {
         if (!raw.isEmpty()) {
             this.id = Identifier.tryParse(raw);
         } else {
-            this.id = DefaultAssets.DEFAULT_BLOCK_ID;
+            // Leave the id unset for naturally placed/legacy tables. The block implementation
+            // resolves the physical workbench to the corresponding gun-pack index id.
+            this.id = null;
         }
     }
 

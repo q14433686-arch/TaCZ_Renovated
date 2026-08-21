@@ -93,6 +93,12 @@ public class RenderCrosshairEvent {
         isRefitScreen = Minecraft.getInstance().screen instanceof GunRefitScreen;
     }
 
+    /** Vanilla's CROSSHAIR layer must be cancelled before the TaCZ crosshair layer is drawn. */
+    public static boolean shouldHideVanillaCrosshair() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        return player != null && IGun.mainHandHoldGun(player);
+    }
+
     private static void renderCrosshair(GuiGraphicsExtractor graphics, Window window) {
         Options options = Minecraft.getInstance().options;
         // 越肩视角可以强制显示准星

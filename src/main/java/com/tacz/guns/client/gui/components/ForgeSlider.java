@@ -58,8 +58,20 @@ public class ForgeSlider extends AbstractSliderButton {
         return (int) getValueLong();
     }
 
-    public void setValue(double value) {
+    /**
+     * Set the slider's real value in the configured min/max range.
+     *
+     * <p>This must not be named {@code setValue}: NeoForge 26.1's
+     * {@code AbstractSliderButton#setValue(double)} receives a 0..1 fractional value and
+     * invokes {@code applyValue()}. Overriding it with real-value semantics breaks the
+     * vanilla drag path through {@code AbstractSliderButton#onDrag}.</p>
+     */
+    public void setValueReal(double value) {
+        double oldValue = this.value;
         this.value = snapToNearest((value - this.minValue) / (this.maxValue - this.minValue));
+        if (!Mth.equal(oldValue, this.value)) {
+            this.applyValue();
+        }
         this.updateMessage();
     }
 
@@ -69,12 +81,20 @@ public class ForgeSlider extends AbstractSliderButton {
 
     @Override
     public void onClick(MouseButtonEvent event, boolean doubleClick) {
+        // NeoForge 26.1's AbstractSliderButton only calls onDrag while its protected
+        // dragging flag is set. ExtendedSlider in the 26.1 NeoForge sources sets this
+        // flag here; without it a track click works, but holding the mouse button and
+        // moving the handle never produces a drag update.
+        this.dragging = this.active;
         this.setValueFromMouse(event.x());
     }
 
     @Override
     protected void onDrag(MouseButtonEvent event, double dragX, double dragY) {
-        super.onDrag(event, dragX, dragY);
+        // Do not call super: AbstractSliderButton#onDrag uses its fractional
+        // setValue(double), while this class also supports step snapping and real values.
+        // Going directly through setValueFromMouse keeps one coherent update path and
+        // invokes applyValue exactly once when the snapped value changes.
         this.setValueFromMouse(event.x());
     }
 
@@ -89,7 +109,7 @@ public class ForgeSlider extends AbstractSliderButton {
             if (stepSize <= 0D) {
                 this.setSliderValue(this.value + (f / (this.width - 8)));
             } else {
-                this.setValue(getValue() + f * this.stepSize);
+                this.setValueReal(getValue() + f * this.stepSize);
             }
         }
         return false;

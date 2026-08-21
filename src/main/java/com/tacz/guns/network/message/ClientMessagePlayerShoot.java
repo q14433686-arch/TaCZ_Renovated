@@ -2,16 +2,13 @@ package com.tacz.guns.network.message;
 
 import com.tacz.guns.GunMod;
 import com.tacz.guns.api.entity.IGunOperator;
-import com.tacz.guns.network.NetworkHandler;
-import com.tacz.guns.network.message.event.ServerMessageGunFire;
-import com.tacz.guns.network.message.event.ServerMessageGunShoot;
+import com.tacz.guns.api.entity.ShootResult;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,11 +45,13 @@ public class ClientMessagePlayerShoot implements CustomPacketPayload {
     public static void handle(ClientMessagePlayerShoot message, IPayloadContext context) {
         context.enqueueWork(() -> {
             ServerPlayer entity = (ServerPlayer) context.player();
-            IGunOperator.fromLivingEntity(entity).shoot(entity::getXRot, entity::getYRot, message.timestamp, message.chargeProgress);
-            ItemStack gun = entity.getMainHandItem();
-            NetworkHandler.sendToTrackingEntityAndSelf(entity, new ServerMessageGunShoot(entity.getId(), gun));
-            NetworkHandler.sendToTrackingEntityAndSelf(entity, new ServerMessageGunFire(entity.getId(), gun));
-            GunMod.LOGGER.debug("WP③ C2S shoot entity={} ts={}", entity.getId(), message.timestamp);
+            ShootResult result = IGunOperator.fromLivingEntity(entity)
+                    .shoot(entity::getXRot, entity::getYRot, message.timestamp, message.chargeProgress);
+            // Successful server shooting already emits ServerMessageGunShoot from
+            // LivingEntityShoot and ServerMessageGunFire from the gun's actual fire cycle.
+            // Do not emit either event unconditionally here: a NOT_DRAW/NO_AMMO/etc.
+            // result would otherwise look like a real shot on the client.
+            GunMod.LOGGER.debug("WP③ C2S shoot entity={} ts={} result={}", entity.getId(), message.timestamp, result);
         });
     }
 }

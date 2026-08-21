@@ -62,18 +62,34 @@ import java.util.zip.ZipFile;
 public enum GunPackLoader implements RepositorySource {
     INSTANCE;
     private static final Marker MARKER = MarkerFactory.getMarker("GunPackFinder");
-    public PackType packType;
     private boolean firstLoad = true;
 
     @Override
     public void loadPacks(Consumer<Pack> pOnLoad) {
-        Pack extensionsPack = discoverExtensions();
+        // This path is taken when a repository calls loadPacks on us as a
+        // RepositorySource.  We cannot know the PackType here, so we default
+        // to SERVER_DATA (what the RecipeManager needs).  The per-type entry
+        // point loadPacksForType is preferred and is used by the
+        // AddPackFindersEvent handler in CommonRegistry.
+        loadPacksForType(pOnLoad, PackType.SERVER_DATA);
+    }
+
+    /**
+     * Entry point that knows which PackType the caller needs.
+     * Used by the AddPackFindersEvent handler which captures
+     * event.getPackType() in a closure instead of relying on a
+     * mutable singleton field that can be overwritten by a later
+     * event firing for the other PackType.
+     */
+    public void loadPacksForType(Consumer<Pack> pOnLoad, PackType packType) {
+        Pack extensionsPack = discoverExtensions(packType);
         if (extensionsPack != null) {
             pOnLoad.accept(extensionsPack);
         }
     }
 
-    public Pack discoverExtensions() {
+    private Pack discoverExtensions(PackType packType) {
+        GunMod.LOGGER.info(MARKER, "discoverExtensions called with packType={}, firstLoad={}", packType, firstLoad);
         Path resourcePacksPath = FMLPaths.GAMEDIR.get().resolve("tacz");
         File folder = resourcePacksPath.toFile();
         if (!folder.isDirectory()) {

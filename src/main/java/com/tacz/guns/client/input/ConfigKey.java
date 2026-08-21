@@ -2,20 +2,11 @@ package com.tacz.guns.client.input;
 
 import net.neoforged.neoforge.client.event.InputEvent;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.tacz.guns.client.gui.compat.ClothConfigScreen;
 import com.tacz.guns.compat.cloth.MenuIntegration;
-import com.tacz.guns.init.CompatRegistry;
-import net.neoforged.fml.ModList;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
 import org.lwjgl.glfw.GLFW;
-
-import java.net.URI;
 
 import static com.tacz.guns.util.InputExtraCheck.isInGame;
 
@@ -32,15 +23,8 @@ public class ConfigKey {
             if (player == null || player.isSpectator()) {
                 return;
             }
-            if (!ModList.get().isLoaded(CompatRegistry.CLOTH_CONFIG)) {
-                ClickEvent clickEvent = new ClickEvent.OpenUrl(URI.create(ClothConfigScreen.CLOTH_CONFIG_URL));
-                HoverEvent hoverEvent = new HoverEvent.ShowText(Component.translatable("gui.tacz.cloth_config_warning.download"));
-                MutableComponent component = Component.translatable("gui.tacz.cloth_config_warning.tips").withStyle(style ->
-                        style.withColor(0x5555FF).withUnderlined(true).withClickEvent(clickEvent).withHoverEvent(hoverEvent));
-                player.sendSystemMessage(component);
-            } else {
-                CompatRegistry.checkModLoad(CompatRegistry.CLOTH_CONFIG, () -> Minecraft.getInstance().setScreen(MenuIntegration.getConfigScreen(null)));
-            }
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.setScreen(MenuIntegration.getConfigScreen(minecraft.screen));
         }
     }
 }

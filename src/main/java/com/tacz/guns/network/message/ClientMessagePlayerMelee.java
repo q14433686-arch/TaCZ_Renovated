@@ -17,7 +17,7 @@ public class ClientMessagePlayerMelee implements CustomPacketPayload {
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientMessagePlayerMelee> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public ClientMessagePlayerMelee() { }
+    private ClientMessagePlayerMelee() { }
 
     @Override
     public @NotNull CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

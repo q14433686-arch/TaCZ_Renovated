@@ -44,4 +44,8 @@ public class ServerMessageUpdateEntityData implements CustomPacketPayload {
         context.enqueueWork(() -> com.tacz.guns.network.ClientPacketBridge.invoke("onUpdateEntityData", new Class[]{com.tacz.guns.network.message.ServerMessageUpdateEntityData.class}, message));
     }
 
+    public List<DataEntry<?, ?>> getEntries() {
+        return entries;
+    }
+
 }

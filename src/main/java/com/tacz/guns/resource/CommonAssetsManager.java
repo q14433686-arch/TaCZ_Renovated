@@ -322,6 +322,11 @@ public class CommonAssetsManager implements ICommonResourceProvider {
                         getInstance().blockIndex == null ? 0 : getInstance().blockIndex.getAllData().size(),
                         getInstance().tableRecipe == null ? 0 : getInstance().tableRecipe.getAllData().size());
             }
+            // Legacy vanilla crafting recipes from gun-pack `recipes/` are remapped to
+            // `recipe/` in DelegatingPackResources (with RecipeCompat format conversion)
+            // so the minecraft:recipe datapack registry loads them. RecipeManager on
+            // 26.1.2 only copies that registry into an immutable RecipeMap — there is
+            // no fromJson(Map) / mutable recipes field to inject into after the fact.
         }
     }
 

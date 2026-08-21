@@ -1,5 +1,6 @@
 package com.tacz.guns.item;
 
+import com.tacz.guns.GunMod;
 import com.tacz.guns.api.LogicalSide;
 import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.GunProperties;
@@ -111,6 +112,8 @@ public class ModernKineticGunScriptAPI {
         // 获取配件数据缓存
         AttachmentCacheProperty cacheProperty = gunOperator.getCacheProperty();
         if (cacheProperty == null) {
+            GunMod.LOGGER.warn("shootOnce: cacheProperty is null for shooter={}, gunId={}. No bullet will be spawned.",
+                    shooter.getId(), gunId);
             return;
         }
 

@@ -18,7 +18,7 @@ public class ClientMessagePlayerDrawGun implements CustomPacketPayload {
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientMessagePlayerDrawGun> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public ClientMessagePlayerDrawGun() { }
+    private ClientMessagePlayerDrawGun() { }
 
     @Override
     public @NotNull CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
@@ -29,8 +29,10 @@ public class ClientMessagePlayerDrawGun implements CustomPacketPayload {
         context.enqueueWork(() -> {
             ServerPlayer entity = (ServerPlayer) context.player();
             Inventory inventory = entity.getInventory();
-            int selected = inventory.getSelectedSlot();
-            IGunOperator.fromLivingEntity(entity).draw(() -> inventory.getItem(selected));
+            // Keep the supplier tied to the server-authoritative selected slot. Capturing
+            // the slot number at packet arrival can bind the gun state to the old slot when
+            // the first draw packet races the initial inventory synchronization.
+            IGunOperator.fromLivingEntity(entity).draw(() -> inventory.getItem(inventory.getSelectedSlot()));
         });
     }
 }

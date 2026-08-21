@@ -17,7 +17,7 @@ public class ClientMessagePlayerCancelReload implements CustomPacketPayload {
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientMessagePlayerCancelReload> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public ClientMessagePlayerCancelReload() { }
+    private ClientMessagePlayerCancelReload() { }
 
     @Override
     public @NotNull CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

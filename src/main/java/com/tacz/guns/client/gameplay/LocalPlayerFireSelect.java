@@ -43,7 +43,7 @@ public class LocalPlayerFireSelect {
             // 播放音效
             SoundPlayManager.playFireSelectSound(player, gunIndex);
             // 发送切换开火模式的数据包，通知服务器
-            ClientPacketDistributor.sendToServer(new ClientMessagePlayerFireSelect());
+            ClientPacketDistributor.sendToServer(ClientMessagePlayerFireSelect.INSTANCE);
             // 客户端切换开火模式
             if (iGun instanceof AbstractGunItem logicGun) {
                 logicGun.fireSelect(null, mainHandItem);

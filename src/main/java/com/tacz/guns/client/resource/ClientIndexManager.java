@@ -48,6 +48,9 @@ public class ClientIndexManager {
         loadAmmoIndex();
         loadAttachmentIndex();
         loadBlockIndex();
+        GunMod.LOGGER.info("WP④ client gun pack loaded: displays={} guns={} ammo={} attachments={} blocks={} recipes={}",
+                GUN_DISPLAY.size(), GUN_INDEX.size(), AMMO_INDEX.size(), ATTACHMENT_INDEX.size(), BLOCK_INDEX.size(),
+                com.tacz.guns.resource.CommonAssetsManager.get().getAllTableRecipes().size());
         warmUpInventoryModels();
 
         LocalPlayer player = Minecraft.getInstance().player;

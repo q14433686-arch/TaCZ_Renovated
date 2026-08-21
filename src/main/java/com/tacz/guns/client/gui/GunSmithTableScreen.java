@@ -153,6 +153,9 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
             // 所有配方都会在下面的 recipeKeys.containsKey(groupName) 处被过滤掉
             // —— 这就是第 12 轮"所有配方都看不见"的原因。
             recipe.init();
+            if (Minecraft.getInstance().level != null) {
+                recipe.resolveIngredients(Minecraft.getInstance().level.registryAccess());
+            }
             if (!isSuitableForMainHand(recipe)) {
                 continue;
             }
@@ -277,6 +280,9 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
             if (pojo != null && pojo.getResult() != null) {
                 GunSmithTableRecipe recipe = new GunSmithTableRecipe(recipeId, pojo);
                 recipe.init();   // 同上，必须解析 raw result
+                if (Minecraft.getInstance().level != null) {
+                    recipe.resolveIngredients(Minecraft.getInstance().level.registryAccess());
+                }
                 return recipe;
             }
         }

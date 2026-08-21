@@ -56,7 +56,7 @@ public class LocalPlayerBolt {
         data.lockState(IGunOperator::getSynIsBolting);
         data.isBolting = true;
         // 发包通知服务器
-        ClientPacketDistributor.sendToServer(new ClientMessagePlayerBoltGun());
+        ClientPacketDistributor.sendToServer(ClientMessagePlayerBoltGun.INSTANCE);
         // 播放动画和音效
         AnimationStateMachine<?> animationStateMachine = display.getAnimationStateMachine();
         if (animationStateMachine != null) {

@@ -16,8 +16,11 @@ import java.lang.reflect.Modifier;
  * Without a subsequent viewer reload, a viewer can retain categories built before the sync and collapse
  * a custom workbench into whichever generic table happened to register first.
  *
- * <p>Both viewers have a version-specific lightweight reload hook, invoked reflectively when installed.
- * If a future viewer version moves the hook, it falls back ONCE to a normal client-resource reload.
+ * <p>NeoForge JEI 29.5 waits for the native {@code RecipesReceivedEvent} before its first
+ * startup, which occurs after TaCZ's synchronized pack cache in the verified 26.1.2 load
+ * order. JEI therefore must not trigger a second full resource reload here. REI does not
+ * provide the same ordering guarantee, so its client plugin reload entry point is invoked
+ * reflectively when REI is present.
  */
 public final class RecipeViewerReloadBridge {
     private static boolean reloadRequested;
@@ -28,7 +31,9 @@ public final class RecipeViewerReloadBridge {
 
     /** Called after the synchronized common gun-pack cache has been installed on the client. */
     public static void requestReload() {
-        if (hasJei() || hasRei()) {
+        // JEI's NeoForge StartEventObserver waits for RecipesReceivedEvent and starts
+        // after this cache is installed. Only REI needs an explicit lightweight reload.
+        if (hasRei()) {
             reloadRequested = true;
         }
     }
@@ -36,6 +41,7 @@ public final class RecipeViewerReloadBridge {
     /** Drops a queued refresh when leaving a server before its sync has completed. */
     public static void clear() {
         reloadRequested = false;
+        reloadInProgress = false;
     }
 
     /** Runs on the client tick so packet ordering and initial world setup have completed first. */
@@ -51,13 +57,7 @@ public final class RecipeViewerReloadBridge {
         GunMod.LOGGER.info("[TACZ Recipe Viewer] Refreshing after gun-pack sync ({} table(s), {} recipe(s)).",
                 tableCount, recipeCount);
 
-        boolean requiresResourceFallback = false;
-        if (hasJei() && !refreshJei()) {
-            requiresResourceFallback = true;
-        }
-        if (hasRei() && !refreshRei()) {
-            requiresResourceFallback = true;
-        }
+        boolean requiresResourceFallback = hasRei() && !refreshRei();
 
         if (!requiresResourceFallback) {
             reloadInProgress = false;
@@ -65,7 +65,7 @@ public final class RecipeViewerReloadBridge {
             return;
         }
 
-        GunMod.LOGGER.warn("[TACZ Recipe Viewer] Viewer reload hook unavailable; falling back to a client resource reload.");
+        GunMod.LOGGER.info("[TACZ Recipe Viewer] Using the NeoForge client resource reload to rebuild viewer registrations.");
         try {
             client.reloadResourcePacks().whenComplete((unused, throwable) -> client.execute(() -> {
                 reloadInProgress = false;
@@ -79,23 +79,6 @@ public final class RecipeViewerReloadBridge {
         } catch (RuntimeException exception) {
             reloadInProgress = false;
             GunMod.LOGGER.warn("[TACZ Recipe Viewer] Could not start the client resource refresh.", exception);
-        }
-    }
-
-    /** JEI Fabric 26.1.2 restarts its plugin registry when this lifecycle event is invoked. */
-    private static boolean refreshJei() {
-        try {
-            Class<?> lifecycleEvents = Class.forName("mezz.jei.fabric.events.JeiLifecycleEvents");
-            Object event = lifecycleEvents.getField("AFTER_RECIPES_UPDATED").get(null);
-            Object invoker = event.getClass().getMethod("invoker").invoke(event);
-            if (!(invoker instanceof Runnable runnable)) {
-                throw new IllegalStateException("JEI recipe-update invoker is not Runnable");
-            }
-            runnable.run();
-            return true;
-        } catch (ReflectiveOperationException | LinkageError | RuntimeException exception) {
-            GunMod.LOGGER.debug("[TACZ Recipe Viewer] JEI lightweight refresh unavailable.", exception);
-            return false;
         }
     }
 
@@ -121,10 +104,6 @@ public final class RecipeViewerReloadBridge {
             GunMod.LOGGER.debug("[TACZ Recipe Viewer] REI lightweight refresh unavailable.", exception);
             return false;
         }
-    }
-
-    private static boolean hasJei() {
-        return ModList.get().isLoaded("jei");
     }
 
     private static boolean hasRei() {

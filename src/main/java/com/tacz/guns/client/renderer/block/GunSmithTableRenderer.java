@@ -10,6 +10,7 @@ import com.tacz.guns.block.entity.GunSmithTableBlockEntity;
 import com.tacz.guns.client.model.bedrock.BedrockModel;
 import com.tacz.guns.client.resource.index.ClientBlockIndex;
 import com.tacz.guns.config.client.RenderConfig;
+import com.tacz.guns.resource.CommonAssetsManager;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -45,21 +47,38 @@ public class GunSmithTableRenderer implements BlockEntityRenderer<GunSmithTableB
 
     public Optional<ClientBlockIndex> getIndex(GunSmithTableBlockEntity blockEntity) {
         Identifier id = blockEntity.getId();
-        if (id == null || id.equals(DefaultAssets.EMPTY_BLOCK_ID)) {
-            return Optional.empty();
+        if (id != null && !id.equals(DefaultAssets.EMPTY_BLOCK_ID)) {
+            Optional<ClientBlockIndex> indexed = TimelessAPI.getClientBlockIndex(id);
+            if (indexed.isPresent()) {
+                return indexed;
+            }
         }
-        return TimelessAPI.getClientBlockIndex(id);
+        return getIndexByPhysicalBlock(blockEntity.getBlockState().getBlock());
     }
 
     public static Optional<ClientBlockIndex> getIndex(ItemStack stack) {
         if (stack.getItem() instanceof IBlock iBlock) {
             Identifier id = iBlock.getBlockId(stack);
-            if (id.equals(DefaultAssets.EMPTY_BLOCK_ID)) {
-                return Optional.empty();
+            if (!id.equals(DefaultAssets.EMPTY_BLOCK_ID)) {
+                Optional<ClientBlockIndex> indexed = TimelessAPI.getClientBlockIndex(id);
+                if (indexed.isPresent()) {
+                    return indexed;
+                }
             }
-            return TimelessAPI.getClientBlockIndex(id);
+        }
+        if (stack.getItem() instanceof net.minecraft.world.item.BlockItem blockItem) {
+            return getIndexByPhysicalBlock(blockItem.getBlock());
         }
         return Optional.empty();
+    }
+
+    private static Optional<ClientBlockIndex> getIndexByPhysicalBlock(net.minecraft.world.level.block.Block block) {
+        Identifier physicalId = BuiltInRegistries.BLOCK.getKey(block);
+        return CommonAssetsManager.get().getAllBlocks().stream()
+                .filter(entry -> physicalId.equals(entry.getValue().getPojo().getId()))
+                .map(entry -> TimelessAPI.getClientBlockIndex(entry.getKey()))
+                .flatMap(Optional::stream)
+                .findFirst();
     }
 
     @Override

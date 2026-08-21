@@ -2,6 +2,7 @@ package com.tacz.guns.resource.modifier.custom;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import com.tacz.guns.api.GunProperties;
 import com.tacz.guns.api.item.IGun;
@@ -39,6 +40,14 @@ public class InaccuracyModifier implements IAttachmentModifier<Map<InaccuracyTyp
     @Override
     public String getOptionalFields() {
         return "inaccuracy_addend";
+    }
+
+    @Override
+    public boolean hasJsonField(JsonObject jsonObject) {
+        return IAttachmentModifier.super.hasJsonField(jsonObject)
+                || jsonObject.has("aim_inaccuracy")
+                || jsonObject.has("sneak_inaccuracy")
+                || jsonObject.has("lie_inaccuracy");
     }
 
     @Override

@@ -17,7 +17,7 @@ public class ClientMessagePlayerBoltGun implements CustomPacketPayload {
     );
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientMessagePlayerBoltGun> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public ClientMessagePlayerBoltGun() { }
+    private ClientMessagePlayerBoltGun() { }
 
     @Override
     public @NotNull CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
