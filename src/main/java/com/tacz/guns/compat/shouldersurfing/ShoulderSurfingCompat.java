@@ -4,28 +4,32 @@ import net.neoforged.fml.ModList;
 
 public final class ShoulderSurfingCompat {
     private static final String MOD_ID = "shouldersurfing";
-    private static boolean INSTALLED;
+    private static boolean INSTALLED = false;
 
     private ShoulderSurfingCompat() {
     }
 
     public static void init() {
-        INSTALLED = ModList.get().isLoaded(MOD_ID);
+        INSTALLED = ModList.get().isLoaded(MOD_ID) && hasV5Api();
+    }
+
+    private static boolean hasV5Api() {
+        try {
+            Class.forName("com.github.exopandora.shouldersurfing.api.client.Perspective", false,
+                    ShoulderSurfingCompat.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException ignored) {
+            // 26.1.2 also had 4.x builds. They use the legacy plugin API; fail closed instead of
+            // linking ShoulderSurfingCompatInner against classes that only exist in 5.x.
+            return false;
+        }
     }
 
     public static boolean showCrosshair() {
-        if (!INSTALLED) {
-            return false;
+        if (INSTALLED) {
+            return ShoulderSurfingCompatInner.showCrosshair();
         }
-        try {
-            Class<?> api = Class.forName("com.github.exopandora.shouldersurfing.api.client.ShoulderSurfing");
-            Object instance = api.getMethod("getInstance").invoke(null);
-            Object camera = instance.getClass().getMethod("getCamera").invoke(instance);
-            Object perspective = camera.getClass().getMethod("getPerspective").invoke(camera);
-            return "SHOULDER_SURFING".equals(String.valueOf(perspective));
-        } catch (Throwable ignored) {
-            return false;
-        }
+        return false;
     }
 
     public static boolean isInstalled() {

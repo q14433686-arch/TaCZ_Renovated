@@ -9,7 +9,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 /**
  * Physical-client entry. Scope pipelines must register before ShaderManager's first reload.
@@ -19,8 +18,13 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 public class GunModClient {
     public GunModClient(ModContainer container) {
         ScopeRenderTypes.init();
-        container.registerExtensionPoint(IConfigScreenFactory.class,
-                (modContainer, parent) -> com.tacz.guns.compat.cloth.MenuIntegration.getConfigScreen(parent));
+        // TACZ classic Cloth Config screen (MUKSC idiom): cloth present -> cloth UI,
+        // absent -> download-hint screen. Registration mirrors MUKSC's CompatRegistry.
+        if (net.neoforged.fml.ModList.get().isLoaded(com.tacz.guns.init.CompatRegistry.CLOTH_CONFIG)) {
+            com.tacz.guns.compat.cloth.MenuIntegration.registerModsPage(container);
+        } else {
+            com.tacz.guns.client.gui.compat.ClothConfigScreen.registerNoClothConfigPage(container);
+        }
         GunMod.LOGGER.info("TaCZ NeoForge 26.1.2 port work package ⑤ client loading. modId={}", GunMod.MOD_ID);
     }
 

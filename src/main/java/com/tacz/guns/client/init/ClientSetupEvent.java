@@ -124,6 +124,7 @@ public class ClientSetupEvent {
     @SubscribeEvent
     public static void onClientResourceReload(AddClientReloadListenersEvent event) {
         PlayerAnimatorCompat.init();
+        PlayerAnimatorCompat.registerReloadListener(event::addListener);
         ClientAssetsManager.INSTANCE.reloadAndRegister(event);
     }
 

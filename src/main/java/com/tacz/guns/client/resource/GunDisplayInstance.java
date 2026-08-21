@@ -763,6 +763,11 @@ public class GunDisplayInstance {
         return playerAnimator3rd;
     }
 
+    /** 诊断/日志用：该 display 的注册 id。 */
+    public Identifier getDisplayId() {
+        return displayId;
+    }
+
     public boolean is3rdFixedHand() {
         return is3rdFixedHand;
     }

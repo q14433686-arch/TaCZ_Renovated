@@ -1,12 +1,28 @@
 package com.tacz.guns.compat.controllable;
 
-public final class ControllableCompat {
-    private ControllableCompat() {
-    }
+import com.tacz.guns.api.item.gun.FireMode;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.ModList;
+
+/**
+ * Optional Controllable (MrCrayfish) compat: controller bindings + gun-fire rumble.
+ * Runtime modid {@code controllable}; compile classpath
+ * {@code curse.maven:controllable-317269:7943194} (Controllable 0.26.0, NeoForge 26.1.2).
+ */
+public class ControllableCompat {
+    private static final String MOD_ID = "controllable";
+    private static volatile boolean installed;
 
     public static void init() {
+        installed = ModList.get().isLoaded(MOD_ID);
+        if (installed) {
+            ControllableInner.init();
+        }
     }
 
-    public static void onGunShoot(net.minecraft.world.item.ItemStack stack, com.tacz.guns.api.item.gun.FireMode fireMode) {
+    public static void onGunShoot(ItemStack gunItem, FireMode fireMode) {
+        if (installed) {
+            ControllableInner.rumbleShoot(gunItem, fireMode);
+        }
     }
 }
