@@ -1,0 +1,75 @@
+name: 内容包 / 兼容性问题
+description: 第三方枪包或可选 mod 的兼容问题
+title: "[Compat] "
+labels: ["compatibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **请先阅读**：
+        - 紫黑贴图或模型缺失**不能**证明该包依赖 Arcana，也可能是目录层级、资源路径、
+          版本谓词、包本身不完整，或**联机时客户端未安装该包**造成的（见 README 联机注意）。
+        - 明确依赖 Arcana 的内容不受支持（Arcana 官方仅提供 1.20.1 Forge 文件）。
+        - 本移植**未内置 LRTactical**：依赖 lrtactical 的枪包可装载、枪械可用，
+          但近战/投掷物等 LR 道具不可用——这是已知边界，不是 bug。
+        - 可选 mod 的支持状态先查 [COMPATIBILITY.md](https://github.com/q14433686-arch/TaCZ-Renovated/blob/main(26.1.2)/docs/COMPATIBILITY.md)。
+
+  - type: dropdown
+    id: mc_version
+    attributes:
+      label: Minecraft 版本
+      options:
+        - "26.1.2"
+    validations:
+      required: true
+
+  - type: input
+    id: pack_name
+    attributes:
+      label: 内容包 / mod 的准确名称与版本
+      description: 请给出准确包名和版本号，不要只写「某个枪包」
+    validations:
+      required: true
+
+  - type: input
+    id: pack_source
+    attributes:
+      label: 该包的下载来源链接
+    validations:
+      required: true
+
+  - type: textarea
+    id: pack_deps
+    attributes:
+      label: 该包作者列出的前置依赖
+      description: 请照抄作者发布页写明的依赖列表
+    validations:
+      required: true
+
+  - type: dropdown
+    id: env
+    attributes:
+      label: 出现环境
+      options:
+        - 单人存档
+        - 局域网联机（双端已装该包）
+        - 专用服务器（双端已装该包）
+        - 专用服务器（仅服务端装包）
+    validations:
+      required: true
+
+  - type: textarea
+    id: symptom
+    attributes:
+      label: 具体表现与复现步骤
+    validations:
+      required: true
+
+  - type: input
+    id: log
+    attributes:
+      label: 完整 latest.log 链接
+      description: 上传到 https://mclo.gs 或 Gist 后粘贴链接；联机问题请双端日志都给。
+      placeholder: "https://mclo.gs/xxxxxxx"
+    validations:
+      required: true
