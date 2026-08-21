@@ -3,7 +3,6 @@ package me.xjqsh.lrtactical.client.init;
 import me.xjqsh.lrtactical.EquipmentMod;
 import me.xjqsh.lrtactical.client.renderer.entity.ThrowableEntityRenderer;
 import me.xjqsh.lrtactical.entity.GrenadeEntity;
-import net.minecraft.client.renderer.item.properties.conditional.ConditionalItemModelProperties;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -53,12 +52,23 @@ public final class ModEntitiesRender {
     }
 
     /**
-     * 客户端物品模型类型 lrtactical:dynamic_item 与条件属性 lrtactical:has_custom_display。
-     * 必须在任何客户端物品 JSON 解码之前调用（GunModClient 构造期）。
+     * 客户端物品模型类型 lrtactical:dynamic_item —— 经 RegisterItemModelsEvent 注册
+     * （ItemModels.ID_MAPPER 在 26.1.2 是 private，主 mod 的 TaczDynamicItemModel 同款习语）。
      */
-    public static void registerItemModels() {
-        me.xjqsh.lrtactical.client.renderer.item.LrDynamicItemModel.registerType();
-        ConditionalItemModelProperties.ID_MAPPER.put(
+    public static void registerItemModels(net.neoforged.neoforge.client.event.RegisterItemModelsEvent event) {
+        event.register(
+                me.xjqsh.lrtactical.client.renderer.item.LrDynamicItemModel.TYPE_ID,
+                me.xjqsh.lrtactical.client.renderer.item.LrDynamicItemModel.Unbaked.MAP_CODEC);
+    }
+
+    /**
+     * 条件属性 lrtactical:has_custom_display（用于「有无内容包」的模型分流）——
+     * 经 RegisterConditionalItemModelPropertyEvent 注册
+     * （ConditionalItemModelProperties.ID_MAPPER 在 26.1.2 是 private）。
+     */
+    public static void registerConditionalProperties(
+            net.neoforged.neoforge.client.event.RegisterConditionalItemModelPropertyEvent event) {
+        event.register(
                 me.xjqsh.lrtactical.client.renderer.item.HasCustomDisplayProperty.ID,
                 me.xjqsh.lrtactical.client.renderer.item.HasCustomDisplayProperty.MAP_CODEC);
     }

@@ -78,7 +78,7 @@ import java.util.function.Predicate;
  * 应改走带注册表的通道，而不是在这里猜参数。
  */
 public abstract class ThrowableItemEntity extends Projectile
-        implements IEntityAdditionalSpawnData, net.minecraft.world.entity.projectile.ItemSupplier {
+        implements IEntityWithComplexSpawn, net.minecraft.world.entity.projectile.ItemSupplier {
     private static final EntityDataAccessor<ItemStack> DATA_ITEM_STACK =
             SynchedEntityData.defineId(ThrowableItemEntity.class, EntityDataSerializers.ITEM_STACK);
 

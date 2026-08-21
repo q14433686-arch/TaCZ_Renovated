@@ -103,7 +103,7 @@ public final class LrTickAnimationEvent {
         if (BuiltinItemRendererRegistry.INSTANCE.get(mainHandItem.getItem())
                 instanceof AnimateGeoItemRenderer<?, ?> renderer) {
             if (renderer.needReInit(mainHandItem)) {
-                renderer.tryInit(mainHandItem, player, event.renderTickTime);
+                renderer.tryInit(mainHandItem, player, event.getPartialTick().getGameTimeDeltaPartialTick(false));
             }
             renderer.visualUpdate(mainHandItem);
         }

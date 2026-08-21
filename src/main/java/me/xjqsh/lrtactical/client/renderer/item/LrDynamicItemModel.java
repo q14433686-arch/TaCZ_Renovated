@@ -103,10 +103,7 @@ public final class LrDynamicItemModel implements ItemModel {
         this.transformation = new Matrix4f(transformation);
     }
 
-    /** 必须在客户端物品 JSON 解码<b>之前</b>调用。 */
-    public static void registerType() {
-        ItemModels.ID_MAPPER.put(TYPE_ID, Unbaked.MAP_CODEC);
-    }
+    // 类型注册经 RegisterItemModelsEvent（GunModClient 挂载）——ItemModels.ID_MAPPER 在 26.1.2 是 private。
 
     @Override
     public void update(ItemStackRenderState state,

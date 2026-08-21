@@ -9,4 +9,12 @@ package me.xjqsh.lrtactical.api.extension;
  */
 public interface IItem {
     com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry.DynamicItemRenderer getCustomRenderer();
+
+    /**
+     * 挥臂拦截（refab 侧由其 LivingEntityMixin 调用）。默认不拦截；
+     * 近战/投掷物物品覆写为 true 以阻止 vanilla 摆手与 Lua 动画打架。
+     */
+    default boolean tacz$onEntitySwing(net.minecraft.world.item.ItemStack stack, net.minecraft.world.entity.LivingEntity entity) {
+        return false;
+    }
 }

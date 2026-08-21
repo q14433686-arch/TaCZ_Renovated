@@ -116,7 +116,8 @@ public final class ModCapabilities {
         // 【死亡重生必须清表】否则近战/投掷物在死后整局失效，见 onRespawn 的完整分析。
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
                 (net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerRespawnEvent event) ->
-                        ModCapabilities.onRespawn((net.minecraft.server.level.ServerPlayer) event.getEntity()));
+                        // PlayerRespawnEvent 只携带新玩家；旧玩家对象在 respawn 后已被替换，map 侧按引用清除即可。
+                        ModCapabilities.onRespawn(null, (net.minecraft.server.level.ServerPlayer) event.getEntity(), true));
     }
 
     /**

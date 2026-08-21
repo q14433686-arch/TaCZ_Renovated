@@ -9,7 +9,7 @@ import me.xjqsh.lrtactical.network.LrNetworkHandler;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -72,7 +72,7 @@ public final class EquipmentMod {
 
         // 数据包重载时加载 index/throwable|melee|consumable/*.json —— 与 TACZ 自身
         // 的 CommonAssetsManager 走同一个服务端 reload 事件，时机一致。
-        NeoForge.EVENT_BUS.addListener((AddReloadListenerEvent event) -> {
+        NeoForge.EVENT_BUS.addListener((AddServerReloadListenersEvent event) -> {
             event.addListener(me.xjqsh.lrtactical.resource.CommonAssetsManager.get().getThrowableIndexManager());
             event.addListener(me.xjqsh.lrtactical.resource.CommonAssetsManager.get().getMeleeIndexManager());
             event.addListener(me.xjqsh.lrtactical.resource.CommonAssetsManager.get().getConsumableIndexManager());

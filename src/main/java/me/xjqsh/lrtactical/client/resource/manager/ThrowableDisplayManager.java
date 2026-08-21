@@ -23,14 +23,6 @@ public class ThrowableDisplayManager extends JsonDataManager<ThrowableDisplayIns
         super(null, pGson, "display/throwable", "LrThrowableDisplay");
     }
 
-    /**
-     * 声明「必须在 TACZ 的模型/动画/脚本加载完之后再跑」。理由见
-     * {@link MeleeDisplayManager#getFabricDependencies()}。
-     */
-    @Override
-    public Collection<Identifier> getFabricDependencies() {
-        return me.xjqsh.lrtactical.client.resource.LrClientAssetsManager.taczAssetDependencies();
-    }
 
     @Override
     protected void apply(Map<Identifier, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {

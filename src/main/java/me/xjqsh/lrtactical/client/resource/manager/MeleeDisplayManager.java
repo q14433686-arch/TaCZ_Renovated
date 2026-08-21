@@ -39,20 +39,6 @@ public class MeleeDisplayManager extends JsonDataManager<MeleeDisplayInstance> {
         super(null, pGson, "display/melee", "LrMeleeDisplay");
     }
 
-    /**
-     * 声明「必须在 TACZ 的模型/动画/脚本加载完之后再跑」。
-     *
-     * <p><b>这是必需的、不是优化</b>：{@code MeleeDisplayInstance#create} 会<b>同步</b>去
-     * {@code ClientAssetsManager} 取 geo 模型、bedrock 动画与 Lua 脚本。
-     * 顺序反了就会全数取到 {@code null}，表现为「no corresponding model found」——
-     * 而且因为资源重载是并行调度的，这种失败是<b>偶发</b>的，极难复现和排查。
-     *
-     * @see me.xjqsh.lrtactical.client.resource.LrClientAssetsManager#taczAssetDependencies()
-     */
-    @Override
-    public Collection<Identifier> getFabricDependencies() {
-        return me.xjqsh.lrtactical.client.resource.LrClientAssetsManager.taczAssetDependencies();
-    }
 
     @Override
     protected void apply(Map<Identifier, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {

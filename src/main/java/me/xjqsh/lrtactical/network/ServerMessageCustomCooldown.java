@@ -1,5 +1,7 @@
 package me.xjqsh.lrtactical.network;
 
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+
 import me.xjqsh.lrtactical.EquipmentMod;
 import me.xjqsh.lrtactical.init.ModCapabilities;
 import net.minecraft.client.player.LocalPlayer;

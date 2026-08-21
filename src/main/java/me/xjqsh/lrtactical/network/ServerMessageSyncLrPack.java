@@ -1,5 +1,7 @@
 package me.xjqsh.lrtactical.network;
 
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+
 import me.xjqsh.lrtactical.EquipmentMod;
 import me.xjqsh.lrtactical.resource.CommonAssetsManager;
 import net.minecraft.client.player.LocalPlayer;
@@ -32,15 +34,15 @@ public class ServerMessageSyncLrPack implements CustomPacketPayload {
     }
 
     public ServerMessageSyncLrPack(FriendlyByteBuf buf) {
-        this(buf.readMap(FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readUtf),
-                buf.readMap(FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readUtf),
-                buf.readMap(FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readUtf));
+        this(buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()),
+                buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()),
+                buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()));
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeMap(this.throwableIndex, FriendlyByteBuf::writeIdentifier, FriendlyByteBuf::writeUtf);
-        buf.writeMap(this.meleeIndex, FriendlyByteBuf::writeIdentifier, FriendlyByteBuf::writeUtf);
-        buf.writeMap(this.consumableIndex, FriendlyByteBuf::writeIdentifier, FriendlyByteBuf::writeUtf);
+        buf.writeMap(this.throwableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
+        buf.writeMap(this.meleeIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
+        buf.writeMap(this.consumableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
     }
 
     @Override
