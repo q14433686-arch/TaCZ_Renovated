@@ -50,10 +50,9 @@
   改 `NeoForge.EVENT_BUS.addListener`（事件本就 post 在 game bus）。compileOnly
   `maven.modrinth:player-animation-library:1.2.5`（refab 同款坐标）。内建规避 PAL 1.2.5 两处坑
   （fadeOut 永久哑化、AdjustmentModifier NPE，见 PalAnimationManager/SafeAdjustmentModifier 注释）。
-- 兼容层状态盘点（r18）：cloth（活）、playeranimator（活，r17）、**controllable（活，r18**：refab 26.1.2
-  `ControllableInner` 移植，Fabric END_CLIENT_TICK → `ClientTickEvent.Post`；输入钩子
-  `onXxxControllerPress/shootControllerTick` 本就在位）、carryon（活，反射桥）、
-  firstperson（活）、shouldersurfing（活）、iris/shader（活，反射）、jei/rei/recipeviewer（活）、
+- 兼容层状态盘点（r20 修正）：cloth（活）、**playeranimator（❌ 未达成——r17 死坐标、r19 配置期 PKIX 崩、r20 用户复测仍不工作，
+  失败环节未知，详见 PORTING_STATUS.md"未完成/未验证项"）**、**controllable（⚠️ 未实测，同链路待 PAL 结论）**、
+  carryon（活，反射桥）、firstperson（活）、shouldersurfing（活）、iris/shader（活，反射）、jei/rei/recipeviewer（活）、
   ar（禁用——AR 无 26.1.2 Feature Rendering 版）、
   **immediatelyfast（有据 no-op**：IF 有 26.1.2 NeoForge 版 1.15.3，但 26.x 渲染经 collector，
   旧 HUD batching API 已不存在，上游 26.2 同样保留空实现）、
