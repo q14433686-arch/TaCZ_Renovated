@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
- * Reflection bridge for the optional Carry On 2.9.x API.
+ * Reflection bridge for the optional Carry On 2.11.x API.
  *
  * <p>Carry On is deliberately not a compile-time dependency. All callers are additionally gated
  * by the optional mixin config, so these lookups only run when the mod is installed.</p>
@@ -83,7 +83,7 @@ public final class CarryOnReflection {
                 getBlock = dataClass.getMethod("getBlock");
                 getBlockEntity = dataClass.getMethod("getBlockEntity", BlockPos.class, HolderLookup.Provider.class);
             } catch (ReflectiveOperationException | LinkageError e) {
-                GunMod.LOGGER.warn("Carry On compatibility could not resolve the audited 2.9.x data API", e);
+                GunMod.LOGGER.warn("Carry On compatibility could not resolve the audited 2.11.x data API", e);
             } finally {
                 resolved = true;
             }

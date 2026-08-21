@@ -19,8 +19,7 @@ public final class ShoulderSurfingCompat {
                     ShoulderSurfingCompat.class.getClassLoader());
             return true;
         } catch (ClassNotFoundException ignored) {
-            // 26.1.2 also had 4.x builds. They use the legacy plugin API; fail closed instead of
-            // linking ShoulderSurfingCompatInner against classes that only exist in 5.x.
+            // Reject stale 4.x jars instead of linking against classes that only exist in 5.x.
             return false;
         }
     }

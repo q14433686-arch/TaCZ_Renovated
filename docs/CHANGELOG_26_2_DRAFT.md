@@ -47,3 +47,14 @@
 - Iris 1.11.x 反射入口按 26.2 source 重验，恢复 shadow-pass 查询，并保留
   HAND/HAND_TRANSLUCENT pipeline 分类与 hand fragment depth 分支。
 - 当前只有静态 classfile/API 检查；JDK 25 全仓构建及 OpenGL/Iris/Vulkan GPU 矩阵未执行。
+
+### WP-262-4
+
+- 重钉 26.2 可选编译坐标：Cloth 26.2.155、PAL 1.2.6+26.2、Controllable 0.26.1、
+  Shoulder Surfing 5.0.7、JEI 30.24.0.176、REI 26.2.820、Architectury 21.0.2。
+- Carry On 兼容对齐 2.11.0：携带渲染的 BlockId 恢复移到
+  `ItemStackTemplate#create()` 后的 mutable stack。
+- 补全 FPM ActivationHandler 与 NEA direct-arm 反射 guard；执行日两者均没有
+  NeoForge 26.2 发布文件，因此桥保持 dormant，不宣称可安装兼容。
+- 新增 `COMPATIBILITY.md`，逐项区分“发布/API 已核”与“未实机”，并列出最终用户矩阵。
+- 所有可选 Mod 运行矩阵仍未执行，不声明 PASS。

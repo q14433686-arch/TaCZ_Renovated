@@ -15,17 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 /**
- * Compatibility facade migrated from the discontinued KosmX PlayerAnimator to
- * ZigyTheBird's Player Animation Library (PAL 1.2.5), following
- * TaCZ_Refabricated_Unofficial 26.1.2 (game semantics).
+ * Compatibility facade for ZigyTheBird's Player Animation Library (PAL 1.2.6).
  *
- * <p>PAL is an OPTIONAL runtime dependency (modid {@code player_animation_library},
- * identical on both loaders of the merged 26.1 jar); compile classpath is
- * CurseForge file 8454167 ("1.2.5+26.1", merged Fabric+NeoForge jar) via
- * CurseMaven. The old stub comment claimed "PAL has no 26.1.2 API" - that was
- * wrong. (r17/r18 first tried {@code maven.modrinth:player-animation-library:1.2.5},
- * which never resolves: Modrinth version numbers for this project are
- * "1.2.5+26.1"-style — the compat was effectively dead on arrival.)</p>
+ * <p>PAL is an OPTIONAL runtime dependency (modid {@code player_animation_library}).
+ * CurseForge file 8674798 is the merged Fabric+NeoForge {@code 1.2.6+26.2} jar.
+ * Its 26.2 source retains the controller, fade, factory, adjustment and loader APIs used here.</p>
  */
 public final class PlayerAnimatorCompat {
     public static final Identifier LOWER_ANIMATION = Identifier.fromNamespaceAndPath("tacz", "lower_animation");

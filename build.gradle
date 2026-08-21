@@ -177,22 +177,20 @@ dependencies {
     jarJar files(commonsMath3ForJarJar)
     jarJar files(luajForJarJar)
 
-    // Current environment: JEI 29.29.0.77 / REI 26.1.819 for NeoForge 26.1.2.
+    // 26.2 recipe viewers: JEI 30.24.0.176 / REI 26.2.820 for NeoForge.
     // These integrations are optional at runtime and are discovered only when the
     // corresponding viewer is present.
-    compileOnly "mezz.jei:jei-26.1.2-neoforge:${jei_neoforge_version}"
+    compileOnly "mezz.jei:jei-26.2-neoforge:${jei_neoforge_version}"
     compileOnly "curse.maven:roughly-enough-items-310111:${rei_neoforge_file}"
     compileOnly "dev.architectury:architectury-neoforge:${rei_architectury_version}"
     compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rei_cloth_config_version}"
 
     // ZigyTheBird Player Animation Library (PAL) — optional at runtime
     // (modid player_animation_library); drives TACZ third-person gun animations.
-    // CurseForge file 8454167 = "1.2.5+26.1" (game versions 26.1.2+2): a merged
-    // Fabric+NeoForge jar — the same file installs on both loaders, so this
-    // compile classpath matches the runtime NeoForge build exactly.
-    // NOTE: the maven.modrinth coordinate used by the Fabric port
-    // ("player-animation-library:1.2.5") does NOT resolve — Modrinth version
-    // numbers for this project are "1.2.5+26.1"-style.
+    // CurseForge file 8674798 = "1.2.6+26.2": a merged Fabric+NeoForge jar,
+    // so this compile classpath is the actual NeoForge-capable 26.2 publication.
+    // NOTE: PAL's public version numbers include the game line ("1.2.6+26.2");
+    // a bare "1.2.6" Modrinth coordinate is not the published artifact.
     // Escape hatch: drop the downloaded jar (PlayerAnimationLibMerged-*.jar)
     // into libs/ and Gradle will use it instead of CurseMaven.
     def localPal = fileTree(dir: 'libs', include: 'PlayerAnimationLib*.jar')
@@ -202,14 +200,12 @@ dependencies {
         compileOnly "curse.maven:player-animation-library-1283899:${player_animation_lib_file}"
     }
 
-    // MrCrayfish's Controllable 0.26.0 — optional at runtime (modid controllable);
-    // controller bindings + gun-fire rumble. CurseForge file 7943194 =
-    // controllable-neoforge-26.1.2-0.26.0.jar. No configure-time downloads here
-    // (r19 fetched GitHub Releases at configure time and crashed behind
-    // TLS-inspecting proxies: "PKIX path building failed").
-    // Escape hatch: if CurseMaven ever refuses this file, download
-    // controllable-neoforge-0.26.0+26.1.2-signed.jar from
-    // https://github.com/MrCrayfish/Controllable/releases/tag/v0.26.0%2B26.1.2
+    // MrCrayfish's Controllable 0.26.1 — optional at runtime (modid controllable);
+    // controller bindings + gun-fire rumble. CurseForge file 8403602 is the
+    // NeoForge 26.2 jar. No configure-time downloads here.
+    // Escape hatch: if CurseMaven refuses this file, download
+    // controllable-neoforge-0.26.1+26.2-signed.jar from
+    // https://github.com/MrCrayfish/Controllable/releases/tag/v0.26.1%2B26.2
     // (or the CurseForge file page) into libs/ and Gradle will use it instead.
     def localControllable = fileTree(dir: 'libs', include: 'controllable-neoforge*.jar')
     if (!localControllable.isEmpty()) {
@@ -219,9 +215,8 @@ dependencies {
     }
 
     // Exopandora's Shoulder Surfing Reloaded 5.x — optional at runtime
-    // (modid shouldersurfing). 5.x API only: 4.x builds (also published for
-    // 26.1.2) use a legacy plugin API and fail closed at runtime.
-    // CurseForge file 8596489 = ShoulderSurfing-NeoForge-26.1.2-5.0.10.
+    // (modid shouldersurfing). 5.x event/plugin API only.
+    // CurseForge file 8445037 = ShoulderSurfing-NeoForge-26.2-5.0.7.
     // Escape hatch: drop ShoulderSurfing-NeoForge-*.jar into libs/ to override.
     def localShoulderSurfing = fileTree(dir: 'libs', include: 'ShoulderSurfing-NeoForge*.jar')
     if (!localShoulderSurfing.isEmpty()) {

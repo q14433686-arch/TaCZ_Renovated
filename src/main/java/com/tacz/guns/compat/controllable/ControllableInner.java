@@ -30,13 +30,11 @@ import java.util.EnumMap;
 import java.util.Optional;
 
 /**
- * Controllable 0.26.x bindings and gun-fire rumble integration,
- * ported from Refabricated 26.1.2 (game semantics).
+ * Controllable 0.26.1 bindings and gun-fire rumble integration.
  *
- * <p>API verified against MrCrayfish/Controllable branch
- * {@code multiloader/26.1.2} (the source line of CurseForge file 7943194 =
- * Controllable 0.26.0 NeoForge 26.1.2): all classes live in the multiloader
- * {@code common} module, so the Fabric-era call sites carry over unchanged.
+ * <p>API verified against MrCrayfish/Controllable tag {@code v0.26.1+26.2},
+ * commit {@code 7333428d29464db914750eac2a039c22102e3e65}: all referenced classes remain
+ * in the multiloader {@code common} module and retain their descriptors.
  * The only adaptation is the end-client-tick hook: Fabric
  * {@code ClientTickEvents.END_CLIENT_TICK} -> NeoForge
  * {@code ClientTickEvent.Post} on the game event bus.</p>

@@ -3,7 +3,7 @@ package com.tacz.guns.compat.ar;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-/** Accelerated Rendering has no 26.1.2 Feature Rendering build. */
+/** Accelerated Rendering has no verified 26.2 Feature Rendering API; acceleration remains disabled. */
 public class ARCompat {
     public static final String MOD_ID = "acceleratedrendering";
     public static boolean LOADED;

@@ -12,12 +12,12 @@ import java.lang.reflect.Modifier;
  * Rebuilds recipe-viewer registrations after TACZ's server-authoritative gun-pack cache arrives.
  *
  * <p>JEI and REI build their categories/catalysts from {@code BlockId}-bearing workbench stacks.
- * In 26.1.2 the client receives TACZ's full custom recipe table through {@code ServerMessageSyncGunPack}.
+ * In 26.2 the client receives TACZ's full custom recipe table through {@code ServerMessageSyncGunPack}.
  * Without a subsequent viewer reload, a viewer can retain categories built before the sync and collapse
  * a custom workbench into whichever generic table happened to register first.
  *
- * <p>NeoForge JEI 29.5 waits for the native {@code RecipesReceivedEvent} before its first
- * startup, which occurs after TaCZ's synchronized pack cache in the verified 26.1.2 load
+ * <p>NeoForge JEI 30.x waits for the native {@code RecipesReceivedEvent} before its first
+ * startup, which occurs after TaCZ's synchronized pack cache in the verified 26.2 load
  * order. JEI therefore must not trigger a second full resource reload here. REI does not
  * provide the same ordering guarantee, so its client plugin reload entry point is invoked
  * reflectively when REI is present.
@@ -82,7 +82,7 @@ public final class RecipeViewerReloadBridge {
         }
     }
 
-    /** REI 26.1.2 rebuilds categories/displays through this all-stage plugin reload entry point. */
+    /** REI 26.2.820 rebuilds categories/displays through this all-stage plugin reload entry point. */
     private static boolean refreshRei() {
         try {
             Class<?> coreClient = Class.forName("me.shedaniel.rei.RoughlyEnoughItemsCoreClient");

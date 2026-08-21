@@ -22,12 +22,10 @@ import javax.annotation.Nullable;
 
 /**
  * TACZ classic Cloth Config screen: eight categories (Key/Render/Resource/Sound/Zoom
- * + Gun/Ammo/Other), aligned with MUKSC/TACZ-1.21.1 (NeoForge idiom) and
- * TaCZ_Refabricated_Unofficial 26.1.2 (game semantics; the only content delta
- * is 26.1.2's extra {@code scope_mask_enable} entry, kept).
+ * + Gun/Ammo/Other), using NeoForge's config-screen extension point.
  *
  * <p>Cloth Config is an OPTIONAL runtime dependency (modid {@code cloth_config});
- * compile classpath is {@code me.shedaniel.cloth:cloth-config-neoforge:26.1.154}.
+ * compile classpath is {@code me.shedaniel.cloth:cloth-config-neoforge:26.2.155}.
  * The T-key entry point sends a clickable download hint instead when absent
  * (see ConfigKey), the Mods-menu falls back to ClothConfigScreen.</p>
  */

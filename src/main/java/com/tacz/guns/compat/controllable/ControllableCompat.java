@@ -7,7 +7,7 @@ import net.neoforged.fml.ModList;
 /**
  * Optional Controllable (MrCrayfish) compat: controller bindings + gun-fire rumble.
  * Runtime modid {@code controllable}; compile classpath
- * {@code curse.maven:controllable-317269:7943194} (Controllable 0.26.0, NeoForge 26.1.2).
+ * {@code curse.maven:controllable-317269:8403602} (Controllable 0.26.1, NeoForge 26.2).
  */
 public class ControllableCompat {
     private static final String MOD_ID = "controllable";

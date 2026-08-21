@@ -8,7 +8,7 @@ import com.tacz.guns.api.item.IGun;
 /**
  * Shoulder Surfing 5.x plugin: gun items participate in adaptive aiming/camera behavior.
  * Discovered via {@code shouldersurfing_plugin.json} at the mod jar root — the same
- * mechanism on every loader (verified against PluginLoaderNeoForge on the 26.1.2 line:
+ * mechanism on every loader (verified against 5.0.7's 26.2 PluginLoaderNeoForge:
  * it scans ModList mod files for that JSON and instantiates the entrypoints).
  */
 public class ShoulderSurfingPlugin implements IShoulderSurfingPlugin {
