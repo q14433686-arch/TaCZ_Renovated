@@ -3,6 +3,7 @@ package com.tacz.guns.mixin.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.tacz.guns.api.client.event.RenderItemInHandBobEvent;
 import com.tacz.guns.api.client.event.RenderLevelBobEvent;
+import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
 import com.tacz.guns.client.renderer.other.GunHurtBobTweak;
 import com.tacz.guns.compat.shader.ShaderCompat;
 import net.minecraft.client.Minecraft;
@@ -33,6 +34,7 @@ public abstract class GameRendererMixin {
                                     Matrix4fc projection,
                                     CallbackInfo ci) {
         this.tacz$renderingItemInHand = true;
+        ScopeMaskRenderer.setInHandPass(true);
     }
 
     @Inject(method = "renderItemInHand", at = @At("RETURN"))
@@ -41,6 +43,7 @@ public abstract class GameRendererMixin {
                                   Matrix4fc projection,
                                   CallbackInfo ci) {
         this.tacz$renderingItemInHand = false;
+        ScopeMaskRenderer.setInHandPass(false);
     }
 
     @Unique

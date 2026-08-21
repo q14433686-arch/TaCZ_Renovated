@@ -5,8 +5,8 @@
 核验日期：2026-08-21
 
 > **状态纪律**：下表的“API 已核”表示发布文件、坐标与源码签名已核对，**不等于游戏内
-> PASS**。用户已报告 JDK 25 `compileJava` / `build` PASS，但本执行环境没有 GPU；所有
-> 可选 Mod 与图形运行矩阵仍需用户实机完成。未实际测试的项目不会标成 PASS。
+> PASS**。用户报告的 JDK 25 build PASS 对应 scope-mask 替换前的 commit `c40dab9`；当前
+> HEAD 需要重建。本执行环境没有 GPU，所有可选 Mod 与图形矩阵仍需用户实机完成。
 
 ## 依赖钉选
 
@@ -19,7 +19,7 @@
 | JEI | `30.24.0.176`，`mezz.jei:jei-26.2-neoforge:30.24.0.176` | 工作台、配件/弹药查询、subtype | 30.24 source/API 已核；未实机 |
 | REI | `26.2.820` NeoForge，Curse file `8271756` | 工作台、配件/弹药查询、subtype、同步后 reload | source/API 已核；未实机 |
 | Architectury API | `21.0.2` NeoForge | REI 26.2.820 的编译/运行依赖 | 按 REI 26.2 source 原始 pin |
-| Iris | `1.11.2` NeoForge 26.2 | 反射 API、HAND/HAND_TRANSLUCENT、shadow/depth hand shader | OpenGL source/API 已核；未实机 |
+| Iris | `1.11.2` NeoForge 26.2 | 反射 API、HAND/HAND_TRANSLUCENT、shadow、linked-fragment mask bridge | OpenGL source/API 已核；未实机 |
 | Carry On | `2.11.0` NeoForge 26.2 | 多格工作台 root/companion、放置预检、携带模型 BlockId | 2.11.0 descriptor 已核；未实机 |
 | First-person Model | **无 NeoForge 26.2 文件**；2.7.2 只有 Fabric 26.2，NeoForge 止于 26.1.2 | 反射 ActivationHandler 已按 2.7.2 API 预留 | 当前不列为可安装兼容；桥保持 dormant |
 | Not Enough Animations | **无 NeoForge 26.2 文件**；1.12.4 的 NeoForge 文件止于 26.1.2 | 直接手臂提交 guard 已按 1.12.4 API 预留 | 当前不列为可安装兼容；桥保持 dormant |
@@ -49,8 +49,8 @@
   两参入口存在。该 source 明确 pin Cloth `26.2.155`、Architectury `21.0.2`。
 - **Iris 26.2**：branch commit
   `8f3a7a35d780fe80c8cd3c8517f3fa3c4df3f18a`。已核 API revision 3、
-  `assignPipeline`、`isRenderingShadowPass`、HandRenderer 三个查询与 ShaderCreator
-  fragment ordinal。
+  `assignPipeline`、`isRenderingShadowPass`、HandRenderer 三个查询，以及
+  `ShaderCreator#link` 的 fragment-source 参数位置。
 - **Carry On 2.11.0**：tag `v2.11.0` →
   `b82a8ccfe8b4a9af98b7485826c2162e8faaae81`。已核：
   `PickupHandler#tryPickUpBlock(ServerPlayer,BlockPos,Level,BiFunction)`、
@@ -69,10 +69,10 @@
 
 | 后端 | 状态 |
 |---|---|
-| OpenGL（无 Iris） | depth-aperture 代码/API 已移植；GPU 未实测 |
-| OpenGL + Iris 1.11.2 | pipeline 分类与 hand shader bridge 已核源码；GPU 未实测 |
-| Vulkan | 只承诺**不执行 OpenGL depth copy**；瞄具走无 depth/unmasked 降级；未实测 |
-| Aperture | 未发布/未接入；不在本期支持范围 |
+| OpenGL（无 Iris） | 阶段边界离屏 ocular mask 已接入；GPU 未实测 |
+| OpenGL + Iris 1.11.2 | HAND pipeline 分类、linked-fragment dormant branch 与逐 draw mask uniform bridge 已接入；GPU 未实测 |
+| Vulkan | 普通 mask 路径只用 26.2 `TextureTarget`/`RenderPass`，无直接 GL；启动与 device-loss 矩阵未实测 |
+| 其他 shader replacement / Aperture | 没有已核 bridge 时走普通未掩码回退；未作为硬依赖接入 |
 
 ## 其他兼容层
 
@@ -92,8 +92,8 @@
 4. Controllable + Framework：绑定、按住连射、换弹/近战/瞄准、各 fire mode 震动。
 5. Shoulder Surfing 5.0.7：双手枪判定、adaptive aim、free-look、准星。
 6. JEI only / REI only / JEI+REI：默认包、第三方包、远程同步后刷新、工作台 catalyst。
-7. Iris 1.11.2：无光影/有光影、HAND solid/translucent、shadow、瞄具 depth/水/粒子/云。
+7. Iris 1.11.2：无光影/有光影、HAND solid/translucent、shadow、mask mode 泄漏、水/粒子/云。
 8. Carry On 2.11.0：A/B/C 工作台任一半格搬起、完整放下、阻挡时原子失败、BlockId 模型。
-9. Vulkan：启动不调用 GL、瞄具降级不黑屏、warning 只出现一次。
+9. Vulkan：阶段边界 target 切换、mask debug 预览、无 device loss、镜身/准星/火光裁剪。
 
 完成上述测试前，只能写“API/坐标已核”，不能写“兼容 PASS”。

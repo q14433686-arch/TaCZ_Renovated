@@ -13,7 +13,7 @@ import com.tacz.guns.client.model.bedrock.BedrockPart;
 import com.tacz.guns.client.model.bedrock.ModelRendererWrapper;
 import com.tacz.guns.client.model.functional.*;
 import com.tacz.guns.client.model.listener.model.ModelAdditionalMagazineListener;
-import com.tacz.guns.client.render.scope.ScopeRenderTypes;
+import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
 import com.tacz.guns.client.resource.pojo.display.gun.TextShow;
 import com.tacz.guns.client.resource.pojo.model.BedrockModelPOJO;
 import com.tacz.guns.client.resource.pojo.model.BedrockVersion;
@@ -297,8 +297,8 @@ public class BedrockGunModel extends BedrockAnimatedModel {
     }
 
     /**
-     * First-person overload carrying the gun texture so the body can switch to an aperture-clipped
-     * clone after (and only after) the scope attachment has queued this frame's depth mask.
+     * First-person overload carrying the gun texture so the body can switch to a mask-aware
+     * pipeline after the scope attachment has registered this frame's ocular geometry.
      */
     public void submit(PoseStack poseStack,
                        ItemStack gunItem,
@@ -315,9 +315,8 @@ public class BedrockGunModel extends BedrockAnimatedModel {
             BeamRenderer.renderLaserBeam(gunItem, poseStack, transformType, laserBeamPaths, collector);
         }
 
-        // The scope must submit first: depthAperture() marks whether this exact viewmodel has an
-        // active ocular. Gun body and later functional attachments can then select the outside-mask
-        // pipeline without importing the unrelated 26.2 off-screen-mask architecture.
+        // The scope must submit first: it registers the active ocular in ScopeMaskGeometry.
+        // Gun body and later functional attachments can then select the same outside-mask pipeline.
         ItemStack scope = currentAttachmentItem.get(AttachmentType.SCOPE);
         if (scopePosPath != null && scope != null && !scope.isEmpty()) {
             PoseStack scopePose = new PoseStack();
@@ -332,7 +331,7 @@ public class BedrockGunModel extends BedrockAnimatedModel {
 
         RenderType bodyType = gunTexture == null
                 ? renderType
-                : ScopeRenderTypes.clipForViewmodel(renderType, gunTexture,
+                : ScopeBodyRenderTypes.clipForViewmodel(renderType, gunTexture,
                         transformType != null && transformType.firstPerson());
         super.submit(poseStack, transformType, collector, bodyType, light, overlay);
     }

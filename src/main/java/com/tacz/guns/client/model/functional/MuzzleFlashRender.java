@@ -8,7 +8,7 @@ import com.tacz.guns.api.item.attachment.AttachmentType;
 import com.tacz.guns.client.model.BedrockGunModel;
 import com.tacz.guns.client.model.IFunctionalSubmitter;
 import com.tacz.guns.client.model.SlotModel;
-import com.tacz.guns.client.render.scope.ScopeRenderTypes;
+import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
 import com.tacz.guns.client.resource.GunDisplayInstance;
 import com.tacz.guns.client.resource.pojo.display.gun.MuzzleFlash;
 import com.tacz.guns.compat.iris.IrisCompat;
@@ -88,18 +88,16 @@ public class MuzzleFlashRender implements IFunctionalSubmitter {
         int overlay = context.overlay();
         muzzleFlashStartMark = false;
 
-        // The depth aperture is restored before ordinary translucent FX, so both muzzle-flash
-        // layers would otherwise reappear inside the scope. Select an aperture-aware type only
-        // when this same first-person gun submission actually queued an ocular sequence. At draw
-        // time ScopeDepthCopyState validates both depth copies and fails open to normal rendering.
-        boolean clipToScopeExterior = context.displayContext() != null
-                && context.displayContext().firstPerson()
-                && ScopeRenderTypes.hasScheduledViewmodelAperture();
-        RenderType backgroundType = clipToScopeExterior
-                ? ScopeRenderTypes.flashTranslucentClipped(muzzleFlash.getTexture())
+        // The scope attachment registers its ocular before functional gun effects are extracted.
+        // If the off-screen mask is available, both flash layers use mask-aware clones so no
+        // viewmodel color/depth is written inside the sight picture.
+        boolean maskReady = ScopeBodyRenderTypes.maskReadyForViewmodel(
+                context.displayContext() != null && context.displayContext().firstPerson());
+        RenderType backgroundType = maskReady
+                ? ScopeBodyRenderTypes.flashTranslucent(muzzleFlash.getTexture())
                 : RenderTypes.entityTranslucent(muzzleFlash.getTexture());
-        RenderType glowType = clipToScopeExterior
-                ? ScopeRenderTypes.flashSwirlClipped(muzzleFlash.getTexture())
+        RenderType glowType = maskReady
+                ? ScopeBodyRenderTypes.flashSwirlClipped(muzzleFlash.getTexture())
                 : RenderTypes.energySwirl(muzzleFlash.getTexture(), 1, 1);
 
         context.add(collector -> {

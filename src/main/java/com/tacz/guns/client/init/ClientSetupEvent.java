@@ -6,6 +6,7 @@ import com.tacz.guns.client.gui.overlay.GunHudOverlay;
 import com.tacz.guns.client.gui.overlay.HeatBarOverlay;
 import com.tacz.guns.client.gui.overlay.InteractKeyTextOverlay;
 import com.tacz.guns.client.gui.overlay.KillAmountOverlay;
+import com.tacz.guns.client.gui.overlay.ScopeMaskDebugOverlay;
 import com.tacz.guns.client.gui.preview.GunPreviewRenderState;
 import com.tacz.guns.client.gui.preview.GunPreviewRenderer;
 import com.tacz.guns.client.input.AimKey;
@@ -27,7 +28,8 @@ import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.tacz.guns.client.renderer.item.GunItemRendererWrapper;
 import com.tacz.guns.client.renderer.item.GunSmithTableItemRenderer;
 import com.tacz.guns.client.renderer.item.TaczDynamicItemModel;
-import com.tacz.guns.client.render.scope.ScopeRenderTypes;
+import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
+import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
 import com.tacz.guns.client.resource.ClientAssetsManager;
 import com.tacz.guns.client.tooltip.ClientAmmoBoxTooltip;
 import com.tacz.guns.client.tooltip.ClientAttachmentItemTooltip;
@@ -101,6 +103,8 @@ public class ClientSetupEvent {
                 KillAmountOverlay.render(graphics, delta.getRealtimeDeltaTicks()));
         event.registerAbove(VanillaGuiLayers.CROSSHAIR, id("interact_key_text"), (graphics, delta) ->
                 InteractKeyTextOverlay.render(graphics, delta.getRealtimeDeltaTicks()));
+        event.registerAboveAll(id("scope_mask_debug"), (graphics, delta) ->
+                ScopeMaskDebugOverlay.render(graphics, delta.getRealtimeDeltaTicks()));
         event.registerAbove(VanillaGuiLayers.CROSSHAIR, id("crosshair_hit"), (graphics, delta) ->
                 com.tacz.guns.client.event.RenderCrosshairEvent.onRenderOverlay(
                         graphics, net.minecraft.client.Minecraft.getInstance().getWindow()));
@@ -123,7 +127,8 @@ public class ClientSetupEvent {
 
     @SubscribeEvent
     public static void onRegisterRenderPipelines(RegisterRenderPipelinesEvent event) {
-        ScopeRenderTypes.registerPipelines(event);
+        ScopeMaskRenderer.registerPipeline(event);
+        ScopeBodyRenderTypes.registerPipelines(event);
     }
 
     @SubscribeEvent

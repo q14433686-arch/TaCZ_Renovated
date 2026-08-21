@@ -81,6 +81,19 @@ public final class IrisCompat {
         }
     }
 
+    /** Assigns a custom mask-aware pipeline to Iris' first-person HAND program. */
+    public static boolean assignScopePipelineToHand(RenderPipeline pipeline, String debugName) {
+        return assignPipelineToIris(pipeline, "HAND", debugName);
+    }
+
+    /**
+     * Iris on the OpenGL backend uses the optional uniform bridge. A Vulkan shader replacement
+     * such as Sulkan has no verified equivalent API, so it takes the ordinary unmasked fallback.
+     */
+    public static boolean shouldDisableScopeMaskUnderShaderPack() {
+        return ModList.get().isLoaded("sulkan");
+    }
+
     public static synchronized void assignCommonEntityPipelinesToHandIfNeeded() {
         if (!ModList.get().isLoaded(CompatRegistry.IRIS)) {
             return;

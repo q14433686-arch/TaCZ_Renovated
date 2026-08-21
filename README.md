@@ -7,9 +7,10 @@
 Timeless and Classics Zero 的 NeoForge 26.2 前滚移植。26.1.2 Beta-1 是唯一代码出发点；
 本仓库保持公开源码与可审计谱系。
 
-**当前 r0 尚未发布：** 26.2 classfile、NeoForge/Iris/兼容 Mod 源码与静态 API 检查已完成；
-用户已在生产 JDK 25 / Gradle 9.2.1 环境报告更新后的 `compileJava` 与 `build` PASS。
-专服 `Done`、OpenGL/Iris/Vulkan 和可选 Mod 游戏矩阵仍待执行；未实测内容不会标成 PASS。
+**当前 r0 尚未发布：** 用户曾对 commit `c40dab9` 报告生产 JDK 25 `compileJava` / `build`
+PASS；此后当前分支按 refab 26.2 语义把 GL-only depth-aperture 替换为离屏目镜掩码，
+因此当前 HEAD 必须重新构建。专服、OpenGL/Iris/Vulkan 和可选 Mod 游戏矩阵仍待执行；
+未实测内容不会标成 PASS。
 
 ## 谱系与许可
 
@@ -33,13 +34,15 @@ MCModderAnchor/TACZ                         1.20.1 Forge 官方源
 
 ## 26.2 渲染边界
 
-- **OpenGL**：保留并前滚 depth-aperture 瞄具；可选 Iris 1.11.x 走反射 API 与
-  HAND/HAND_TRANSLUCENT shader bridge。
-- **Vulkan（实验）**：不执行 OpenGL depth copy；瞄具走隐藏 opaque ocular 的未掩码降级，
-  并记录一次说明日志。
-- **Aperture**：未作为已发布依赖接入，本期不支持。
+- **OpenGL**：采用 26.2 阶段边界离屏 ocular mask；镜身/视模/火光在镜内 discard，
+  准星反向约束在镜内。
+- **OpenGL + Iris 1.11.x**：自定义 pipeline 归类到 HAND，并通过默认关闭的 fragment
+  uniform branch 绑定同一 mask；仍待 GPU 实测。
+- **Vulkan（实验）**：普通 mask 路径不调用 GL API，使用同一 `TextureTarget` /
+  `RenderPass` 抽象；仍须验证 target 切换无 device loss。
+- **其他 shader replacement**：没有已核 bridge 时走普通未掩码回退；Aperture 未硬依赖接入。
 
-这意味着 r0 不应被描述为“Vulkan 瞄具/光影已兼容”。
+这意味着 r0 仍不应在 GPU 矩阵完成前描述成“Vulkan/光影已兼容”。
 
 ## 可选 Mod
 

@@ -8,8 +8,9 @@ import net.minecraft.world.item.ItemStack;
  * Work package ⑥ shader-pack facade.
  *
  * <p>26.2's OpenGL path talks to Iris only through this type / {@link IrisCompat}
- * (public API + optional HAND-fragment mixin). The experimental Vulkan backend deliberately
- * uses the unmasked scope fallback; Aperture is not a released dependency for this port.</p>
+ * (public API + optional dormant HAND-fragment mask branch). The ordinary 26.2 off-screen mask
+ * itself is backend-neutral; shader replacements without a verified bridge use the unmasked
+ * fallback rather than attempting loader-specific internals.</p>
  */
 public final class ShaderCompat {
     private ShaderCompat() {

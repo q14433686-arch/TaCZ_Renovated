@@ -78,14 +78,14 @@ TextColor#getValue() : int
 
 | AT 项 | 26.2 descriptor / 实际 access | 处理 |
 |---|---|---|
-| `RenderType.<init>` | `(String, RenderSetup)V`，`private` | **保留**，签名未变 |
+| `RenderType.<init>` | `(String, RenderSetup)V`，`private` | scope 改用公开 `RenderType#create` 后删除该 AT |
 | `MultiPlayerGameMode#ensureHasSentCarriedItem` | `()V`，NeoForge patched source 为 `private` | **恢复** `public` AT |
 | `Minecraft#startUseItem` | `()V`，真实 compile 为 `private` | **恢复** `public` AT |
 | `LivingEntity#jumping` | `Z`，真实 compile 为 `protected` | **恢复** `public-f` AT |
 | `RenderPipelines#register` | `(RenderPipeline)RenderPipeline`，`public static` | 仍删除；本仓已改用 NeoForge pipeline event |
 
-AT 现在包含四个在役源码访问所必需的精确目标；没有恢复已不用的
-`RenderPipelines#register`。这与 refab AW 的前三项语义一致，但采用 NeoForge AT 表面。
+AT 现在只包含三个在役源码访问所必需的精确目标；`RenderType` 构造器与已不用的
+`RenderPipelines#register` 均不再开放。这与 refab AW 的前三项语义一致，但采用 NeoForge AT 表面。
 
 ## 其他非渲染核验
 
@@ -125,9 +125,9 @@ NeoForm 成功下载并处理 Minecraft 26.2，随后 `compileJava` 报 9 个错
 - `AvatarRenderer#renderRightHand/#renderLeftHand` 改用 26.2 五参 descriptor，并把末参恢复为
   对应 sleeve model-part 是否显示，而不是旧代码误传的 slim/player 参数。
 
-commit `15e4a35` 落地上述修复后，用户已报告请求的 JDK 25 `compileJava` / `build`
-重跑 **PASS**。该结果只关闭生产编译/构建闸门；专服 `Done` 与枪包装载数字尚未实跑，
-仍需执行：
+commit `15e4a35` 落地上述修复后，用户对 commit `c40dab9` 报告 JDK 25
+`compileJava` / `build` **PASS**。该结果确认这些非渲染修复成立；之后的 scope-mask
+替换仍需重建。专服 `Done` 与枪包装载数字尚未实跑，仍需执行：
 
 ```bash
 ./gradlew runServer --no-configuration-cache

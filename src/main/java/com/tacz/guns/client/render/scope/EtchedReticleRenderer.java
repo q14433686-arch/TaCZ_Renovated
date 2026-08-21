@@ -30,12 +30,16 @@ import java.util.List;
  * {@code scope_1873_6x} 有 96×34 的），第 9 轮无差别绘制过一次，
  * 结果是一大块黑色糊住屏幕，第 10 轮撤销。
  *
- * <p>上游能直接整根画是因为 stencil 会把一切裁在目镜圆内。当前实现已具备真正的 ocular
- * 屏幕空间 mask（reticle 片段逐像素比较 aperture 深度与世界深度，只有
- * {@code ocularDepth > worldDepth + epsilon} 存活），但 CPU 尺寸过滤仍然保留：遮光板
- * 反正会被 mask 整块 discard，提前在提交时剔除可以省掉顶点写入与光栅化，并且在 mask
- * 链路降级的极端情况下依旧不会出现大块黑面。调用方用 {@code maskActive} 表示该安全过滤
- * 路径已启用；否则仍然不画。
+ * <p>上游能直接整根画是因为它有 stencil 兜底
+ * （{@code renderDivisionOnly: stencilFunc(GL_EQUAL, i+1)} 把一切裁在目镜圆内）。
+ * <b>现在我们也有等价物了</b> —— 反向裁剪的 RenderType。
+ * 已逐个核对：这些遮光板的 XY 范围<b>全部落在目镜投影之外</b>
+ * （如 {@code scope_retro_2x} 目镜 X∈[-0.75,0.75]，而遮光板 X∈[-32,-8]），
+ * 因此会被反向裁剪整块丢弃，不会重演第 9 轮的糊屏。
+ *
+ * <p>换句话说：这个策略<b>依赖掩码才成立</b>。若掩码不可用（配置关闭等），
+ * 调用方传进来的就是未裁剪的 RenderType，此时遮光板会露出来 ——
+ * 所以 {@link #submitReticle} 里加了兜底，掩码没生效时不画。
  */
 public final class EtchedReticleRenderer implements IReticleRenderer {
 
@@ -60,7 +64,10 @@ public final class EtchedReticleRenderer implements IReticleRenderer {
     @Override
     public void submitReticle(Context ctx, ScopeNodeSet nodes) {
         if (!ctx.maskActive()) {
-            // Without the caller-selected filtered pipeline, never risk submitting the full division tree.
+            // 【安全兜底】掩码没生效时绝不绘制。
+            // division 里的遮光板尺寸极大（scope_qmk152 单块面积 6486），
+            // 没有反向裁剪就会整块糊在屏幕上 —— 第 9 轮踩过、第 10 轮撤销过。
+            // 宁可这几个瞄具暂时没准星（= 修复前的现状），也不能糊屏。
             return;
         }
         float progress = ctx.aimingProgress();
@@ -124,10 +131,7 @@ public final class EtchedReticleRenderer implements IReticleRenderer {
             PoseStack identity = new PoseStack();
             ctx.collector().submitCustomGeometry(
                     identity, ctx.baseRenderType(),
-                    // 遮光板剔除的规则与阈值见 ReticleMarkFilter —— 与发光准星共用同一把尺，
-                    // 避免任何一条路径在 mask 降级时把大面外露。
-                    (entryPose, consumer) -> snapshot.writeFiltered(
-                            consumer, ReticleMarkFilter::isThinMark));
+                    (entryPose, consumer) -> snapshot.write(consumer));
         }
     }
 }

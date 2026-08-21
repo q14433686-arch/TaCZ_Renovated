@@ -20,7 +20,6 @@ import com.tacz.guns.client.model.SlotModel;
 import com.tacz.guns.client.model.bedrock.BedrockPart;
 import com.tacz.guns.client.model.functional.MuzzleFlashRender;
 import com.tacz.guns.client.model.functional.ShellRender;
-import com.tacz.guns.client.render.scope.ScopeRenderTypes;
 import com.tacz.guns.client.resource.GunDisplayInstance;
 import com.tacz.guns.client.resource.pojo.TransformScale;
 import com.tacz.guns.compat.iris.IrisCompat;
@@ -268,9 +267,6 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
             // 第一人称手部 pass 下，预先让 Iris 把 vanilla entity/item 管线归到 hand program。
             // 方法内部只尝试一次，避免 shader 下每帧重复匹配刷日志。
             IrisCompat.assignCommonEntityPipelinesToHandIfNeeded();
-            // Reset the extraction-time aperture marker before the scope attachment and gun FX
-            // are traversed synchronously by gunModel.submit.
-            ScopeRenderTypes.beginViewmodelSubmission();
             // 调用枪械模型渲染
             RenderType renderType = display.enablesTransparency()
                     ? RenderTypes.entityTranslucent(display.getModelTexture())

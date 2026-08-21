@@ -13,6 +13,14 @@ public class RenderConfig {
     public static ModConfigSpec.BooleanValue HEAD_SHOT_DEBUG_HITBOX;
     /** 瞄准镜镜内裁剪（目镜掩码）总开关。默认<b>开启</b>。 */
     public static ModConfigSpec.BooleanValue SCOPE_MASK_ENABLE;
+    /** 调试：将当帧离屏目镜掩码显示在屏幕左上角。 */
+    public static ModConfigSpec.BooleanValue SCOPE_MASK_DEBUG;
+    /** 用目镜投影凸包填充稀疏板条模型的孔径。 */
+    public static ModConfigSpec.BooleanValue SCOPE_MASK_HULL_FILL;
+    /** 将物理 ocular_ring 从裁剪批次摘出并使用普通 RenderType 重画。 */
+    public static ModConfigSpec.BooleanValue SCOPE_OCULAR_RING_FIX;
+    /** 红点/低倍 sight 通道不裁镜身，对齐上游 renderSight。 */
+    public static ModConfigSpec.BooleanValue SCOPE_SIGHT_CLIP_FIX;
     public static ModConfigSpec.BooleanValue GUN_HUD_ENABLE;
     public static ModConfigSpec.BooleanValue KILL_AMOUNT_ENABLE;
     public static ModConfigSpec.DoubleValue KILL_AMOUNT_DURATION_SECOND;
@@ -49,9 +57,21 @@ public class RenderConfig {
         builder.comment("Whether or not to display the head shot's hitbox");
         HEAD_SHOT_DEBUG_HITBOX = builder.define("HeadShotDebugHitbox", false);
         SCOPE_MASK_ENABLE = builder
-                .comment("Whether to open first-person scopes with the OpenGL ocular depth aperture. "
-                        + "Minecraft's experimental Vulkan backend uses an unmasked fallback.")
+                .comment("Whether to clip scope bodies, reticles and viewmodel effects using the 26.2 off-screen ocular mask.")
                 .define("ScopeMaskEnable", true);
+        SCOPE_MASK_DEBUG = builder
+                .comment("Debug: draw the off-screen ocular mask at the top-left corner.")
+                .define("ScopeMaskDebug", false);
+        SCOPE_MASK_HULL_FILL = builder
+                .comment("Fill the convex hull of the ocular projection; fixes sparse/sliver ocular geometry. "
+                        + "Set false to use the raw ocular geometry as an instant fallback.")
+                .define("ScopeMaskHullFill", true);
+        SCOPE_OCULAR_RING_FIX = builder
+                .comment("Draw the physical ocular_ring unclipped while aiming, matching upstream stencil-ALWAYS semantics.")
+                .define("ScopeOcularRingFix", true);
+        SCOPE_SIGHT_CLIP_FIX = builder
+                .comment("Do not clip the scope body for red-dot/low-power sight channels, matching upstream renderSight.")
+                .define("ScopeSightClipFix", true);
 
         builder.comment("Whether or not to display the gun's HUD");
         GUN_HUD_ENABLE = builder.define("GunHUDEnable", true);

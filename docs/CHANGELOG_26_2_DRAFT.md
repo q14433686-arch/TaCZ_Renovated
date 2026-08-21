@@ -11,7 +11,7 @@
   `ResourceHandler<ItemResource>` API。
 - 退弹入包改用原版 `Inventory#placeItemBackInInventory(ItemStack)`；背包满时仍会掉落实体。
 - 删除无引用的 `GunPackProgressScreen`。
-- 构建验收待在具备 JDK 25 且可下载 Gradle/依赖的环境补跑；当前不声明编译或实机 PASS。
+- commit `c40dab9` 曾获用户 JDK 25 build PASS；当前 scope-mask 替换后的 HEAD 需重建。
 
 ### WP-262-1
 
@@ -19,8 +19,7 @@
 - 版本设为 `1.1.8+neoforge.26.2.0.r0`，保持 `1.1.8` SemVer core 与枪包依赖兼容。
 - 对齐官方 MDK-26.2：Gradle 9.2.1、ModDevGradle 2.0.144、Foojay 1.0.0、
   Java 25、`[26.2]` 精确游戏范围，并修正 `gradlew` 可执行位。
-- 保留 OpenGL/depth-aperture 为本期瞄具主路径；没有宣称 Vulkan 或 Aperture 支持。
-- 服务端启动验收仍待可联网的 JDK 25 环境执行。
+- 瞄具主路径已改为 26.2 阶段边界离屏 ocular mask；当前 HEAD 构建与服务端启动待重跑。
 
 ### WP-262-2
 
@@ -28,25 +27,25 @@
   `Minecraft.gui.screen()` / `Gui#setScreen(...)`。
 - HUD/准星取消继续走 NeoForge `RenderGuiLayerEvent.Pre`，不注入 vanilla `Hud` 私有流程。
 - 交互提示颜色从已移除的 `ChatFormatting#getColor()` 迁到 `TextColor#getValue()`。
-- 逐条重验 AT；仅保留仍为 private 的 `RenderType(String, RenderSetup)` 构造器条目，
-  删除四个 26.2 已公开成员的冗余 widening。
+- 逐条重验 AT；scope 改用公开 `RenderType#create` 后删除构造器 widening，只保留三个
+  真实 transformed classpath 所需的 gameplay 访问条目。
 - Mixin compatibility level 对齐 Java 25；注册与 common mixin 目标完成静态 descriptor 核验。
 - 专服 `Done` 与枪包装载数字仍待可运行环境验证。
 
 ### WP-262-3
 
-- 将自定义 pipeline 迁到 26.2 的 `BindGroupLayout`、多 color target、vertex binding、
-  `PrimitiveTopology` 与 `GpuFormat` API，并通过 NeoForge `RegisterRenderPipelinesEvent` 注册。
-- 保留 OpenGL depth-aperture；`RenderType#draw` operation 边界迁到
-  `PreparedRenderType` + 26.2 八参数 GL encoder draw 边界。
-- 对齐 26.2 reversed-Z compare、depth bias 与 GLSL aperture 深度判据。
-- Vulkan 下不构造 GL-only pipeline，瞄具改走隐藏 opaque ocular 的未掩码降级，并记录一次 warning；
-  不声明 Vulkan depth/光影或 Aperture 支持。
-- PiP 改为框架传入 `SubmitNodeCollector`；爆头框改走官方 shape-outline feature；
-  第一人称 hand 方法、GameRenderer camera getter 全部对齐 26.2 descriptor。
-- Iris 1.11.x 反射入口按 26.2 source 重验，恢复 shadow-pass 查询，并保留
-  HAND/HAND_TRANSLUCENT pipeline 分类与 hand fragment depth 分支。
-- 当前只有静态 classfile/API 检查；JDK 25 全仓构建及 OpenGL/Iris/Vulkan GPU 矩阵未执行。
+- 采用 refab 26.2 已知解：提交阶段收集 ocular，`FeatureRenderDispatcher#executeSolid` 前
+  在阶段边界一次性绘制无 depth 的 RGBA8 离屏 mask。
+- 镜身/枪身/非瞄具配件/枪口火光在镜内 discard，准星反向约束在镜内；加入凸包填充、
+  sight/scope 通道门禁与 `ocular_ring` 普通 RenderType 重画。
+- 七条 mask-aware pipeline 经 NeoForge `RegisterRenderPipelinesEvent` 注册；普通路径不调用
+  GL API，可进入 OpenGL/Vulkan backend。
+- 删除旧 raw-depth copy/restore 类、GL encoder mixin、fragment shader 与 private RenderType AT。
+- Iris 改为 linked-fragment dormant mask branch + 每 draw uniform/texture binding；没有已核 bridge
+  的 shader replacement 安全回退普通渲染。
+- PiP、shape outline、hand 方法与 GameRenderer camera getter 继续使用 26.2 API。
+- 当前只有静态 classfile/API/scratch 检查；scope-mask 替换后的 JDK 25 build 与
+  OpenGL/Iris/Vulkan GPU 矩阵未执行。
 
 ### WP-262-4
 
@@ -62,6 +61,6 @@
 ### WP-262-5（发布准备，受阻）
 
 - 新建根 `CHANGELOG.md` 的 Unreleased r0 条目；README、LICENSES、PORTING_STATUS 更新到
-  26.2，且显式保留“未构建/未实测/未发布”状态。
+  26.2，且显式保留当前 HEAD“待重建/未实测/未发布”状态。
 - README 不再充当逐工作包进度表；详细状态只放 `docs/PORTING_STATUS.md`。
-- 没有生成或发布 jar：JDK 25 Gradle、专服、GPU 与可选 Mod 矩阵未通过，发布闸门保持关闭。
+- 没有发布 jar：当前 scope-mask HEAD、专服、GPU 与可选 Mod 矩阵未通过，发布闸门保持关闭。

@@ -17,10 +17,12 @@
   revalidated the minimal access transformer against the NeoForge 26.2 transformed compile classpath.
 - Migrated custom rendering to 26.2 bind-group layouts, GPU formats, multiple color targets, vertex
   bindings, primitive topology, PreparedRenderType, Feature Rendering, PiP collectors, and shape outlines.
-- Retained the OpenGL depth-aperture scope architecture, including Iris hand-pipeline classification
-  and depth restore/mask shader bridge; updated comparisons for 26.2 reversed-Z.
-- Added an explicit Vulkan fallback: no OpenGL depth-copy calls or GL-only custom pipeline
-  registration; the opaque ocular is hidden and ordinary unmasked render types are used.
+- Replaced the interim OpenGL depth-aperture port with refab 26.2's stage-boundary off-screen ocular
+  mask semantics, adapted to NeoForge pipeline and GUI-layer registration.
+- Added backend-neutral mask target rendering, convex-hull ocular fill, sight/scope channel gating,
+  unclipped ocular-ring redraw, inverse-clipped reticles, and shared gun/attachment/muzzle-flash clipping.
+- Replaced the Iris depth-restore bridge with the refab linked-fragment mask branch and per-draw
+  uniform/texture binding; shader replacements without a verified bridge fail open to ordinary rendering.
 - Re-pinned optional 26.2 artifacts for Cloth, PAL, Controllable, Shoulder Surfing, JEI, REI and
   their compile dependencies.
 - Updated Carry On compatibility to 2.11's `ItemStackTemplate#create()` rendering path.
@@ -32,13 +34,15 @@
 
 - Removed dead `GunPackProgressScreen`.
 - Removed all use of NeoForge's deprecated-for-removal `IItemHandler` family.
-- Removed the unused `RenderPipelines#register` AT; retained the four transformed members required by active 26.2 code.
+- Removed the old raw-depth scope classes/mixins/shaders and their private `RenderType` constructor AT;
+  retained only the three transformed gameplay members required by active 26.2 code.
 
 ### Known limitations / verification
 
-- User-reported production JDK 25 `compileJava` and `build`: **PASS** after the 26.2 compile fixes.
+- User-reported production JDK 25 `compileJava` and `build`: **PASS for commit `c40dab9`**.
+  The subsequent scope-mask replacement changes the current HEAD and requires a fresh build.
 - Dedicated-server `Done`, gun-pack load counts and the built jar's final contents are not yet verified.
-- OpenGL, Iris and Vulkan require GPU testing; Vulkan has no depth-aperture effect.
+- OpenGL, Iris and Vulkan scope-mask paths require GPU testing.
 - Optional compatibility entries are source/API-audited but not user PASS.
 - Aperture and LRTactical are not included.
 

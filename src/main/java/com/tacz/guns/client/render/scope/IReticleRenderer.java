@@ -2,7 +2,7 @@ package com.tacz.guns.client.render.scope;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.tacz.guns.client.model.bedrock.BedrockPart;
-import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
 
@@ -26,7 +26,7 @@ import net.minecraft.world.item.ItemDisplayContext;
  * <h2>实现约定</h2>
  * <ol>
  *   <li>只能走 <b>submit 快照</b>链路（{@code BedrockRenderSnapshot}），
- *       <b>不要</b>调用 legacy {@code renderTempPart}——它在 26.1.2 是 no-op；</li>
+ *       <b>不要</b>调用 legacy {@code renderTempPart}——它在 26.2 是 no-op；</li>
  *   <li>若修改了 {@link BedrockPart#visible}，必须在 {@code finally} 里还原：
  *       模型节点是<b>跨帧共享</b>的，不还原会污染第三人称与物品栏；</li>
  *   <li>实现应当是无状态的（单例即可），所有每帧数据从 {@link Context} 取。</li>
@@ -75,7 +75,7 @@ public interface IReticleRenderer {
      *                       才能安全绘制，否则会糊住屏幕（第 9 轮的教训）。</p>
      */
     record Context(PoseStack poseStack,
-                   OrderedSubmitNodeCollector collector,
+                   SubmitNodeCollector collector,
                    ItemDisplayContext displayContext,
                    RenderType baseRenderType,
                    RenderType illuminatedRenderType,

@@ -17,12 +17,15 @@
 
 当前沙盒仍没有生产 JDK 25 依赖下载通道或 GPU。2026-08-21 用户在 Windows 的真实
 JDK 25 / Gradle 9.2.1 环境首次运行 `gradlew build`，随后报告 9 个错误。本分支依据该
-真实输出修复 AT、FOV pass、HUD tick 与 AvatarRenderer descriptor 后，用户已报告请求的
-`compileJava` / `build` 重跑 **PASS**。
+真实输出修复 AT、FOV pass、HUD tick 与 AvatarRenderer descriptor 后，用户对 commit
+`c40dab9` 报告 `compileJava` / `build` 重跑 **PASS**。此后当前分支按用户裁决将 scope
+渲染替换为 refab 26.2 离屏 ocular mask，因此该 PASS 不再覆盖当前 HEAD。
 
-该 PASS 不覆盖以下仍未通过的发布闸门：
+以下发布闸门仍未通过：
 
 ```bash
+./gradlew clean compileJava --warning-mode all --no-configuration-cache
+./gradlew build --no-configuration-cache
 ./gradlew runServer --no-configuration-cache
 ./gradlew runClient --no-configuration-cache
 ```
