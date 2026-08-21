@@ -185,4 +185,7 @@ AI 协作者请先读 [`AGENTS.md`](AGENTS.md)。版本历史见 [CHANGELOG.md](
 2. Minecraft、NeoForge 与本 mod 的完整版本；
 3. 第三方枪包和可选模组的名称与版本；
 4. 是否能在"仅本 mod"的最小环境复现；
-5. 使用 shader pack 时，注明 Iris 与 shader pack 的具体版本。
+5. 使用 shader pack 时，注明 Iris 与 shader pack 的具体版本；
+6. **混合服（Youer/Arclight/Mohist 系）或代理网络（Velocity 等）上的问题，
+   请先在原生 NeoForge 专用服务器复现后再提交**——混合核会改写网络与事件底层，
+   无法复现的问题恕不受理。
