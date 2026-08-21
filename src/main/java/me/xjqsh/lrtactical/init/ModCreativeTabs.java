@@ -43,8 +43,11 @@ public final class ModCreativeTabs {
             net.minecraft.resources.Identifier.fromNamespaceAndPath(EquipmentMod.MOD_ID, "test_medkit")
     };
 
-    public static final CreativeModeTab THROWABLE_TAB = register("throwable",
-            CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
+    /** 26.1：注册只能在 RegisterEvent 窗口内执行（注册表冻结机制），见 ModItems 注释。 */
+    public static CreativeModeTab THROWABLE_TAB;
+
+    private static CreativeModeTab buildThrowableTab() {
+        return CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
                     .title(Component.translatable("itemGroup." + EquipmentMod.MOD_ID + ".throwable"))
                     .icon(() -> ModItems.THROWABLE.getDefaultInstance())
                     .displayItems((parameters, output) -> {
@@ -67,7 +70,7 @@ public final class ModCreativeTabs {
                                 .forEach(index -> output.accept(index.createItemStack()));
                         output.accept(ModItems.DETONATOR);
                     })
-                    .build());
+                    .build();
 
     private static void addBuiltinTestStacks(CreativeModeTab.Output output) {
         for (net.minecraft.resources.Identifier id : BUILTIN_TEST_THROWABLES) {
@@ -105,8 +108,14 @@ public final class ModCreativeTabs {
     private ModCreativeTabs() {
     }
 
-    public static void init() {
-        // 触发静态初始化，完成注册
+    public static void register(net.neoforged.bus.api.IEventBus modEventBus) {
+        modEventBus.addListener(net.neoforged.neoforge.registries.RegisterEvent.class, event -> {
+            if (event.getRegistryKey() != net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB) {
+                return;
+            }
+            // CREATIVE_MODE_TAB 的注册阶段晚于 ITEM，displayItems/icon lambda 引用的物品均已就绪。
+            THROWABLE_TAB = register("throwable", buildThrowableTab());
+        });
     }
 
     private static CreativeModeTab register(String name, CreativeModeTab tab) {

@@ -54,14 +54,18 @@ public final class EquipmentMod {
      * 标签页的 {@code icon} 与 {@code displayItems} 会引用物品实例。
      */
     public static void init(IEventBus modEventBus) {
-        ModItems.init();
-        ModEntities.init();
+        // 26.1：所有 vanilla 注册表的写入都必须在 RegisterEvent 窗口内执行
+        //（mod 构造期注册表已冻结，new Item()/Registry.register 会直接抛
+        // "Registry is already frozen"）。各 init 类挂监听、窗口内填充静态字段。
+        ModItems.register(modEventBus);
+        ModEntities.register(modEventBus);
         // 粒子类型注册表两端都要有（服务端 addParticle 也要能查到该类型）
-        me.xjqsh.lrtactical.init.ModParticleTypes.init();
+        me.xjqsh.lrtactical.init.ModParticleTypes.register(modEventBus);
         // 状态效果注册表两端都要有（服务端施加效果、客户端查询效果）
-        me.xjqsh.lrtactical.init.ModEffects.init();
+        me.xjqsh.lrtactical.init.ModEffects.register(modEventBus);
+        // ModCustomTypes 是自建静态 map（非 vanilla 注册表），构造期类加载安全
         ModCustomTypes.init();
-        ModCreativeTabs.init();
+        ModCreativeTabs.register(modEventBus);
 
         // 近战攻击入口：把左键攻击接到 IMeleeWeapon#performAttack（服务端权威，客户端拦截原版攻击）。
         NeoForge.EVENT_BUS.addListener((AttackEntityEvent event) ->

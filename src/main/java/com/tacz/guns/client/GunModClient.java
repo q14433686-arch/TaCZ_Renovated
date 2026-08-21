@@ -25,7 +25,6 @@ public class GunModClient {
         modEventBus.addListener(me.xjqsh.lrtactical.client.init.ModEntitiesRender::registerEntityRenderers);
         modEventBus.addListener(me.xjqsh.lrtactical.client.init.ModEntitiesRender::registerParticles);
         modEventBus.addListener(me.xjqsh.lrtactical.client.init.ModEntitiesRender::registerHudOverlays);
-        me.xjqsh.lrtactical.client.init.ModEntitiesRender.registerItemRenderers();
         // LR 的 game bus 注册：近战左右键、冷却/动画 tick、耳鸣声驱动。
         var bus = net.neoforged.neoforge.common.NeoForge.EVENT_BUS;
         bus.addListener(me.xjqsh.lrtactical.client.input.MeleeAttackKeys::onMousePress);

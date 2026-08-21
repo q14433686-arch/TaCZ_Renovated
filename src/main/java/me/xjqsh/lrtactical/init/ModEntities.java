@@ -3,6 +3,7 @@ package me.xjqsh.lrtactical.init;
 import me.xjqsh.lrtactical.EquipmentMod;
 import me.xjqsh.lrtactical.entity.GrenadeEntity;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -22,30 +23,30 @@ import net.minecraft.world.entity.EntityType;
  * 这与 TACZ 侧同名方法的用意相同。
  */
 public final class ModEntities {
-    public static final EntityType<GrenadeEntity> GRENADE =
-            register("explode_grenade", GrenadeEntity.TYPE);
-
-    public static final EntityType<me.xjqsh.lrtactical.entity.StickyGrenadeEntity> STICKY_GRENADE =
-            register("sticky_grenade", me.xjqsh.lrtactical.entity.StickyGrenadeEntity.TYPE);
-
-    public static final EntityType<me.xjqsh.lrtactical.entity.SmokeGrenadeEntity> SMOKE_GRENADE =
-            register("smoke_grenade", me.xjqsh.lrtactical.entity.SmokeGrenadeEntity.TYPE);
-
-    public static final EntityType<me.xjqsh.lrtactical.entity.EffectCloudGrenadeEntity> EFFECT_CLOUD_GRENADE =
-            register("effect_cloud_grenade", me.xjqsh.lrtactical.entity.EffectCloudGrenadeEntity.TYPE);
-
-    /** 效果云本体 —— 由 {@link #EFFECT_CLOUD_GRENADE} 落地后生成。 */
-    public static final EntityType<me.xjqsh.lrtactical.entity.sp.SpEffectCloudEntity> SP_EFFECT_CLOUD =
-            register("sp_effect_cloud", me.xjqsh.lrtactical.entity.sp.SpEffectCloudEntity.TYPE);
-
-    public static final EntityType<me.xjqsh.lrtactical.entity.StunGrenadeEntity> STUN_GRENADE =
-            register("stun_grenade", me.xjqsh.lrtactical.entity.StunGrenadeEntity.TYPE);
+    /** 26.1：注册只能在 RegisterEvent 窗口内执行（注册表冻结机制），见 ModItems 注释。 */
+    public static EntityType<GrenadeEntity> GRENADE;
+    public static EntityType<me.xjqsh.lrtactical.entity.StickyGrenadeEntity> STICKY_GRENADE;
+    public static EntityType<me.xjqsh.lrtactical.entity.SmokeGrenadeEntity> SMOKE_GRENADE;
+    public static EntityType<me.xjqsh.lrtactical.entity.EffectCloudGrenadeEntity> EFFECT_CLOUD_GRENADE;
+    public static EntityType<me.xjqsh.lrtactical.entity.sp.SpEffectCloudEntity> SP_EFFECT_CLOUD;
+    public static EntityType<me.xjqsh.lrtactical.entity.StunGrenadeEntity> STUN_GRENADE;
 
     private ModEntities() {
     }
 
-    public static void init() {
-        // 触发静态初始化，见类注释
+    /** 效果云本体 —— 由 {@link #EFFECT_CLOUD_GRENADE} 落地后生成。 */
+    public static void register(net.neoforged.bus.api.IEventBus modEventBus) {
+        modEventBus.addListener(net.neoforged.neoforge.registries.RegisterEvent.class, event -> {
+            if (event.getRegistryKey() != Registries.ENTITY_TYPE) {
+                return;
+            }
+            GRENADE = register("explode_grenade", GrenadeEntity.TYPE);
+            STICKY_GRENADE = register("sticky_grenade", me.xjqsh.lrtactical.entity.StickyGrenadeEntity.TYPE);
+            SMOKE_GRENADE = register("smoke_grenade", me.xjqsh.lrtactical.entity.SmokeGrenadeEntity.TYPE);
+            EFFECT_CLOUD_GRENADE = register("effect_cloud_grenade", me.xjqsh.lrtactical.entity.EffectCloudGrenadeEntity.TYPE);
+            SP_EFFECT_CLOUD = register("sp_effect_cloud", me.xjqsh.lrtactical.entity.sp.SpEffectCloudEntity.TYPE);
+            STUN_GRENADE = register("stun_grenade", me.xjqsh.lrtactical.entity.StunGrenadeEntity.TYPE);
+        });
     }
 
     private static <T extends Entity> EntityType<T> register(String name, EntityType<T> type) {

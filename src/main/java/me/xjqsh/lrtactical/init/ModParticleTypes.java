@@ -28,14 +28,19 @@ import net.minecraft.resources.Identifier;
  * 这个坑本模块第 4 步已经踩过一次（物品注册了却找不到）。
  */
 public final class ModParticleTypes {
-    public static final SimpleParticleType SMOKE_CLOUD =
-            register("smoke_cloud", new SimpleParticleType(true));
+    /** 26.1：注册只能在 RegisterEvent 窗口内执行（注册表冻结机制），见 ModItems 注释。 */
+    public static SimpleParticleType SMOKE_CLOUD;
 
     private ModParticleTypes() {
     }
 
-    public static void init() {
-        // 触发静态初始化，完成注册
+    public static void register(net.neoforged.bus.api.IEventBus modEventBus) {
+        modEventBus.addListener(net.neoforged.neoforge.registries.RegisterEvent.class, event -> {
+            if (event.getRegistryKey() != net.minecraft.core.registries.Registries.PARTICLE_TYPE) {
+                return;
+            }
+            SMOKE_CLOUD = register("smoke_cloud", new SimpleParticleType(true));
+        });
     }
 
     private static SimpleParticleType register(String name, SimpleParticleType type) {

@@ -25,17 +25,21 @@ import net.minecraft.world.effect.MobEffect;
  * 静态字段的注册要靠类加载触发，而类加载是惰性的。
  */
 public final class ModEffects {
-    /** 致盲：屏幕糊白/黑。实际表现见 {@code BlindnessOverlay}。 */
-    public static final Holder<MobEffect> BLIND = register("blinded", new HarmfulEffect(0xFFFFFF));
-
-    /** 耳鸣/失聪：压低所有音效音量。实际表现见 {@code DeafenSoundHandler}。 */
-    public static final Holder<MobEffect> DEAFENED = register("deafened", new HarmfulEffect(0xFFFFFF));
+    /** 26.1：注册只能在 RegisterEvent 窗口内执行（注册表冻结机制），见 ModItems 注释。 */
+    public static Holder<MobEffect> BLIND;
+    public static Holder<MobEffect> DEAFENED;
 
     private ModEffects() {
     }
 
-    public static void init() {
-        // 触发静态初始化，完成注册
+    public static void register(net.neoforged.bus.api.IEventBus modEventBus) {
+        modEventBus.addListener(net.neoforged.neoforge.registries.RegisterEvent.class, event -> {
+            if (event.getRegistryKey() != net.minecraft.core.registries.Registries.MOB_EFFECT) {
+                return;
+            }
+            BLIND = register("blinded", new HarmfulEffect(0xFFFFFF));
+            DEAFENED = register("deafened", new HarmfulEffect(0xFFFFFF));
+        });
     }
 
     private static Holder<MobEffect> register(String name, MobEffect effect) {

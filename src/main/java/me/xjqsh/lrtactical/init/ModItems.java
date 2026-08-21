@@ -24,23 +24,29 @@ import net.minecraft.world.item.Item;
  * 原作的 {@code flash_shield} 仍未移植，因此这里不注册一个无法使用的空壳物品。</p>
  */
 public final class ModItems {
-    public static final ThrowableItem THROWABLE =
-            register("throwable", new ThrowableItem(itemProps("throwable")));
-
-    public static final me.xjqsh.lrtactical.item.MeleeItem MELEE =
-            register("melee", new me.xjqsh.lrtactical.item.MeleeItem(itemProps("melee")));
-
-    public static final me.xjqsh.lrtactical.item.DetonatorItem DETONATOR =
-            register("detonator", new me.xjqsh.lrtactical.item.DetonatorItem(itemProps("detonator")));
-
-    public static final me.xjqsh.lrtactical.item.ConsumableItem CONSUMABLE =
-            register("consumable", new me.xjqsh.lrtactical.item.ConsumableItem(itemProps("consumable")));
+    /**
+     * 26.1 NeoForge：{@code new Item(...)} 的构造器会立即向注册表写 intrusive holder，
+     * 而 mod 构造期注册表已冻结 —— 物品只能在 {@code RegisterEvent} 窗口内构造。
+     * 因此字段不是 final，由 {@link #register(IEventBus)} 在窗口内填充（引用点无需改动）。
+     */
+    public static ThrowableItem THROWABLE;
+    public static me.xjqsh.lrtactical.item.MeleeItem MELEE;
+    public static me.xjqsh.lrtactical.item.DetonatorItem DETONATOR;
+    public static me.xjqsh.lrtactical.item.ConsumableItem CONSUMABLE;
 
     private ModItems() {
     }
 
-    public static void init() {
-        // 触发静态初始化，完成上面的注册
+    public static void register(net.neoforged.bus.api.IEventBus modEventBus) {
+        modEventBus.addListener(net.neoforged.neoforge.registries.RegisterEvent.class, event -> {
+            if (event.getRegistryKey() != Registries.ITEM) {
+                return;
+            }
+            THROWABLE = register("throwable", new ThrowableItem(itemProps("throwable")));
+            MELEE = register("melee", new me.xjqsh.lrtactical.item.MeleeItem(itemProps("melee")));
+            DETONATOR = register("detonator", new me.xjqsh.lrtactical.item.DetonatorItem(itemProps("detonator")));
+            CONSUMABLE = register("consumable", new me.xjqsh.lrtactical.item.ConsumableItem(itemProps("consumable")));
+        });
     }
 
     private static ResourceKey<Item> itemKey(String name) {

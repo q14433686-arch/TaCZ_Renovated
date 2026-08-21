@@ -138,6 +138,9 @@ public class ClientSetupEvent {
 
     public static void onClientSetup() {
         ThirdPersonManager.registerDefault();
+        // WP⑦ LR 的动态渲染器登记：必须在 RegisterEvent 之后（物品已实例化），
+        // FMLClientSetupEvent.enqueueWork 时点满足。
+        me.xjqsh.lrtactical.client.init.ModEntitiesRender.registerItemRenderers();
         FirstPersonAnimationCompat.init();
         ShoulderSurfingCompat.init();
         ControllableCompat.init();
