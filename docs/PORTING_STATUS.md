@@ -64,6 +64,16 @@ r20 运行日志（main latest.log）已排除的环节：PAL mod 加载 ✓（m
 - r16：爆头范围显示（F3+B）线渲染修复
 - r17 前：配置界面崩溃（双 blur）修复等
 
+### ✅ Shoulder Surfing Reloaded（越肩视角重制）——r23 恢复完整兼容
+
+三件套 + 插件 JSON（refab 26.1.2 语义，全部 API 对照 `Exopandora/ShoulderSurfing@26.1.2` 源码验证）：
+`ShoulderSurfingCompat`（判装 + **5.x API 探测**，26.1.2 线还有 4.x 旧版流通、fail-closed）、
+`ShoulderSurfingCompatInner`（`Perspective.current()==SHOULDER_SURFING && !FREE_LOOK.isDown()` 准星判断）、
+`ShoulderSurfingPlugin`（持枪/副手持枪 → SSR 自适应瞄准相机）+ `shouldersurfing_plugin.json`
+（**NeoForge 版 PluginLoader 同样扫描该 JSON**，机制跨加载器统一，源码 `PluginLoaderNeoForge` 实证）。
+编译：CurseForge 8596489（5.0.10 NeoForge 26.1.2）via CurseMaven + libs/ 逃生舱。运行时可选（modid `shouldersurfing`）。
+此前 r17 之前的残件只有反射版准星判断，无插件注册（自适应相机缺失）。
+
 ### 其余兼容层状态
 
 见 `docs/WP05_EVIDENCE.md` 兼容层盘点；其中 immediatelyfast（有据 no-op）、zoomify（NeoForge 无此 mod）、ar（无 26.1.2 版）为终态结论，非待办。

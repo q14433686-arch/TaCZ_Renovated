@@ -217,6 +217,18 @@ dependencies {
     } else {
         compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
     }
+
+    // Exopandora's Shoulder Surfing Reloaded 5.x — optional at runtime
+    // (modid shouldersurfing). 5.x API only: 4.x builds (also published for
+    // 26.1.2) use a legacy plugin API and fail closed at runtime.
+    // CurseForge file 8596489 = ShoulderSurfing-NeoForge-26.1.2-5.0.10.
+    // Escape hatch: drop ShoulderSurfing-NeoForge-*.jar into libs/ to override.
+    def localShoulderSurfing = fileTree(dir: 'libs', include: 'ShoulderSurfing-NeoForge*.jar')
+    if (!localShoulderSurfing.isEmpty()) {
+        compileOnly localShoulderSurfing
+    } else {
+        compileOnly "curse.maven:shoulder-surfing-reloaded-243190:${shoulder_surfing_neoforge_file}"
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
