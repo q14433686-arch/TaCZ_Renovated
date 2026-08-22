@@ -1,6 +1,6 @@
 # TaCZ: Renovated 26.2 文档索引
 
-当前版本：`1.1.8+neoforge.26.2.0.R1`（Unreleased candidate）。
+当前版本：`1.1.8+neoforge.26.2.R1`（Unreleased candidate）。
 
 文档按用途分为以下几类。不要把冻结记录当成当前状态，也不要把工作包过程写回根 README。
 

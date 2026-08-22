@@ -4,7 +4,7 @@
 
 > **非官方移植。请勿向 MCModderAnchor / Serene Wave Studio 报告本移植的问题。**
 >
-> 当前源码版本：**`1.1.8+neoforge.26.2.0.R1`**；状态：**Unreleased R1 candidate**
+> 当前源码版本：**`1.1.8+neoforge.26.2.R1`**；状态：**Unreleased R1 candidate**
 
 从 NeoForge 26.1.2 R1 前滚到 Minecraft 26.2 的 TaCZ 社区移植。modId 保持
 `tacz`，枪包的 `tacz >= 1.1.8` 依赖检查继续有效。
@@ -16,7 +16,7 @@
 | Minecraft | **26.2** |
 | NeoForge | **26.2.0.64** release |
 | Java | **25** |
-| 本 Mod | **1.1.8+neoforge.26.2.0.R1** |
+| 本 Mod | **1.1.8+neoforge.26.2.R1** |
 | Gradle / ModDevGradle | 9.2.1 / 2.0.144 |
 | 专用服务器与基础多人 | LR 合入前核心候选 L0-L3 用户 PASS；当前 HEAD 待重跑 |
 | LRTactical 内置层 | 已前滚；26.1.2 源基线单机/专服 PASS，26.2 未实测 |
@@ -50,7 +50,7 @@ L0-L3、L2.5 与 LR 专项；26.1.2 的 LR PASS 只作为源基线证据。
 ## 3. 安装
 
 1. 安装 Minecraft 26.2、NeoForge 26.2.0.64 与 Java 25。
-2. 将构建产物 `tacz-1.1.8+neoforge.26.2.0.R1.jar` 放入实例 `mods/`。
+2. 将构建产物 `tacz-1.1.8+neoforge.26.2.R1.jar` 放入实例 `mods/`。
 3. 客户端若使用 Vulkan，将 `config/fml.toml` 中的 `earlyWindowControl` 改为 `false`。
 4. 服务端搭建与完整 L0-L4 流程见
    [`docs/DEDICATED_SERVER_TEST.md`](docs/DEDICATED_SERVER_TEST.md)。
@@ -94,7 +94,7 @@ bash scripts/check_release_consistency.sh --strict
 
 ## 7. 版本约束
 
-`1.1.8` 是 SemVer core；`+neoforge.26.2.0.R1` 是 build metadata，不参与
+`1.1.8` 是 SemVer core；`+neoforge.26.2.R1` 是 build metadata，不参与
 `>=1.1.8` 的优先级比较。
 
 **禁止**改成 `1.1.8-neoforge...`：`-` 会产生低于正式 `1.1.8` 的 pre-release，导致部分

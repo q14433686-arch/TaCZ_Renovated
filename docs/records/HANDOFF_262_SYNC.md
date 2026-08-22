@@ -55,5 +55,5 @@
 
 ## 5. 版本号红线
 
-本分支已由项目发起人定名为 `1.1.8+neoforge.26.2.0.R1`，不得因来源 handoff 中旧的
+本分支已由项目发起人定名为 `1.1.8+neoforge.26.2.R1`，不得因来源 handoff 中旧的
 `r0` 起步示例而回退。`+` 后是 build metadata，禁止改成 `-` pre-release。
