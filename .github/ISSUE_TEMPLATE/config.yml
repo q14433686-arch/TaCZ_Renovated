@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: TaCZ 原版（Forge）的问题
+    url: https://github.com/MCModderAnchor/TACZ/issues
+    about: 非本移植特有的问题，请提交到 TaCZ 原始项目
+  - name: Fabric 版（26.2 / 26.1.2 / 1.21.11）的问题
+    url: https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/issues
+    about: 姊妹项目 TaCZ Refabricated Unofficial 的问题请提交到其仓库
+  - name: 下载与版本对照
+    url: https://github.com/q14433686-arch/TaCZ-Renovated/releases
+    about: 先确认你下载的构建与 Minecraft 版本匹配
+  - name: 兼容矩阵与已知边界
+    url: https://github.com/q14433686-arch/TaCZ-Renovated/blob/main(26.1.2)/docs/COMPATIBILITY.md
+    about: 可选 mod 支持状态、枪包兼容、联机注意事项先看这里

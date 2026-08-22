@@ -1,0 +1,14 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "lrtactical:has_custom_display",
+    "on_true": {
+      "type": "lrtactical:dynamic_item",
+      "base": "minecraft:item/iron_sword"
+    },
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "minecraft:item/iron_sword"
+    }
+  }
+}

@@ -61,6 +61,7 @@ sourceSets {
     main {
         java {
             // Work package ⑤: compile client animation/gltf APIs.
+            // WP-LR2：LR 内置层已接线（安全阀已摘除，LR2-4）。
         }
     }
 }

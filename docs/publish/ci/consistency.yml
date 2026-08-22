@@ -1,0 +1,32 @@
+name: consistency
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  release-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 版本号一致性门禁（AGENTS.md §1）
+        run: bash scripts/check_release_consistency.sh --strict
+      - name: 文档链接核验
+        run: |
+          python3 - <<'EOF'
+          import re, os, sys
+          broken = 0
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if d not in ('.git','build','run','.gradle','src')]
+              for fn in files:
+                  if not fn.endswith('.md'): continue
+                  f = os.path.join(root, fn)
+                  for m in re.findall(r'\]\(([^)#\s]+)(#[^)]*)?\)', open(f, encoding='utf-8').read()):
+                      t = m[0]
+                      if t.startswith('http'): continue
+                      p = os.path.normpath(os.path.join(os.path.dirname(f), t))
+                      if not os.path.exists(p):
+                          print(f"BROKEN {f} -> {t}"); broken += 1
+          sys.exit(1 if broken else 0)
+          EOF

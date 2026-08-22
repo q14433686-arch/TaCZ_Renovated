@@ -33,6 +33,8 @@ public class GunModClient {
         event.enqueueWork(() -> {
             com.tacz.guns.client.init.ClientSetupEvent.onClientSetup();
             com.tacz.guns.client.init.ClientSetupEvent.registerItemRenderers();
+            // WP-LR2：LR 物品渲染器登记——必须在 enqueueWork 内（r29：构造期字段未填充会静默跳过）。
+            me.xjqsh.lrtactical.client.init.ModEntitiesRender.registerItemRenderers();
             com.tacz.guns.compat.shader.ShaderCompat.assignCommonEntityPipelinesToHandIfNeeded();
             GunMod.LOGGER.info("TaCZ client setup (work package ⑥ ShaderCompat). minecraft={}",
                     Minecraft.getInstance().getUser().getName());
