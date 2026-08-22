@@ -22,7 +22,7 @@
 | Minecraft | 加载器 | 状态 |
 |---|---|---|
 | **26.1.2** | NeoForge | **本仓库**（当前源码版本见上方；Releases 发布前请从源码构建） |
-| **26.2** | NeoForge | 已完成（https://github.com/q14433686-arch/TaCZ-Renovated/tree/26.2） |
+| **26.2** | NeoForge | 已完成（ https://github.com/q14433686-arch/TaCZ-Renovated/tree/26.2 ） |
 | 26.2 / 26.1.2 / 1.21.11 | Fabric | 由[姊妹项目](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)提供 |
 
 ---
