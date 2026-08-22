@@ -106,3 +106,24 @@ mods.toml `[[mixins]]` 加 `lrtactical.mixins.json`；AT 补 `Player#canCritical
 
 19 个 [removal] 警告 = 已知 transfer API 旧账（records/WP05，26.2 前清理项），
 非本轮引入，不阻塞。
+
+## LR2-5 第二轮（2026-08-22，首次 runClient 实测）
+
+**里程碑：E-13 正式死亡。** 客户端进主菜单、进存档、创造栏可见 LR 物品——
+当年 r30 的未定位启动崩溃在 DeferredRegister 重写下未复现，WP-LR2 最大不确定性消除。
+
+实测暴露两问题，均已修：
+
+1. **悬停任意 LR 物品即崩**（`Unknown TooltipComponent` @ ClientTooltipComponent.create，
+   crash log 实证）：LR 三类 tooltip 只注册了数据组件、漏了客户端工厂——refab 走
+   Fabric TooltipComponentCallback，我接线时漏了 NeoForge 侧的
+   RegisterClientTooltipComponentFactoriesEvent。已在 LrClientEvents 补注册三件套。
+2. **图标紫黑块**：上游 refab 仓库根本没带 `assets/lrtactical/items/*.json`
+   （MeleeItem javadoc 描述了 condition 分流设计但未落盘——上游遗漏，紫黑在
+   Fabric 侧同样存在，可回哺）。本仓补齐四个 items json：
+   throwable/melee 用 `minecraft:condition` + `lrtactical:has_custom_display`
+   分流（有内容包 display → lrtactical:dynamic_item；无 → 原版占位模型
+   snowball/iron_sword）；consumable/detonator 无动态渲染器，直接原版占位
+   （glass_bottle/repeater）。零美术资产打包，仅引用原版模型。
+   **预期效果**：无内容包 = 原版占位图标（不再紫黑）；装 LR 内容包且有
+   display 数据 = 基岩模型渲染。

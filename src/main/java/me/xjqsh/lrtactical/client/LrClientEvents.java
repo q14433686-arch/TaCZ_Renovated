@@ -67,6 +67,22 @@ public final class LrClientEvents {
         ModEntitiesRender.onRegisterGuiLayers(event);
     }
 
+    /**
+     * LR 三类 tooltip 数据组件 → 客户端组件工厂。
+     * 首轮 runClient 实测崩溃修复：漏注册时鼠标悬停任意 LR 物品即
+     * IllegalArgumentException: Unknown TooltipComponent
+     * （ClientTooltipComponent.create，refab 侧走 Fabric TooltipComponentCallback）。
+     */
+    @SubscribeEvent
+    public static void onRegisterTooltips(net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent event) {
+        event.register(me.xjqsh.lrtactical.inventory.tooltip.ThrowableTooltip.class,
+                me.xjqsh.lrtactical.client.tooltip.ClientThrowableTooltip::new);
+        event.register(me.xjqsh.lrtactical.inventory.tooltip.MeleeTooltip.class,
+                me.xjqsh.lrtactical.client.tooltip.ClientMeleeTooltip::new);
+        event.register(me.xjqsh.lrtactical.inventory.tooltip.ConsumableTooltip.class,
+                me.xjqsh.lrtactical.client.tooltip.ClientConsumableTooltip::new);
+    }
+
     // ---------- game 总线（tick / 输入 / 渲染帧） ----------
 
     @SubscribeEvent
