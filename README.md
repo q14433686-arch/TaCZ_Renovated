@@ -1,3 +1,5 @@
+<p align="center"><img src="src/main/resources/icon.png" width="128" alt="TaCZ: Renovated"></p>
+
 # [UNOFFICIAL] TaCZ: Renovated — Minecraft 26.1.2 / NeoForge
 
 > **Unofficial NeoForge port of TaCZ (Timeless & Classics Guns: Zero) for Minecraft 26.1.2.
