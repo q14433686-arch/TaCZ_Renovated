@@ -27,9 +27,21 @@
 - 低倍 sight 的 reticle containment 与 full-viewmodel clipping 拆分：低倍使用
   reticle-only mask，高倍使用完整镜身/枪身/配件/火光 mask。
 
+### 新增：LRTactical 内置层
+
+- 从 26.1.2 R1 稳定尖端前滚 throwable / melee / detonator / consumable 四类基础物品、
+  explode / sticky / smoke / stun / effect-cloud 五类投掷行为、LR 数据/配方/Lua 装载与
+  `lr1` payload 同步。
+- 接入三类 tooltip、使用进度 HUD、id-keyed 分类冷却遮罩、耳鸣压音量、实体渲染与
+  26.2 item-model 分流；无内容包时使用 vanilla 占位资源。
+- 26.2 专项修正：受保护 `SimpleParticleType` 构造、即时药效方法拼写、Java 25 mixin、
+  `GuiGraphicsExtractor` / `SoundEngine` 注入点复核与 `Player#canCriticalAttack` AT。
+- 不含 flash_shield，不打包 LRTactical 原作 ARR 美术。26.1.2 源基线已有单机/专服 PASS，
+  但 26.2 LR 实机矩阵仍待执行。
+
 ### 变更
 
-- 从完整的 NeoForge 26.1.2 R1 多人稳定基线前滚到 26.2；不是重写。
+- 从包含多人修复与 LRTactical 的完整 NeoForge 26.1.2 R1 稳定基线前滚到 26.2；不是重写。
 - 将已 removal 的 `IItemHandler` 路径迁到事务式 `ResourceHandler<ItemResource>`。
 - 当前 screen 访问迁到 `Minecraft.gui`；HUD、文本颜色、PiP、shape outline、hand API 与
   Feature Rendering 对齐 26.2。
@@ -56,16 +68,18 @@
 
 ### 验证
 
-- 用户对**定名前同代码候选**报告 JDK 25 build 与专服/多人 L0-L3 PASS；冻结记录：
-  `docs/records/SERVER_TEST_20260821_262_R1.md`。
+- 用户对 **LR 合入前** 的 26.2 核心候选报告 JDK 25 build 与专服/多人 L0-L3 PASS；
+  冻结记录：`docs/records/SERVER_TEST_20260821_262_R1.md`。
+- 26.1.2 R1 的 LR 层已有用户单机与专服 PASS；该结果只作为源基线，不外推到 26.2。
 - NeoForge Vulkan 需在 `config/fml.toml` 设置 `earlyWindowControl=false` 绕过仍开放的
   NeoForge#3230 ELS 问题；关闭后用户报告 Vulkan 启动 PASS。
-- 最终 R1 只改变 version metadata 与文档；逻辑层 L1-L3 结论不变。
+- 当前 LR-integrated R1 只完成源码/API 静态前滚，尚无 JDK 25 生产构建或实机 PASS。
 
 ### 发布前仍需完成
 
-- 最终 R1 jar 的 build、L0 与 Mod List 版本快速复核；
-- L2.5 第三方枪包专项明确确认；
+- 当前 LR-integrated R1 jar 的 clean build、L0 与 Mod List/`Done` 复核；
+- LR 单机与生产专服专项（同步、实体 tracking、冷却、近战、烟雾/闪光）；
+- L2.5 第三方枪包及 LR 内容包明确确认；
 - OpenGL / Iris / Vulkan 完整 GPU scope-mask 矩阵；
 - 可选 Mod 逐项用户结果；
 - metadata、license、source tag 与 source archive 最终一致性检查。

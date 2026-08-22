@@ -37,7 +37,8 @@ earlyWindowControl=false
 1. Minecraft 26.2 未混淆 classfile/source。
 2. NeoForge 26.2 primer 与官方 sources。
 3. `TaCZ_Refabricated_Unofficial` `26.2(main)`：只取游戏语义，不复制 Fabric API 表面。
-4. 本仓 26.1.2 R1：NeoForge 加载器习语和多人稳定基线。
+4. 本仓 26.1.2 R1 尖端 `6020a5cf1dd02c356f797557f6323b0d430b75e1`：
+   NeoForge 加载器习语、多人和 LR 稳定基线。
 5. MUKSC/TACZ-1.21.1：必要时只参考加载器习语，渲染禁止复制。
 
 禁止接触 CurseForge `tacz-port` jar。非平凡 API 必须在 evidence/records 中写出类、方法、
@@ -56,6 +57,15 @@ descriptor 与来源。
 grep -rn "TimelessAPI.getClient\|ClientIndexManager" src/main/java --include="*.java"
 grep -R "ItemStack.STREAM_CODEC\|ItemStack.OPTIONAL_STREAM_CODEC" -n src/main/java/com/tacz/guns/network
 ```
+
+LRTactical 额外纪律：
+
+- common init/network 类常量池不得直接引用 `LocalPlayer` / `Minecraft`；
+- 三类 LR index 必须同时进入 server reload 与登录/重载 S2C；
+- `SimpleParticleType` 使用 26.2 可访问工厂或匿名子类，不能直接调用 protected 构造器；
+- `GuiGraphicsExtractor#itemCooldown(ItemStack,int,int)V` 与
+  `SoundEngine#calculateVolume(SoundInstance)F` 每次 bump 都需重新核 descriptor；
+- flash_shield 与原作 ARR 美术保持排除。
 
 ## 5. 渲染纪律
 

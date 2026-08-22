@@ -82,10 +82,11 @@ TextColor#getValue() : int
 | `MultiPlayerGameMode#ensureHasSentCarriedItem` | `()V`，NeoForge patched source 为 `private` | **恢复** `public` AT |
 | `Minecraft#startUseItem` | `()V`，真实 compile 为 `private` | **恢复** `public` AT |
 | `LivingEntity#jumping` | `Z`，真实 compile 为 `protected` | **恢复** `public-f` AT |
+| `Player#canCriticalAttack` | `(Entity)Z`，26.2 package-private | LR 近战前滚后新增 `public` AT；与 refab 26.2 access widener 同 descriptor |
 | `RenderPipelines#register` | `(RenderPipeline)RenderPipeline`，`public static` | 仍删除；本仓已改用 NeoForge pipeline event |
 
-AT 现在只包含三个在役源码访问所必需的精确目标；`RenderType` 构造器与已不用的
-`RenderPipelines#register` 均不再开放。这与 refab AW 的前三项语义一致，但采用 NeoForge AT 表面。
+AT 现在包含四个在役源码访问所必需的精确目标；`RenderType` 构造器与已不用的
+`RenderPipelines#register` 均不再开放。前三个来自核心端口，第四个是 2026-08-22 LR 前滚新增。
 
 ## 26.1.2 R1 多人修复回流
 
@@ -144,3 +145,7 @@ NeoForm 成功下载并处理 Minecraft 26.2，随后 `compileJava` 报 9 个错
 `docs/DEDICATED_SERVER_TEST.md` **L0-L3 全部 PASS**：当前 build、`runServer`、真实生产专服
 和双客户端联机基础矩阵关闭。冻结回执：
 `docs/records/SERVER_TEST_20260821_262_R1.md`。L2.5 未被单独点名，继续保持待确认。
+
+2026-08-22 又前滚 LR 内置层并增加第四条 AT；上述 PASS 因而只覆盖 LR 合入前核心候选。
+当前 artifact 必须按 `docs/DEDICATED_SERVER_TEST.md` 重跑，LR descriptor 证据见
+`docs/records/LR_R1_SYNC_26_2_20260822.md`。

@@ -7,10 +7,10 @@
 
 执行者：项目发起人的 JDK 25 / GPU 环境；结果必须记录当前 commit 与完整版本矩阵。
 
-> 当前执行状态（2026-08-21）：用户报告定名前同代码候选 **L0-L3 全部 PASS**。最终版本
-> 随后只定名为 R1；需重跑 L0 并快速确认 Mod List/`Done`。本回执未附逐行日志，因此
-> PAL/F3+B/高延迟等可选行不单独外推为 PASS；L2.5 也继续等待明确确认。冻结记录：
-> `docs/records/SERVER_TEST_20260821_262_R1.md`。
+> 当前执行状态（2026-08-22）：用户报告的 **L0-L3 PASS** 对应 LR 合入前核心候选，冻结
+> 记录为 `docs/records/SERVER_TEST_20260821_262_R1.md`。当前 R1 已前滚 LRTactical 的
+> 代码、资源、AT、mixin 与 payload，必须从 L0 起重跑，并增加下述 LR 专项；26.1.2 的
+> LR 单机/专服 PASS 只作为源基线。
 
 ---
 
@@ -20,7 +20,8 @@
 ./gradlew build
 JAR=build/libs/tacz-1.1.8+neoforge.26.2.0.R1.jar   # 以实际文件名为准
 unzip -l "$JAR" | grep -E "META-INF/jarjar/|luaj|commons-math3"
-unzip -l "$JAR" | grep -E "tacz.*mixins.json|accesstransformer.cfg"
+unzip -l "$JAR" | grep -E "tacz.*mixins.json|lrtactical.mixins.json|accesstransformer.cfg"
+unzip -l "$JAR" | grep -E "me/xjqsh/lrtactical/|assets/lrtactical/|data/lrtactical/"
 unzip -p "$JAR" META-INF/neoforge.mods.toml | grep -E "version=|modId="
 ```
 
@@ -28,7 +29,8 @@ unzip -p "$JAR" META-INF/neoforge.mods.toml | grep -E "version=|modId="
 
 - [ ] `META-INF/jarjar/` 下有 **luaj** 与 **commons-math3**（缺 = 生产必炸
       `NoClassDefFoundError: org/luaj/vm2/LuaError`，见 `LICENSES.md` 前科）；
-- [ ] 三个 mixin json（`tacz` / `tacz.iris` / `tacz.carryon`）与 AT 文件在 jar 内；
+- [ ] 四个 mixin json（`tacz` / `tacz.iris` / `tacz.carryon` / `lrtactical`）与 AT 文件在 jar 内；
+- [ ] LR Java、assets、data、items/models/particles JSON 全部在 jar 内，且无来源不明二进制美术；
 - [ ] mods.toml 中 `version` 已展开为 `1.1.8+neoforge...`（**不得**残留 `${mod_version}`，
       **不得**是 `-neoforge`）。
 
@@ -41,10 +43,12 @@ unzip -p "$JAR" META-INF/neoforge.mods.toml | grep -E "version=|modId="
 判据（对照 `docs/records/` 各期冒烟口径）：
 
 - [ ] Mod List 出现 `Timeless and Classics Zero 1.1.8+neoforge.26.2.0.R1 (tacz)`；
-- [ ] 日志有 payload 注册行与枪包装载行（R1 参考：`guns=54 ammo=24 attachments=99 blocks=3 recipes=173`；26.2 数字变了要能解释）；
+- [ ] 日志有 TaCZ 与 LR payload 注册行、枪包装载行及
+      `LRTactical built-in layer (NeoForge 26.2 R1 candidate) registered`；
+- [ ] LR throwable/melee/consumable 三类 index reload 完成，登入同步不报未知 payload；
 - [ ] 到 `Done`，`stop` 干净退出；
 - [ ] 全程无 `NoClassDefFoundError`（dedicated classpath 没有
-      `LocalPlayer`/`Minecraft`——历史崩溃类，S2C 处理必须留在 `ClientPacketBridge` 后面）。
+      `LocalPlayer`/`Minecraft`——LR 与 TaCZ 的 S2C 处理都必须留在 client bridge 后面）。
 
 这层抓：注册/网络/资源加载在 server dist 的类加载问题。抓不到：jarJar、生产 mixin/AT。
 
@@ -71,8 +75,9 @@ cd srv && java -Xmx2G -jar <安装器生成的启动 jar 或 run.sh> nogui
 - [ ] 日志枪包计数与 L1 一致；
 - [ ] 控制台执行 `/tacz` 系列命令（list pack 等）：需要玩家上下文的子命令应
       **报错可读**而非堆栈；
-- [ ] 放入一个依赖 `lrtactical` 的第三方枪包 → 服务器**不崩**、枪械部分装载
-      （LR 道具不可用是预期行为，见 `docs/PORTING_STATUS.md` 的 LRTactical 边界）；
+- [ ] 放入一个依赖 `lrtactical` 的第三方内容包：LR index/recipe/script 装载；投掷、近战、
+      消耗品与引爆器服务端逻辑可执行；flash_shield 缺失是明确范围边界；
+- [ ] 两客户端观察 LR 投掷实体 tracking、分类冷却与索引同步，不踢出、不串 id；
 - [ ] `stop` 干净退出，重启第二次（验证导出目录已存在时的幂等）。
 
 ## L2.5 枪包装载专项（专服上验证第三方枪包）
@@ -115,6 +120,14 @@ R1 证据：`docs/records/SERVER_TEST_20260821_GUNPACK.md`。
 包内 `gunpack.meta.json` 声明 `tacz >= 1.1.8` 的，26.2 R1（`+` build metadata）
 应照常通过；遇到写了奇怪谓词的包，记录其完整谓词再下结论。
 
+### E. LRTactical 内容包
+
+1. 双端安装至少一个含 throwable/melee/consumable 的 LR 内容包；
+2. 登录后名字、tooltip、模型与配方正确，服务端三类 index 与客户端一致；
+3. 分别验证普通/粘性/烟雾/闪光/效果云/C4、左右键近战、消耗品与遥控引爆；
+4. 服务端 `/tacz reload` 后在线客户端重新收到 LR index，实体 tracking 与 cooldown 无残留；
+5. 缺客户端显示资产时可降级但不崩；flash_shield 条目明确记录为范围外，不伪装支持。
+
 ### 已知遗留（备案）
 
 - `ListPackCommand.java` 存在但未在 `RootCommand` 接线——无列包命令。
@@ -140,6 +153,10 @@ R1 证据：`docs/records/SERVER_TEST_20260821_GUNPACK.md`。
 | 9 | 双端装 PAL 后重跑 #3/#5 | 第三人称动画在**联机**下（r17-r22 的 PASS 场景是否含联机未记录，需补验） | |
 | 10 | 开 F3+B 后重跑 #4 | 爆头盒线渲染（r16 修复）在联机下的回归 | |
 | 11 | （可选）netem/clumsy 加 100ms+ 延迟重跑 #3-#5 | 高延迟下开火/换弹手感与状态回滚 | |
+| 12 | A 投掷各类 LR 道具，B 旁观 | `IEntityWithComplexSpawn`、实体 tracking、烟雾/闪光/效果云同步 | |
+| 13 | A 连续使用分类冷却道具 | `ServerMessageCustomCooldown` 只发所属玩家；B 不串冷却 | |
+| 14 | A 用 LR 近战攻击 B | C2S prepare、服务端索敌/冷却/伤害权威、双方动画/HUD | |
+| 15 | 在线 `/tacz reload` 后重跑 #12-#14 | LR 三类 index S2C 重同步、旧状态不泄漏 | |
 
 ## L4. 服务器形态矩阵（L2/L3 通过后按优先级推进）
 
@@ -149,7 +166,7 @@ R1 证据：`docs/records/SERVER_TEST_20260821_GUNPACK.md`。
 | 优先级 | 形态 | 独有故障面 | 怎么测 | 状态 |
 |---|---|---|---|---|
 | **1** | 内置服务器 + LAN/本地隧道 | 双客户端基础同步 | 跑 L3 全矩阵 | ❌ 26.2 未测；26.1.2 R1 基线见 records #1/#2 |
-| **2** | **真实专用服务器**（NeoForge 安装器 `--installServer`） | 生产类加载、dedicated dist、jar 内资源导出、纯远程同步 | 本预案 **L2** + 两客户端 **L3** | ✅ 定名前同代码用户 PASS；R1 版本快速复核待做 |
+| **2** | **真实专用服务器**（NeoForge 安装器 `--installServer`） | 生产类加载、dedicated dist、jar 内资源导出、纯远程同步 | 本预案 **L2** + 两客户端 **L3** | ⚠️ LR 合入前核心候选 PASS；当前 artifact 与 LR 专项待重跑 |
 | 3 | 面板服/托管商 | 受限内存/面板注入的启动脚本与 JVM 参数 | 任选一家面板装同一 jar，重点看启动内存与枪包导出目录写权限 | ❌ 未测 |
 | 4 | 离线模式混跑（online-mode=false） | UUID 体系差异 → 按 UUID 键控的玩家持久化数据（弹匣余弹/配件） | 同一玩家离线名/正版各进一次，检查数据不串号 | ⚠️ 本轮 LAN 实为离线模式，未专项验证 |
 | 5 | 代理网络（Velocity modern forwarding 后挂 NeoForge 后端） | 握手/自定义 payload 过代理、跨服切换后的枪包重同步 | Velocity + 两个后端服，切服后开工作台/开枪 | ❌ 未测 |

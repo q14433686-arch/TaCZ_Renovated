@@ -16,13 +16,14 @@
 | Java | **25** |
 | 本 Mod | **1.1.8+neoforge.26.2.0.R1** |
 | Gradle / ModDevGradle | 9.2.1 / 2.0.144 |
-| 专用服务器与基础多人 | L0-L3 用户 PASS（版本定名前同代码候选） |
-| 第三方枪包专项 | L2.5 待单独确认 |
+| 专用服务器与基础多人 | LR 合入前核心候选 L0-L3 用户 PASS；当前 HEAD 待重跑 |
+| LRTactical 内置层 | 已前滚；26.1.2 源基线单机/专服 PASS，26.2 未实测 |
+| 第三方枪包专项 | L2.5 与 LR 内容包均待确认 |
 | GPU / 可选 Mod | 逐项状态见 [`COMPATIBILITY.md`](COMPATIBILITY.md) |
 
-R1 只改版本 metadata 与文档，不改上述已测逻辑；但最终 R1 jar 的文件名、mods.toml 展开和
-Mod List 版本仍应补跑一次 L0/L1 快速确认。冻结测试记录：
-[`SERVER_TEST_20260821_262_R1.md`](docs/records/SERVER_TEST_20260821_262_R1.md)。
+冻结测试记录 [`SERVER_TEST_20260821_262_R1.md`](docs/records/SERVER_TEST_20260821_262_R1.md)
+只覆盖 LR 合入前的 26.2 核心候选。当前 R1 已增加 LRTactical 内置层，必须重新执行 build、
+L0-L3、L2.5 与 LR 专项；26.1.2 的 LR PASS 只作为源基线证据。
 
 ## 2. 已实现内容与明确边界
 
@@ -37,7 +38,9 @@ Mod List 版本仍应补跑一次 L0/L1 快速确认。冻结测试记录：
 - **Vulkan**：普通 mask 使用 `TextureTarget`/`RenderPass`，不直接调用 GL。NeoForge#3230
   要求客户端先在 `config/fml.toml` 设置 `earlyWindowControl=false`；启动已获用户 PASS，
   scope-mask 视觉矩阵仍待确认。
-- **LRTactical**：仍维持 26.1.2 R1 的撤回决定；本仓库不包含其四类基础物品与行为。
+- **LRTactical**：已内置 throwable / melee / detonator / consumable、五类投掷行为、
+  LR index/recipe/script 装载与同步、tooltip/HUD/分类冷却反馈层；不含 flash_shield，也不
+  打包原作 ARR 美术。26.2 API 已静态前滚，当前实机矩阵尚未执行。
 - **Aperture / 未核 shader replacement**：没有稳定 bridge 时走未掩码安全回退。
 
 未实际执行的项目不会写成兼容或 PASS。
@@ -60,6 +63,8 @@ LuaJ 与 Commons Math 已通过 jar-in-jar 打包，不需要玩家另外安装�
 - 客户端运行中新增本地枪包：按 **F3+T** 重载资源。
 - 只装服务端时允许逻辑数据同步，但客户端会缺显示资源；只装客户端时服务端不认识包内 id。
 - 版本谓词必须以 `tacz >= 1.1.8` 等正常 SemVer 形式书写。
+- 依赖 `lrtactical` 的内容包可使用内置四类承载物品与行为；仍需双端安装显示/数据资产，
+  且 flash_shield 内容不在本次范围内。
 
 详见 [`docs/GUNPACKS.md`](docs/GUNPACKS.md) 与 L2.5 测试章节。
 

@@ -83,8 +83,9 @@ Gradle wrapper / ModDevGradle / Foojay / Java toolchain 与 MDK 表逐项相同
 
 ## 动态验收与 R1 定名
 
-用户已对定名前同代码候选报告 build、`runServer`、生产专服与 L0-L3 PASS。随后只把
-version metadata 定名为 R1，逻辑代码不变。最终 R1 产物仍需快速执行：
+用户曾对 LR 合入前核心候选报告 build、`runServer`、生产专服与 L0-L3 PASS。R1 定名后
+又前滚了 26.1.2 R1 的 LRTactical 内置层，因此“只改 metadata”的旧前提已经失效。当前
+LR-integrated R1 必须完整执行：
 
 ```bash
 ./gradlew clean build --no-configuration-cache

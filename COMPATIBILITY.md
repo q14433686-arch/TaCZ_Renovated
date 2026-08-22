@@ -3,11 +3,23 @@
 适用构建：`1.1.8+neoforge.26.2.0.R1`
 
 游戏 / 加载器：Minecraft 26.2 / NeoForge 26.2.0.64  
-核验日期：2026-08-21
+核验日期：2026-08-22
 
 > **状态纪律**：下表的“API 已核”表示发布文件、坐标与源码签名已核对，**不等于游戏内
-> PASS**。用户已报告定名前同代码候选的 JDK 25 build 与 L0-L3 PASS；R1 版本 metadata
-> 产物仍需快速复核。该结果不覆盖 L2.5、GPU 或可选 Mod 单项矩阵。
+> PASS**。旧 L0-L3 回执覆盖 LR 合入前的 26.2 核心候选；当前 LR-integrated R1 必须
+> 重跑构建、专服与多人。26.1.2 的 LR 单机/专服 PASS 也不自动继承到 26.2。
+
+## 内置 LRTactical
+
+| 范围 | 本仓接入 | 当前状态 |
+|---|---|---|
+| 四类物品与五类投掷行为 | throwable / melee / detonator / consumable；explode / sticky / smoke / stun / effect-cloud | 26.2 source/API 已核；未实机 |
+| 数据与网络 | index/data/recipe/filter/Lua；独立 `lr1` payload；登录/重载同步 | NeoForge 26.2 API 已核；未实机 |
+| 客户端反馈 | tooltip、使用进度 HUD、分类冷却、耳鸣、实体/动态物品渲染 | 26.2 mixin/事件目标已核；未实机 |
+| 明确排除 | flash_shield；原作 ARR 美术 | 不实现/不打包，不宣称支持 |
+
+来源与 descriptor 证据见
+[`docs/records/LR_R1_SYNC_26_2_20260822.md`](docs/records/LR_R1_SYNC_26_2_20260822.md)。
 
 ## 依赖钉选
 
@@ -96,5 +108,7 @@
 7. Iris 1.11.2：无光影/有光影、HAND solid/translucent、shadow、mask mode 泄漏、水/粒子/云。
 8. Carry On 2.11.0：A/B/C 工作台任一半格搬起、完整放下、阻挡时原子失败、BlockId 模型。
 9. Vulkan：阶段边界 target 切换、mask debug 预览、无 device loss、镜身/准星/火光裁剪。
+10. LRTactical：单机与专服分别验证 tooltip/HUD、投掷/近战/消耗品、烟雾/闪光、
+    index 同步、实体 tracking、分类冷却及至少一个 LR 内容包。
 
 完成上述测试前，只能写“API/坐标已核”，不能写“兼容 PASS”。

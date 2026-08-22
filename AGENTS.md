@@ -11,8 +11,11 @@ Minecraft **26.2** + NeoForge **26.2.0.64** + Java **25** 的非官方 GPL-3.0 �
 - modId 永远是 `tacz`；枪包依赖已绑定该 id。
 - 当前版本：`1.1.8+neoforge.26.2.0.R1`，仍为 Unreleased candidate。
 - 代码谱系基线：26.1.2 R1 分支
-  `arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0`，不能再把 Beta-1 `4d2edc1`
-  当作完整功能基线。
+  `arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0`，尖端
+  `6020a5cf1dd02c356f797557f6323b0d430b75e1`；该稳定基线包含多人修复与
+  LRTactical 内置层，不能再把 Beta-1 `4d2edc1` 或旧 `b9de5e0` 当作完整功能基线。
+- 26.1.2 的 LR 单机/专服 PASS 不自动继承到 26.2；当前 LR-integrated HEAD 必须重跑
+  build、L0-L3、L2.5 与 LR 专项。
 - 游戏语义权威：`TaCZ_Refabricated_Unofficial` 的 `26.2(main)`；只取游戏语义，
   不复制 Fabric API 表面。
 

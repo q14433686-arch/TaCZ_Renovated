@@ -144,9 +144,9 @@ Iris 1.11.2 source commit
   做 scratch `javac`：PASS；
 - `git diff --check`：PASS。
 
-后续用户已对包含离屏 mask、低倍状态拆分与 R1 基线修复的定名前同代码候选报告 build
-和 L0-L3 PASS。最终版本 metadata 改名为 R1 后，只需重新确认 build/L0/L1；该结果仍不等于
-GPU 视觉 PASS。
+后续用户已对包含离屏 mask、低倍状态拆分与多人 R1 修复、但尚未包含 LR 的核心候选报告
+build 和 L0-L3 PASS。当前又增加 LR HUD、动态物品/实体渲染与两个 client mixin，因此必须
+重跑完整 build/客户端/专服矩阵；旧结果仍不等于 GPU 或 LR 视觉 PASS。
 
 ## R1 快速复核与 GPU 矩阵
 

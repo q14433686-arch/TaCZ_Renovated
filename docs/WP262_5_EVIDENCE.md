@@ -1,6 +1,6 @@
 # WP-262-5 证据：发布准备与阻塞闸门
 
-日期：2026-08-21
+日期：2026-08-21；LRTactical 前滚状态更新：2026-08-22
 
 ## 已完成的发布准备
 
@@ -15,14 +15,16 @@
 
 ## 尚未通过，故发布被阻塞
 
-用户已在 Windows JDK 25 / Gradle 9.2.1 环境对定名前同代码候选报告 L0-L3 **PASS**，
-覆盖 build、jar 基础内容、`runServer`、真实生产专服和双客户端基础联机层级。冻结回执：
-`docs/records/SERVER_TEST_20260821_262_R1.md`。随后只修改版本 metadata 与文档。
+用户已在 Windows JDK 25 / Gradle 9.2.1 环境对 LR 合入前核心候选报告 L0-L3 **PASS**，
+覆盖当时的 build、jar、`runServer`、生产专服和基础联机。冻结回执：
+`docs/records/SERVER_TEST_20260821_262_R1.md`。2026-08-22 又前滚 LRTactical 内置层，
+旧回执不能替代当前 artifact 的验证。
 
 以下发布闸门仍未通过：
 
-- 最终 R1 jar 的 build、L0 与 Mod List 版本快速复核；
-- L2.5 第三方枪包专项未被本次回执单独确认；
+- LR-integrated R1 jar 的 clean build、L0、Mod List 与 `Done`；
+- 当前 artifact 的 L2/L3 与 L2.5 第三方枪包专项；
+- LR 单机/专服/内容包专项；
 - OpenGL / Iris / Vulkan 完整 GPU 矩阵；
 - `COMPATIBILITY.md` 可选 Mod 逐项用户 PASS；
 - metadata/license 与对应源码 tag/source archive 的最终一致性检查。

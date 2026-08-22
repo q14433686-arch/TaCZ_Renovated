@@ -43,8 +43,15 @@
 
 ## LRTactical 边界
 
-本仓库没有内置 LRTactical 的 throwable、melee、detonator、consumable 基础物品与行为。
-依赖 LRTactical 的枪包只能期待普通枪械部分；LR 专属道具不可用。发现包不等于完整支持。
+当前 R1 候选已内置 LRTactical 的 throwable、melee、detonator、consumable 四类承载物品，
+以及 explode、sticky、smoke、stun、effect-cloud 行为、索引/配方/Lua 与联机同步。
+
+- LR 内容包仍须双端安装：服务端需要 index/data/recipe/scripts，客户端需要 display、模型、
+  贴图、声音与语言；
+- 无内容包时只提供内置测试数据和 vanilla 占位模型，不分发原作 ARR 美术；
+- flash_shield 不在范围内；依赖它的内容不能视为支持；
+- 26.1.2 源基线已有 LR 单机/专服 PASS，但 26.2 前滚尚未完成实机验收，当前只能写
+  “已内置、待测试”，不能写兼容 PASS。
 
 ## 故障判读
 
