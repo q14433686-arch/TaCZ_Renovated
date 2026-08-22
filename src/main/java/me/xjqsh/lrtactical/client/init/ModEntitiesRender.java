@@ -2,10 +2,10 @@ package me.xjqsh.lrtactical.client.init;
 
 import me.xjqsh.lrtactical.EquipmentMod;
 import me.xjqsh.lrtactical.api.item.ILrItemExtension;
+import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import me.xjqsh.lrtactical.client.overlay.BlindnessOverlay;
 import me.xjqsh.lrtactical.client.overlay.UsingProgressOverlay;
 import me.xjqsh.lrtactical.client.particle.SmokeCloudParticle;
-import me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry;
 import me.xjqsh.lrtactical.client.renderer.entity.ThrowableEntityRenderer;
 import me.xjqsh.lrtactical.client.renderer.item.HasCustomDisplayProperty;
 import me.xjqsh.lrtactical.client.renderer.item.LrDynamicItemModel;
@@ -90,7 +90,7 @@ public final class ModEntitiesRender {
         if (item instanceof ILrItemExtension ext) {
             var renderer = ext.getCustomRenderer();
             if (renderer != null) {
-                LrItemRendererRegistry.INSTANCE.register(item, renderer);
+                BuiltinItemRendererRegistry.INSTANCE.register(item, renderer);
             }
         }
     }

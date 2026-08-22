@@ -1,6 +1,6 @@
 package me.xjqsh.lrtactical.client.renderer.item;
 
-import me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry;
+import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Transformation;
 import com.mojang.serialization.MapCodec;
@@ -42,7 +42,7 @@ import java.util.function.Supplier;
  *
  * <h2>为什么<b>不能</b>直接复用 {@code tacz:dynamic_item}</h2>
  * 两者的 {@code SpecialModelRenderer} 逻辑一字不差（都是从
- * {@code LrItemRendererRegistry} 按 {@code Item} 取渲染器再调 {@code render}），
+ * {@code BuiltinItemRendererRegistry} 按 {@code Item} 取渲染器再调 {@code render}），
  * 唯一的差别在 <b>GUI 图标缓存键</b>。
  *
  * <p>{@code GuiItemAtlas#getOrUpdate} 用 {@code getModelIdentity()}（一个 List）
@@ -173,8 +173,8 @@ public final class LrDynamicItemModel implements ItemModel {
                            int overlay,
                            boolean hasFoil,
                            int outlineColor) {
-            LrItemRendererRegistry.DynamicItemRenderer renderer =
-                    LrItemRendererRegistry.INSTANCE.get(argument.stack().getItem());
+            BuiltinItemRendererRegistry.DynamicItemRenderer renderer =
+                    BuiltinItemRendererRegistry.INSTANCE.get(argument.stack().getItem());
             if (renderer != null) {
                 renderer.render(argument.stack(), argument.displayContext(), poseStack, collector, light, overlay);
             }

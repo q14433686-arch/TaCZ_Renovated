@@ -381,7 +381,7 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
      * <p>说明与注意事项见 {@link MeleeItem#getCustomRenderer()}。
      */
     @Override
-    public me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
+    public com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
         return me.xjqsh.lrtactical.client.renderer.item.ThrowableItemRendererWrapper.INSTANCE.get();
     }
 

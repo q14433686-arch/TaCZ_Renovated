@@ -1,7 +1,7 @@
 package me.xjqsh.lrtactical.client.event;
 
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
-import me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry;
+import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.tacz.guns.client.animation.statemachine.GunAnimationConstant;
 import com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer;
 import me.xjqsh.lrtactical.client.renderer.item.MeleeItemRenderer;
@@ -33,7 +33,7 @@ import net.minecraft.world.item.ItemStack;
  *       故照抄。注意<b>不能</b>改用 {@code input.up/down/...} ——
  *       那些字段已被 {@code keyPresses} 取代。</li>
  *   <li>上游用 {@code IClientItemExtensions.of(stack).getCustomRenderer()} 取渲染器；
- *       Fabric 侧改为 {@code LrItemRendererRegistry.INSTANCE.get(item)}。</li>
+ *       Fabric 侧改为 {@code BuiltinItemRendererRegistry.INSTANCE.get(item)}。</li>
  * </ul>
  */
 public final class LrTickAnimationEvent {
@@ -52,7 +52,7 @@ public final class LrTickAnimationEvent {
         if (!isLrAnimatedItem(mainHandItem)) {
             return;
         }
-        var renderer = LrItemRendererRegistry.INSTANCE.get(mainHandItem.getItem());
+        var renderer = BuiltinItemRendererRegistry.INSTANCE.get(mainHandItem.getItem());
         if (!(renderer instanceof AnimateGeoItemRenderer<?, ?> geoRenderer)) {
             return;
         }
@@ -102,7 +102,7 @@ public final class LrTickAnimationEvent {
         if (!isLrAnimatedItem(mainHandItem)) {
             return;
         }
-        if (LrItemRendererRegistry.INSTANCE.get(mainHandItem.getItem())
+        if (BuiltinItemRendererRegistry.INSTANCE.get(mainHandItem.getItem())
                 instanceof AnimateGeoItemRenderer<?, ?> renderer) {
             if (renderer.needReInit(mainHandItem)) {
                 renderer.tryInit(mainHandItem, player, event.getPartialTick().getGameTimeDeltaPartialTick(false));
@@ -120,7 +120,7 @@ public final class LrTickAnimationEvent {
      * 两边都处理会导致状态机<b>每 tick 被 trigger 两次</b>）。
      */
     private static boolean isLrAnimatedItem(ItemStack stack) {
-        var renderer = LrItemRendererRegistry.INSTANCE.get(stack.getItem());
+        var renderer = BuiltinItemRendererRegistry.INSTANCE.get(stack.getItem());
         return renderer instanceof MeleeItemRenderer || renderer instanceof ThrowableItemRendererWrapper;
     }
 }

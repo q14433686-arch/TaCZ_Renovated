@@ -49,10 +49,9 @@ public class MeleeDisplayManager extends JsonDataManager<MeleeDisplayInstance> {
      *
      * @see me.xjqsh.lrtactical.client.resource.LrClientAssetsManager#taczAssetDependencies()
      */
-    @Override
-    public Collection<Identifier> getFabricDependencies() {
-        return me.xjqsh.lrtactical.client.resource.LrClientAssetsManager.taczAssetDependencies();
-    }
+    // WP-LR2：getFabricDependencies 为 Fabric 专有（reload 依赖排序）。NeoForge 无等价物，
+    // 顺序由 AddClientReloadListenersEvent 注册顺序承载（弱保证，WP07 C 表）——
+    // LR 的 display 监听器在 LrClientEvents 中注册，晚于 tacz ClientSetupEvent 的资产监听器。
 
     @Override
     protected void apply(Map<Identifier, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {

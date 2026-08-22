@@ -1,6 +1,6 @@
 package me.xjqsh.lrtactical.client.renderer.entity;
 
-import me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry;
+import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import me.xjqsh.lrtactical.client.renderer.item.ThrowableItemRendererWrapper;
@@ -42,7 +42,7 @@ import net.minecraft.world.item.ItemStack;
  *       <td>{@code ItemModelResolver#updateForTopItem} +
  *           {@code ItemStackRenderState#submit}</td></tr>
  *   <tr><td>{@code IClientItemExtensions.of(stack).getCustomRenderer()}</td>
- *       <td>{@code LrItemRendererRegistry.INSTANCE.get(item)}</td></tr>
+ *       <td>{@code BuiltinItemRendererRegistry.INSTANCE.get(item)}</td></tr>
  * </table>
  *
  * <h2>{@code setEntityRendering} 为什么必须在 submit 阶段成对开关</h2>
@@ -134,7 +134,7 @@ public class ThrowableEntityRenderer
         if (stack.isEmpty()) {
             return null;
         }
-        if (LrItemRendererRegistry.INSTANCE.get(stack.getItem())
+        if (BuiltinItemRendererRegistry.INSTANCE.get(stack.getItem())
                 instanceof ThrowableItemRendererWrapper renderer) {
             return renderer.getModel(stack);
         }

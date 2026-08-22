@@ -121,7 +121,7 @@ public final class MeleeAttackKeys {
     }
 
     private static void triggerAttackAnimation(ItemStack stack, MeleeAction action) {
-        var renderer = me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry.INSTANCE.get(stack.getItem());
+        var renderer = com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry.INSTANCE.get(stack.getItem());
         if (renderer instanceof com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer<?, ?> animated) {
             animated.triggerAnimation(stack, action.getId());
         }

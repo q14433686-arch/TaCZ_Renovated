@@ -88,3 +88,21 @@ mods.toml `[[mixins]]` 加 `lrtactical.mixins.json`；AT 补 `Player#canCritical
 - 遗留观察项：ThrowableItemEntity 顶部未用 import（FriendlyByteBuf/Packet 等，
   无害）；LR mixin 两个（GuiGraphicsExtractor/SoundEngine）为 VERBATIM 迁入，
   目标为 vanilla 类，LR2-5 启动时首验。
+
+## LR2-5 首轮编译修复（2026-08-22，用户构建日志驱动）
+
+4 个编译错，两类根因，均已修：
+
+1. **LrItemRendererRegistry 是画蛇添足**（2 错）：WP⑤ 时 tacz 港已收编
+   `com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry`，且
+   `AnimateGeoItemRenderer` 实现的就是它的 `DynamicItemRenderer`——LR 的
+   渲染器包装类继承自后者，与我新造的同形接口不兼容。**删除自造类，
+   LR 全树改用 tacz 现有注册表**（顺带消灭了"两套注册表"的分裂风险，
+   第一人称渲染管线 ItemInHandRendererMixin 查的也是这一张表）。
+2. **getFabricDependencies 覆写**（2 错）：Fabric 专有的 reload 依赖排序，
+   我们的 JsonDataManager 无此方法（WP07 C 表明示无等价物）。删除覆写，
+   顺序由事件注册顺序弱保证——LR display 监听器注册晚于 tacz 资产监听器，
+   语义方向正确；若实测出现偶发的模型引用失败，按 C 表备注升级处理。
+
+19 个 [removal] 警告 = 已知 transfer API 旧账（records/WP05，26.2 前清理项），
+非本轮引入，不阻塞。

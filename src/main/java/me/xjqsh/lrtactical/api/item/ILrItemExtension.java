@@ -1,6 +1,6 @@
 package me.xjqsh.lrtactical.api.item;
 
-import me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry;
+import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
  * 化妆级效果。LR2-6 实测若确认影响观感，再评估补 mixin。
  */
 public interface ILrItemExtension {
-    default LrItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
+    default BuiltinItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
         return null;
     }
 

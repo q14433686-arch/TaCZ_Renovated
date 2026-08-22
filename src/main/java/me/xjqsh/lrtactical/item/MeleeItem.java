@@ -107,7 +107,7 @@ public class MeleeItem extends Item implements IAnimationItem, IMeleeWeapon, me.
      *
      * <p>{@code IItem} 是本仓库为 Fabric 补的扩展接口（NeoForge 侧对应
      * {@code IClientItemExtensions#getCustomRenderer}）。返回的实例会在
-     * {@code TaCZFabricClient} 里被登记进 {@code LrItemRendererRegistry}，
+     * {@code TaCZFabricClient} 里被登记进 {@code BuiltinItemRendererRegistry}，
      * 再由客户端物品模型 {@code lrtactical:dynamic_item} 的 SpecialModelRenderer 调用。
      *
      * <p><b>没装内容包时不会走到这里</b> —— {@code items/melee.json} 用
@@ -115,7 +115,7 @@ public class MeleeItem extends Item implements IAnimationItem, IMeleeWeapon, me.
      * 条件为假时直接用原版占位模型。详见 {@code HasCustomDisplayProperty}。
      */
     @Override
-    public me.xjqsh.lrtactical.client.renderer.LrItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
+    public com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
         return me.xjqsh.lrtactical.client.renderer.item.MeleeItemRenderer.INSTANCE.get();
     }
 
