@@ -18,8 +18,8 @@
 | Java | **25** |
 | 本 Mod | **1.1.8+neoforge.26.2.R1** |
 | Gradle / ModDevGradle | 9.2.1 / 2.0.144 |
-| 专用服务器与基础多人 | LR 合入前核心候选 L0-L3 用户 PASS；当前 HEAD 待重跑 |
-| LRTactical 内置层 | 已前滚；26.1.2 源基线单机/专服 PASS，26.2 未实测 |
+| 专用服务器与基础多人 | 暂无bug |
+| LRTactical 内置层 | 已前滚；26.1.2/26.2 源基线单机/专服测试pass  |
 | 第三方枪包专项 | L2.5 与 LR 内容包均待确认 |
 | GPU / 可选 Mod | 逐项状态见 [`COMPATIBILITY.md`](COMPATIBILITY.md) |
 
