@@ -3,35 +3,11 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 1.1.8+neoforge.26.1.2.R2 — 2026-08-22
+## 1.1.8+neoforge.26.1.2.R1 — 2026-08-22
 
-**LRTactical 内置层**（WP-LR2）。单机全功能 + 专用服务器专项均用户实测 PASS
-（records/LR2_INVENTORY.md 全程台账）。
-
-### 新增
-
-- LRTactical 战术装备框架内置：throwable/melee/detonator/consumable 四类基础物品、
-  五类投掷行为（explode/sticky/smoke/stun/effect-cloud）、数据装载与网络同步
-  （独立载荷通道 `lr1`）、反馈层（三类 tooltip / 使用进度 HUD / 分类冷却遮罩）。
-- 依赖 `lrtactical` 的内容包现在**完整可用**（此前仅枪械部分可用）。
-- 范围界定：flash_shield 未含（独立子系统 + ARR 美术，与姊妹项目同边界）；
-  原作美术零打包，道具模型/贴图由内容包提供；无内容包时显示原版占位模型。
-
-### 实现要点（NeoForge 侧独有）
-
-- LR init 包全量 DeferredRegister 重写（根治 WP07 A 类注册时序坑，
-  当年 r30 的未定位启动崩溃未复现——E-13 闭案）。
-- 本仓补齐 NeoForge 路径必需的 `items/*.json`（condition 分流 + 原版占位）与
-  `particles/smoke_cloud.json`（原版篝火烟精灵）——注：此为本仓实现所需，
-  非上游缺陷（Fabric 侧实现不同，作者实测无此问题）。
-
-## 1.1.8+neoforge.26.1.2.R1 — 2026-08-21
-
-多人联机稳定版，首个建议公开发布的版本。三轮实测（LAN → LAN 复测 → 专用服务器
-L2+L3 + 枪包专项）全部通过，记录见 `docs/records/SERVER_TEST_20260821_*.md`。
-
-> 标签定名说明：开发期曾短暂使用 Beta-1/Beta-2 标签；发布前定名 **R 序列**
-> （对齐姊妹项目惯例），本版即 R1，代码内容与 Beta-2 一致。
+首个发布版。三条战线在同一版本收口，全部经用户实机验收
+（LAN 双轮 + 专用服务器 L2/L3 + 枪包专项 + LR 单机/专服专项，
+records/SERVER_TEST_*、records/LR2_INVENTORY.md 全程台账）。
 
 ### 更名
 
@@ -39,11 +15,23 @@ L2+L3 + 枪包专项）全部通过，记录见 `docs/records/SERVER_TEST_202608
   只改显示名，**modId 仍为 `tacz`**，枪包兼容不受影响。
   决策记录：`docs/records/NAMING_DECISION.md`。
 
-### 修复
+### 新增：LRTactical 内置层（WP-LR2）
+
+- throwable/melee/detonator/consumable 四类基础物品、五类投掷行为
+  （explode/sticky/smoke/stun/effect-cloud）、数据装载与网络同步
+  （独立载荷通道 `lr1`）、反馈层（三类 tooltip / 使用进度 HUD / 分类冷却遮罩）。
+- 依赖 `lrtactical` 的内容包**完整可用**。
+- 范围界定：flash_shield 未含（独立子系统 + ARR 美术，与姊妹项目同边界）；
+  原作美术零打包，道具模型/贴图由内容包提供；无内容包时显示原版占位模型。
+- 实现要点：LR init 包全量 DeferredRegister 重写（根治 WP07 A 类注册时序坑，
+  当年 r30 的未定位启动崩溃未复现——E-13 闭案）；本仓补齐 NeoForge 路径必需的
+  `items/*.json` 与 `particles/smoke_cloud.json`（本仓实现所需，非上游缺陷）。
+
+### 修复（联机战役，Beta-1 → R1）
 
 - **专服致命**：四个物品类（枪/弹药/配件/工作台）的 `getName` 覆写调用 client 索引，
   `/give` 等服务端路径触发即 `NoClassDefFoundError` 崩服（26.1 起 NeoForge 不再按
-  `@OnlyIn` 剥离成员，上游祖传写法失效）。改走 common 索引，同一翻译键，双端安全。
+  `@OnlyIn` 剥离成员，上游祖传写法失效）。改走 common 索引。
 - **联机致命**：`ServerMessageGunDraw` 空 ItemStack 编码崩溃——加入/空手切枪把视野内
   所有玩家踢下线。改 `ItemStack.OPTIONAL_STREAM_CODEC`（上游 1.21.1 与 refab 同款）。
 - **联机功能**：RECIPE_FILTER 与 ATTACHMENT_TAGS 漏出网络同步包——联机客户端方块索引
@@ -54,15 +42,13 @@ L2+L3 + 枪包专项）全部通过，记录见 `docs/records/SERVER_TEST_202608
 ### 文档
 
 - 文档体系对齐姊妹项目规范：README 重写、`AGENTS.md`、一致性自检脚本、
-  专用服务器测试预案（`docs/DEDICATED_SERVER_TEST.md`，含 L4 形态矩阵与
-  L2.5 枪包专项）。
-- 联机枪包指引：双端安装职责、服务端 `/tacz reload`、**客户端新增包按 F3+T
-  重载即可（实测确认，无需重启）**。
+  专用服务器测试预案（`docs/DEDICATED_SERVER_TEST.md`，L0-L4 + L2.5 枪包专项）。
+- 联机枪包指引：双端安装职责、服务端 `/tacz reload`、客户端新增包按 F3+T 重载。
 
 ### 已知事项
 
-- Fabric 姊妹项目（refab）存在同款 getName 潜伏崩溃，待回报上游。
-- 面板服/代理网络/混合服未测试（L4 矩阵在案，非本版阻塞项）。
+- Fabric 姊妹项目的 getName 模式待其作者顺手核查（NeoForge 侧已实证，Fabric 未实测）。
+- 面板服/代理网络/混合服未测试（L4 矩阵在案，非阻塞项）。
 
 ## 1.1.8+neoforge.26.1.2.Beta-1 — 2026-08-21
 

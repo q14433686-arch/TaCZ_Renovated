@@ -6,7 +6,7 @@
 
 - 兼容按 TaCZ **1.1.8** 制作的枪包，`tacz >= 1.1.8` 依赖检查照常通过。
 - 默认枪包随 jar 附带，首次启动解压到 `游戏目录/tacz/`。
-- **依赖 `lrtactical` 的内容包**：R2 起完整可用（LRTactical 框架已内置，
+- **依赖 `lrtactical` 的内容包**：R1 起完整可用（LRTactical 框架已内置，
   单机+专服实测 PASS；flash_shield 除外）。台账见
   [`records/LR2_INVENTORY.md`](records/LR2_INVENTORY.md)。
 

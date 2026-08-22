@@ -1,6 +1,6 @@
 # 给 26.2 前滚 AGENT 的同步说明（复制本文全文给他即可）
 
-> 更新：2026-08-22。**基线由 R1 升级为 R2（LRTactical 内置层已合入并通过
+> 更新：2026-08-22。**基线 = R1（含 LRTactical 内置层，已通过
 > 单机 + 专用服务器双重验收）。** 本分支可直接读取，不必等 PR 合并。
 
 ## 0. 你要同步的源
@@ -8,19 +8,19 @@
 ```
 仓库：q14433686-arch/TaCZ-Renovated
 分支：arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
-基线：R2 = 分支最新提交（mod_version = 1.1.8+neoforge.26.1.2.R2）
+基线：R1 = 分支最新提交（mod_version = 1.1.8+neoforge.26.1.2.R1，含 LR）
 ```
 
 ```bash
 git fetch origin arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
-git merge FETCH_HEAD        # 或 rebase；R2 起不再有开发中提交混入
+git merge FETCH_HEAD        # 或 rebase；R1 收版后不再有开发中提交混入
 ```
 
-之前钉在 `b9de5e0`（R1）的指示**作废**：LR-dev 开发期已结束，分支尖端即稳定基线。
-若你已基于 R1 做了大量工作，merge 会带入的增量 = LR 内置层（`me/xjqsh/**` 全树 +
+之前钉在 `b9de5e0` 的指示**作废**：LR-dev 开发期已结束，分支尖端即稳定基线 R1。
+若你已基于 b9de5e0 做了大量工作，merge 会带入的增量 = LR 内置层（`me/xjqsh/**` 全树 +
 四处 tacz 接线 + 资源）+ R1 后的文档，无其它代码变动。
 
-## 1. R2 相对 R1 的增量（你的 26.2 前滚范围随之扩大）
+## 1. R1 基线相对提交 b9de5e0 的增量（你的 26.2 前滚范围随之扩大）
 
 - `me.xjqsh.lrtactical.*`（约 105 java）：LR 战术装备框架，NeoForge 习语
   已全量改写（DeferredRegister / 事件面 / PayloadRegistrar `lr1` 通道）。
@@ -48,7 +48,7 @@ git merge FETCH_HEAD        # 或 rebase；R2 起不再有开发中提交混入
    方法，一律按无注解审查方法体内的 client 类引用。
 2. **网络消息里的 ItemStack 字段先问一句：会不会是 EMPTY？** 会 → OPTIONAL codec。
 3. **单机跑通 ≠ 完成**——验收必须包含 `docs/DEDICATED_SERVER_TEST.md` 的
-   L0-L2 + L2.5 + L3；R2 的 LR 层就是按这套完成专服验收的。
+   L0-L2 + L2.5 + L3；R1 的 LR 层就是按这套完成专服验收的。
 
 ## 4. 必读文档（都在本分支）
 
@@ -56,10 +56,10 @@ git merge FETCH_HEAD        # 或 rebase；R2 起不再有开发中提交混入
 - `docs/WP_LR2_BRIEF.md` + `docs/records/LR2_INVENTORY.md` —— LR 层的完整
   实现台账（前滚 LR 时照着改动清单走）
 - `AGENTS.md` —— 会话规则（版本一致性门禁、不得声称未实现）
-- `CHANGELOG.md` R1/R2 条目 —— 修复与新增全景
+- `CHANGELOG.md` R1 条目 —— 修复与新增全景
 
 ## 5. 版本号红线
 
-起步 `1.1.8+neoforge.26.2.0.r0`，基于 **R2** 代码；`+` 后是 build metadata，
+起步 `1.1.8+neoforge.26.2.0.r0`，基于 **R1** 代码；`+` 后是 build metadata，
 **禁止 `-`**。改 `gradle.properties` 后跑
 `bash scripts/check_release_consistency.sh --strict`。
