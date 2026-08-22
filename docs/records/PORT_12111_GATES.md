@@ -111,3 +111,30 @@ java -version                          # 期望 21.x（Gradle 9.2.1 本身要求
 - 业务源码迁移（GUI 族、Feature Rendering 回退、瞄具管线、mixin 目标重验等）
   全部在 WP-12111-2/3，未开始；
 - 未推送任何远程分支。
+
+## 8. 追记（WP-12111-2 执行中，2026-08-22）：三条工单假设被姊妹 1.21.11 定稿推翻
+
+1. **1.21.11 原生有 Feature Rendering**：姊妹定稿仍用 `SubmitNodeCollector` /
+   `RenderTypes` / `submitCustomGeometry`；26.1 新增的只是 `RenderPipeline` 状态对象层。
+   PORT_12111_BRIEF §4-C 已更正——不需要 33 文件的 MultiBufferSource 回退。
+2. **NeoForge 21.11 原生触发 `ViewportEvent.ComputeCameraAngles`**（neoforged/NeoForge
+   `1.21.11` 分支 `patches/net/minecraft/client/Camera.java.patch`：`Camera#setup` 内
+   `NeoForge.EVENT_BUS.post(new ComputeCameraAngles(...))` + `setRotation(yaw, pitch, roll)`），
+   `ComputeFov` 同样原生触发（ClientHooks.java:362）。因此 CameraMixin 已删除、
+   GameRendererMixin 不需要 getFov hook（Fabric 侧才需要）。这与 26.1.2 基线注释
+   「RenderFrameEvent is already fired by NeoForge ClientHooks」同一性质。
+3. **本仓库 25 个已注册 mixin 中绝大多数与姊妹 1.21.11 定稿签名逐字一致**（diff 实测：
+   仅 GlCommandEncoder（+GL_ALWAYS 方案，已移植）与 GameRendererMixin（Fabric 独有
+   FOV hook，不需要）两处有差）；PIP 两文件与姊妹定稿逐字节一致（无需改）；
+   LR 侧仅 `GuiGraphicsExtractorMixin`→`GuiGraphicsMixin`（目标
+   `itemCooldown`→`renderItemCooldown`，javap 核实）一处。
+
+WP-12111-2 剩余主体 = scope 包 + Iris 层整体采纳（见 PORT_12111_BRIEF §4-E 修订版），
+连同爆头盒 Gizmo 修复与 `RenderTypes` 常量核验，归入下一回合。
+
+## 9. 姊妹参考文件镜像
+
+本沙箱不持久化 /tmp；WP-12111-3 需要的姊妹 1.21.11 定稿文件（scope 包 9 文件、
+IrisCompat legacy/newly、2 个 iris mixin、GameRendererMixin/GlCommandEncoder 参考、
+migrate 脚本、错误族 JSON、树清单）已镜像到 `/home/user/.ref-sister12111/`
+（git 之外、snapshot 之内），下一回合直接消费。

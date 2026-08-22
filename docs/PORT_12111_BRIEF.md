@@ -101,17 +101,18 @@
 - **LR 层连带**：`me/xjqsh/lrtactical/mixin/client/GuiGraphicsExtractorMixin.java` 的
   **mixin 目标类名**随回退改为 `GuiGraphics`。
 
-### C.【硬】Feature Rendering 回退到 MultiBufferSource（结构性最大项）
+### C.【验】Feature Rendering 层 —— 无需回退（工单调研更正，2026-08-22 执行中核实）
 
-26.x 的 `SubmitNodeCollector` / `FeatureRenderDispatcher` / `submitCustomGeometry` 在
-1.21.11 不存在，回到 `MultiBufferSource.BufferSource` + `RenderType` 直接提交纪元。
+**更正**：1.21.11 原生就有 Feature Rendering——姊妹 1.21.11 定稿文件仍 import
+`SubmitNodeCollector` / `RenderTypes`（如 `TargetMinecartRenderer`、`ScopeRenderTypes`），
+其 `SpecialModelRenderer#submit(..., SubmitNodeCollector, ...)` 签名也在。26.1 只是
+在它之上又发明了 `RenderPipeline` 状态对象。**本仓库 33 个引用
+`SubmitNodeCollector`/`FeatureRenderDispatcher` 的文件不需要结构性回退**。
 
-- **本仓库计数：33 个文件引用 `SubmitNodeCollector`/`FeatureRenderDispatcher`**。
-- 重点文件：`client/model/bedrock/BedrockModel.java`（26.1.2 代码内注释「26.2:
-  Minecraft.renderBuffers() removed」的上下游同区）、第一人称渲染提交路径、
-  `client/event/RenderHeadShotAABB.java`（见 F）。
-- 姊妹项目 1.21.11 分支上这些文件已有回退后的实现——**照其语义改写成 NeoForge 写法**，
-  不要重新发明。
+- 需**逐文件验**的 1.21.11 差异：`RenderTypes` 常量类取代 `RenderType` 常量（NeoForge
+  21.11 发布页点名）；`submitHitbox`/`renderLineBox` **不存在**（F 的 Gizmo 修复）；
+  `submitCustomGeometry` 存在（F3+B 崩溃正是经由它发生）。
+- `BedrockModel.java` 的「26.2: Minecraft.renderBuffers() removed」注释与 1.21.11 无关。
 
 ### D.【硬】包迁移（姊妹项目错误族 2/3/5/8/9）
 
@@ -125,20 +126,21 @@
 | `LightCoordsUtil.pack` | `LightTexture.pack` | `client/model/functional/TextShowRender.java` |
 | `Player#sendSystemMessage` | `Player#displayClientMessage(Component, boolean)`（注意 `ServerPlayer`/`CommandSourceStack` 上旧名仍存在，勿误改） | `api/util/LuaEntityAccessor.java`、`client/event/PlayerEnterWorld.java`（共 4 处，均客户端路径） |
 
-### E.【硬】瞄具 depth-aperture 管线重写 + `CompareOp.ALWAYS_PASS` 高危点（姊妹项目遗留问题 #1）
+### E.【硬】瞄具管线重写（执行中修正版，2026-08-22）
 
-- `client/render/scope/ScopeRenderTypes.java` 整文件建在 26.x 的
-  `RenderPipeline.builder()` + `ColorTargetState`/`DepthStencilState` + `RenderPipelines.register`
-  上（姊妹项目错误族 11 点名这些符号 1.21.11 不存在）——**整文件按 1.21.11 的
-  `RenderTypes`/`RenderType` + `RenderStateShard` API 重写**，以姊妹项目 1.21.11 分支的
-  同文件为语义蓝本（其 R 序列已经把准星/光圈/裁剪在 1.21.11 上迭代了多轮）。
-- **`CompareOp.ALWAYS_PASS` 在 1.21.11 无等价物**（`DepthTestFunction` 只有
-  NO_DEPTH_TEST/EQUAL/LEQUAL/LESS/GREATER；GL_ALWAYS 只出现在会 `glDisable(GL_DEPTH_TEST)`
-  的分支，深度写入一并丢弃）。姊妹项目定案：取 `GREATER`（depth-cleanup 语义等价），
-  对 etched/visible reticle 在 `GlCommandEncoderScopeDepthCopyMixin`（**本仓库已有该 mixin**，
-  hook `drawFromBuffers` HEAD）里补 `_depthFunc(GL_ALWAYS)`，代码中留 `TODO(1.21.11 scope)` 标注。
-  **实机验证准星缺失/闪烁时的正解是补 depthFunc，不是换枚举。**
-- 本仓库 `ScopeRenderTypes.java` 现用 `CompareOp.ALWAYS_PASS` ×3（316/334/351 行），全部落在该方案内。
+- 1.21.11 **有** `RenderPipeline`/`RenderPipelines`/`DepthTestFunction`/`BlendFunction`
+  基础 API（姊妹 1.21.11 定稿 `ScopeRenderTypes` 的 import 实证）；26.1-only 的只有
+  `ColorTargetState`/`DepthStencilState`/`CompareOp` 那套状态对象。
+- **方案：整体采纳姊妹项目 1.21.11 分支的 scope 包**（`ScopeRenderTypes` 844 行 +
+  `ScopeDepthCopyState`/`ScopeNodeSet` + Reticle 渲染器组 + Iris late/final overlay 状态），
+  其 `DepthTestFunction.NO_DEPTH_TEST` + `GlCommandEncoderScopeDepthCopyMixin` 里的
+  `_enableDepthTest()+_depthFunc(GL_ALWAYS)` 方案就是遗留问题 #1 的定案（**该 mixin
+  已在本回合移植完毕**）。配套采纳其 1.21.11 版的 `IrisCompat`（legacy/newly 分层）+
+  2 个 Iris mixin + scope 消费方（`BedrockGunModel`/`BedrockAttachmentModel`/
+  `AttachmentRender`/`MuzzleFlashRender`/`GunItemRendererWrapper`/`ShaderCompat`/
+  `GunModClient`）——这是 WP-12111-3 的主体，**NeoForge 面逐文件改写，Fabric 面不抄**。
+- 原 26.1.2 `ScopeRenderTypes` 用 `CompareOp.ALWAYS_PASS` ×3（316/334/351 行）随替换消失。
+- 验收不变：GPU 实机矩阵 + 准星缺失/闪烁专测（正解是补 depthFunc，不是换枚举）。
 
 ### F.【策】爆头判定盒 F3+B 冲突（姊妹项目 R2-hotfix 同款病）
 
@@ -268,7 +270,7 @@ NeoForge 1.21.11 变体需执行时对活动仓库逐项重解析（拿到 200 �
 | WP-12111-0 前置闸门与证据 | §1 全部闸门：NeoForge 21.11 release 构建、MDK 对齐、parchment/mixin AP 方案、vendored jar 字节码、兼容矩阵可解析性预检（各取 200）、基线 commit 钉死；`docs/records/PORT_12111_GATES.md` | 每项有证据记录，无代码改动 |
 | WP-12111-1 构建骨架 bump | `gradle.properties`/`build.gradle`/mods.toml/Java 21/compatLevel/AT 首轮/映射接线；`mod_version=1.1.8+neoforge.1.21.11.R0` | `./gradlew help` 过；`runServer` Mod List 可见 `tacz`；映射 jar 可 javap（姊妹项目阶段 1 的 NeoForge 版） |
 | WP-12111-2 非渲染编译修复 | §4 B/D/J/K/N（GUI 族、包迁移、jspecify、配方单点、payload/事件面）+ mixin 核验脚本移植并首跑 | `compileJava` 0 error；refmap 产出；**专用服务端 L0-L2**（`docs/DEDICATED_SERVER_TEST.md`）`Done` 且枪包扫描数 = 26.1.2 基线 |
-| WP-12111-3 渲染层 | §4 C/E/F/G/I（Feature Rendering→MultiBufferSource、瞄具管线重写 + ALWAYS_PASS 方案、爆头盒 Gizmo 修复、shader/GLSL 核验、渲染类 mixin） | 有 GPU 实机矩阵：开镜/准星/裁剪/黑屏专项 + 单机 L2.5；**瞄具专测不能省**（姊妹项目遗留问题 #1） |
+| WP-12111-3 渲染层 | §4 C/E/F/G/I（Feature Rendering 逐文件验 + `RenderTypes` 常量、scope 包整体采纳 + ALWAYS 深度方案（已移植 mixin）、爆头盒 Gizmo 修复、shader/GLSL 核验、渲染类 mixin 收尾） | 有 GPU 实机矩阵：开镜/准星/裁剪/黑屏专项 + 单机 L2.5；**瞄具专测不能省**（姊妹项目遗留问题 #1） |
 | WP-12111-4 兼容矩阵重验 | §4 L/M：Iris/CarryOn 决策执行、JEI/REI/Cloth/PAL/Controllable/SSR 重新钉版 + 符号核验、重写 `docs/COMPATIBILITY.md` | 逐行用户 PASS 或明确标注「未实测」；全矩阵回归 |
 | WP-12111-5 发布 | CHANGELOG 新条目（**新建 `docs/CHANGELOG_1_21_11.md`，仿姊妹项目分支级 changelog 惯例**）、README 版本导航表加 1.21.11 行 + AGENTS §1 全部同步点、`scripts/check_release_consistency.sh --strict`、发布 jar + 源码 | `--strict` 0 退出；枪包 `>=1.1.8` 语义回归 |
 

@@ -14,8 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /** Adds LRTactical's id-keyed cooldown mask beside vanilla item cooldown rendering. */
 @Mixin(GuiGraphics.class)
-public abstract class GuiGraphicsExtractorMixin {
-    @Inject(method = "itemCooldown(Lnet/minecraft/world/item/ItemStack;II)V", at = @At("TAIL"))
+public abstract class GuiGraphicsMixin {
+    // 1.21.11: the 26.x GuiGraphicsExtractor#itemCooldown is GuiGraphics#renderItemCooldown here
+    // (private, same descriptor; javap-verified by the sister project against the 1.21.11 merged jar).
+    @Inject(method = "renderItemCooldown(Lnet/minecraft/world/item/ItemStack;II)V", at = @At("TAIL"))
     private void lrtactical$customCooldown(ItemStack stack, int x, int y, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || !(stack.getItem() instanceof ICustomItem item)) {
