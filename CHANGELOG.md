@@ -3,6 +3,14 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## Unreleased
+
+### 品牌
+
+- 新增本仓库原创 `icon.png` / `logo.png`（青色四段瞄具环 + 铜色 R），并写入
+  `neoforge.mods.toml` 的 `logoFile`。未使用官方 TaCZ 图标（CC BY-NC-ND 4.0
+  禁止再创作），也与 Fabric 姊妹项目那套官方原图区分开。
+
 ## 1.1.8+neoforge.26.1.2.R1 — 2026-08-22
 
 首个发布版。三条战线在同一版本收口，全部经用户实机验收

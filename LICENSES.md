@@ -9,6 +9,7 @@
 | 本仓库代码（NeoForge 26.1.2 移植） | GPL-3.0-only |
 | 上游代码谱系 MCModderAnchor/TACZ、Sh1roCu/TACZ-Refabricated、q14433686-arch/TaCZ_Refabricated_Unofficial、MUKSC/TACZ-1.21.1 | GPL-3.0 |
 | 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0 |
+| 本仓库品牌图标 `icon.png` / `logo.png` | 本项目原创（`scripts/generate_branding.py`），**不是**官方 TaCZ 美术的衍生品 |
 
 ## 构建与开发依赖
 
