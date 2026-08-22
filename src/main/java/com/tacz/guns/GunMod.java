@@ -66,6 +66,8 @@ public class GunMod {
 
         registerDefaultExtraGunPack();
         AttachmentPropertyManager.registerModifier();
+        // LRTactical is an internal layer of the tacz mod container, not a second mod.
+        me.xjqsh.lrtactical.EquipmentMod.register(modEventBus);
         LOGGER.info("TaCZ NeoForge 26.2 port R1 loading. modId={}", MOD_ID);
     }
 

@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.xjqsh.lrtactical.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
+  "_comment": "LRTactical built-in layer for the unofficial NeoForge 26.2 port. Kept separate because its mixins use the me.xjqsh.lrtactical.mixin package.",
+  "mixins": [],
+  "client": [
+    "client.GuiGraphicsExtractorMixin",
+    "client.SoundEngineMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

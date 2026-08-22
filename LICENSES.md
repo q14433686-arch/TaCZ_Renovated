@@ -8,6 +8,9 @@
 |---|---|
 | 本仓库代码（NeoForge 26.2 移植） | GPL-3.0-only |
 | 上游代码谱系 MCModderAnchor/TACZ、Sh1roCu/TACZ-Refabricated、q14433686-arch/TaCZ_Refabricated_Unofficial、MUKSC/TACZ-1.21.1 | GPL-3.0 |
+| 内置 LRTactical 代码与 Lua 逻辑（原作 Programmer xjqsh，经 refab / 26.1.2 R1 谱系） | GPL-3.0 |
+| LR 占位 item model / particle JSON | 本移植代码资源；只引用 Minecraft vanilla 贴图/模型 |
+| LRTactical 原作美术 | **不打包**；原作 Art Assets: All Rights Reserved |
 | 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0 |
 
 ## 构建骨架

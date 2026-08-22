@@ -44,7 +44,8 @@ description='''
 Unofficial NeoForge 26.2 port of Timeless and Classics Zero (TaCZ).
 
 THIS IS UNOFFICIAL. Do not report bugs to the original authors (MCModderAnchor / Serene Wave Studio).
-Forward-ported from the audited NeoForge 26.1.2 R1 baseline; 26.2 scope rendering uses the stage-boundary off-screen ocular mask.
+Forward-ported from the audited NeoForge 26.1.2 R1 baseline; includes the built-in LRTactical framework (excluding flash_shield and original ARR art).
+26.2 scope rendering uses the stage-boundary off-screen ocular mask.
 '''
 
 [[mixins]]
@@ -55,6 +56,9 @@ config="tacz.iris.mixins.json"
 
 [[mixins]]
 config="tacz.carryon.mixins.json"
+
+[[mixins]]
+config="lrtactical.mixins.json"
 
 # The [[accessTransformers]] block allows you to declare where your AT file is.
 # If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg
