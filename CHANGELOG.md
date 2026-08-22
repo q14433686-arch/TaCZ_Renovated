@@ -18,11 +18,12 @@ SemVer build metadata，因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过
   + ModDevGradle 2.0.144；`neoForge { version; parchment {} }` 取代 26.x 的
   `enable {}` 写法，mixin AP/refmap 由 MDG 自动接线。
 - 可选集成 1.21.11 线重新钉版：JEI 27.23.x、Cloth 21.11.153、Architectury 19.0.1、
-  SSR 1.21.11-5.0.10、PAL **1.1.9**（降版，API delta 待核）均已实测解析成功；
-  REI 21.11.816 与 Controllable **1.21.11-0.25.8**（降版）的 NeoForge 构件不在任何
-  maven 上（用户构建日志实证）→ 改 **libs/-only**，下载源已在 build.gradle 注释与
-  `records/PORT_12111_GATES.md` §6 指认（Controllable 为 GitHub release 直链，
-  REI 走 Modrinth 1.21.11/NeoForge 筛选页）。
+  SSR 1.21.11-5.0.10+neoforge、PAL **1.1.9**（降版，API delta 待核）均已解析/具备
+  解析条件；REI 21.11.816 与 Controllable **1.21.11-0.25.8**（降版）的 NeoForge 构件
+  不在任何 maven 上（用户构建日志实证）→ 改 **libs/-only**，下载源已在 build.gradle
+  注释与 `records/PORT_12111_GATES.md` §6 指认（Controllable 为 GitHub release 直链，
+  REI 走 Modrinth 1.21.11/NeoForge 筛选页）。SSR 首见 Modrinth `Read timed out`
+  （坐标有效、纯网络问题）→ Gradle HTTP 超时加长至 180s/120s，libs/ 兜底保留。
 - 访问转换器移除 26.x 专属 `RenderPipelines#register`；其余 5 条与姊妹项目
   1.21.11 javap 核验记录一致，待 WP-12111-2 对 1.21.11 jar 逐条复验。
 - `tacz.carryon.mixins.json` compatibilityLevel `JAVA_25` → `JAVA_21`

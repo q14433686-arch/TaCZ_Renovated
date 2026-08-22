@@ -78,7 +78,7 @@
 | Cloth | `cloth-config-neoforge:21.11.153` | ③ 姊妹项目 `cloth_config_fabric=21.11.153`（Fabric 坐标）；NeoForge 同线推断；**用户构建已解析成功**（2026-08-22） |
 | PAL | `1.1.9`（**降版**） | ③ 姊妹项目 `player_animation_lib=1.1.9`（Modrinth，解析 200）；**用户构建已解析成功**（2026-08-22）。26.1.2 用 1.2.5 → `compat/playeranimator/**` API delta 待核 |
 | Controllable | `1.21.11-0.25.8`（**降版，libs/-only**） | ① GitHub release 实证（2026-08-22）：`MrCrayfish/Controllable` tag `v1.21.11-0.25.8`，资产 `controllable-neoforge-1.21.11-0.25.8-signed.jar` + `browser_download_url` 已取。Modrinth maven 无此版本 NeoForge 构件（2026-08-22 用户构建日志）→ libs/ 直下。26.1.2 用 0.26.0 → `compat/controllable/**` API delta 待核 |
-| Shoulder Surfing | `1.21.11-5.0.10+neoforge` | ③ 姊妹项目 `shoulder_surfing_version=9T2YSavE`（Modrinth 版本 id，对应 `1.21.11-5.0.10+fabric`）；NeoForge 后缀为推断，libs/ 兜底 |
+| Shoulder Surfing | `1.21.11-5.0.10+neoforge` | ③ 姊妹项目 `shoulder_surfing_version=9T2YSavE`（Modrinth 版本 id，对应 `1.21.11-5.0.10+fabric`）；NeoForge 变体同命名惯例（MUKSC 1.21.1 用 `1.21.1-4.7.0+neoforge` 同款 `MC-VER+neoforge` 坐标）。**2026-08-22 用户构建首见 `Read timed out`（POM 已过、卡 jar 下载；同构建 PAL 从同主机解析成功）**→ 已加长 HTTP 超时；若仍超时，libs/ 兜底：从 https://modrinth.com/mod/shoulder-surfing-reloaded/versions?g=1.21.11&l=neoforge 下载 NeoForge jar（文件名 `ShoulderSurfing-NeoForge-1.21.11*` 可被 build.gradle 识别） |
 | Iris | `1.10.7+mc1.21.11-neoforge`（仅客户端 dev 档案） | ③ 姊妹项目 `iris_curse_file=7805348`（`1.10.7+mc1.21.11` Fabric）；Iris mixin 全部字符串 targets，**无编译依赖**；NeoForge 变体存在性待验证 |
 | Carry On | `2.9.2` 线（运行时） | ③ 姊妹项目 R2 钉 Carry On 2.9.2（Fabric）；本仓库 CarryOn mixin 全部字符串 targets，**无编译依赖**；R2 兼容逻辑回哺待后续包 |
 
