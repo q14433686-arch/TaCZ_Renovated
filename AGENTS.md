@@ -10,8 +10,9 @@
 ## 0. 本仓库是什么
 
 **TaCZ: Renovated** —— TaCZ（Timeless & Classics Guns: Zero）的**非官方** NeoForge 移植，
-GPL-3.0。当前单分支：Minecraft **26.1.2** + NeoForge 26.1.2.x，Java **25**，未混淆。
-26.2 移植筹备中（[`docs/PORT_262_BRIEF.md`](docs/PORT_262_BRIEF.md)）。
+GPL-3.0。三分支：**26.2** / **26.1.2**（默认分支，NeoForge 26.1.2.x + Java 25，未混淆）/
+**1.21.11**（Java 21+，混淆时代，需 mappings）；三线均已于 2026-08-22 发布 R1，
+发布状态以 [`docs/publish/RELEASE.md`](docs/publish/RELEASE.md) 为准。
 
 - 游戏语义权威：姊妹项目 [TaCZ_Refabricated_Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)（Fabric 26.x）。
 - **modId 永远是 `tacz`**——枪包依赖检查钉死的。改的是显示名，不是 id
@@ -35,10 +36,10 @@ bash scripts/check_release_consistency.sh --strict   # 发布/合并门禁，不
 
 `--strict` 返回非 0 时**不得声称任务完成，也不得发布**。
 
-CI 模板位于 [`docs/publish/ci/consistency.yml`](docs/publish/ci/consistency.yml)
-（一致性门禁 + 文档链接核验），需由**仓库所有者**复制到
-`.github/workflows/consistency.yml`——AI 助手的 token 无 `workflows` 权限，无法代劳
-（2026-08-21 推送被拒实证，与姊妹项目 AGENTS 记载一致）。
+CI 门禁已安装于 [`.github/workflows/consistency.yml`](.github/workflows/consistency.yml)
+（与模板 [`docs/publish/ci/consistency.yml`](docs/publish/ci/consistency.yml) 保持同源：
+一致性门禁 + 文档链接核验；模板若有更新需同步回 workflow）。
+本地仍可随时手动运行自检命令。
 
 ## 2. 【强制】不得声称未实际实现的东西
 
