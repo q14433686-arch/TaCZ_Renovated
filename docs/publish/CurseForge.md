@@ -1,164 +1,152 @@
 # CurseForge 发布文案（TaCZ: Renovated）
 
-> 复制粘贴用。`[[ ]]` 内容发布前替换。规则依据：CurseForge
-> [Moderation Policies](https://support.curseforge.com/support/solutions/articles/9000197279-moderation-policies)；
-> 条文解读沿用姊妹项目 CurseForge.md 的已验证结论。
+> 项目级正文，参考本项目 CurseForge **Project ID 1663324** 的简洁结构整理。
+> 项目正文不堆叠单次修复；每个文件的变化使用本文末尾的 Changelog 模板。
+> CurseForge 描述中不放外部文件下载链接；源码和 Issues 使用项目 Links 字段。
 
-## ⚠️ 硬性规则速查
+## Project Name
 
-| 规则 | 对本项目的执行 |
-|---|---|
-| 项目名不得含游戏名/版本号，必须英文 | 名称不含具体游戏或加载器版本 |
-| fork 必须自述改动、不得照抄原项目描述 | 描述为本仓库自撰，含 "What changed" 专节 |
-| 必须署名并链接原作者 | Credits 表全谱系（TACZ Dev Team / Sh1roCu / 姊妹项目 / LR 原作） |
-| **描述内禁止外部下载链接** | 描述不放 GitHub Releases 链接；Source/Issues 走 Links 字段 |
-| 捐赠/个人链接只能在页面最底部 | 不放此类内容 |
-| Avatar 400×400、不可纯色、不可用他人版权图 | **[[ 自制头像，勿用 TACZ 官方图 ]]** |
-| NC 运营注意 | **项目设置关闭 Rewards Program** |
-
-## ① Project Name
-
-```
+```text
 [UNOFFICIAL]TaCZ Renovated
 ```
 
-> 无版本号、无游戏名、纯英文；`[UNOFFICIAL]` 属状态标注（站内先例：
-> `[UNOFFICIAL] TaCZ NeoForge Port`，48 万下载已过审）。
-> ❌ 不要把具体游戏或加载器版本写进项目名。
+## Summary
 
-## ② Summary
-
-```
-An unofficial community port of the TaCZ gun mod with the LRTactical tactical-equipment framework built in, verified in dedicated-server play.
+```text
+An unofficial NeoForge community port of the TaCZ gun mod for newer Minecraft releases, focused on gun-pack compatibility and extension support.
 ```
 
-## ③ Description
-
-> 与 Modrinth 正文同源但独立成文（CF 禁抄他人描述不禁自家跨站复用；
-> 差异点：无外部下载链接、英文在前中文在后）。
+## Description
 
 ```markdown
-# Unofficial NeoForge Port
+# Unofficial NeoForge port
 
-> **Unofficial community port. Not an official TACZ release, and not affiliated
-> with, reviewed by, or endorsed by the TACZ Dev Team.**
+> **TaCZ: Renovated is an unofficial community port of Timeless & Classics Guns:
+> Zero (TaCZ). It is not an official TACZ Dev Team release and has not been
+> reviewed or endorsed by that team.**
 
-## What this project is
+This project brings TaCZ to **NeoForge** on Minecraft **26.2, 26.1.2 and
+1.21.11**. It is based on the public GPL source lineage of
+[MCModderAnchor/TACZ](https://github.com/MCModderAnchor/TACZ),
+[Sh1roCu/TACZ-Refabricated](https://github.com/Sh1roCu/TACZ-Refabricated), and
+[TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial).
+Its focus is porting and compatibility maintenance, not adding new firearms.
 
-**Timeless and Classics Guns: Zero (TaCZ)** is a modern firearms mod — deeply
-customizable guns, attachments, optics, ammo types, a gun-smithing workbench,
-and third-party "gun pack" support.
+## Features
 
-This project is a community port of that mod to **NeoForge for a recent
-Minecraft release**, with a built-in port of the **LRTactical** tactical-equipment
-framework (throwables, melee, detonators, consumables) so content packs depending
-on `lrtactical` work out of the box. No new guns are added; the goal is to keep
-the existing ecosystem running. Exact support details are listed on each file.
+- TaCZ firearms, attachments, optics, ammunition, workbenches and data-driven
+  gun packs, including the upstream default gun pack.
+- NeoForge-native registration, events and networking, with resource, GUI and
+  rendering adaptations for each supported Minecraft release.
+- Direct loading of modern gun packs and conversion of supported legacy layouts.
+- A **partial LRTactical compatibility framework** for melee items, consumables,
+  detonators and several throwable behaviours.
+- Built-in JEI/REI ammo queries and workbench categories where available;
+  optional integrations vary by Minecraft release.
 
-## Credits — original work
-
-| | |
-|---|---|
-| Original mod | **Timeless and Classics Guns: Zero**, by the **TACZ Dev Team** |
-| Game-semantics source | **TaCZ Refabricated Unofficial** (Fabric sister project) |
-| Its upstream | **Sh1roCu / TACZ-Refabricated**, providing the upstream game semantics |
-| LRTactical original | **LesRaisins Tactical Equipements** — Programmer **xjqsh**, Artist **LeComte** |
-
-All code in this lineage is **GPL-3.0**, which permits this port; this project
-is likewise released under GPL-3.0. Full source and audit records are linked in
-the **Source** field of this page.
-
-**Assets:** the bundled default gun pack's assets are **CC BY-NC-ND 4.0**,
-redistributed unmodified. No LRTactical art is bundled (All Rights Reserved) —
-LR items show vanilla placeholder models until a content pack provides visuals.
-
-## What changed from the original
-
-- **Rewritten for NeoForge**: registration, event wiring and networking were
-  re-implemented on NeoForge idioms (the original targets Forge; the Fabric
-  sister project provided game semantics).
-- **Scope rendering** re-implemented as a depth-aperture path for the target
-  release's renderer (no stencil buffer anymore); some visuals differ from the
-  original.
-- **Dedicated-server hardening**: crashes reproducible only on real servers
-  (client-class access in shared paths, empty-ItemStack packet encoding,
-  missing sync channels) were found in live multiplayer testing and fixed.
-- **LRTactical framework** rebuilt on NeoForge, including network sync,
-  tooltips, HUD and cooldown overlays. `flash_shield` is not ported.
-
-## Status
-
-**First release.** Verified in single-player, LAN and dedicated-server
-play (join/sync, combat, crafting, gun-pack hot reload, LRTactical items), with
-test logs archived in the source repository. Not yet tested: hosting panels,
-proxy networks, hybrid Bukkit+mods servers — issues from those environments
-must first be reproduced on a plain NeoForge dedicated server.
+Exact compatibility and test status are listed on each uploaded file and in its
+release notes. Third-party gun packs, tactical-equipment packs, optional mods and
+shader packs must still be checked per version.
 
 ## Requirements
 
-| | |
-|---|---|
-| Loader | **NeoForge** |
-| Required dependencies | **None** |
-| Optional | Config UI, shaders, third-person animations, controller support, recipe viewers — see the compatibility matrix in the source repository |
+| Minecraft | Loader | Java | Required dependencies |
+|---|---|---|---|
+| 26.2 / 26.1.2 | NeoForge | 25+ | None |
+| 1.21.11 | NeoForge | 21+ | None |
 
-> **NeoForge only.** Fabric builds are provided by the sister project, not here.
+Files for different Minecraft releases are not interchangeable. This project
+provides **NeoForge only**. For Fabric, use the sister project
+[TaCZ Refabricated Unofficial](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-refabricated).
 
 ## Installing gun packs
 
-Gun packs go in **`.minecraft/tacz/`** (created on first launch). A zip or
-folder is only recognised if **`gunpack.meta.json` exists at its root**;
-otherwise it is silently skipped.
+Place modern gun packs in `.minecraft/tacz/`. Zip files may be loaded directly,
+or packs may be extracted as folders. In both cases, `gunpack.meta.json` must be
+at the pack root; do not wrap a zip in an extra directory.
 
-**Multiplayer:** install the same packs on **both server and client** — the
-server provides gameplay data (synced over the network), the client provides
-models/textures/sounds. After adding a pack, run `/tacz reload` on the server;
-on the client press **F3+T** (no restart needed).
+Place legacy-layout packs in `.minecraft/tacz_backup/`, keep the originals, and
+run `/tacz convert` in game. Conversion cannot repair every resource, recipe or
+script difference automatically. Decide whether conversion is needed from the
+pack structure, not only its advertised Minecraft version.
 
-**Compatibility predicate:** the mod preserves the current TaCZ gun-pack
-compatibility baseline, so packs using the corresponding minimum dependency
-requirement load normally. Exact build details belong to the uploaded file, not
-this reusable description.
+For multiplayer, install the same packs on server and clients. The server
+supplies gameplay data; clients supply models, textures, animations, sounds and
+translations. After adding a pack, run `/tacz reload` on the server and press
+**F3+T** on clients.
 
-## Known limitation: packs requiring TacZ:Arcana
+## LRTactical and Arcana
 
-Packs that ship encrypted assets (`recursion/taczpack.dat`) require the
-closed-source, Forge-only mod **TacZ:Arcana** to decrypt. No open TACZ build
-can load them — entries and names appear, models/textures stay missing. Not a
-defect of this port; cannot be fixed here.
+The built-in LRTactical layer is a **partial compatibility framework**, not a
+complete NeoForge distribution. It does not bundle the original art, does not
+include `flash_shield`, and cannot guarantee that every LRTactical content pack
+will work. Content packs must provide all assets they are licensed to distribute.
 
-## FAQ: REI/JEI cheat-give on a dedicated server yields purple items
+This project does not include **TacZ:Arcana** or implement its API or protected
+asset-loading process. Packs that explicitly require Arcana are unsupported.
+Missing models or purple/black textures alone do not prove an Arcana dependency;
+incorrect directory nesting, resource paths, version constraints or incomplete
+files can cause the same symptom.
 
-If the recipe viewer is **not installed on the server**, its cheat-give sends a
-bare item without data components, so the content id cannot be resolved.
-Install the same viewer version on the server, take items from TaCZ's own
-creative tabs, or `/give` with components. Same behaviour as the original mod.
+## Known boundaries and issue reports
 
-## Feedback
+- Detection of a gun pack does not prove that all models, animations, recipes
+  and scripts are compatible.
+- Scope rendering is adapted separately for each branch; results can differ by
+  graphics backend and shader pack.
+- Hosting panels, proxy networks and hybrid Bukkit/mod servers are not covered
+  by one compatibility guarantee. Reproduce issues on a plain NeoForge server.
 
-Report issues via the **Issues** link on this page, using the provided
-templates. Always attach the full `latest.log` — for multiplayer issues, from
-both server and client. Please do not report issues of this port to the
-original authors.
+When reporting a problem, first reproduce it in a minimal NeoForge environment
+with this mod and attach the complete `latest.log` or crash report. For
+multiplayer issues, include both server and client logs. Report port issues to
+this project, not to TaCZ, TaCZ Refabricated or LRTactical authors.
 
----
+## Credits and licensing
 
-## 中文简介
+- Original: [MCModderAnchor / TACZ](https://github.com/MCModderAnchor/TACZ)
+- Direct upstream: [Sh1roCu / TACZ-Refabricated](https://github.com/Sh1roCu/TACZ-Refabricated)
+- LRTactical original: [LesRaisins Tactical Equipements](https://github.com/LesRaisins-Studios/LesRaisins-Tactical-Equipements)
+- Fabric sister project: [TaCZ Refabricated Unofficial](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-refabricated)
+- This NeoForge port: source and issue tracker are available in this page's Links section
 
-本项目是《永恒枪械工坊:零》(TaCZ) 的非官方 NeoForge 移植，内置 LRTactical
-战术装备框架（依赖 lrtactical 的内容包可完整使用；flash_shield 除外）。
-无必装前置；联机需双端安装相同枪包，服务端 `/tacz reload`、客户端 F3+T 生效。
-代码 GPL-3.0 开源（源码见本页 Source 链接），默认枪包资源 CC BY-NC-ND 4.0
-原样承载。问题请经本页 Issues 链接反馈，勿打扰原作者。
-按"原样"提供，不附带任何担保。
+TaCZ, this port and the incorporated LRTactical code use GPL-3.0. The default gun
+pack declares CC BY-NC-ND 4.0 for its assets. LuaJ uses MIT; Commons Math uses
+Apache-2.0. Other code and assets retain their own
+licenses. A code license does not automatically cover models, textures,
+animations or sounds. See `LICENSE` and `LICENSES.md` in the source repository.
+
+The mod ID remains `tacz` for existing gun-pack dependencies and save data. This
+does not make the project official. Provided as-is, without warranty.
 ```
 
-## ④ 字段与设置
+## 项目字段
 
 | 字段 | 值 |
 |---|---|
 | License | GNU General Public License version 3 |
-| Links | Source / Issues = 本仓库（**不放在描述里**） |
-| Rewards Program | **关闭** |
-| 文件上传 | 与 GitHub Release 同一 jar；Display Name 使用项目名和当前发布标识；Game Version 与 Loader 按上传文件的兼容性标签选择；Changelog 粘当前发布条目 |
-| Avatar | **[[ 自制 400×400，勿用 TACZ 官方素材 ]]** |
+| Environment | Client & Server |
+| Loader | NeoForge |
+| Source | `https://github.com/q14433686-arch/TaCZ_Renovated` |
+| Issues | `https://github.com/q14433686-arch/TaCZ_Renovated/issues` |
+| Rewards Program | 关闭（默认枪包资源含 NC 条款） |
+| Avatar | 使用本仓库原创 400×400 品牌图，不使用 TaCZ 官方图标 |
+
+## 单个文件 Changelog 模板
+
+```markdown
+## TaCZ: Renovated [[完整版本号]]
+
+**Environment:** Minecraft [[版本]] · NeoForge [[版本]] · Java [[版本]]
+
+### Changes
+- [[从该分支 CHANGELOG / Release 摘取本次新增、修复或变更]]
+
+### Compatibility notes
+- [[只写该文件已核验的枪包、可选模组、图形后端和联机状态]]
+- [[未实测项目明确写 Not tested，不得写 Supported]]
+
+### Upgrade notes
+- Files for other Minecraft releases are not interchangeable.
+- Back up worlds and gun packs before upgrading.
+```
