@@ -97,31 +97,23 @@ TaCZ 枪械 mod 的 Minecraft 26.1.2 NeoForge 移植首个发布版，代码开�
 
 ## §4 Modrinth 上架物料
 
-- **Project name**: `TaCZ: Renovated`
-- **Summary**（≤256 字符，英文）:
-  `Unofficial NeoForge port of TaCZ (Timeless & Classics Guns: Zero) for Minecraft 26.1.2, with built-in LRTactical framework. Open source, auditable GPL lineage. 非官方社区移植，GPL-3.0.`
-- **License**: GPL-3.0-only（资产例外在 Description 中声明）
-- **Environment**: Client & Server 均必装 · **Loaders**: NeoForge · **Game versions**: 26.1.2
-- **Links**: Source = 仓库地址；Issues = 仓库 Issues；Wiki/Discord 留空
-- **Monetization**: 关闭（NC 运营注意）
-- **Description 正文**: 直接复用 §1 全文（Modrinth 支持 Markdown），仅去掉
-  "本 Release 的 Source code 归档"一句，改为"完整源码见 Source 链接"。
-- **版本文件命名**: `TaCZ-Renovated-1.1.8+neoforge.26.1.2.R1.jar`，
-  Version number 填 `1.1.8+neoforge.26.1.2.R1`，Changelog 粘 CHANGELOG 的 R1 条目。
+**见 [`Modrinth.md`](Modrinth.md)**（规则速查 + 标题/Summary/Description 全文 + 字段设置）。
+
+> 勘误：本文件早先版本建议的标题 `TaCZ: Renovated` 与含 "TaCZ" 的 Summary
+> 违反 Modrinth §5.2/§5.3，已废止；以 Modrinth.md 为准
+> （标题 `[UNOFFICIAL]TaCZ Renovated`，Summary 不含标题词）。
 
 ## §5 CurseForge 上架物料
 
-- **Project name**: `TaCZ: Renovated [Unofficial NeoForge Port]`
-  （CF 搜索权重靠标题，Unofficial 字样入题 = 免责 + 检索双赢）
-- **Summary**: 同 §4 Summary。
-- **License**: 选 GNU General Public License version 3；描述页附 LICENSES.md 链接
-  说明资产例外。
-- **Description**: 复用 §1 全文 + 顶部加一行英文导语
-  （CF 审核对纯中文描述可能放缓）：
-  `Unofficial NeoForge 26.1.2 port of TaCZ. Full source & docs: <仓库链接>. Chinese documentation below / 中文说明如下.`
-- **Author Rewards**: 不领取（NC 运营注意）。
-- **External links**: Source/Issues 同 §4；**主文件仍以 GitHub Release 为准**，
-  CF/Modrinth 同步上传相同 jar（三处文件哈希一致，便于玩家校验）。
+**见 [`CurseForge.md`](CurseForge.md)**（规则速查 + 名称/Summary/Description 全文 + 字段设置）。
+
+> 勘误：早先建议的 `TaCZ: Renovated [Unofficial NeoForge Port]` 含 filler
+> 信息违反 CF 命名规则，已废止；描述内不得出现 GitHub Releases 等外部
+> 下载链接（Source/Issues 走 Links 字段）。
+
+## §5.5 MC 百科物料
+
+**见 [`MCMOD.md`](MCMOD.md)**（词条判断 + 简介/正文/属性/提交附言全套）。
 
 ## §6 发布顺序建议
 
