@@ -203,12 +203,15 @@ dependencies {
     }
 
     // Roughly Enough Items 21.11.x line. Runtime optional (modid roughlyenoughitems).
-    def localRei = fileTree(dir: 'libs', include: 'roughlyenoughitems-neoforge-*.jar')
-    if (!localRei.isEmpty()) {
-        compileOnly localRei
-    } else {
-        compileOnly "me.shedaniel:roughly-enough-items-neoforge:${rei_neoforge_version}"
-    }
+    // libs/-ONLY (no maven coordinate): the NeoForge artifact is NOT published to
+    // maven.shedaniel.me / Modrinth maven under the fabric version number 21.11.816
+    // (user build log 2026-08-22: all 8 repos searched, not found). REI's own repo
+    // confirms the 1.21.11 branch builds a neoforge module (platforms=fabric,neoforge),
+    // so grab the 1.21.11 NeoForge jar from Modrinth and drop it into libs/:
+    //   https://modrinth.com/mod/rei/versions?g=1.21.11&l=neoforge
+    // (any RoughlyEnoughItems*.jar file name is picked up).
+    def localRei = fileTree(dir: 'libs', include: 'RoughlyEnoughItems*.jar')
+    compileOnly localRei
     compileOnly "dev.architectury:architectury-neoforge:${rei_architectury_version}"
 
     // Cloth Config 21.11.x line. Runtime optional (modid cloth_config).
@@ -233,16 +236,13 @@ dependencies {
     }
 
     // MrCrayfish's Controllable 1.21.11-0.25.8 — optional at runtime (modid controllable);
-    // controller bindings + gun-fire rumble. Exact evidence: GitHub release tag
-    // v1.21.11-0.25.8, asset controllable-neoforge-1.21.11-0.25.8-signed.jar
-    // (2026-08-22). DOWN-version from 26.1.2's 0.26.0 -> compat/controllable/** re-check.
-    // Escape hatch: drop controllable-neoforge-1.21.11-0.25.8-signed.jar into libs/.
+    // controller bindings + gun-fire rumble. libs/-ONLY: Modrinth maven does not serve
+    // the NeoForge jar under version "1.21.11-0.25.8" (user build log 2026-08-22).
+    // Exact verified source (GitHub release tag + asset name checked 2026-08-22):
+    //   https://github.com/MrCrayfish/Controllable/releases/download/v1.21.11-0.25.8/controllable-neoforge-1.21.11-0.25.8-signed.jar
+    // DOWN-version from 26.1.2's 0.26.0 -> compat/controllable/** re-check.
     def localControllable = fileTree(dir: 'libs', include: 'controllable-neoforge-1.21.11*.jar')
-    if (!localControllable.isEmpty()) {
-        compileOnly localControllable
-    } else {
-        compileOnly "maven.modrinth:controllable:${controllable_neoforge_version}"
-    }
+    compileOnly localControllable
 
     // Exopandora's Shoulder Surfing Reloaded 5.x — optional at runtime
     // (modid shouldersurfing). 5.x API only: 4.x builds use a legacy plugin API and

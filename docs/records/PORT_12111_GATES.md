@@ -73,11 +73,11 @@
 | 集成 | 钉版 | 证据层级 |
 |---|---|---|
 | JEI | `jei-1.21.11-neoforge:27.23.0.71` | ③ 姊妹项目 1.21.11 gradle.properties `jei_version=27.23.0.71`（2026-08-13 对活动仓库解析 200）——**Fabric 变体**；NeoForge 同线为推断，libs/ 兜底 |
-| REI | `roughly-enough-items-neoforge:21.11.816` | ③ 姊妹项目 `rei_version=21.11.816`（Fabric）；NeoForge 同线推断，libs/ 兜底 |
-| Architectury | `19.0.1` | ③ 姊妹项目 `architectury_version=19.0.1`（2026-08-13 解析 200） |
-| Cloth | `cloth-config-neoforge:21.11.153` | ③ 姊妹项目 `cloth_config_fabric=21.11.153`（Fabric 坐标）；NeoForge 同线推断，libs/ 兜底 |
-| PAL | `1.1.9`（**降版**） | ③ 姊妹项目 `player_animation_lib=1.1.9`（Modrinth，解析 200）；26.1.2 用 1.2.5 → `compat/playeranimator/**` API delta 待核 |
-| Controllable | `1.21.11-0.25.8`（**降版**） | ① GitHub release 实证（2026-08-22）：`MrCrayfish/Controllable` tag `v1.21.11-0.25.8`，资产 `controllable-neoforge-1.21.11-0.25.8-signed.jar`。26.1.2 用 0.26.0 → `compat/controllable/**` API delta 待核 |
+| REI | `roughly-enough-items-neoforge:21.11.816`（**libs/-only**） | ③ 姊妹项目 `rei_version=21.11.816`（Fabric 坐标，shedaniel maven）。**该版本号的 NeoForge 构件不在任何 maven 上**（2026-08-22 用户构建日志：8 仓库全查无果）；REI 官方仓库 `1.21.11` 分支 `platforms=fabric,neoforge` 证实 NeoForge 构建存在 → 从 Modrinth 下载 jar 进 `libs/`（build.gradle REI 块有确切指引） |
+| Architectury | `19.0.1` | ③ 姊妹项目 `architectury_version=19.0.1`（2026-08-13 解析 200）；**用户构建已解析成功**（2026-08-22） |
+| Cloth | `cloth-config-neoforge:21.11.153` | ③ 姊妹项目 `cloth_config_fabric=21.11.153`（Fabric 坐标）；NeoForge 同线推断；**用户构建已解析成功**（2026-08-22） |
+| PAL | `1.1.9`（**降版**） | ③ 姊妹项目 `player_animation_lib=1.1.9`（Modrinth，解析 200）；**用户构建已解析成功**（2026-08-22）。26.1.2 用 1.2.5 → `compat/playeranimator/**` API delta 待核 |
+| Controllable | `1.21.11-0.25.8`（**降版，libs/-only**） | ① GitHub release 实证（2026-08-22）：`MrCrayfish/Controllable` tag `v1.21.11-0.25.8`，资产 `controllable-neoforge-1.21.11-0.25.8-signed.jar` + `browser_download_url` 已取。Modrinth maven 无此版本 NeoForge 构件（2026-08-22 用户构建日志）→ libs/ 直下。26.1.2 用 0.26.0 → `compat/controllable/**` API delta 待核 |
 | Shoulder Surfing | `1.21.11-5.0.10+neoforge` | ③ 姊妹项目 `shoulder_surfing_version=9T2YSavE`（Modrinth 版本 id，对应 `1.21.11-5.0.10+fabric`）；NeoForge 后缀为推断，libs/ 兜底 |
 | Iris | `1.10.7+mc1.21.11-neoforge`（仅客户端 dev 档案） | ③ 姊妹项目 `iris_curse_file=7805348`（`1.10.7+mc1.21.11` Fabric）；Iris mixin 全部字符串 targets，**无编译依赖**；NeoForge 变体存在性待验证 |
 | Carry On | `2.9.2` 线（运行时） | ③ 姊妹项目 R2 钉 Carry On 2.9.2（Fabric）；本仓库 CarryOn mixin 全部字符串 targets，**无编译依赖**；R2 兼容逻辑回哺待后续包 |
@@ -90,6 +90,10 @@
 ## 6. 下游机器 runbook（WP-12111-2 开工第一步）
 
 ```bash
+# 0) 两个 libs/-only 的 compileOnly 依赖（缺了 compileJava 必挂）：
+#    REI 1.21.11 NeoForge jar -> libs/（https://modrinth.com/mod/rei/versions?g=1.21.11&l=neoforge）
+#    Controllable -> libs/（https://github.com/MrCrayfish/Controllable/releases/download/v1.21.11-0.25.8/controllable-neoforge-1.21.11-0.25.8-signed.jar）
+
 # 1) JDK 21 环境（foojay resolver 会补 toolchain）
 java -version                          # 期望 21.x（Gradle 9.2.1 本身要求 JVM 17+）
 
