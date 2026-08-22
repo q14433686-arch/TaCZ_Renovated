@@ -198,7 +198,7 @@ AT 六条处置（姊妹已对 vanilla 1.21.11 jar 核过五条）：
 minecraft_version=1.21.11
 minecraft_version_range=[1.21.11]      # 精确区间，与 26.1.2 分支同款纪律
 neo_version=21.11.45                    # 已核无 -beta；注意 21.11.43 不存在
-mod_version=1.1.8+neoforge.1.21.11.r0   # 开发起步；发布 = 1.1.8+neoforge.1.21.11.R1
+mod_version=1.1.8+neoforge.1.21.11.R1   # R1 发布版本
 ```
 
 - **`+` 铁律、禁止 `-`**（pre-release 会让枪包 `>=1.1.8` 检查静默失败，宪章 §7.4）；
@@ -230,7 +230,7 @@ mod_version=1.1.8+neoforge.1.21.11.r0   # 开发起步；发布 = 1.1.8+neoforge
 - **分支策略**：直接在现有 `1.21.11` 分支上做——它已是从 26.1.2 R1 切出的正确起点
   （与姊妹 Phase1 第一节结论一致）。`26.1.2` 只收 bugfix；`26.2` 不受影响。
 - 项目显示名 `TaCZ: Renovated`（modId `tacz` 不变）。
-- `mod_version` = `1.1.8+neoforge.1.21.11.r0` 起步、`R1` 收版。**`+` 后是 build metadata；
+- `mod_version` = `1.1.8+neoforge.1.21.11.R1`，R1 收版。**`+` 后是 build metadata；
   禁止 `-`**。改版本号必须同步 README/CHANGELOG 并通过 `--strict`。
 - 该线首发版本号建议 `R1`（与 26.1.2 线语义对齐：含 LR、含联机修复、含品牌物料），
   与姊妹线的 R2-hotfix 内容差异在各自 CHANGELOG 说明。
