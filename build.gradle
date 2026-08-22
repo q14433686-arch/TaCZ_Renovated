@@ -146,6 +146,28 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+// WP-12111: REI and Controllable are libs/-only compileOnly deps (their 1.21.11
+// NeoForge jars are not published on any maven — verified by a user build log).
+// Without them, javac drowns in unrelated "package does not exist" errors across
+// compat/rei and compat/controllable. Fail loudly here with exact sources instead.
+// Runs at execution time so it reads the real libs/ contents on every build
+// (immune to configuration-cache staleness).
+def checkCompatLibs = tasks.register('checkCompatLibs') {
+    doLast {
+        def missing = []
+        if (fileTree(dir: 'libs', include: 'RoughlyEnoughItems*.jar').isEmpty()) {
+            missing << 'REI 1.21.11 NeoForge jar -> https://modrinth.com/mod/rei/versions?g=1.21.11&l=neoforge'
+        }
+        if (fileTree(dir: 'libs', include: 'controllable-neoforge-1.21.11*.jar').isEmpty()) {
+            missing << 'Controllable NeoForge jar -> https://github.com/MrCrayfish/Controllable/releases/download/v1.21.11-0.25.8/controllable-neoforge-1.21.11-0.25.8-signed.jar'
+        }
+        if (!missing.isEmpty()) {
+            throw new GradleException('Missing libs/ compileOnly jar(s):\n  - ' + missing.join('\n  - '))
+        }
+    }
+}
+tasks.named('compileJava') { dependsOn checkCompatLibs }
+
 // Vendored runtime libs. `implementation files(...)` only puts them on the Gradle
 // compile/run classpath — the published mod jar does NOT contain them, so a real
 // launcher (PCL / Prism / vanilla NeoForge) crashes at construct:

@@ -58,12 +58,36 @@ SemVer build metadata，因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过
 
 ### 待办（下一包）
 
-- scope 包整体采纳（姊妹 1.21.11 `ScopeRenderTypes` + Reticle 渲染器组 +
-  `ScopeDepthCopyState` + Iris late/final overlay 层，见 `docs/PORT_12111_BRIEF.md`
-  §4-E 修订版）及配套 `IrisCompat` legacy/newly 分层；
-- CarryOn R2 兼容逻辑回哺（姊妹 `docs/CARRYON_COMPAT.md`）；
-- PAL 1.1.9 / Controllable 0.25.8 降版符号核验（`compat/playeranimator/**`、
-  `compat/controllable/**`）。
+- ~~scope 包整体采纳~~（本回合完成，见下方 WP-12111-3 条目）；
+- CarryOn R2 兼容逻辑回哺（姊妹 `docs/CARRYON_COMPAT.md`，参考文件已镜像）；
+- PAL 1.1.9 / Controllable 0.25.8 降版符号核验（Controllable 已对官方 tag 树
+  核证 7/7 类存在，无需代码适配；PAL `compat/playeranimator/**` 待核）。
+
+### 源码迁移（WP-12111-3 scope 包，进行中）
+
+- **scope 包整体采纳姊妹 1.21.11 R8-R11 定稿**（本回合）：
+  `ScopeRenderTypes` 重写为 1.21.11 管线 API（`DepthTestFunction`/Builder 独立
+  setter 取代 26.1 的 `ColorTargetState`/`DepthStencilState`/`CompareOp`），新增
+  LATE_*/FINAL_* 管线族与 `needsForcedAlwaysDepth` 白名单（承接已移植的
+  GL_ALWAYS 深度方案）；`ScopeDepthCopyState` 升级 R11 final-overlay 世界深度拷贝；
+  新增 `ScopeLateReticleState`（HAND_SOLID→HAND_TRANSLUCENT 冻结重放）与
+  `ScopeFinalOverlayState`（Iris final composite 之后的 3D 快照重画）；
+  `IReticleRenderer`/`EtchedReticleRenderer`/`IlluminatedReticleRenderer` 升级
+  双 defer 参数 + 镜框/准星绘制顺序修复（准星溢出镜框 bug）；
+  `BedrockAttachmentModel` 升级 defer 决策链。
+- Iris 分层（本回合）：`IrisCompat` 升级姊妹 legacy/newly 双桥 +
+  `supportsFinalScopeOverlay`/`isRenderingSolidHandPass`（NeoForge 适配：
+  `ModList` 取代 `FabricLoader`、防御式数字版本比较）；新增
+  `IrisCompatLegacy`/`IrisCompatNewly`；mixin 升级为 3 个
+  （`IrisDepthRestoreShaderMixin` 手部 shader 定向补丁版 +
+  新增 `IrisHandRendererReticlePassMixin`/`IrisFinalScopeOverlayMixin`），
+  `tacz.iris.mixins.json` 同步；`IrisCompatMixinPlugin` 保持本仓库 NeoForge 习语
+  （`FMLLoader.getCurrent().getLoadingModList()`）。
+- 新增 shader 资源 `scope_reticle_final.fsh`/`scope_ring_final.fsh`（无雾 final
+  提交用）；既有 3 个 fsh 与姊妹 1.21.11 逐字节一致，未动。
+- 构建防护：新增 `checkCompatLibs` 任务——REI/Controllable 的 libs/ jar 缺失时
+  **大声失败并给出下载直链**（此前 fileTree 静默为空时 javac 会在一堆无关文件
+  报"程序包不存在"）。
 
 ## Unreleased
 

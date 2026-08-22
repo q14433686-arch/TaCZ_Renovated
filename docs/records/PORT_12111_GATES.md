@@ -142,3 +142,41 @@ WP-12111-2 剩余主体 = scope 包 + Iris 层整体采纳（见 PORT_12111_BRIE
 IrisCompat legacy/newly、2 个 iris mixin、GameRendererMixin/GlCommandEncoder 参考、
 migrate 脚本、错误族 JSON、树清单）已镜像到 `/home/user/.ref-sister12111/`
 （git 之外、snapshot 之内），下一回合直接消费。
+
+## 10. WP-12111-3 执行记录（2026-08-22）：scope 包 + Iris 分层整体采纳
+
+**触发**：用户机器首轮真实 1.21.11 编译——100 错误归并为 3 个族：
+① `ScopeRenderTypes` 的 3 个 26.1-only import（`ColorTargetState`/
+`DepthStencilState`/`CompareOp`，1.21.11 无这些聚合对象，Builder 上是独立 setter）；
+② Controllable 全部 import"程序包不存在"；③ REI 全部 import"程序包不存在"。
+
+**②③ 的定性（关键）**：`com.mrcrayfish.controllable.Controllable`、
+`me.shedaniel.rei.api.client.gui` 这类包在对应 jar 的**任何**版本都存在——报
+"不存在"只可能是 jar 不在本轮 classpath。经查 Controllable 官方 tag
+`v1.21.11-0.25.8`（commit 91c43fd）的树：本仓库 `ControllableInner` 导入的
+**7/7 个类全部存在**，无需 API 降级适配。上一轮同代码零错误 = libs/ fileTree
+在配置缓存复用下静默为空所致。对策：`checkCompatLibs` 任务在**执行期**读 libs/
+（不受配置缓存影响），缺 jar 大声失败并打印下载直链。
+
+**① 的执行**：整体采纳姊妹 1.21.11 scope 包（证据：姊妹分支为同路线权威，
+其 R8-R11 在 1.21.11 上经过实机迭代）：
+- `ScopeRenderTypes`（844 行）→ 替换；`ScopeDepthCopyState` → 替换（R11 增量）；
+  `ScopeLateReticleState`/`ScopeFinalOverlayState` → 新增；
+  `IReticleRenderer`/`EtchedReticleRenderer`/`IlluminatedReticleRenderer` → 替换
+  （双 defer 参数 + 镜框/准星顺序修复）；
+  `BedrockAttachmentModel` → 替换（defer 决策链）；其余消费方
+  （BedrockGunModel/AttachmentRender/MuzzleFlashRender）与姊妹**逐字一致**，
+  GunItemRendererWrapper 的两处差异为本仓库 NeoForge/左利手修复，保留。
+- Iris 分层：`IrisCompat` 以姊妹为基底做 NeoForge 适配（`ModList` 取代
+  `FabricLoader`；版本比较改用防御式数字字符串比较，fail-open）；新增
+  legacy/newly 两桥 + 2 个新 mixin + 2 个新 shader（`scope_reticle_final.fsh`/
+  `scope_ring_final.fsh`）；既有 3 个 fsh 与姊妹逐字节一致。
+- 静态自检：全部采纳文件无 `net.fabricmc` 残留；`ScopeRenderTypes` 26.1-only
+  符号仅存于注释；调用面（`needsForcedAlwaysDepth`/`beforeDraw`/`init` 等）
+  与已移植的 `GlCommandEncoderScopeDepthCopyMixin`、`GunModClient` 对齐；
+  `tacz.iris.mixins.json` 3 mixin + 本仓库 NeoForge 版 `IrisCompatMixinPlugin` 保留。
+
+**剩余（不阻塞编译）**：Controllable/REI 的 libs/ jar 由用户重新放置后
+`checkCompatLibs` 会放行；PAL 1.1.9 符号核验；CarryOn R2 回哺；GPU 实机矩阵
+（开镜/准星/裁剪/黑屏 + Iris 1.10.7 专项）；19 条 IItemHandler `[removal]`
+警告为 1.21.11 上的既有卫生项，留待清理。

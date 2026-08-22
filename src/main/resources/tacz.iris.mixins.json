@@ -5,9 +5,12 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "com.tacz.guns.mixin.client.iris.IrisCompatMixinPlugin",
   "client": [
-    "IrisDepthRestoreShaderMixin"
+    "IrisDepthRestoreShaderMixin",
+    "IrisHandRendererReticlePassMixin",
+    "IrisFinalScopeOverlayMixin"
   ],
   "injectors": {
     "defaultRequire": 0
-  }
+  },
+  "_comment": "WP-12111-3 Iris 集成（姊妹 1.21.11 R8-R11 定稿）：ShaderCreator link 第 5 次 createShader(ordinal=4) 为 fragment；R8 冻结 scope reticle 强制 HAND_TRANSLUCENT；R9 写 late foreground depth；R11 仅对经审计的 Iris 1.10.7 在 IrisRenderingPipeline.finalizeLevelRendering TAIL 重画 3D 快照（no-fog vanilla fragments）。required=false + IrisCompatMixinPlugin 的 FMLLoader 检查双重兜底，未装 Iris 不受影响。"
 }

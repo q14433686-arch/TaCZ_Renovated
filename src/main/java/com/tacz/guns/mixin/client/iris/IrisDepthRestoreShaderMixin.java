@@ -9,13 +9,16 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 /**
  * Adds depth-restore and ocular screen-space mask branches to Iris hand fragment shaders.
  *
- * <p>Does not import Iris types: {@code @Mixin(targets=...)} so this class compiles without Iris
- * on the classpath. The companion plugin refuses to apply the mixin when Iris is absent.</p>
+ * <p>Important NVIDIA compatibility note: older revisions injected these dormant branches into
+ * every Iris shader-pack program. Even with both mode uniforms at 0, merely adding conditional
+ * {@code discard} / {@code gl_FragDepth} paths can make some NVIDIA drivers compile ordinary
+ * gbuffers programs differently, producing translucent-looking mobs, arms and gun shells. The
+ * scope depth backup is only consumed by first-person hand draws, so this mixin now patches only
+ * Iris' first-person hand shader keys/programs.</p>
  *
- * <p>Only first-person HAND programs are patched. Injecting dormant {@code discard}/{@code gl_FragDepth}
- * into world gbuffers makes some NVIDIA drivers compile those programs differently.</p>
- *
- * Semantic source: Fabric 26.1.2 {@code IrisDepthRestoreShaderMixin} (game shader text, not MUKSC).
+ * <p>Under Iris the mask world-depth source is {@code depthtex2}, which Iris copies immediately
+ * before HAND_SOLID, while the aperture depth is the mod-owned copy bound to a high texture unit
+ * for the duration of the reticle draw.</p>
  */
 @Mixin(targets = "net.irisshaders.iris.pipeline.programs.ShaderCreator", remap = false)
 public abstract class IrisDepthRestoreShaderMixin {
@@ -56,6 +59,8 @@ public abstract class IrisDepthRestoreShaderMixin {
                 declarationPos = lineEnd + 1;
             }
         }
+        // Iris copies world depth immediately before HAND_SOLID and publishes it as depthtex2. Reuse that
+        // canonical sampler rather than copying the currently-bound hand FBO, whose depth can start cleared.
         String depthtex2Declaration = source.contains("depthtex2")
                 ? ""
                 : "uniform sampler2D depthtex2;\n";
@@ -65,6 +70,11 @@ public abstract class IrisDepthRestoreShaderMixin {
                 + "uniform sampler2D tacz_ApertureDepthSampler;\n"
                 + "uniform sampler2D tacz_PostBodyDepthSampler;\n"
                 + depthtex2Declaration;
+        // Once a shader statically writes gl_FragDepth anywhere, OpenGL leaves the value undefined
+        // on paths that do not write it. NVIDIA exposes this aggressively: ordinary hand draws can
+        // poison the hand depth buffer, which then breaks water/fog/particles and produces odd lens
+        // clipping. Preserve vanilla depth for every normal path; the cleanup branch overwrites it
+        // with the sampled pre-hand world depth and returns.
         String restoreBranch = "\n    gl_FragDepth = gl_FragCoord.z;\n"
                 + "    if (tacz_DepthRestoreMode != 0) {\n"
                 + "        if (tacz_DepthRestoreMode == 2) {\n"
@@ -81,6 +91,8 @@ public abstract class IrisDepthRestoreShaderMixin {
                 + "        gl_FragDepth = texture(depthtex2, tacz_depthUv).r;\n"
                 + "        return;\n"
                 + "    }\n";
+        // Mode 1 keeps reticles inside the ocular. Mode 2 keeps viewmodel FX outside it; this is
+        // used by both muzzle-flash layers after the cleanup draw restores ordinary world depth.
         String maskBranch = "\n    if (tacz_ScopeMaskMode != 0) {\n"
                 + "        vec2 tacz_maskWorldUv = gl_FragCoord.xy / max(vec2(textureSize(depthtex2, 0)), vec2(1.0));\n"
                 + "        vec2 tacz_maskApertureUv = gl_FragCoord.xy / max(vec2(textureSize(tacz_ApertureDepthSampler, 0)), vec2(1.0));\n"
@@ -109,6 +121,10 @@ public abstract class IrisDepthRestoreShaderMixin {
         if (name == null) {
             return false;
         }
+        // ShaderCreator#createShader receives ShaderKey#getName() (for example
+        // hand_cutout / hand_translucent / hand_water_bright), not only the underlying
+        // shader-pack ProgramId source name (gbuffers_hand / gbuffers_hand_water).
+        // Patch every first-person hand key, but keep world/entity/particle/water keys untouched.
         return name.equals("gbuffers_hand")
                 || name.equals("gbuffers_hand_water")
                 || name.endsWith("/gbuffers_hand")
