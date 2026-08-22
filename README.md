@@ -112,14 +112,8 @@ bash scripts/check_release_consistency.sh --strict
 - [更新日志](CHANGELOG.md)
 - [许可证清单](LICENSES.md)
 
-## 9. 谱系、许可与反馈
+## 9. 许可与反馈
 
-```text
-MCModderAnchor/TACZ                         1.20.1 Forge 官方源
-        ├── Sh1roCu/TACZ-Refabricated      1.21.1 Fabric
-        │       └── TaCZ_Refabricated_Unofficial 26.2（游戏语义权威）
-        └── MUKSC/TACZ-1.21.1              1.21.1 NeoForge（仅加载器习语）
-                                └── TaCZ: Renovated 26.1.2 R1 → 26.2 R1
 ```
 
 - 代码：GPL-3.0-only；发布二进制时必须同步提供对应源码。
