@@ -1,66 +1,65 @@
 # 给 26.2 前滚 AGENT 的同步说明（复制本文全文给他即可）
 
-> 更新：2026-08-21（R1 定名后）。本会话（01a023bf）保持开启，**本分支可直接读取，
-> 不必等 PR #6 合并**。
+> 更新：2026-08-22。**基线由 R1 升级为 R2（LRTactical 内置层已合入并通过
+> 单机 + 专用服务器双重验收）。** 本分支可直接读取，不必等 PR 合并。
 
 ## 0. 你要同步的源
 
 ```
 仓库：q14433686-arch/TaCZ-Renovated
 分支：arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
-基线：**钉死在提交 `b9de5e0`（R1）**——不要跟分支最新提交！
+基线：R2 = 分支最新提交（mod_version = 1.1.8+neoforge.26.1.2.R2）
 ```
 
 ```bash
 git fetch origin arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0
-git checkout b9de5e0   # R1 基线
+git merge FETCH_HEAD        # 或 rebase；R2 起不再有开发中提交混入
 ```
 
-> ⚠️ 2026-08-21 起该分支尖端开始进行 **WP-LR2（LRTactical 内置层）** 开发
-> （`docs/WP_LR2_BRIEF.md`），属 26.1.2 线的 R2 目标，**不在你的 26.2 首发范围**。
-> LR 稳定后另行通知你平移；在那之前你的一切同步以 `b9de5e0` 为准。
+之前钉在 `b9de5e0`（R1）的指示**作废**：LR-dev 开发期已结束，分支尖端即稳定基线。
+若你已基于 R1 做了大量工作，merge 会带入的增量 = LR 内置层（`me/xjqsh/**` 全树 +
+四处 tacz 接线 + 资源）+ R1 后的文档，无其它代码变动。
 
-你的基线如果切自 `4d2edc1`（Beta-1 时代的 main），就缺少三轮多人联机实测抓出的
-全部修复。**26.2 必须从 R1 起跳**（R1 = 该分支 `5d2358d` 切版 + 后续文档收尾，
-开发期曾用标签 Beta-2，代码同物）。
+## 1. R2 相对 R1 的增量（你的 26.2 前滚范围随之扩大）
 
-## 1. 同步方式二选一
+- `me.xjqsh.lrtactical.*`（约 105 java）：LR 战术装备框架，NeoForge 习语
+  已全量改写（DeferredRegister / 事件面 / PayloadRegistrar `lr1` 通道）。
+- tacz 侧接线四处：`GunMod` 构造器、`GunModClient` enqueueWork、
+  mods.toml `[[mixins]]`（lrtactical.mixins.json）、AT（`Player#canCriticalAttack`）。
+- 资源：`assets/lrtactical/**`（items json / particles json / lang / scripts /
+  display）、`data/lrtactical/**`。
 
-**A（推荐）**：把你的 26.2 分支直接 rebase / merge 到本分支最新提交上——
-文档、脚本、修复一次拿齐。
+## 2. LR 层的 26.2 前滚专项注意（除 PORT_262_BRIEF 全部条目外新增）
 
-**B（你已大改、怕冲突）**：只 cherry-pick 三个代码修复，再手动抄文档：
+1. **`SimpleParticleType` 构造器 26.2 变 protected**（WP07 B-9）——
+   `me.xjqsh.lrtactical.init.ModParticleTypes` 直接 `new`，26.2 上必须改
+   工厂/匿名子类（该文件 javadoc 已预埋提示）。
+2. LR 的 mixin 两个（`GuiGraphicsExtractorMixin` 冷却遮罩、`SoundEngineMixin`
+   耳鸣压音量）目标是 vanilla 类——26.2 的 Gui/Hud 重组（PORT_262_BRIEF §4-G）
+   与音频系统变动需逐一重验注入点。
+3. LR 反馈层（tooltip/HUD/粒子）跑在 GuiGraphicsExtractor 与 Feature Rendering
+   体系上——26.2 渲染大改（§4-B/D/F）会波及，前滚时与 tacz 渲染层同批处理。
+4. LR 网络消息三条无 ItemStack 字段（EMPTY 纪律天然过）；
+   `ServerMessageSyncLrPack` 的 readMap/writeMap 已是显式 lambda（B-8）。
 
-| 提交 | 内容 | 26.2 上是否仍适用 |
-|---|---|---|
-| `09a0edd` | ① `ServerMessageGunDraw` 两字段 `ItemStack.OPTIONAL_STREAM_CODEC`（空栈踢全员）；② `AttachmentsTagManager`/`RecipeFilterManager` 接回 `registerNetwork`（否则联机客户端方块索引全灭、配件允装失效）；③ IrisCompat "already assigned" 视为成功 | ①② **必须**；③ 视 Iris 26.2 版行为再验 |
-| `eea0b59` | mods.toml 模板注释禁写字面量 dollar-brace（Groovy 引擎连注释一起求值） | **必须** |
-| `3b19477` | 四个物品类 `getName` 改走 common 索引（原引用 client 索引，专服 `/give` 即 NoClassDefFoundError 崩服） | **必须** |
+## 3. 三条经验（不变，前滚时会反复踩）
 
-另有版本号提交 `5d2358d`（Beta-2）与 `b9de5e0`（定名 R1）只影响 26.1.2 线元数据，
-你不用 pick——你的版本串直接从 `1.1.8+neoforge.26.2.0.r0` 起步。
-
-## 2. 三条经验（比提交更重要，前滚时会反复踩）
-
-1. **26.1+ 上 `@OnlyIn(Dist.CLIENT)` 只是文档，不是保护**（dist cleaner 不再剥离成员）。
-   你前滚渲染/GUI 会大量搬带注解的覆写——凡覆写 vanilla 双端方法的，一律按无注解
-   审查方法体内的 client 类引用。审计命令：
-   `grep -rn "TimelessAPI.getClient\|ClientIndexManager" src/main/java --include="*.java"`
+1. **26.1+ 上 `@OnlyIn(Dist.CLIENT)` 只是文档不是保护**——凡覆写 vanilla 双端
+   方法，一律按无注解审查方法体内的 client 类引用。
 2. **网络消息里的 ItemStack 字段先问一句：会不会是 EMPTY？** 会 → OPTIONAL codec。
-   refab `ServerMessageGunDraw#write` javadoc 有上游逐条对照。
-3. **单机跑通 ≠ 完成。** 26.1.2 线的四个致命 bug 全部只在多人下现形。26.2 的验收
-   必须包含本分支 `docs/DEDICATED_SERVER_TEST.md` 的 L0-L2（headless 可做）
-   + L2.5 枪包专项 + L3 实机矩阵。
+3. **单机跑通 ≠ 完成**——验收必须包含 `docs/DEDICATED_SERVER_TEST.md` 的
+   L0-L2 + L2.5 + L3；R2 的 LR 层就是按这套完成专服验收的。
 
-## 3. 必读文档（都在本分支）
+## 4. 必读文档（都在本分支）
 
 - `docs/PORT_262_BRIEF.md` —— 你的工单（差异映射、权威边界、WP-262 切分）
+- `docs/WP_LR2_BRIEF.md` + `docs/records/LR2_INVENTORY.md` —— LR 层的完整
+  实现台账（前滚 LR 时照着改动清单走）
 - `AGENTS.md` —— 会话规则（版本一致性门禁、不得声称未实现）
-- `docs/DEDICATED_SERVER_TEST.md` —— 测试预案（L0-L4 + L2.5）
-- `docs/records/SERVER_TEST_20260821_*.md` —— 五份实测记录（根因与证据链）
-- `CHANGELOG.md` R1 条目 —— 修复全景
+- `CHANGELOG.md` R1/R2 条目 —— 修复与新增全景
 
-## 4. 版本号红线
+## 5. 版本号红线
 
-起步 `1.1.8+neoforge.26.2.0.r0`；`+` 后是 build metadata，**禁止 `-`**。
-改 `gradle.properties` 后跑 `bash scripts/check_release_consistency.sh --strict`。
+起步 `1.1.8+neoforge.26.2.0.r0`，基于 **R2** 代码；`+` 后是 build metadata，
+**禁止 `-`**。改 `gradle.properties` 后跑
+`bash scripts/check_release_consistency.sh --strict`。

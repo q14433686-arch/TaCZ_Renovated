@@ -6,9 +6,9 @@
 
 - 兼容按 TaCZ **1.1.8** 制作的枪包，`tacz >= 1.1.8` 依赖检查照常通过。
 - 默认枪包随 jar 附带，首次启动解压到 `游戏目录/tacz/`。
-- **依赖 `lrtactical` 的枪包**：可以装载，枪械部分正常；但近战/投掷物/引爆器/消耗品等
-  LR 道具**不可用**（LRTactical 框架未内置，撤回记录见
-  [`records/WP07_LRTACTICAL_PLAN.md`](records/WP07_LRTACTICAL_PLAN.md)）。
+- **依赖 `lrtactical` 的内容包**：R2 起完整可用（LRTactical 框架已内置，
+  单机+专服实测 PASS；flash_shield 除外）。台账见
+  [`records/LR2_INVENTORY.md`](records/LR2_INVENTORY.md)。
 
 ## 可选 mod
 

@@ -3,13 +3,27 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 未发布（1.1.8+neoforge.26.1.2.LR-dev — WP-LR2 测试线）
+## 1.1.8+neoforge.26.1.2.R2 — 2026-08-22
 
-- **新增（测试中）**：LRTactical 内置层重启（WP-LR2）——四类基础物品、五类投掷行为、
-  数据装载与反馈层（tooltip/使用进度 HUD/分类冷却遮罩），全量 DeferredRegister +
-  NeoForge 事件面改写，联机同步经独立载荷通道（registrar `lr1`）。
-  flash_shield 不含；原作美术零打包。**未过 LR2-5..7 验收前不构成任何支持承诺**；
-  验收通过后收版 R2。工单 `docs/WP_LR2_BRIEF.md`，台账 `docs/records/LR2_INVENTORY.md`。
+**LRTactical 内置层**（WP-LR2）。单机全功能 + 专用服务器专项均用户实测 PASS
+（records/LR2_INVENTORY.md 全程台账）。
+
+### 新增
+
+- LRTactical 战术装备框架内置：throwable/melee/detonator/consumable 四类基础物品、
+  五类投掷行为（explode/sticky/smoke/stun/effect-cloud）、数据装载与网络同步
+  （独立载荷通道 `lr1`）、反馈层（三类 tooltip / 使用进度 HUD / 分类冷却遮罩）。
+- 依赖 `lrtactical` 的内容包现在**完整可用**（此前仅枪械部分可用）。
+- 范围界定：flash_shield 未含（独立子系统 + ARR 美术，与姊妹项目同边界）；
+  原作美术零打包，道具模型/贴图由内容包提供；无内容包时显示原版占位模型。
+
+### 实现要点（NeoForge 侧独有）
+
+- LR init 包全量 DeferredRegister 重写（根治 WP07 A 类注册时序坑，
+  当年 r30 的未定位启动崩溃未复现——E-13 闭案）。
+- 本仓补齐 NeoForge 路径必需的 `items/*.json`（condition 分流 + 原版占位）与
+  `particles/smoke_cloud.json`（原版篝火烟精灵）——注：此为本仓实现所需，
+  非上游缺陷（Fabric 侧实现不同，作者实测无此问题）。
 
 ## 1.1.8+neoforge.26.1.2.R1 — 2026-08-21
 

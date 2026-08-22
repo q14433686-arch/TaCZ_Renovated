@@ -9,7 +9,7 @@
 本仓库把 TaCZ 移植到 **Minecraft 26.1.2 NeoForge**。游戏语义来自姊妹项目
 [TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
 （Fabric 26.x / 1.21.11 移植）的 26.1.2 分支；本仓库当前源码版本为
-**`1.1.8+neoforge.26.1.2.LR-dev`**。
+**`1.1.8+neoforge.26.1.2.R2`**。
 
 [问题反馈](https://github.com/q14433686-arch/TaCZ-Renovated/issues)
 · [姊妹项目（Fabric）](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
@@ -33,7 +33,7 @@
 | 加载器 | **NeoForge 26.1.2.x**（release 通道；开发基于 26.1.2.97） |
 | Java | 游戏侧随 NeoForge 安装器（源码构建需 JDK 25） |
 | 硬依赖 | **无**（不需要 Fabric API / Forge Config API Port，配置走 NeoForge 原生） |
-| 本 mod | **`1.1.8+neoforge.26.1.2.LR-dev`** |
+| 本 mod | **`1.1.8+neoforge.26.1.2.R2`** |
 
 可选集成（Cloth Config 图形配置、Iris 光影、Player Animation Library 第三人称动画、
 Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
@@ -51,11 +51,11 @@ Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
 - 为 26.x API 与 NeoForge 事件面改写的注册、网络、资源加载、GUI 和渲染接线；
 - 若干可选模组的兼容接线。
 
-**与 Fabric 姊妹项目的关键差异**：本仓库**未内置 LRTactical 兼容框架**
-（曾于开发期引入，因未定位的启动崩溃撤回；决策与踩坑记录见
-[`docs/records/WP07_LRTACTICAL_PLAN.md`](docs/records/WP07_LRTACTICAL_PLAN.md)）。
-依赖 `lrtactical` 的枪包可以装载、枪械部分可用，但近战/投掷物/引爆器/消耗品等
-LR 道具**不可用**。
+**LRTactical 内置框架**（R2 起）：throwable/melee/detonator/consumable 四类物品与
+五类投掷行为，依赖 `lrtactical` 的内容包完整可用。范围界定：flash_shield 未含；
+原作美术零打包，道具模型/贴图由内容包提供，无内容包时显示原版占位模型。
+（开发史：WP07 撤回 → WP-LR2 重启并通过单机+专服验收，
+见 [`docs/records/LR2_INVENTORY.md`](docs/records/LR2_INVENTORY.md)。）
 
 ---
 
@@ -114,7 +114,7 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 
 ### 版本约束
 
-本仓库的完整版本号 `1.1.8+neoforge.26.1.2.LR-dev` 中，`1.1.8` 是 SemVer 核心，
+本仓库的完整版本号 `1.1.8+neoforge.26.1.2.R2` 中，`1.1.8` 是 SemVer 核心，
 `+` 之后是构建元数据，不参与版本先后比较——因此枪包常见的 `tacz >= 1.1.8` 谓词照常通过。
 一个枪包最终是否通过检查，取决于它写下的完整谓词，不能笼统理解为"所有旧包都兼容"。
 
@@ -130,7 +130,7 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 
 - 明确依赖 **TaCZ:Arcana** 的内容包：本仓库不提供 Arcana，也未实现其 API
   （Arcana 官方发布为 1.20.1 Forge，姊妹项目 2026-08-12 核对）。
-- 依赖 **lrtactical** 的 LR 道具部分（见第 2 节）。
+- LRTactical 的 flash_shield（独立子系统 + 原作 ARR 美术，未移植，与姊妹项目同边界）。
 
 紫黑贴图或模型缺失不能直接证明"依赖 Arcana"，也可能是目录层级、资源路径、
 版本谓词或包不完整造成的。
@@ -143,7 +143,6 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
   （2026-08-21，R1）；混合服（Youer/Arclight 等）、代理网络（Velocity）、
   面板服等形态未测试。测试预案与形态矩阵见
   [docs/DEDICATED_SERVER_TEST.md](docs/DEDICATED_SERVER_TEST.md)。
-- LRTactical 未内置（第 2 节）。
 - 启动日志中原版 `RecipeManager` 对工作台配方报 `empty ingredients` 警告：无害，
   实际合成走 mod 内部管线。
 - 可选 mod 的逐项状态（含**明确不适配**的 Just Zoom、无 NeoForge 版的 Zoomify 等）

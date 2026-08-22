@@ -147,3 +147,16 @@ mods.toml `[[mixins]]` 加 `lrtactical.mixins.json`；AT 补 `Player#canCritical
    Fabric 侧图标紫黑同病；本仓四个 json 可直接平移；
 3. `assets/lrtactical/particles/smoke_cloud.json` 缺失——Fabric 侧烟雾弹
    崩溃同病；本仓 json 可直接平移。
+
+## LR2-6/7 验收 PASS + 回哺推断撤回（2026-08-22）
+
+- **烟雾弹修复复测 PASS**；**专用服务器 LR 专项用户实测 PASS（"没任何问题"）**。
+  LR2-5/6/7 三关全过，WP-LR2 进入收版（R2）。
+- **回哺推断修正（AGENTS §2）**：作者（refab 维护者本人）实测反馈
+  **refab 侧并无这些 bug，系实现不同**。撤回"Fabric 同病"推断：
+  - items json / particles json 缺失 → 仅在**本仓 NeoForge 注册路径**下成为必需
+    资源，不构成上游缺陷，回哺项 #2/#3 **作废**；
+  - getName 条目维持原口径（NeoForge 已实证 / Fabric 未实测、不预设结论），
+    降级为低优先核查项。
+  教训归档：跨加载器的"同构代码"不等于"同构行为"——资源解析与回退路径
+  两边加载器差异大，"同病"必须实测后才可声称。
