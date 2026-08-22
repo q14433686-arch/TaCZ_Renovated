@@ -4,7 +4,9 @@
 
 > **非官方移植。请勿向 MCModderAnchor / Serene Wave Studio 报告本移植的问题。**
 >
-> 当前源码版本：**`1.1.8+neoforge.26.2.R1`**；状态：**Unreleased R1 candidate**
+> 当前源码版本：**`1.1.8+neoforge.26.2.R1`**；状态：**R1 已发布**（2026-08-22，
+> [GitHub Release `26.2_R1`](https://github.com/q14433686-arch/TaCZ-Renovated/releases/tag/26.2_R1) /
+> [CurseForge 1663324](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-renovated)）
 
 从 NeoForge 26.1.2 R1 前滚到 Minecraft 26.2 的 TaCZ 社区移植。modId 保持
 `tacz`，枪包的 `tacz >= 1.1.8` 依赖检查继续有效。
