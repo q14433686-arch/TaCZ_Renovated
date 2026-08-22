@@ -1,4 +1,4 @@
-# Modrinth 发布文案（TaCZ: Renovated R1）
+# Modrinth 发布文案（TaCZ: Renovated）
 
 > 复制粘贴用。`[[ ]]` 内容发布前替换，搜 `[[` 全部处理掉。
 > 规则依据：Modrinth [Content Rules](https://modrinth.com/legal/rules)；
@@ -8,7 +8,7 @@
 
 | 规则 | 对本项目的执行 |
 |---|---|
-| §5.2 标题只能是项目名，不带版本等 filler | 标题不含 `26.1.2` / `NeoForge` |
+| §5.2 标题只能是项目名，不带版本等 filler | 标题不含具体游戏版本或加载器版本 |
 | §5.3 Summary 纯文本、不重复标题词 | Summary 不出现 "TaCZ" / "Renovated" |
 | §1.9 不得让人误以为官方出品/背书 | `[UNOFFICIAL]` 前缀 + 描述首段免责 |
 | §4 以 license 合规 fork 立足 | 描述写明 GPL-3.0 与全谱系来源 |
@@ -22,8 +22,8 @@
 [UNOFFICIAL]TaCZ Renovated
 ```
 
-> 与姊妹项目同构：无版本号；`[UNOFFICIAL]` 服务于 §1.9 硬规则，
-> 且有站内先例（`[UNOFFICIAL] TaCZ 1.21.1 NeoForge Port`，49 万下载在线）。
+> 与姊妹项目同构：无版本号；`[UNOFFICIAL]` 服务于 §1.9 硬规则。
+> 正文也不写死具体游戏版本，准确范围以当前文件的兼容性标签为准。
 
 ## ② Summary（≤256 字符，纯文本）
 
@@ -47,7 +47,7 @@ A community port of the Timeless and Classics Guns mod to the NeoForge loader, w
 customizable guns with attachments, optics and ammo types, a gun-smithing
 workbench, and support for third-party "gun packs" that add entire weapon sets.
 
-This project ports that mod to **NeoForge on Minecraft 26.1.2**, and additionally
+This project ports that mod to **NeoForge on a recent Minecraft release**, and additionally
 ships a built-in port of the **LRTactical** tactical-equipment framework
 (throwables, melee weapons, detonators, consumables) so content packs that
 depend on `lrtactical` work out of the box.
@@ -57,8 +57,8 @@ gun-pack ecosystem working on this loader and game version.
 
 ## Why you might want it
 
-- You want TaCZ's gun system on **NeoForge 26.1.2** — no other open-source build
-  targets it.
+- You want TaCZ's gun system on **NeoForge for a recent Minecraft release**.
+  Check the uploaded file's compatibility tags for the exact supported environment.
 - **No required dependencies.** Drop one jar into `mods/` and play.
 - **Multiplayer is actually tested**: single-player, LAN and dedicated-server
   scenarios (join/sync, shooting, crafting, gun-pack hot reload, LRTactical
@@ -72,8 +72,8 @@ gun-pack ecosystem working on this loader and game version.
 | | |
 |---|---|
 | Original mod | **Timeless and Classics Guns: Zero**, by the **TACZ Dev Team** |
-| Game-semantics source | [TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial) (Fabric 26.x sister project) |
-| Its upstream | [`Sh1roCu/TACZ-Refabricated`](https://github.com/Sh1roCu/TACZ-Refabricated), baseline **1.1.8** |
+| Game-semantics source | [TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial) (Fabric sister project) |
+| Its upstream | [`Sh1roCu/TACZ-Refabricated`](https://github.com/Sh1roCu/TACZ-Refabricated), providing the upstream game semantics |
 | LRTactical original | **LesRaisins Tactical Equipements** — Programmer **xjqsh**, Artist **LeComte** |
 | Source of this port | https://github.com/q14433686-arch/TaCZ-Renovated |
 
@@ -93,7 +93,7 @@ This target version and loader required substantial rework, not a recompile:
 
 - **Loader layer rewritten for NeoForge**: registration (DeferredRegister),
   event wiring, and networking (payload registrar / stream codecs).
-- **Scope rendering** uses a depth-aperture path built for 26.1's renderer
+- **Scope rendering** uses a depth-aperture path built for the target release's renderer
   (the stencil buffer upstream relied on no longer exists). Some visual effects
   differ from the original.
 - **Dedicated-server hardening**: several crashes that only occur on real
@@ -106,11 +106,11 @@ This target version and loader required substantial rework, not a recompile:
 
 ## Requirements
 
-**Minecraft 26.1.2 · NeoForge 26.1.2.x · no required dependencies.**
+**A recent Minecraft release · NeoForge · no required dependencies.**
 Optional integrations (config UI, shaders, third-person animations, controller,
 recipe viewers) are listed in the repository's compatibility matrix.
-There is no Fabric build here — for Fabric (26.2 / 26.1.2 / 1.21.11) see the
-sister project linked above.
+There is no Fabric build here — see the sister project linked above for its
+Fabric builds.
 
 ## Installing gun packs
 
@@ -123,9 +123,10 @@ the server provides gameplay data (synced over the network), the client
 provides models/textures/sounds. After adding a pack, run `/tacz reload` on the
 server; on the client press **F3+T** (no restart needed).
 
-**Version predicate:** this port reports `1.1.8` plus build metadata after `+`.
-SemVer ignores build metadata, so packs requiring `"tacz": ">=1.1.8"` load
-normally.
+**Compatibility predicate:** this port preserves the current TaCZ gun-pack
+compatibility baseline, so packs using the corresponding minimum dependency
+requirement load normally. Exact build details belong to the uploaded file, not
+this reusable description.
 
 ## Known limitation: packs requiring TacZ:Arcana
 
@@ -156,8 +157,8 @@ Provided "as is", without warranty of any kind.
 |---|---|
 | License | GPL-3.0-only |
 | Environment | Client & Server 均必装 |
-| Loaders / Game versions | NeoForge / 26.1.2 |
+| Loaders / Game versions | NeoForge / select the supported game version shown for the uploaded file |
 | Links | Source / Issues = 本仓库；Wiki/Discord 留空 |
 | Dependencies | 无 required；可选集成如需展示填 optional |
 | Monetization | **关闭** |
-| 版本文件 | `Version number` = `1.1.8+neoforge.26.1.2.R1`，Changelog 粘 CHANGELOG R1 条目，Channel = Release |
+| 版本文件 | 按当前上传构建的实际文件信息填写；具体版本只放在平台字段，不写入项目名或正文，Channel = Release |

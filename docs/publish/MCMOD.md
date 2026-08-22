@@ -1,4 +1,4 @@
-# MC 百科（mcmod.cn）发布文案（TaCZ: Renovated R1）
+# MC 百科（mcmod.cn）发布文案（TaCZ: Renovated）
 
 > 复制粘贴用。`[[ ]]` 内容发布前替换。规则依据：MC百科模组收录规则与主站
 > 编辑规范；条文解读沿用姊妹项目 MCMOD.md 的已验证结论
@@ -26,7 +26,7 @@
 
 原模组由 TACZ Dev Team 开发，采用 GPL-3.0 开源许可；本移植的游戏语义
 来源于姊妹项目 TaCZ Refabricated Unofficial（Fabric 移植，其上游为
-Sh1roCu 的 TACZ-Refabricated，对应上游 1.1.8 版本），同样以 GPL-3.0 开源。
+Sh1roCu 的 TACZ-Refabricated，对应上游兼容基线），同样以 GPL-3.0 开源。
 
 本项目与 TACZ 官方团队无隶属关系，未经其审阅或背书。
 ```
@@ -45,7 +45,7 @@ Sh1roCu 的 TACZ-Refabricated，对应上游 1.1.8 版本），同样以 GPL-3.0
   包含配件、瞄具、多种弹药类型，以及用于制作和改装武器的枪械工作台，
   支持第三方"枪包"扩展。
 
-  本项目将该模组移植至 NeoForge 加载器与 Minecraft 26.1.2，并内置
+  本项目将该模组移植至 NeoForge 加载器与较新的 Minecraft 版本，并内置
   LRTactical 战术装备框架的移植（投掷物、近战武器、遥控起爆器、消耗品
   四类物品与五类投掷行为），使依赖 lrtactical 的内容包可以完整使用。
   本项目不新增枪械或玩法内容。
@@ -56,7 +56,7 @@ Sh1roCu 的 TACZ-Refabricated，对应上游 1.1.8 版本），同样以 GPL-3.0
 
   原模组　　：永恒枪械工坊:零（TACZ Dev Team）
   语义来源　：TaCZ Refabricated Unofficial（Fabric 移植，姊妹项目）
-  其上游　　：Sh1roCu / TACZ-Refabricated（对应上游 1.1.8）
+  其上游　　：Sh1roCu / TACZ-Refabricated（提供上游游戏语义）
   LR 原作　 ：LesRaisins Tactical Equipements
               （Programmer xjqsh，Artist LeComte，代码 GPL-3.0）
   本项目源码：https://github.com/q14433686-arch/TaCZ-Renovated
@@ -84,7 +84,7 @@ Sh1roCu 的 TACZ-Refabricated，对应上游 1.1.8 版本），同样以 GPL-3.0
 
 四、当前状态
 
-  R1 为首个发布版本。单人、局域网与专用服务器场景（加入与同步、战斗、
+  本次为首个发布版本。单人、局域网与专用服务器场景（加入与同步、战斗、
   合成、枪包热重载、LRTactical 道具）均经实际测试；面板服、代理网络、
   混合服未经测试，此类环境的问题需先在原生 NeoForge 专用服务器复现。
 
@@ -97,8 +97,7 @@ Sh1roCu 的 TACZ-Refabricated，对应上游 1.1.8 版本），同样以 GPL-3.0
   可选集成　：配置界面、光影、第三人称动画、手柄、配方查看器等，
               详见源码仓库的兼容矩阵文档
 
-  本移植版仅支持 NeoForge；Fabric 版本（26.2 / 26.1.2 / 1.21.11）
-  由姊妹项目提供。
+  本移植版仅支持 NeoForge；Fabric 版本由姊妹项目提供。
 
 ──────────────────────────────
 
@@ -112,9 +111,8 @@ Sh1roCu 的 TACZ-Refabricated，对应上游 1.1.8 版本），同样以 GPL-3.0
   客户端提供模型、贴图与音效。服务端新增枪包后执行 /tacz reload 生效；
   客户端新增枪包后按 F3+T 重载资源即可，无需重启游戏。
 
-  版本校验：本移植版版本号以上游基线（1.1.8）开头，加号后为构建元数据；
-  按语义化版本规范，构建元数据不参与版本比较，声明 "tacz": ">=1.1.8"
-  的枪包可正常通过校验。
+  版本校验：本移植版保留当前 TaCZ 枪包兼容基线；声明符合当前最低依赖要求的枪包
+  可正常通过校验。具体构建信息以当前下载文件为准，正文不写死版本号。
 
 ──────────────────────────────
 
@@ -168,7 +166,7 @@ Sh1roCu 的 TACZ-Refabricated，对应上游 1.1.8 版本），同样以 GPL-3.0
 
 | 字段 | 值 |
 |---|---|
-| 支持版本 | 26.1.2 |
+| 支持版本 | 较新的 Minecraft 版本（具体范围以当前下载文件的页面标签为准） |
 | 运行环境 | 客户端需装 + 服务端需装 |
 | 模组类型 | **[[ 参考 TACZ 原词条分类，保持一致 ]]** |
 | 开源协议 | GPL-3.0 |
