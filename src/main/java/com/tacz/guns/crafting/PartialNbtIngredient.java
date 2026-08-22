@@ -56,7 +56,7 @@ public final class PartialNbtIngredient implements ICustomIngredient {
 
     @Override
     public boolean test(ItemStack stack) {
-        if (!items.contains(stack.typeHolder())) {
+        if (!items.contains(stack.getItemHolder())) {
             return false;
         }
         CustomData customData = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
@@ -89,9 +89,9 @@ public final class PartialNbtIngredient implements ICustomIngredient {
         return new SlotDisplay.Composite(items.stream().map(item -> {
             ItemStack stack = new ItemStack(item);
             stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, CustomData.of(nbt.copy()));
-            return (SlotDisplay) new SlotDisplay.ItemStackSlotDisplay(
-                    ItemStackTemplate.fromNonEmptyStack(stack)
-            );
+            // 1.21.11: ItemStackTemplate does not exist (26.1.2-only); SlotDisplay.ItemStackSlotDisplay
+            // takes the ItemStack directly (sister project phase-2 table, javap-verified).
+            return (SlotDisplay) new SlotDisplay.ItemStackSlotDisplay(stack);
         }).toList());
     }
 

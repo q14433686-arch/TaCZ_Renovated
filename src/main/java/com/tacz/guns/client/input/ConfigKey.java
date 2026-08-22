@@ -42,7 +42,7 @@ public class ConfigKey {
                 HoverEvent hoverEvent = new HoverEvent.ShowText(Component.translatable("gui.tacz.cloth_config_warning.download"));
                 MutableComponent component = Component.translatable("gui.tacz.cloth_config_warning.tips").withStyle(style ->
                         style.withColor(0x5555FF).withUnderlined(true).withClickEvent(clickEvent).withHoverEvent(hoverEvent));
-                player.sendSystemMessage(component);
+                player.displayClientMessage(component, false);
             } else {
                 Minecraft.getInstance().setScreen(MenuIntegration.getConfigScreen(null));
             }

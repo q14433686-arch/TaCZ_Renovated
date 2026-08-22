@@ -10,7 +10,6 @@ import com.tacz.guns.entity.TargetMinecart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.entity.AbstractMinecartRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.MinecartRenderState;
@@ -19,6 +18,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Optional;
 
@@ -90,7 +90,7 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
      */
     @Override
     protected void submitMinecartContents(MinecartRenderState state,
-                                          BlockModelRenderState blockModelRenderState,
+                                          BlockState blockState, // 1.21.11: bare BlockState (26.1.2 wraps it in BlockModelRenderState)
                                           PoseStack stack,
                                           SubmitNodeCollector collector,
                                           int packedLight) {

@@ -279,7 +279,7 @@ public class GunRefitScreen extends Screen {
                             ClientMessageUnloadAttachment message = new ClientMessageUnloadAttachment(inventory.getSelectedSlot(), RefitTransform.getCurrentTransformType());
                             ClientPacketDistributor.sendToServer(message);
                         } else {
-                            player.sendSystemMessage(Component.translatable("gui.tacz.gun_refit.unload.no_space"));
+                            player.displayClientMessage(Component.translatable("gui.tacz.gun_refit.unload.no_space"), false);
                         }
                     }
                 });

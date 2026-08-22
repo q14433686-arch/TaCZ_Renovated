@@ -13,7 +13,6 @@
   ],
   "client": [
     "client.AbstractButtonMixin",
-    "client.CameraMixin",
     "client.GameRendererMixin",
     "client.GlCommandEncoderScopeDepthCopyMixin",
     "client.ItemInHandLayerMixin",

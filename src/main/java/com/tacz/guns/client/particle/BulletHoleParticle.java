@@ -10,13 +10,14 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+import net.minecraft.client.renderer.state.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -70,10 +71,12 @@ public class BulletHoleParticle extends SingleQuadParticle {
         Level world = minecraft.level;
         if (world != null) {
             BlockState state = world.getBlockState(pos);
-            return minecraft.getModelManager().getBlockStateModelSet().getParticleMaterial(state).sprite();
+            // 1.21.11: ModelManager#getBlockStateModelSet doesn't exist -> getBlockModelShaper().getParticleIcon
+            // (sister project phase-2 table, javap-verified).
+            return minecraft.getModelManager().getBlockModelShaper().getParticleIcon(state);
         }
         // Fallback: should not normally happen
-        return minecraft.getModelManager().getBlockStateModelSet().missingModel().particleMaterial().sprite();
+        return minecraft.getModelManager().getBlockModelShaper().getParticleIcon(Blocks.AIR.defaultBlockState());
     }
 
     private int getLifetimeFromConfig(ClientLevel world) {
