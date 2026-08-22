@@ -127,3 +127,23 @@ mods.toml `[[mixins]]` 加 `lrtactical.mixins.json`；AT 补 `Player#canCritical
    （glass_bottle/repeater）。零美术资产打包，仅引用原版模型。
    **预期效果**：无内容包 = 原版占位图标（不再紫黑）；装 LR 内容包且有
    display 数据 = 基岩模型渲染。
+
+## LR2-6 单机验收进展（2026-08-22 第三轮）
+
+- **功能完整（用户实测）**：手雷/近战/消耗品全链路可用，LR 内容包道具工作。
+- 唯一崩溃：**烟雾弹** —— `NPE: this.sprites is null`
+  @ ParticleResources$MutableSpriteSet.first（crash log 实证）。
+  根因：`assets/lrtactical/particles/smoke_cloud.json` **上游即缺失**
+  （原作烟雾贴图为 ARR 美术，refab 剥离美术时连粒子定义一并剥掉，
+  留下"类型已注册、精灵表为空"的潜伏崩溃——Fabric 侧同病，回哺项 #3）。
+  修复：补粒子定义，引用原版篝火大烟精灵 `minecraft:big_smoke_0..11`
+  （12 帧，SmokeCloudParticle 的 setSpriteFromAge 按龄取帧正好适配；
+  零美术打包）。
+
+### 回哺 refab 的 LR 侧清单（累计三项）
+
+1. getName 专服崩溃（已在 REFAB_BACKPORT_PLAN，四处 common 化）；
+2. `assets/lrtactical/items/*.json` 未落盘（javadoc 有设计、文件缺失）——
+   Fabric 侧图标紫黑同病；本仓四个 json 可直接平移；
+3. `assets/lrtactical/particles/smoke_cloud.json` 缺失——Fabric 侧烟雾弹
+   崩溃同病；本仓 json 可直接平移。
