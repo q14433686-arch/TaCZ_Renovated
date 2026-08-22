@@ -11,6 +11,15 @@
   `neoforge.mods.toml` 的 `logoFile`。未使用官方 TaCZ 图标（CC BY-NC-ND 4.0
   禁止再创作），也与 Fabric 姊妹项目那套官方原图区分开。
 
+### 文档
+
+- 重写 CurseForge、Modrinth 与 MC 百科发布正文：按项目级长期说明与版本级
+  Changelog 分层，删除冗长、重复及过度承诺的内容。
+- MC 百科文案改为可直接使用的 BBCode，并为本项目 CurseForge 页面（Project ID
+  1663324）、原始项目、直接上游、源码、Release、Issues 与许可文件补齐跳转链接。
+- `docs/publish/RELEASE.md` 改为覆盖 26.2、26.1.2、1.21.11 的内部更新规范，明确
+  活文档 → Release notes → 平台 Changelog 的同步顺序及“测试结论不得跨分支继承”。
+
 ## 1.1.8+neoforge.26.1.2.R1 — 2026-08-22
 
 首个发布版。三条战线在同一版本收口，全部经用户实机验收
