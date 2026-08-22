@@ -8,10 +8,11 @@
 |---|---|
 | 本仓库代码（NeoForge 26.2 移植） | GPL-3.0-only |
 | 上游代码谱系 MCModderAnchor/TACZ、Sh1roCu/TACZ-Refabricated、q14433686-arch/TaCZ_Refabricated_Unofficial、MUKSC/TACZ-1.21.1 | GPL-3.0 |
-| 内置 LRTactical 代码与 Lua 逻辑（原作 Programmer xjqsh，经 refab / 26.1.2 R1 谱系） | GPL-3.0 |
+| 内置 LRTactical 代码与 Lua 逻辑（`me/xjqsh/lrtactical`，109 个源文件，仅代码） | GPL-3.0 ← [`LesRaisins-Studios/LesRaisins-Tactical-Equipements`](https://github.com/LesRaisins-Studios/LesRaisins-Tactical-Equipements)（Programmer: xjqsh，Artist: LeComte） |
+| `com/maydaymemory/mae`（`Pose` / `DummyPose`） | Mayday Animation Engine（`com.maydaymemory:mae`，SimpleBedrockModel 的编译期依赖）的**编译期桩**：一个空接口 + 一个 dummy 实现，不含 MAE 任何代码；仅在缺少 MAE 的编译环境中替代其 `Pose` 类型 |
 | LR 占位 item model / particle JSON | 本移植代码资源；只引用 Minecraft vanilla 贴图/模型 |
 | LRTactical 原作美术 | **不打包**；原作 Art Assets: All Rights Reserved |
-| 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0 |
+| 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0（**非商业**、禁止演绎；随 jar 分发的默认枪包受此约束，故本 mod jar 整体按非商业再分发处理，与原版 TaCZ 同一约束） |
 | 本仓库品牌图标 `icon.png` / `logo.png` | 本项目原创（`scripts/generate_branding.py`），**不是**官方 TaCZ 美术的衍生品 |
 
 ## 构建骨架
@@ -35,7 +36,7 @@ FML 的模块类加载器看不到这些本地库，会在 `GunMod` 构造期触
 |---|---|---|
 | `libs/luaj-jse-3.0.1.jar`（`org.luaj.vm2`） | 枪包 Lua 脚本（开火/换弹/动画状态机） | MIT（LuaJ） |
 | `libs/commons-math3-3.6.1.jar` | 后坐力样条插值 | Apache-2.0 |
-| SimpleBedrockModel v1（源码 vendored） | 基岩版几何渲染 | 上游 GPL-3.0 谱系 |
+| SimpleBedrockModel v1（源码 vendored） | 基岩版几何渲染 | GPL-3.0 ← [`MCModderAnchor/SimpleBedrockModel`](https://github.com/MCModderAnchor/SimpleBedrockModel) |
 
 ## 可选 compile-only / 运行时兼容
 
