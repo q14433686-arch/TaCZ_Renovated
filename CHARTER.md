@@ -6,6 +6,11 @@
 >
 > 编写日期：2026-08-20。作者：项目发起人 + 调研 AI（基于本仓库 docs/ 体系、
 > NeoForged 官方公告/primer、CurseForge/Modrinth 公开数据逐条核实）。
+>
+> **状态补注（2026-08-22）**：下文 §0/§1 的版本决策是撰写时点的决策记录，此后
+> 26.1.2 / 26.2 / 1.21.11 三线均已发布 R1（现状见本仓库 GitHub Releases 与
+> CurseForge [Project 1663324](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-renovated)）。
+> §2 参考边界与洁净室红线、§3 API 证据规则等规范性条款不受版本进度影响，持续有效。
 
 ---
 
