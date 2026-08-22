@@ -12,6 +12,7 @@
 | LR 占位 item model / particle JSON | 本移植代码资源；只引用 Minecraft vanilla 贴图/模型 |
 | LRTactical 原作美术 | **不打包**；原作 Art Assets: All Rights Reserved |
 | 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0 |
+| 本仓库品牌图标 `icon.png` / `logo.png` | 本项目原创（`scripts/generate_branding.py`），**不是**官方 TaCZ 美术的衍生品 |
 
 ## 构建骨架
 

@@ -1,3 +1,5 @@
+<p align="center"><img src="src/main/resources/icon.png" width="128" alt="TaCZ: Renovated"></p>
+
 # TaCZ: Renovated — NeoForge 26.2
 
 > **非官方移植。请勿向 MCModderAnchor / Serene Wave Studio 报告本移植的问题。**

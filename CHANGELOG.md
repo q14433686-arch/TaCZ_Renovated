@@ -12,6 +12,14 @@
 - Java 25
 - Gradle 9.2.1 / ModDevGradle 2.0.144
 
+### 品牌
+
+- 接入 26.1.2 定稿的原创品牌标：`icon.png`（512² 方形头像）与 `logo.png`
+  （1280×360 Mods 横幅），青色四段瞄具环 + 铜色 R。`neoforge.mods.toml` 写入
+  `logoFile="logo.png"` 与 `logoBlur=false`；用 `scripts/generate_branding.py`
+  重新生成，逐字节与 26.1.2 一致。不使用官方 TaCZ 图标（CC BY-NC-ND 4.0
+  禁止再创作），决策快照见 `docs/records/BRANDING.md`。
+
 ### 修复
 
 - 修复 26.2 首次生产编译暴露的 FOV event、HUD tick、AvatarRenderer descriptor 与三个
