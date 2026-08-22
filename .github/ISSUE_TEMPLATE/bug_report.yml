@@ -35,6 +35,7 @@ body:
       description: 不在列表中的版本不受支持。
       options:
         - "26.1.2"
+        - "26.2"
     validations:
       required: true
 
