@@ -31,7 +31,6 @@ import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
-import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -174,11 +173,6 @@ public final class ClientGameEvents {
     @SubscribeEvent
     public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
         ReloadKey.autoReload(event);
-    }
-
-    @SubscribeEvent
-    public static void onRenderLiving(RenderLivingEvent.Post<?, ?, ?> event) {
-        RenderHeadShotAABB.onRenderEntity(event);
     }
 
     @SubscribeEvent

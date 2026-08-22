@@ -23,7 +23,8 @@
     "client.PlayerModelMixin",
     "client.ScreenAccessor",
     "client.SoundManagerPreparationsMixin",
-    "client.StairBlockAccessor"
+    "client.StairBlockAccessor",
+    "client.EntityHitboxDebugRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

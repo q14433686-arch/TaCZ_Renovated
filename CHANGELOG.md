@@ -26,6 +26,42 @@ SemVer build metadata，因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过
 - `tacz.carryon.mixins.json` compatibilityLevel `JAVA_25` → `JAVA_21`
   （1.21.11 的 sponge-mixin 无 JAVA_25）。
 
+### 源码迁移（WP-12111-2，进行中）
+
+- GUI 族回退：`GuiGraphicsExtractor`→`GuiGraphics`、`extract*`→`render*` 覆写与调用
+  （34+28 文件，映射全部来自姊妹项目 javap 双 jar 核实表）；动态物品模型
+  `submit()` 增 `ItemDisplayContext` 形参、`setLocalTransform` 改随参数下传。
+- 包迁移与单点：`renderer.state.level`/`resources.model.cuboid`/`resources.model.sprite`
+  /`state.gui.pip` 四族包路径；`Player#sendSystemMessage/sendOverlayMessage`→
+  `displayClientMessage(Component, boolean)`（ServerPlayer/CommandSourceStack 调用点保留）；
+  `LightCoordsUtil`→`LightTexture`；`ItemStack#typeHolder`→`getItemHolder`；
+  `ItemStackTemplate` 移除（`SlotDisplay.ItemStackSlotDisplay` 直接收 ItemStack）；
+  `ModelManager#getBlockStateModelSet`→`getBlockModelShaper().getParticleIcon`；
+  `submitMinecartContents` 第二参改裸 `BlockState`。
+- mixin 层：`CameraMixin` 删除（NeoForge 21.11 在 `Camera#setup` 原生触发
+  `ViewportEvent.ComputeCameraAngles`，Camera.java.patch 实证）；`GameRendererMixin`
+  改 1.21.11 签名（`renderItemInHand(float,boolean,Matrix4f)`、
+  `bobHurt/bobView(PoseStack,float)`）；`GlCommandEncoderScopeDepthCopyMixin` 采用
+  姊妹 GL_ALWAYS 方案（`_enableDepthTest()+_depthFunc(GL_ALWAYS)`，配合
+  `ScopeRenderTypes.needsForcedAlwaysDepth` 白名单）；LR `GuiGraphicsExtractorMixin`
+  →`GuiGraphicsMixin`（目标 `itemCooldown`→`renderItemCooldown`）；过时的
+  CarryOnRenderHelperMixin 移除（其目标方法在 CarryOn 1.21.11 不存在，
+  CarryOn R2 兼容逻辑随后续包回哺）。
+- 爆头判定盒改走 `Gizmos`（`EntityHitboxDebugRenderer#showHitboxes` 路径 +
+  `RenderHeadShotAABB.emitGizmo`），不再使用会与 F3+B 冲突的 custom-geometry 提交
+  （姊妹 R2-hotfix 同款修复）。
+- 校验工具移植：`docs/verify_mixin_targets.py`（mixin 目标/描述符/形参四类检查）与
+  `docs/verify_shader_imports.py`（`#moj_import` 悬空检查），供编译环境启动前闸门。
+
+### 待办（下一包）
+
+- scope 包整体采纳（姊妹 1.21.11 `ScopeRenderTypes` + Reticle 渲染器组 +
+  `ScopeDepthCopyState` + Iris late/final overlay 层，见 `docs/PORT_12111_BRIEF.md`
+  §4-E 修订版）及配套 `IrisCompat` legacy/newly 分层；
+- CarryOn R2 兼容逻辑回哺（姊妹 `docs/CARRYON_COMPAT.md`）；
+- PAL 1.1.9 / Controllable 0.25.8 降版符号核验（`compat/playeranimator/**`、
+  `compat/controllable/**`）。
+
 ## Unreleased
 
 ### 品牌

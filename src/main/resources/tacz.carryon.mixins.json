@@ -8,9 +8,7 @@
     "CarryOnPickupHandlerMixin",
     "CarryOnPlacementHandlerMixin"
   ],
-  "client": [
-    "CarryOnRenderHelperMixin"
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 0
   }
