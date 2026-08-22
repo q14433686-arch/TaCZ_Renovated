@@ -1,0 +1,26 @@
+# Gradle / build outputs
+.gradle/
+build/
+run/
+out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+bin/
+
+# Logs (past commits had to delete RawOutput.log/latest.log/debug.log by hand)
+*.log
+hs_err_pid*
+replay_pid*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local tooling
+repo/

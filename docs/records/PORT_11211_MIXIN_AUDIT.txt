@@ -1,0 +1,96 @@
+
+====================================================================================================
+lrtactical.mixins.json
+  -- client.GuiGraphicsExtractorMixin
+     target net.minecraft.client.gui.GuiGraphics:
+       !! MISSING method "renderItemCooldown(Lnet/minecraft/world/item/ItemStack;II)V"
+  -- client.SoundEngineMixin
+     target net.minecraft.client.sounds.SoundEngine:
+       !! MISSING method "calculateVolume(Lnet/minecraft/client/resources/sounds/SoundInstance;)F"
+
+====================================================================================================
+tacz.carryon.mixins.json
+  -- CarryOnRenderHelperMixin
+     target tschipp.carryon.client.render.CarryRenderHelper: CLASS NOT FOUND IN JAR
+  -- CarryOnPickupHandlerMixin
+     target tschipp.carryon.common.carry.PickupHandler: CLASS NOT FOUND IN JAR
+  -- CarryOnPlacementHandlerMixin
+     target tschipp.carryon.common.carry.PlacementHandler: CLASS NOT FOUND IN JAR
+
+====================================================================================================
+tacz.iris.mixins.json
+  -- IrisDepthRestoreShaderMixin
+     target net.irisshaders.iris.pipeline.programs.ShaderCreator: CLASS NOT FOUND IN JAR
+
+====================================================================================================
+tacz.mixins.json
+  -- client.AbstractButtonMixin
+     target net.minecraft.client.gui.components.AbstractButton:
+       !! MISSING method "onClick(Lnet/minecraft/client/input/MouseButtonEvent;Z)V"
+  -- client.CameraMixin
+     target net.minecraft.client.Camera:
+       OK  setup(net.minecraft.world.level.Level, net.minecraft.world.entity.Entity, boolean, boolean, float);
+       OK  field level (active)
+  -- client.GameRendererMixin
+     target net.minecraft.client.renderer.GameRenderer:
+       OK  bobHurt(com.mojang.blaze3d.vertex.PoseStack, float);
+       OK  bobView(com.mojang.blaze3d.vertex.PoseStack, float);
+       OK  renderItemInHand(float, boolean, org.joml.Matrix4f);
+       OK  field minecraft (Minecraft)
+  -- client.GlCommandEncoderScopeDepthCopyMixin
+     target com.mojang.blaze3d.opengl.GlCommandEncoder:
+       OK  drawFromBuffers(com.mojang.blaze3d.opengl.GlRenderPass, int, int, int, com.mojang.blaze3d.vertex.VertexFormat$IndexType, com.mojang.blaze3d.opengl.GlRenderPipeline, int);
+  -- client.ItemInHandLayerMixin
+     target net.minecraft.client.renderer.entity.layers.ItemInHandLayer:
+       !! MISSING method "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/ArmedEntityRenderState;FF)V"
+       OK  submitArmWithItem(S, net.minecraft.client.renderer.item.ItemStackRenderState, net.minecraft.world.item.ItemStack, net.minecraft.world.entity.HumanoidArm, com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector, int);
+  -- client.ItemInHandRendererMixin
+     target net.minecraft.client.renderer.ItemInHandRenderer:
+       OK  renderHandsWithItems(float, com.mojang.blaze3d.vertex.PoseStack, net.minecraft.client.renderer.SubmitNodeCollector, net.minecraft.client.player.LocalPlayer, int);
+       OK  tick();
+       OK  field mainHandHeight (float)
+       OK  field oMainHandHeight (float)
+       OK  field mainHandItem (ItemStack)
+  -- client.LanguageMixin
+     target net.minecraft.client.resources.language.ClientLanguage:
+       !! MISSING method "getOrDefault(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+       !! MISSING method "has(Ljava/lang/String;)Z"
+  -- client.LocalPlayerMixin
+     target net.minecraft.client.player.LocalPlayer:
+       OK  aiStep();
+       OK  respawn();
+       OK  tick();
+  -- client.MouseHandlerMixin
+     target net.minecraft.client.MouseHandler:
+       OK  turnPlayer(double);
+  -- client.PlayerModelMixin
+     target net.minecraft.client.model.player.PlayerModel:
+       !! MISSING method "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V"
+       OK  field leftSleeve (ModelPart)
+       OK  field rightSleeve (ModelPart)
+  -- client.ScreenAccessor
+     target net.minecraft.client.gui.screens.Screen:
+  -- client.SoundManagerPreparationsMixin
+     target net.minecraft.client.sounds.SoundManager$Preparations:
+       OK  listResources(net.minecraft.server.packs.resources.ResourceManager);
+       OK  field soundCache (Resource>)
+  -- client.StairBlockAccessor
+     target net.minecraft.world.level.block.StairBlock:
+  -- common.EntityMixin
+     target net.minecraft.world.entity.Entity:
+       OK  tick();
+  -- common.LivingEntityMixin
+     target net.minecraft.world.entity.LivingEntity:
+       OK  tick();
+  -- common.PlayerMixin
+     target net.minecraft.world.entity.player.Player:
+  -- common.ServerGamePacketListenerImplMixin
+     target net.minecraft.server.network.ServerGamePacketListenerImpl:
+       OK  handlePlayerCommand(net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket);
+  -- common.ServerPlayerMixin
+     target net.minecraft.server.level.ServerPlayer:
+       OK  restoreFrom(net.minecraft.server.level.ServerPlayer, boolean);
+  -- common.ServerPlayNetHandlerMixin
+     target net.minecraft.server.network.ServerGamePacketListenerImpl:
+       OK  handlePlayerAction(net.minecraft.network.protocol.game.ServerboundPlayerActionPacket);
+       OK  field player (ServerPlayer)

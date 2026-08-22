@@ -9,7 +9,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
@@ -56,7 +55,7 @@ public final class PartialNbtIngredient implements ICustomIngredient {
 
     @Override
     public boolean test(ItemStack stack) {
-        if (!items.contains(stack.typeHolder())) {
+        if (!items.contains(stack.getItemHolder())) {
             return false;
         }
         CustomData customData = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
@@ -89,9 +88,7 @@ public final class PartialNbtIngredient implements ICustomIngredient {
         return new SlotDisplay.Composite(items.stream().map(item -> {
             ItemStack stack = new ItemStack(item);
             stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, CustomData.of(nbt.copy()));
-            return (SlotDisplay) new SlotDisplay.ItemStackSlotDisplay(
-                    ItemStackTemplate.fromNonEmptyStack(stack)
-            );
+            return (SlotDisplay) new SlotDisplay.ItemStackSlotDisplay(stack);
         }).toList());
     }
 

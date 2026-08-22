@@ -13,9 +13,11 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import me.shedaniel.rei.api.common.util.EntryIngredients;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.display.SlotDisplayContext;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,8 +82,14 @@ public class GunSmithTableCategory implements DisplayCategory<GunSmithTableDispl
             if (resolved == null) {
                 return Collections.singletonList(EntryStack.of(VanillaEntryTypes.ITEM, ItemStack.EMPTY));
             }
+            // 1.21.11：REI 21.11.816 已移除 EntryIngredients.slotDisplayContext()，
+            // 改用原版 SlotDisplayContext.fromLevel(level)。
+            Level level = Minecraft.getInstance().level;
+            if (level == null) {
+                return Collections.emptyList();
+            }
             return resolved.display()
-                    .resolveForStacks(EntryIngredients.slotDisplayContext())
+                    .resolveForStacks(SlotDisplayContext.fromLevel(level))
                     .stream()
                     .map(stack -> EntryStack.of(VanillaEntryTypes.ITEM, stack.copyWithCount(ingredient.getCount())))
                     .toList();

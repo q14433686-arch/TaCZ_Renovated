@@ -68,7 +68,7 @@ public class GunMod {
         AttachmentPropertyManager.registerModifier();
         // WP-LR2：LRTactical 内置层唯一 common 接线点（docs/WP_LR2_BRIEF.md）。
         me.xjqsh.lrtactical.EquipmentMod.register(modEventBus);
-        LOGGER.info("TaCZ NeoForge 26.1.2 port work package ⑥ loading. modId={}", MOD_ID);
+        LOGGER.info("TaCZ NeoForge 1.21.11 port work package ⑥ loading. modId={}", MOD_ID);
     }
 
     private static void registerDefaultExtraGunPack() {

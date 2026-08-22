@@ -74,7 +74,7 @@ public class SmokeCloudParticle extends SingleQuadParticle {
      * 这里保持同样的可见性 —— 放宽成 public 虽然合法，但没有理由对外暴露。
      */
     @Override
-    protected int getLightCoords(float partialTick) {
+    protected int getLightColor(float partialTick) {
         return 15728880;
     }
 

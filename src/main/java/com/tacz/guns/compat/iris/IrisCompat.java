@@ -39,6 +39,36 @@ public final class IrisCompat {
         }
     }
 
+    /**
+     * @return whether the active Iris hand renderer is currently extracting its solid pass.
+     *         A scope reticle is frozen only in this pass and emitted later by the Iris-only
+     *         {@code HAND_TRANSLUCENT} bridge or the post-final-composite overlay.
+     *         (Semantic source: sibling 1.21.11 IrisCompat, reflection-only.)
+     */
+    public static boolean isRenderingSolidHandPass() {
+        if (!ModList.get().isLoaded(CompatRegistry.IRIS) || !isUsingRenderPack()) {
+            return false;
+        }
+        try {
+            Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
+            Object instance = handRendererClass.getField("INSTANCE").get(null);
+            return (Boolean) handRendererClass.getMethod("isActive").invoke(instance)
+                    && (Boolean) handRendererClass.getMethod("isRenderingSolid").invoke(instance);
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    /**
+     * The post-final-composite overlay hook was bytecode-audited against Iris 1.10.7 only.
+     * Other Iris versions keep the R8/R9 HAND_TRANSLUCENT fallback.
+     */
+    public static boolean supportsFinalScopeOverlay() {
+        return ModList.get().getModContainerById(CompatRegistry.IRIS)
+                .map(container -> container.getModInfo().getVersion().toString().startsWith("1.10.7"))
+                .orElse(false);
+    }
+
     public static synchronized boolean assignPipelineToIris(RenderPipeline pipeline,
                                                             String irisProgramName,
                                                             String debugName) {

@@ -10,7 +10,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+import net.minecraft.client.renderer.state.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -70,10 +70,10 @@ public class BulletHoleParticle extends SingleQuadParticle {
         Level world = minecraft.level;
         if (world != null) {
             BlockState state = world.getBlockState(pos);
-            return minecraft.getModelManager().getBlockStateModelSet().getParticleMaterial(state).sprite();
+            return minecraft.getModelManager().getBlockModelShaper().getParticleIcon(state);
         }
         // Fallback: should not normally happen
-        return minecraft.getModelManager().getBlockStateModelSet().missingModel().particleMaterial().sprite();
+        return minecraft.getModelManager().getMissingBlockStateModel().particleIcon();
     }
 
     private int getLifetimeFromConfig(ClientLevel world) {
@@ -190,7 +190,9 @@ public class BulletHoleParticle extends SingleQuadParticle {
 
     @Override
     protected Layer getLayer() {
-        return Layer.TRANSLUCENT_TERRAIN;
+        // 1.21.11：SingleQuadParticle$Layer 没有 TRANSLUCENT_TERRAIN；
+        // TERRAIN 的 translucent 标志为 true，弹孔在透明地形层渲染（姊妹实测对应关系）。
+        return Layer.TERRAIN;
     }
 
     private boolean shouldRemove() {

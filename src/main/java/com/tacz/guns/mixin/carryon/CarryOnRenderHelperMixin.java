@@ -8,7 +8,6 @@ import com.tacz.guns.item.GunSmithTableItem;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -22,29 +21,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class CarryOnRenderHelperMixin {
     @Inject(method = "getRenderItemStack", at = @At("RETURN"), cancellable = true, require = 0)
     private static void tacz$restoreTableRenderIdentity(Player player,
-                                                        CallbackInfoReturnable<Object> cir) {
-        Object rawResult = cir.getReturnValue();
-        if (rawResult == null) {
-            return;
-        }
-
-        if (rawResult instanceof ItemStack renderStack) {
-            if (processStack(player, renderStack)) {
-                cir.setReturnValue(renderStack);
-            }
-        } else if (rawResult instanceof ItemStackTemplate template) {
-            ItemStack renderStack = template.create();
-            if (processStack(player, renderStack)) {
-                cir.setReturnValue(ItemStackTemplate.fromNonEmptyStack(renderStack));
-            }
-        }
-    }
-
-    private static boolean processStack(Player player, ItemStack renderStack) {
+                                                        CallbackInfoReturnable<ItemStack> cir) {
+        ItemStack renderStack = cir.getReturnValue();
         if (!(renderStack.getItem() instanceof GunSmithTableItem)
                 || !(renderStack.getItem() instanceof BlockItemDataAccessor accessor)
                 || !DefaultAssets.EMPTY_BLOCK_ID.equals(accessor.getBlockId(renderStack))) {
-            return false;
+            return;
         }
 
         BlockEntity carriedBlockEntity = CarryOnReflection.getCarriedBlockEntity(
@@ -53,9 +35,8 @@ public abstract class CarryOnRenderHelperMixin {
             Identifier blockId = tableBlockEntity.getId();
             if (blockId != null && !DefaultAssets.EMPTY_BLOCK_ID.equals(blockId)) {
                 accessor.setBlockId(renderStack, blockId);
-                return true;
+                cir.setReturnValue(renderStack);
             }
         }
-        return false;
     }
 }

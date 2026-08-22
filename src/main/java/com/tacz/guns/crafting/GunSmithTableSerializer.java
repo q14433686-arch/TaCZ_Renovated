@@ -109,6 +109,18 @@ public final class GunSmithTableSerializer {
     }
 
     public static RecipeSerializer<GunSmithTableRecipe> create() {
-        return new RecipeSerializer<>(CODEC, STREAM_CODEC);
+        // 1.21.11：vanilla RecipeSerializer 是接口（codec/streamCodec 两个抽象方法），
+        // 不再有 26.1 的 (MapCodec, StreamCodec) 构造器。
+        return new RecipeSerializer<>() {
+            @Override
+            public MapCodec<GunSmithTableRecipe> codec() {
+                return CODEC;
+            }
+
+            @Override
+            public StreamCodec<RegistryFriendlyByteBuf, GunSmithTableRecipe> streamCodec() {
+                return STREAM_CODEC;
+            }
+        };
     }
 }

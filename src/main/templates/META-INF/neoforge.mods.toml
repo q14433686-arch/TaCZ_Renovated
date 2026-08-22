@@ -1,9 +1,10 @@
-# FML mod metadata. Template source: official NeoForge MDK-26.1.2-ModDevGradle
+# FML mod metadata. Template source: official NeoForge MDK-1.21.11-ModDevGradle
 # (no moddedmc.mod.json in that MDK). Placeholders (dollar-brace, e.g. mod_id,
 # mod_version) are expanded by generateModMetadata from gradle.properties.
 # TRAP: this whole file -- comments included -- goes through the Groovy template
 # engine. Never write a literal dollar-brace here unless it names a real property.
-# Do not add mappings/parchment anywhere in this project: 26.1+ is unobfuscated.
+# 1.21.11 is obfuscated: official Mojang mappings are wired by ModDevGradle.
+# Do not add parchment/yarn anywhere in this project.
 
 license="${mod_license}"
 issueTrackerURL="https://github.com/q14433686-arch/TaCZ-Renovated/issues"
@@ -15,8 +16,8 @@ displayName="${mod_name}"
 logoFile="logo.png"
 logoBlur=false
 displayURL="https://github.com/q14433686-arch/TaCZ-Renovated"
-credits="Original TaCZ: Serene Wave Studio / Timeless Squad. Unofficial ports: Sh1roCu (Fabric 1.21.1), q14433686-arch (Fabric 26.x), MUKSC (NeoForge 1.21.1). This tree is an unofficial NeoForge 26.1.2 port."
-authors="Serene Wave Studio | Timeless Squad (original); unofficial NeoForge 26.1.2 port"
+credits="Original TaCZ: Serene Wave Studio / Timeless Squad. Unofficial ports: Sh1roCu (Fabric 1.21.1), q14433686-arch (Fabric 26.x), MUKSC (NeoForge 1.21.1). This tree is an unofficial NeoForge 1.21.11 port."
+authors="Serene Wave Studio | Timeless Squad (original); unofficial NeoForge 1.21.11 port"
 description='''
 TaCZ: Renovated — Unofficial NeoForge port of Timeless and Classics Zero (TaCZ).
 

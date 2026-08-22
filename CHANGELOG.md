@@ -1,7 +1,61 @@
 # 更新日志
 
-版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
+版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
+
+## 1.1.8+neoforge.1.21.11.r0 — 开发中（WP-11211 回移植）
+
+### WP-11211-5a 光影下准星被云/粒子覆盖的修复（用户实机反馈）
+
+- **修复**：开启 Iris 光影时准星被云、雾与药水粒子覆盖——根因是准星颜色在
+  HAND_TRANSLUCENT 阶段烘焙进 gbuffer，而 shaderpack 更晚的 composite/final
+  阶段会重画这些元素盖在其上。平移姊妹 1.21.11 分支的 R8/R9/R11 机制：准星/镜框
+  快照延迟到 Iris 全部 composite/final pass 之后绘制（Iris 1.10.7 走
+  `IrisRenderingPipeline#finalizeLevelRendering` TAIL 的 final-overlay，其余版本回退
+  HAND_TRANSLUCENT 晚交），配套 6 条新管线、2 个新 Iris mixin（注点已对 1.10.7 jar
+  javap 复核）、no-fog final shader 与专用世界深度副本；
+- 镜框/准星绘制顺序修正为上游「先准星后镜框」（修复准星溢出镜框贴边的隐患）；
+- 无光影 / 无 Iris / 非 1.10.7 时全部失效为原版即时路径，行为不变。
+
+### WP-11211-4 客户端 mixin 注点审计（用户实机崩溃驱动修复）
+
+- **修复**：`GameRendererMixin` 三处注点签名漂移——1.21.11 的
+  `renderItemInHand(float, boolean, Matrix4f)` / `bobHurt(PoseStack, float)` /
+  `bobView(PoseStack, float)`（26.1.2 是带 CameraRenderState/Matrix4fc 的旧签名）；
+- **修复**：`CameraMixin` 注点 `update(DeltaTracker)` → `setup(Level, Entity, boolean,
+  boolean, float)`（1.21.11 无 update 方法，javap 实证）；
+- 全部 4 份 mixin 配置逐条 javap 审计（`docs/records/PORT_11211_MIXIN_AUDIT.txt` +
+  COMPILE_RECORD 第六节），其余注点全部兼容；Iris 1.10.7 上 iris mixin 惰性安全、
+  IrisCompat 反射全程 fail-safe；Carry On 未装时三 mixin 静默跳过。
+
+26.1.2 R1 → Minecraft 1.21.11 回移植，进行中。工作包 WP-11211-x，工单
+`docs/PORT_1_21_11_BRIEF.md`，执行台账 `docs/records/PORT_11211_DEPS.md` 起。
+
+### WP-11211-1 构建骨架
+
+- gradle.properties：bump 至 MC 1.21.11 + NeoForge 21.11.45（与官方
+  MDK-1.21.11-ModDevGradle 钉版一致，maven metadata 实证 21.11.43 不存在）；
+- JDK toolchain 25 → 21（1.21.11 随游戏发行 Java 21）；
+- 依赖重钉：JEI 27.30.0.76、REI 21.11.816（转 maven.shedaniel.me 坐标）、
+  Architectury 19.0.1、Cloth Config 21.11.153；PAL 1.1.9 / Controllable 0.25.8 /
+  Shoulder Surfing 5.0.10 的 1.21.11 NeoForge 构建入 `libs/`（escape hatch，
+  缺失即构建失败并给出下载指引）；
+- mods.toml 展示元数据改 1.21.11；mixin compatibilityLevel：carryon
+  JAVA_25 → JAVA_21（1.21.11 运行于 Java 21）。
+- 沙箱适配：NeoForm 外部工具 JVM 需 `JAVA_TOOL_OPTIONS` 封顶（cgroup v1 OOM，
+  gradle.properties 已注释）；run 配置堆 448M。
+
+### WP-11211-2 编译收敛（完成）
+
+- 6 轮收敛 100 → 0 错误：GuiGraphicsExtractor 改名族、GUI 覆写族
+  （extract*→render*，含 renderer 误改回退）、包迁移族、动态物品模型三处
+  接口差异、RecipeSerializer 接口化、瞄具管线改写（决策 A：GREATER_DEPTH_TEST +
+  NO_DEPTH_TEST reticle + encoder mixin 强制 GL_ALWAYS）等；
+- 专服冒烟：MC 1.21.11 + NeoForge 21.11.45 `runServer` Done (0.848s)，
+  tacz/LR 注册、payloads、枪包导出、mixin/AT 运行期生效；
+- 证据：`docs/records/PORT_11211_COMPILE_RECORD.md`、`PORT_11211_DEPS.md`。
+- 已知遗留（下包）：瞄具 GPU 实机量化（WP-11211-3）、剩余 mixin 注点逐条复核
+  （WP-11211-4）、兼容矩阵实施与 COMPATIBILITY.md 重写（WP-11211-5）。
 
 ## Unreleased
 

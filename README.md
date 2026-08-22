@@ -1,17 +1,18 @@
 <p align="center"><img src="src/main/resources/icon.png" width="128" alt="TaCZ: Renovated"></p>
 
-# [UNOFFICIAL] TaCZ: Renovated — Minecraft 26.1.2 / NeoForge
+# [UNOFFICIAL] TaCZ: Renovated — Minecraft 1.21.11 / NeoForge
 
-> **Unofficial NeoForge port of TaCZ (Timeless & Classics Guns: Zero) for Minecraft 26.1.2.
+> **Unofficial NeoForge port of TaCZ (Timeless & Classics Guns: Zero) for Minecraft 1.21.11.
 > Open source, auditable GPL lineage. Not an official TaCZ release; not reviewed or
 > endorsed by the TACZ Dev Team. GPL-3.0.**
 
 > **非官方社区移植，不是 TaCZ 官方发布，也未获 TACZ Dev Team 审核或背书。**
 
-本仓库把 TaCZ 移植到 **Minecraft 26.1.2 NeoForge**。游戏语义来自姊妹项目
+本仓库把 TaCZ 移植到 **Minecraft 1.21.11 NeoForge**。游戏语义来自姊妹项目
 [TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
-（Fabric 26.x / 1.21.11 移植）的 26.1.2 分支；本仓库当前源码版本为
-**`1.1.8+neoforge.26.1.2.R1`**。
+（Fabric 26.x / 1.21.11 移植）的 1.21.11 分支；本仓库当前源码版本为
+**`1.1.8+neoforge.1.21.11.r0`**（WP-11211 回移植进行中，见
+[docs/PORT_1_21_11_BRIEF.md](docs/PORT_1_21_11_BRIEF.md)）。
 
 [问题反馈](https://github.com/q14433686-arch/TaCZ-Renovated/issues)
 · [姊妹项目（Fabric）](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
@@ -21,7 +22,8 @@
 
 | Minecraft | 加载器 | 状态 |
 |---|---|---|
-| **26.1.2** | NeoForge | **本仓库**（当前源码版本见上方；Releases 发布前请从源码构建） |
+| **1.21.11** | NeoForge | **本仓库**（当前源码版本见上方；移植进行中，Releases 发布前请从源码构建） |
+| **26.1.2** | NeoForge | 已完成（ https://github.com/q14433686-arch/TaCZ-Renovated/tree/26.1.2 ） |
 | **26.2** | NeoForge | 已完成（ https://github.com/q14433686-arch/TaCZ-Renovated/tree/26.2 ） |
 | 26.2 / 26.1.2 / 1.21.11 | Fabric | 由[姊妹项目](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)提供 |
 
@@ -29,13 +31,13 @@
 
 ## 1. 支持环境
 
-| 项目 | 26.1.2 要求 |
+| 项目 | 1.21.11 要求 |
 |---|---|
-| Minecraft | **26.1.2** |
-| 加载器 | **NeoForge 26.1.2.x**（release 通道；开发基于 26.1.2.97） |
-| Java | 游戏侧随 NeoForge 安装器（源码构建需 JDK 25） |
+| Minecraft | **1.21.11** |
+| 加载器 | **NeoForge 21.11.x**（release 通道；开发基于 21.11.45） |
+| Java | 游戏侧随 NeoForge 安装器（源码构建需 JDK 21） |
 | 硬依赖 | **无**（不需要 Fabric API / Forge Config API Port，配置走 NeoForge 原生） |
-| 本 mod | **`1.1.8+neoforge.26.1.2.R1`** |
+| 本 mod | **`1.1.8+neoforge.1.21.11.r0`** |
 
 可选集成（Cloth Config 图形配置、Iris 光影、Player Animation Library 第三人称动画、
 Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
@@ -49,8 +51,9 @@ Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
 
 本仓库包含：
 
-- TaCZ 的 NeoForge 26.1.2 端口及随上游带来的默认枪包；
-- 为 26.x API 与 NeoForge 事件面改写的注册、网络、资源加载、GUI 和渲染接线；
+- TaCZ 的 NeoForge 1.21.11 端口及随上游带来的默认枪包；
+- 为 1.21.x API 与 NeoForge 事件面改写的注册、网络、资源加载、GUI 和渲染接线
+  （自 26.1.2 线回移植）；
 - 若干可选模组的兼容接线。
 
 **LRTactical 内置框架**（R1 起）：throwable/melee/detonator/consumable 四类物品与
@@ -65,9 +68,12 @@ Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
 
 **本端口的瞄具不是 Picture-in-Picture，不会为镜片再渲染一次世界。**
 
-26.1.2 线采用 **depth-aperture（深度孔径）** 方案：在绘制边界备份/恢复深度并做目镜
+1.21.11 线沿用 **depth-aperture（深度孔径）** 方案：在绘制边界备份/恢复深度并做目镜
 孔径拷贝，镜片后看到的仍是同一次世界渲染——没有第二台相机，没有第二次 `renderLevel`。
 代码中的 `PictureInPictureRenderer` **仅用于枪械工作台的 GUI 模型预览**，与瞄具无关。
+1.21.11 的管线状态没有 26.x 的 `ALWAYS_PASS` 深度比较：按工单
+[`docs/PORT_1_21_11_BRIEF.md`](docs/PORT_1_21_11_BRIEF.md) §4.2 决策，采用姊妹项目
+验证过的 `GREATER_DEPTH_TEST` 变体（WP-11211-3 实施）。
 
 装有 Iris 时走单独的 HAND shader 接线（反射接入，不装 Iris 则完全不加载）；
 其他 shader pack 仍可能改写自定义管线的最终效果，不保证一致。
@@ -76,7 +82,7 @@ Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
 
 ## 4. 安装
 
-1. 安装 Minecraft 26.1.2 与 NeoForge 26.1.2.x；
+1. 安装 Minecraft 1.21.11 与 NeoForge 21.11.x；
 2. 把本 mod 的 `.jar` 放入 `.minecraft/mods/`（无必装前置）；
 3. 启动游戏。首次启动会把默认枪包解压到 `.minecraft/tacz/`。
 
@@ -116,7 +122,7 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 
 ### 版本约束
 
-本仓库的完整版本号 `1.1.8+neoforge.26.1.2.R1` 中，`1.1.8` 是 SemVer 核心，
+本仓库的完整版本号 `1.1.8+neoforge.1.21.11.r0` 中，`1.1.8` 是 SemVer 核心，
 `+` 之后是构建元数据，不参与版本先后比较——因此枪包常见的 `tacz >= 1.1.8` 谓词照常通过。
 一个枪包最终是否通过检查，取决于它写下的完整谓词，不能笼统理解为"所有旧包都兼容"。
 

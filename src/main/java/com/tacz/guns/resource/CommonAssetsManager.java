@@ -312,7 +312,7 @@ public class CommonAssetsManager implements ICommonResourceProvider {
 
     @SubscribeEvent
     public static void onTagsUpdated(TagsUpdatedEvent event) {
-        if (event instanceof TagsUpdatedEvent.ServerDataLoad && getInstance() != null && getInstance().recipeManager != null) {
+        if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD && getInstance() != null && getInstance().recipeManager != null) {
             List<GunSmithTableRecipe> recipes = getInstance().recipeManager.getRecipes().stream()
                     .map(RecipeHolder::value)
                     .filter(recipe -> recipe.getType() == ModRecipe.GUN_SMITH_TABLE_CRAFTING.get())
