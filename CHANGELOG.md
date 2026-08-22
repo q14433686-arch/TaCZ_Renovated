@@ -1,7 +1,30 @@
 # 更新日志
 
-版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
-因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
+版本号格式：`1.1.8+neoforge.<mc>.<标签>`（26.1.2 线 / 1.21.11 线同规则）。`+` 之后是
+SemVer build metadata，因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，
+那是 pre-release，会静默不满足 `>=1.1.8`）。
+
+## 1.1.8+neoforge.1.21.11.R0 — Unreleased（1.21.11 线，回移植进行中）
+
+> 状态声明：构建骨架与证据已就位（WP-12111-0/1），**业务源码迁移仍在进行**，
+> 当前快照不可构建发布。范围与验收见 `docs/PORT_12111_BRIEF.md`。
+
+### 回移植基建
+
+- 新增回移工单 `docs/PORT_12111_BRIEF.md`（权威边界、差异映射、工作包切分）与
+  证据记录 `docs/records/PORT_12111_GATES.md`（构建钉版 + 依赖钉版证据链）。
+- 构建骨架整体切到 1.21.11：以官方 `MDK-1.21.11-ModDevGradle` 为基线——
+  NeoForge **21.11.45**（release 通道）+ Parchment **2025.12.20** + JDK **21**
+  + ModDevGradle 2.0.144；`neoForge { version; parchment {} }` 取代 26.x 的
+  `enable {}` 写法，mixin AP/refmap 由 MDG 自动接线。
+- 可选集成 1.21.11 线重新钉版（均带 libs/ 兜底）：JEI 27.23.x、REI 21.11.x、
+  Cloth 21.11.153、Architectury 19.0.1、PAL **1.1.9**（降版，API delta 待核）、
+  Controllable **1.21.11-0.25.8**（降版，GitHub release 资产实证）、
+  Shoulder Surfing 1.21.11-5.0.10。
+- 访问转换器移除 26.x 专属 `RenderPipelines#register`；其余 5 条与姊妹项目
+  1.21.11 javap 核验记录一致，待 WP-12111-2 对 1.21.11 jar 逐条复验。
+- `tacz.carryon.mixins.json` compatibilityLevel `JAVA_25` → `JAVA_21`
+  （1.21.11 的 sponge-mixin 无 JAVA_25）。
 
 ## Unreleased
 

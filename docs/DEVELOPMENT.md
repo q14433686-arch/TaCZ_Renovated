@@ -6,9 +6,11 @@
 
 ## 环境与构建
 
-- **JDK 25**（Minecraft 26.1.2 / NeoForge 官方要求）
+- **JDK 21**（Minecraft 1.21.11 / NeoForge 21.11.x 官方要求）
 - Gradle Wrapper 9.2.1（仓库自带，勿升级）
-- **不要配置 mappings / parchment / Yarn**——26.1+ 游戏本体未混淆，直接读源码。
+- **1.21.11 是混淆版本**：构建已配置官方映射 + Parchment（`gradle.properties` 钉版
+  `2025.12.20`，来自官方 MDK-1.21.11）；mixin AP/refmap 由 ModDevGradle 自动接线。
+  26.1.2 线「不要配置 mappings」的旧约定在 1.21.11 线上作废。
 
 ```bash
 ./gradlew build        # 产物在 build/libs/
@@ -16,8 +18,9 @@
 ./gradlew runServer    # 专用服务端（无 GUI 环境的冒烟手段）
 ```
 
-低内存环境可在 `build.gradle` 保持 `disableRecompilation = true`；本机开发建议改回
-`false` 以挂上 Minecraft 反编译源码。
+依赖解析失败时按 `build.gradle` 各条目注释把对应 jar 丢进 `libs/` 兜底
+（兜底优先于 maven 坐标）。构建证据与 runbook 见
+[`records/PORT_12111_GATES.md`](records/PORT_12111_GATES.md)。
 
 ## 版本号（红线）
 
@@ -39,8 +42,9 @@
 1. **洁净室**：禁止以任何形式接触 CurseForge `tacz-port`（guilhermez1989）的 jar。
 2. **API 必须有证据**：任何非平凡 API 调用要能指认 `类#方法(签名)` + 来源
    （层级见宪章第 3 节），并记入对应的 records 文档。
-3. **参考边界**：游戏语义抄 Fabric 26.1.2 分支，加载器习语抄 MUKSC 1.21.1，
-   **MUKSC 的渲染代码一行不抄**（宪章第 2 节的表格是完整版）。
+3. **参考边界**：游戏语义抄姊妹项目（Fabric）的 1.21.11 分支，加载器习语抄
+   MUKSC 1.21.1，**MUKSC 的渲染代码一行不抄**（宪章第 2 节的表格是完整版；
+   1.21.11 线的权威边界修订见 [`PORT_12111_BRIEF.md`](PORT_12111_BRIEF.md) §2）。
 
 ## 进度与记录约定
 
