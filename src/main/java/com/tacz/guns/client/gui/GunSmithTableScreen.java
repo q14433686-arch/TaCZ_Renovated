@@ -34,7 +34,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
@@ -95,9 +95,9 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
         this.getPlayerIngredientCount(this.selectedRecipe);
     }
 
-    public static void drawModCenteredString(GuiGraphicsExtractor gui, Font font, Component component, int pX, int pY, int color) {
+    public static void drawModCenteredString(GuiGraphics gui, Font font, Component component, int pX, int pY, int color) {
         FormattedCharSequence text = component.getVisualOrderText();
-        gui.text(font, text, pX - font.width(text) / 2, pY, color, false);
+        gui.drawString(font, text, pX - font.width(text) / 2, pY, color, false);
     }
 
     private void classifyRecipes() {
@@ -547,16 +547,16 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     }
 
     @Override
-    public void extractRenderState(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick);
         drawModCenteredString(graphics, font, Component.translatable("gui.tacz.gun_smith_table.preview"), leftPos + 108, topPos + 5, 0xFF555555);
         if (selectedType != null) {
             var config = recipeKeys.get(selectedType);
             if (config != null) {
-                graphics.text(font, config.getName(), leftPos + 150, topPos + 32, 0xFF555555, false);
+                graphics.drawString(font, config.getName(), leftPos + 150, topPos + 32, 0xFF555555, false);
             }
         }
-        graphics.text(font, Component.translatable("gui.tacz.gun_smith_table.ingredient"), leftPos + 254, topPos + 50, 0xFF555555, false);
+        graphics.drawString(font, Component.translatable("gui.tacz.gun_smith_table.ingredient"), leftPos + 254, topPos + 50, 0xFF555555, false);
         // 「制造」——【本轮还原】按上游补回这一行。
         //
         // 第 15 轮曾把它删掉，理由是与按钮自带标签叠印成乱码（"Cmilaft"）。
@@ -569,7 +569,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
         if (!this.filterEnabled && this.selectedRecipe != null) {
             this.renderLeftModel(graphics, this.selectedRecipe);
             this.renderPackInfo(graphics, this.selectedRecipe);
-            graphics.text(font, Component.translatable("gui.tacz.gun_smith_table.count", this.selectedRecipe.getResult().getResult().getCount()), leftPos + 254, topPos + 140, 0xFF555555, false);
+            graphics.drawString(font, Component.translatable("gui.tacz.gun_smith_table.count", this.selectedRecipe.getResult().getResult().getCount()), leftPos + 254, topPos + 140, 0xFF555555, false);
         }
         if (selectedRecipeList != null && !selectedRecipeList.isEmpty()) {
             renderIngredient(graphics);
@@ -579,7 +579,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
                 .forEach(w -> ((ResultButton) w).renderTooltips(stack -> graphics.setTooltipForNextFrame(font, stack, mouseX, mouseY)));
     }
 
-    private void renderPackInfo(GuiGraphicsExtractor gui, GunSmithTableRecipe recipe) {
+    private void renderPackInfo(GuiGraphics gui, GunSmithTableRecipe recipe) {
         ItemStack output = recipe.getOutput();
         Item item = output.getItem();
         Identifier id;
@@ -599,7 +599,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
             poseStack.pushMatrix();
             poseStack.scale(0.75f, 0.75f);
             Component nameText = Component.translatable(packInfo.getName());
-            gui.text(font, nameText, (int) ((leftPos + 6) / 0.75f), (int) ((topPos + 122) / 0.75f), 0xFF555555, false);
+            gui.drawString(font, nameText, (int) ((leftPos + 6) / 0.75f), (int) ((topPos + 122) / 0.75f), 0xFF555555, false);
             poseStack.popMatrix();
 
             poseStack.pushMatrix();
@@ -609,7 +609,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
             int offsetY = (topPos + 123) * 2;
             int nameWidth = font.width(nameText);
             Component ver = Component.literal("v" + packInfo.getVersion()).withStyle(style -> style.withUnderlined(true));
-            gui.text(font, ver, (int) (offsetX + nameWidth * 0.75f / 0.5f + 5), offsetY, 0xFF555555, false);
+            gui.drawString(font, ver, (int) (offsetX + nameWidth * 0.75f / 0.5f + 5), offsetY, 0xFF555555, false);
             offsetY += 14;
 
             String descKey = packInfo.getDescription();
@@ -617,42 +617,42 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
                 Component desc = Component.translatable(descKey);
                 List<FormattedCharSequence> split = font.split(desc, 245);
                 for (FormattedCharSequence charSequence : split) {
-                    gui.text(font, charSequence, offsetX, offsetY, 0xFF555555, false);
+                    gui.drawString(font, charSequence, offsetX, offsetY, 0xFF555555, false);
                     offsetY += font.lineHeight;
                 }
                 offsetY += 3;
             }
 
-            gui.text(font, Component.translatable("gui.tacz.gun_smith_table.license")
+            gui.drawString(font, Component.translatable("gui.tacz.gun_smith_table.license")
                             .append(Component.literal(packInfo.getLicense()).withStyle(style -> style.withColor(0xFF555555))),
                     offsetX, offsetY, 0xFF555555, false);
             offsetY += 12;
 
             List<String> authors = packInfo.getAuthors();
             if (!authors.isEmpty()) {
-                gui.text(font, Component.translatable("gui.tacz.gun_smith_table.authors")
+                gui.drawString(font, Component.translatable("gui.tacz.gun_smith_table.authors")
                                 .append(Component.literal(StringUtils.join(authors, ", ")).withStyle(style -> style.withColor(0xFF555555))),
                         offsetX, offsetY, 0xFF555555, false);
                 offsetY += 12;
             }
 
-            gui.text(font, Component.translatable("gui.tacz.gun_smith_table.date")
+            gui.drawString(font, Component.translatable("gui.tacz.gun_smith_table.date")
                             .append(Component.literal(packInfo.getDate()).withStyle(style -> style.withColor(0xFF555555))),
                     offsetX, offsetY, 0xFF555555, false);
 
             poseStack.popMatrix();
         } else {
             Identifier recipeId = recipe.getId();
-            gui.text(font, Component.translatable("gui.tacz.gun_smith_table.error").withStyle(style -> style.withColor(0xFFAA0000)), leftPos + 6, topPos + 122, 0xFFAF0000, false);
-            gui.text(font, Component.translatable("gui.tacz.gun_smith_table.error.id", recipeId.toString()).withStyle(style -> style.withColor(0xFFAA0000)), leftPos + 6, topPos + 134, 0xFFFFFFFF, false);
+            gui.drawString(font, Component.translatable("gui.tacz.gun_smith_table.error").withStyle(style -> style.withColor(0xFFAA0000)), leftPos + 6, topPos + 122, 0xFFAF0000, false);
+            gui.drawString(font, Component.translatable("gui.tacz.gun_smith_table.error.id", recipeId.toString()).withStyle(style -> style.withColor(0xFFAA0000)), leftPos + 6, topPos + 134, 0xFFFFFFFF, false);
             PackInfo errorPackInfo = ClientAssetsManager.INSTANCE.getPackInfo(id);
             if (errorPackInfo != null) {
-                gui.text(font, Component.translatable(errorPackInfo.getName()).withStyle(style -> style.withColor(0xFFAA0000)), leftPos + 6, topPos + 146, 0xFFAF0000, false);
+                gui.drawString(font, Component.translatable(errorPackInfo.getName()).withStyle(style -> style.withColor(0xFFAA0000)), leftPos + 6, topPos + 146, 0xFFAF0000, false);
             }
         }
     }
 
-    private void renderIngredient(GuiGraphicsExtractor gui) {
+    private void renderIngredient(GuiGraphics gui) {
         if (this.selectedRecipe == null) {
             return;
         }
@@ -676,7 +676,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
                 int itemIndex = ((int) (System.currentTimeMillis() / 1_000)) % Math.max(1, items.length);
                 ItemStack item = items.length > 0 ? items[itemIndex] : ItemStack.EMPTY;
 
-                gui.fakeItem(item, offsetX, offsetY);
+                gui.renderFakeItem(item, offsetX, offsetY);
 
                 Matrix3x2fStack poseStack = gui.pose();
                 poseStack.pushMatrix();
@@ -685,19 +685,19 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
                 poseStack.scale(0.5f, 0.5f);
                 int count = smithTableIngredient.getCount();
                 if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.isCreative()) {
-                    gui.text(font, String.format("%d/∞", count), (offsetX + 17) * 2, (offsetY + 10) * 2, 0xFFFFFFFF, false);
+                    gui.drawString(font, String.format("%d/∞", count), (offsetX + 17) * 2, (offsetY + 10) * 2, 0xFFFFFFFF, false);
                 } else {
                     int hasCount = 0;
                     if (playerIngredientCount != null && index < playerIngredientCount.size()) {
                         hasCount = playerIngredientCount.get(index);
                     }
                     // 第 14 轮修复：这两个色值原本是 6 位（0xFFFFFF / 0xFF0000），alpha 分量为 0。
-                    // 26.2 的 GuiGraphicsExtractor#text 开头就是 if (ARGB.alpha(color) != 0)，
+                    // 26.2 的 GuiGraphics#text 开头就是 if (ARGB.alpha(color) != 0)，
                     // alpha=0 的文字会被<b>静默丢弃</b>（1.21.x 的 drawString 会自动补不透明，26.2 不会）。
                     // 结果：材料数量 "x/y" 在两种情况下都画不出来 —— 这正是用户看到的
                     // 「仅在持有所需物品时才显示个数」（那时走的是上面创造模式 0xFFFFFFFF 分支）。
                     int color = count <= hasCount ? 0xFFFFFFFF : 0xFFFF0000;
-                    gui.text(font, String.format("%d/%d", count, hasCount), (offsetX + 17) * 2, (offsetY + 10) * 2, color, false);
+                    gui.drawString(font, String.format("%d/%d", count, hasCount), (offsetX + 17) * 2, (offsetY + 10) * 2, color, false);
                 }
 
                 poseStack.popMatrix();
@@ -710,7 +710,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
      *
      * <h2>本轮修复：缩放/旋转按钮此前完全无效</h2>
      *
-     * <p>旧实现只有一句 {@code graphics.item(result, x, y)} —— 画的是 16×16 的<b>物品栏图标</b>，
+     * <p>旧实现只有一句 {@code graphics.renderItem(result, x, y)} —— 画的是 16×16 的<b>物品栏图标</b>，
      * 既不旋转也不缩放；{@code scale} 字段与 {@code +/-/R} 三个按钮从头到尾没有被读过。
      * 这正是玩家反馈的「工作台里的模型没法缩放」。</p>
      *
@@ -731,7 +731,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
      * {@code displayContext.ordinal()} 混进 seed，而这里要的是与上游一致的
      * {@code FIXED} 上下文 + 固定 seed 0。</p>
      */
-    private void renderLeftModel(GuiGraphicsExtractor graphics, GunSmithTableRecipe recipe) {
+    private void renderLeftModel(GuiGraphics graphics, GunSmithTableRecipe recipe) {
         // 先标记一下，渲染高模（与上游同序：LOD 判定依赖它）
         RenderDistance.markGuiRenderTimestamp();
         if (recipe == null) {
@@ -774,7 +774,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
     }
 
     @Override
-    protected void extractLabels(@NotNull GuiGraphicsExtractor gui, int mouseX, int mouseY) {
+    protected void renderLabels(@NotNull GuiGraphics gui, int mouseX, int mouseY) {
     }
 
     /**
@@ -794,8 +794,8 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
      * 这里与之对齐。
      */
     @Override
-    public void extractBackground(@NotNull GuiGraphicsExtractor gui, int mouseX, int mouseY, float partialTick) {
-        super.extractBackground(gui, mouseX, mouseY, partialTick);
+    public void renderBackground(@NotNull GuiGraphics gui, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(gui, mouseX, mouseY, partialTick);
         // 【贴图尺寸必须是 256×256】
         //
         // 26.2 的 blit 多了末尾两个「贴图总尺寸」参数，而 1.21.1 的

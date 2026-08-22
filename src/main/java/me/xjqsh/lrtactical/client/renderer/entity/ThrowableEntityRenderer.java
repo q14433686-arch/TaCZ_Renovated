@@ -34,7 +34,7 @@ import net.minecraft.world.item.ItemStack;
  *   <tr><td>{@code EntityRenderer<T>}（一个泛型参）</td>
  *       <td>{@code EntityRenderer<T, S extends EntityRenderState>}（两个）</td></tr>
  *   <tr><td>{@code render(entity, yaw, pt, poseStack, bufferSource, light)}</td>
- *       <td><b>拆成两步</b>：{@code extractRenderState(entity, state, pt)} 先在主线程
+ *       <td><b>拆成两步</b>：{@code render(entity, state, pt)} 先在主线程
  *           取快照，{@code submit(state, poseStack, collector, cameraState)} 再提交</td></tr>
  *   <tr><td>{@code getTextureLocation(entity)}</td>
  *       <td><b>已从基类移除</b> —— 上游那个返回 {@code null} 的覆写直接删掉</td></tr>
@@ -86,7 +86,7 @@ public class ThrowableEntityRenderer
     }
 
     @Override
-    public void extractRenderState(ThrowableItemEntity entity, ThrowableRenderState state, float partialTicks) {
+    public void render(ThrowableItemEntity entity, ThrowableRenderState state, float partialTicks) {
         super.extractRenderState(entity, state, partialTicks);
         state.yRot = Mth.lerp(partialTicks, entity.yRotO, entity.getYRot());
         state.xRot = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot());

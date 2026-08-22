@@ -82,7 +82,7 @@ public class GunSmithTableRenderer implements BlockEntityRenderer<GunSmithTableB
     }
 
     @Override
-    public void extractRenderState(GunSmithTableBlockEntity blockEntity, GunSmithTableRenderState state, float partialTick, net.minecraft.world.phys.Vec3 cameraPos, net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void render(GunSmithTableBlockEntity blockEntity, GunSmithTableRenderState state, float partialTick, net.minecraft.world.phys.Vec3 cameraPos, net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
         state.blockIndex = null;
         state.isRoot = false;

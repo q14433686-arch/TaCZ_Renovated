@@ -54,7 +54,7 @@ public class StatueRenderer implements BlockEntityRenderer<StatueBlockEntity, St
     }
 
     @Override
-    public void extractRenderState(StatueBlockEntity blockEntity, StatueRenderState state, float partialTick, Vec3 cameraPos, net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    public void render(StatueBlockEntity blockEntity, StatueRenderState state, float partialTick, Vec3 cameraPos, net.minecraft.client.renderer.feature.ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
         BlockState blockState = blockEntity.getBlockState();
         state.facing = blockState.getValue(StatueBlock.FACING);

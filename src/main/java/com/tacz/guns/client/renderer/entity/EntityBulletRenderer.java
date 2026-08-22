@@ -56,7 +56,7 @@ public class EntityBulletRenderer extends EntityRenderer<EntityKineticBullet, En
     }
 
     @Override
-    public void extractRenderState(EntityKineticBullet bullet, BulletRenderState state, float partialTicks) {
+    public void render(EntityKineticBullet bullet, BulletRenderState state, float partialTicks) {
         super.extractRenderState(bullet, state, partialTicks);
         state.bullet = bullet;
         state.partialTicks = partialTicks;

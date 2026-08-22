@@ -6,7 +6,7 @@ import me.xjqsh.lrtactical.api.item.ICustomItem;
 import me.xjqsh.lrtactical.api.item.IThrowable;
 import me.xjqsh.lrtactical.init.ModCapabilities;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -17,7 +17,7 @@ public final class UsingProgressOverlay {
     private UsingProgressOverlay() {
     }
 
-    public static void render(GuiGraphicsExtractor graphics, float partialTick) {
+    public static void render(GuiGraphics graphics, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null) {
@@ -68,7 +68,7 @@ public final class UsingProgressOverlay {
 
                 if (toggle) {
                     Component hint = Component.translatable("overlay.lrtactical.consumable.toggle_hint");
-                    graphics.text(minecraft.font, hint,
+                    graphics.drawString(minecraft.font, hint,
                             graphics.guiWidth() / 2 - minecraft.font.width(hint) / 2,
                             y + 8, 0xFFFFFFFF, true);
                 }

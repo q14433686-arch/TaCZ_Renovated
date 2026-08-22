@@ -68,7 +68,7 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
     }
 
     @Override
-    public void extractRenderState(TargetMinecart entity, MinecartRenderState state, float partialTicks) {
+    public void render(TargetMinecart entity, MinecartRenderState state, float partialTicks) {
         // 让父类填好位置、朝向、受击摇晃、沿轨道姿态等全部 vanilla 状态。
         super.extractRenderState(entity, state, partialTicks);
         if (state instanceof TargetMinecartRenderState targetState) {
