@@ -1,14 +1,15 @@
-# 发布物料：TaCZ: Renovated 26.1.2_R1
+# 发布物料：TaCZ: Renovated
 
 > 使用说明：§1 是 GitHub Release 正文（整段复制）；§2 是发布操作清单；
 > §3 是平台规则分析（为什么首发只上 GitHub）。
-> 文案纪律：只声称实测过的（AGENTS §2）；首行环境行（姊妹项目发布惯例）。
+> 文案纪律：只声称实测过的（AGENTS §2）；正文只描述较新的 Minecraft 环境，
+> 不把具体版本号写死；准确的支持范围以当前上传文件和平台标签为准。
 
 ---
 
-## §1 GitHub Release 正文（tag 建议：`26.1.2_R1`，标题：`TaCZ: Renovated 26.1.2 R1`）
+## §1 GitHub Release 正文（tag 与标题按当前构建填写，不在正文写死版本号）
 
-**环境：Minecraft 26.1.2 · NeoForge 26.1.2.x（开发基于 26.1.2.97）· 无必装前置 · 版本串 `1.1.8+neoforge.26.1.2.R1`**
+**环境：较新的 Minecraft 版本 · NeoForge · 无必装前置 · 具体支持范围以当前发布文件的兼容性标签为准**
 
 > **Unofficial NeoForge port of TaCZ (Timeless & Classics Guns: Zero). Not an
 > official TaCZ release; not reviewed or endorsed by the TACZ Dev Team. GPL-3.0.**
@@ -18,14 +19,14 @@
 
 ### 这是什么
 
-TaCZ 枪械 mod 的 Minecraft 26.1.2 NeoForge 移植首个发布版，代码开源（GPL-3.0-only）、
+TaCZ 枪械 mod 面向较新的 Minecraft 版本的 NeoForge 移植首个发布版，代码开源（GPL-3.0-only）、
 谱系可审计。游戏语义源自姊妹项目
-[TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)（Fabric 26.x）。
+[TaCZ Refabricated Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)（Fabric 姊妹项目）。
 
 ### 内容
 
 - **完整枪械玩法**：注册/数据/网络/弹道/枪包装载 + depth-aperture 瞄具、
-  第一人称 Feature Rendering。按 TaCZ 1.1.8 制作的枪包直接可用（`>=1.1.8` 检查照常通过）。
+  第一人称 Feature Rendering。符合当前 TaCZ 兼容要求的枪包可直接使用。
 - **LRTactical 内置框架**：投掷物/近战/引爆器/消耗品四类物品、五类投掷行为、
   tooltip/HUD/冷却遮罩反馈层——依赖 `lrtactical` 的内容包完整可用。
   范围界定：flash_shield 未含；**原作美术零打包**，道具外观由内容包提供，
@@ -33,7 +34,7 @@ TaCZ 枪械 mod 的 Minecraft 26.1.2 NeoForge 移植首个发布版，代码开�
 - **可选集成**：Cloth Config、Iris、Player Animation Library、Controllable、
   Shoulder Surfing Reloaded、JEI/REI、Carry On、FirstPerson Model——
   验证版本号与状态矩阵见
-  [docs/COMPATIBILITY.md](https://github.com/q14433686-arch/TaCZ-Renovated/blob/main(26.1.2)/docs/COMPATIBILITY.md)。
+  源码仓库中的 [兼容性矩阵](https://github.com/q14433686-arch/TaCZ-Renovated)。
 
 ### 实测覆盖（全部有日志归档，docs/records/）
 
@@ -44,7 +45,7 @@ TaCZ 枪械 mod 的 Minecraft 26.1.2 NeoForge 移植首个发布版，代码开�
 
 ### 安装
 
-1. Minecraft 26.1.2 + NeoForge 26.1.2.x；
+1. 安装较新的 Minecraft 版本与 NeoForge（具体支持范围以当前发布文件的兼容性标签为准）；
 2. jar 放入 `mods/`（无必装前置）；首次启动默认枪包自动解压到 `游戏目录/tacz/`；
 3. 第三方枪包放 `游戏目录/tacz/`；联机需**双端安装**同一枪包
    （服务端 `/tacz reload` 生效；客户端新增包按 F3+T 重载）。
@@ -70,13 +71,13 @@ TaCZ 枪械 mod 的 Minecraft 26.1.2 NeoForge 移植首个发布版，代码开�
 
 ## §2 发布操作清单（发起人执行）
 
-1. 合并 PR #6（`arena/01a023bf-...` → `main(26.1.2)`）；
+1. 合并 PR #6（`arena/01a023bf-...` → 默认分支）；
 2. 本地最终构建：`./gradlew build`，L0 静态自检
    （jar 内 `META-INF/jarjar/` 含 luaj + commons-math3、四个 mixin json、AT、
-   mods.toml 版本串 = `1.1.8+neoforge.26.1.2.R1`）；
+   mods.toml 版本串与当前构建一致）；
 3. `bash scripts/check_release_consistency.sh --strict` 必须通过；
-4. GitHub → Releases → New release：tag `26.1.2_R1`（对准 main(26.1.2) 合并后
-   commit）、标题 `TaCZ: Renovated 26.1.2 R1`、正文粘 §1、附件上传构建出的
+4. GitHub → Releases → New release：按当前构建创建 tag（对准默认分支合并后的
+   commit）、标题 `TaCZ: Renovated`、正文粘 §1、附件上传构建出的
    mod jar（Source code zip/tar 由 GitHub 自动附带，即 GPL 对应源码）；
 5. 发布后回填 README「选择你的版本」表的 Release 链接（此前占位文案
    "Releases 发布前请从源码构建"可删）。
@@ -97,7 +98,7 @@ TaCZ 枪械 mod 的 Minecraft 26.1.2 NeoForge 移植首个发布版，代码开�
 
 ## §4 Modrinth 上架物料
 
-**见 [`Modrinth.md`](Modrinth.md)**（规则速查 + 标题/Summary/Description 全文 + 字段设置）。
+**见 [`Modrinth.md`](Modrinth.md)**（规则速查 + 标题/Summary/Description 全文 + 字段设置；正文不写死具体版本号）。
 
 > 勘误：本文件早先版本建议的标题 `TaCZ: Renovated` 与含 "TaCZ" 的 Summary
 > 违反 Modrinth §5.2/§5.3，已废止；以 Modrinth.md 为准
@@ -105,7 +106,7 @@ TaCZ 枪械 mod 的 Minecraft 26.1.2 NeoForge 移植首个发布版，代码开�
 
 ## §5 CurseForge 上架物料
 
-**见 [`CurseForge.md`](CurseForge.md)**（规则速查 + 名称/Summary/Description 全文 + 字段设置）。
+**见 [`CurseForge.md`](CurseForge.md)**（规则速查 + 名称/Summary/Description 全文 + 字段设置；正文不写死具体版本号）。
 
 > 勘误：早先建议的 `TaCZ: Renovated [Unofficial NeoForge Port]` 含 filler
 > 信息违反 CF 命名规则，已废止；描述内不得出现 GitHub Releases 等外部
