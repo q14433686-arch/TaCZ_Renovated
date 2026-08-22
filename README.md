@@ -22,9 +22,9 @@
 
 | Minecraft | 加载器 | 状态 |
 |---|---|---|
-| **1.21.11** | NeoForge | **本仓库**（当前源码版本见上方；移植进行中，Releases 发布前请从源码构建） |
-| **26.1.2** | NeoForge | 已完成（ https://github.com/q14433686-arch/TaCZ-Renovated/tree/26.1.2 ） |
-| **26.2** | NeoForge | 已完成（ https://github.com/q14433686-arch/TaCZ-Renovated/tree/26.2 ） |
+| **1.21.11** | NeoForge | **本仓库**（`1.1.8+neoforge.1.21.11.R1` 已发布，[CurseForge 1663324](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-renovated)） |
+| **26.1.2** | NeoForge | [`26.1.2` 分支](https://github.com/q14433686-arch/TaCZ-Renovated/tree/26.1.2)（`1.1.8+neoforge.26.1.2.R1` 已发布） |
+| **26.2** | NeoForge | [`26.2` 分支](https://github.com/q14433686-arch/TaCZ-Renovated/tree/26.2)（`1.1.8+neoforge.26.2.R1` 已发布） |
 | 26.2 / 26.1.2 / 1.21.11 | Fabric | 由[姊妹项目](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)提供 |
 
 ---
