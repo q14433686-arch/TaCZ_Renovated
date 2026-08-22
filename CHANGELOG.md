@@ -87,7 +87,8 @@ SemVer build metadata，因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过
   提交用）；既有 3 个 fsh 与姊妹 1.21.11 逐字节一致，未动。
 - 构建防护：新增 `checkCompatLibs` 任务——REI/Controllable 的 libs/ jar 缺失时
   **大声失败并给出下载直链**（此前 fileTree 静默为空时 javac 会在一堆无关文件
-  报"程序包不存在"）。
+  报"程序包不存在"）。实现为纯 `java.io.File` 扫描，兼容配置缓存（`fileTree`
+  模型方法在 `doLast` 内不被 configuration cache 支持）。
 
 ## Unreleased
 
