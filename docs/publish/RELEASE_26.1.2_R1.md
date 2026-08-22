@@ -81,14 +81,51 @@ TaCZ 枪械 mod 的 Minecraft 26.1.2 NeoForge 移植首个发布版，代码开�
 5. 发布后回填 README「选择你的版本」表的 Release 链接（此前占位文案
    "Releases 发布前请从源码构建"可删）。
 
-## §3 平台规则分析：为什么首发只上 GitHub
+## §3 平台规则分析（2026-08-22 发起人勘定后修订）
 
 | 平台 | 判定 | 依据 |
 |---|---|---|
-| **GitHub Release** | ✅ 无障碍 | 源码仓库自发布，GPL 义务天然满足；无平台侧内容审查条款冲突 |
-| **Modrinth** | ⚠️ 暂缓 | 默认枪包资源为 **CC BY-NC-ND**：ND（禁演绎）对"移植版再分发修改后整体"的授权边界存疑——姊妹项目 DISCOVERABILITY_CHECKLIST §4 已把这条列为 Modrinth 上架的前置障碍，同一结论适用本仓库。需先取得原作者对资产再分发的明确许可，或改为不打包默认枪包的"纯代码 + 外置资源下载"形态 |
-| **CurseForge** | ⚠️ 暂缓 | 同上资产问题；另有先例敏感性——CurseForge 上存在无源码的 `tacz-port` 项目（宪章 §1 记载其违反 GPL），我们上架时更要保证自身授权链无可指摘，否则失去批评立场 |
-| **MCMod 百科等社区** | ✅ 可做"介绍页" | 只挂介绍与 GitHub 链接、不直传文件，无再分发问题 |
+| **GitHub Release** | ✅ 首发 | 源码仓库自发布，GPL 义务天然满足 |
+| **Modrinth** | ✅ 可发 | 默认枪包资产为 CC BY-NC-ND **原样承载**（未修改）——ND 禁止的是演绎后再分发，不禁止逐字节再分发，无授权障碍（发起人勘定；早先引用姊妹项目 DISCOVERABILITY §4 的"障碍"判断据此作废）。运营注意：NC 条款下建议**关闭项目端货币化**（Modrinth 的 monetization 开关），规避"商业性使用"争议 |
+| **CurseForge** | ✅ 可发 | 同上；建议**不领取 Author Rewards Points**（同 NC 理由）。上架本身即是对无源码 `tacz-port` 的最好回应：同一平台、全链开源 |
+| **MCMod 百科等社区** | ✅ | 介绍页 + 链接 |
 
-**结论**：首发 GitHub-only；CF/Modrinth 等取得资产再分发许可后再议
-（届时文案可复用 §1，按各平台字段拆分）。
+三平台共同红线（每个描述页必须包含）：非官方声明 + 源码仓库链接（GPL）+
+"问题报本仓库、勿扰原作者" + 实测覆盖如实分级。
+
+---
+
+## §4 Modrinth 上架物料
+
+- **Project name**: `TaCZ: Renovated`
+- **Summary**（≤256 字符，英文）:
+  `Unofficial NeoForge port of TaCZ (Timeless & Classics Guns: Zero) for Minecraft 26.1.2, with built-in LRTactical framework. Open source, auditable GPL lineage. 非官方社区移植，GPL-3.0.`
+- **License**: GPL-3.0-only（资产例外在 Description 中声明）
+- **Environment**: Client & Server 均必装 · **Loaders**: NeoForge · **Game versions**: 26.1.2
+- **Links**: Source = 仓库地址；Issues = 仓库 Issues；Wiki/Discord 留空
+- **Monetization**: 关闭（NC 运营注意）
+- **Description 正文**: 直接复用 §1 全文（Modrinth 支持 Markdown），仅去掉
+  "本 Release 的 Source code 归档"一句，改为"完整源码见 Source 链接"。
+- **版本文件命名**: `TaCZ-Renovated-1.1.8+neoforge.26.1.2.R1.jar`，
+  Version number 填 `1.1.8+neoforge.26.1.2.R1`，Changelog 粘 CHANGELOG 的 R1 条目。
+
+## §5 CurseForge 上架物料
+
+- **Project name**: `TaCZ: Renovated [Unofficial NeoForge Port]`
+  （CF 搜索权重靠标题，Unofficial 字样入题 = 免责 + 检索双赢）
+- **Summary**: 同 §4 Summary。
+- **License**: 选 GNU General Public License version 3；描述页附 LICENSES.md 链接
+  说明资产例外。
+- **Description**: 复用 §1 全文 + 顶部加一行英文导语
+  （CF 审核对纯中文描述可能放缓）：
+  `Unofficial NeoForge 26.1.2 port of TaCZ. Full source & docs: <仓库链接>. Chinese documentation below / 中文说明如下.`
+- **Author Rewards**: 不领取（NC 运营注意）。
+- **External links**: Source/Issues 同 §4；**主文件仍以 GitHub Release 为准**，
+  CF/Modrinth 同步上传相同 jar（三处文件哈希一致，便于玩家校验）。
+
+## §6 发布顺序建议
+
+1. GitHub Release 先发（§2 清单）；
+2. Modrinth、CurseForge 当日跟进（文件用同一个 jar）；
+3. 三处发完后回填 README 版本导航表链接；
+4. MCMod 百科介绍页最后做（引流到 GitHub/Modrinth）。
