@@ -6,12 +6,12 @@
 
 - 根 `README.md` 的目标、源码版本、工具链和渲染边界更新到 26.2；删除一期逐包进度表，
   不把 README 当工作日志。
-- 根 `CHANGELOG.md` 新增 `Unreleased — 1.1.8+neoforge.26.2.0.R1` 条目。
+- 根 `CHANGELOG.md` 新增 `Unreleased — 1.1.8+neoforge.26.2.R1` 条目。
 - `LICENSES.md` 更新到 Minecraft 26.2 / NeoForge 26.2.0.64 / MDK-26.2，并列出
   jar-in-jar 与可选 compile-only 许可。
 - `docs/PORTING_STATUS.md` 改为 26.2 真实状态与发布阻塞清单。
 - `COMPATIBILITY.md` 保持每行“API 已核 / 未实测”的明确区分。
-- `mod_version` 仍为 `1.1.8+neoforge.26.2.0.R1`，没有引入 `-` prerelease。
+- `mod_version` 仍为 `1.1.8+neoforge.26.2.R1`，没有引入 `-` prerelease。
 
 ## 尚未通过，故发布被阻塞
 

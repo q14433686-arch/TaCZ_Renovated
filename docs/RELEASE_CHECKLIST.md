@@ -1,6 +1,6 @@
 # 26.2 R1 发布检查清单
 
-目标版本：`1.1.8+neoforge.26.2.0.R1`。当前 CHANGELOG 必须保持 **Unreleased**，直到本页
+目标版本：`1.1.8+neoforge.26.2.R1`。当前 CHANGELOG 必须保持 **Unreleased**，直到本页
 所有阻塞项关闭并得到项目发起人明确发布命令。
 
 ## A. 版本与构建
@@ -12,7 +12,7 @@
 
 ## B. L0 产物
 
-- [ ] jar 文件名为 `tacz-1.1.8+neoforge.26.2.0.R1.jar`。
+- [ ] jar 文件名为 `tacz-1.1.8+neoforge.26.2.R1.jar`。
 - [ ] `META-INF/neoforge.mods.toml` 已展开 R1，无未知 placeholder。
 - [ ] jar 内含 tacz / iris / carryon / lrtactical mixin JSON 与 AT。
 - [ ] jar 内含 `me/xjqsh/lrtactical/**`、`assets/lrtactical/**` 与 `data/lrtactical/**`。

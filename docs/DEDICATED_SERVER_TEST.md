@@ -18,7 +18,7 @@
 
 ```bash
 ./gradlew build
-JAR=build/libs/tacz-1.1.8+neoforge.26.2.0.R1.jar   # 以实际文件名为准
+JAR=build/libs/tacz-1.1.8+neoforge.26.2.R1.jar   # 以实际文件名为准
 unzip -l "$JAR" | grep -E "META-INF/jarjar/|luaj|commons-math3"
 unzip -l "$JAR" | grep -E "tacz.*mixins.json|lrtactical.mixins.json|accesstransformer.cfg"
 unzip -l "$JAR" | grep -E "me/xjqsh/lrtactical/|assets/lrtactical/|data/lrtactical/"
@@ -42,7 +42,7 @@ unzip -p "$JAR" META-INF/neoforge.mods.toml | grep -E "version=|modId="
 
 判据（对照 `docs/records/` 各期冒烟口径）：
 
-- [ ] Mod List 出现 `Timeless and Classics Zero 1.1.8+neoforge.26.2.0.R1 (tacz)`；
+- [ ] Mod List 出现 `Timeless and Classics Zero 1.1.8+neoforge.26.2.R1 (tacz)`；
 - [ ] 日志有 TaCZ 与 LR payload 注册行、枪包装载行及
       `LRTactical built-in layer (NeoForge 26.2 R1 candidate) registered`；
 - [ ] LR throwable/melee/consumable 三类 index reload 完成，登入同步不报未知 payload；

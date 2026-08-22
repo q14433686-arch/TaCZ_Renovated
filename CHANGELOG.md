@@ -3,7 +3,7 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
-## Unreleased — 1.1.8+neoforge.26.2.0.R1
+## Unreleased — 1.1.8+neoforge.26.2.R1
 
 ### 目标环境
 
@@ -57,7 +57,7 @@
   convex-hull fill、sight/scope 分组、`ocular_ring` 普通重画、反向准星裁切、视模与火光裁切。
 - 普通 mask 只使用 `TextureTarget` / `RenderPass` backend 抽象，可进入 OpenGL/Vulkan。
 - Iris 改用 HAND pipeline 分类、linked-fragment dormant branch 与逐 draw uniform/texture binding。
-- 版本 metadata 定名为 `1.1.8+neoforge.26.2.0.R1`。
+- 版本 metadata 定名为 `1.1.8+neoforge.26.2.R1`。
 
 ### 可选兼容
 

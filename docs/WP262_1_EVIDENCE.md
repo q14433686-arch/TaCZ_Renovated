@@ -62,10 +62,10 @@ neo_version=26.2.0.64
 ## 版本语义
 
 ```properties
-mod_version=1.1.8+neoforge.26.2.0.R1
+mod_version=1.1.8+neoforge.26.2.R1
 ```
 
-`1.1.8` 是 SemVer core；`+neoforge.26.2.0.R1` 是 build metadata，不参与枪包
+`1.1.8` 是 SemVer core；`+neoforge.26.2.R1` 是 build metadata，不参与枪包
 `>=1.1.8` 的先后比较。没有使用 `-neoforge...` prerelease。
 
 `neoforge.mods.toml` 的展示文字与模板来源注释已更新为 26.2；Iris 仍是 optional，
@@ -95,7 +95,7 @@ LR-integrated R1 必须完整执行：
 确认 Mod List 为：
 
 ```text
-Timeless and Classics Zero 1.1.8+neoforge.26.2.0.R1 (tacz)
+Timeless and Classics Zero 1.1.8+neoforge.26.2.R1 (tacz)
 ```
 
 并检查最终 jar 文件名和 `neoforge.mods.toml` 均已展开 R1。

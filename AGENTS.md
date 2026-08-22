@@ -9,7 +9,7 @@
 Minecraft **26.2** + NeoForge **26.2.0.64** + Java **25** 的非官方 GPL-3.0 移植。
 
 - modId 永远是 `tacz`；枪包依赖已绑定该 id。
-- 当前版本：`1.1.8+neoforge.26.2.0.R1`，仍为 Unreleased candidate。
+- 当前版本：`1.1.8+neoforge.26.2.R1`，仍为 Unreleased candidate。
 - 代码谱系基线：26.1.2 R1 分支
   `arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0`，尖端
   `6020a5cf1dd02c356f797557f6323b0d430b75e1`；该稳定基线包含多人修复与
