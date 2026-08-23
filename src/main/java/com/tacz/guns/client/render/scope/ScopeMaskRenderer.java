@@ -333,9 +333,8 @@ public final class ScopeMaskRenderer {
                 // 共享的四边形索引缓冲：把 QUADS 展开成三角形。
                 // 用 vanilla 现成的，不必自己生成索引。
                 RenderSystem.AutoStorageIndexBuffer indices =
-                        RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
-                indices.bind(draw.indexCount());
-                GpuBuffer indexBuffer = indices.getBuffer();
+                        RenderSystem.getSequentialBuffer(draw.primitiveTopology());
+                GpuBuffer indexBuffer = indices.getBuffer(draw.indexCount());
 
                 CommandEncoder encoder = RenderSystem.getDevice().createCommandEncoder();
                 // 每次清成纯黑（透明/未盖到）。只关心颜色，不需要深度。

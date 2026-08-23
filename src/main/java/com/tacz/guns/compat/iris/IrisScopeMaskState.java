@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL20C;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Bridges TACZ's off-screen ocular mask texture into Iris shaders when a shader pack is active.
@@ -29,6 +30,7 @@ public final class IrisScopeMaskState {
     private static final String FLASH_TRANSLUCENT_PIPELINE = "tacz:pipeline/muzzle_flash_translucent";
     private static final String FLASH_SWIRL_PIPELINE = "tacz:pipeline/muzzle_flash_swirl";
     private static final String RETICLE_PIPELINE = "tacz:pipeline/scope_reticle_clipped";
+    private static final String MASK_SAMPLER = "ScopeMaskSampler";
     private static final String UNIFORM_MODE = "tacz_ScopeMaskMode";
     private static final String UNIFORM_SAMPLER = "tacz_ScopeMaskSampler";
 
@@ -73,6 +75,23 @@ public final class IrisScopeMaskState {
     }
 
     /**
+     * Resets the scope mask uniform on an Iris ExtendedShader program to 0 upon setup/binding.
+     */
+    public static void resetShaderProgram(Object shader) {
+        try {
+            int programId = getProgramId(shader);
+            if (programId > 0) {
+                int modeLocation = GL20C.glGetUniformLocation(programId, UNIFORM_MODE);
+                if (modeLocation >= 0) {
+                    GL20C.glUniform1i(modeLocation, 0);
+                }
+            }
+        } catch (Throwable t) {
+            logOnce("reset shader program", t);
+        }
+    }
+
+    /**
      * Inspects the active GlRenderPass and injects scope-mask uniform state if supported.
      * Invoked from {@code IrisGlCommandEncoderMixin} right before executing a draw command.
      */
@@ -80,15 +99,6 @@ public final class IrisScopeMaskState {
         if (!IrisCompat.isUsingRenderPack()) {
             return;
         }
-        RenderTarget maskTarget = ScopeMaskTarget.current();
-        if (maskTarget == null) {
-            return;
-        }
-        int textureId = maskTarget.getColorTextureId();
-        if (textureId <= 0) {
-            return;
-        }
-
         try {
             if (glRenderPass == null) {
                 return;
@@ -131,6 +141,12 @@ public final class IrisScopeMaskState {
 
             int samplerLocation = GL20C.glGetUniformLocation(programId, UNIFORM_SAMPLER);
             if (samplerLocation < 0) {
+                GL20C.glUniform1i(modeLocation, 0);
+                return;
+            }
+
+            int textureId = resolveMaskTextureId(glRenderPass);
+            if (textureId <= 0) {
                 GL20C.glUniform1i(modeLocation, 0);
                 return;
             }
@@ -245,6 +261,132 @@ public final class IrisScopeMaskState {
         } catch (Throwable ignored) {
         }
         return 0;
+    }
+
+    private static int resolveMaskTextureId(Object glRenderPass) {
+        try {
+            Object samplersObj = readField(glRenderPass, "samplers");
+            if (samplersObj instanceof Map<?, ?> samplers) {
+                Object tvs = samplers.get(MASK_SAMPLER);
+                if (tvs != null) {
+                    int id = getGlTextureId(tvs);
+                    if (id > 0) {
+                        return id;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        try {
+            RenderTarget target = ScopeMaskTarget.current();
+            if (target != null) {
+                Object colorTex = target.getColorTexture();
+                if (colorTex != null) {
+                    int id = getGlTextureId(colorTex);
+                    if (id > 0) {
+                        return id;
+                    }
+                }
+                Object colorTexView = target.getColorTextureView();
+                if (colorTexView != null) {
+                    int id = getGlTextureId(colorTexView);
+                    if (id > 0) {
+                        return id;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return 0;
+    }
+
+    private static int getProgramId(Object shader) {
+        try {
+            if (shader == null) {
+                return 0;
+            }
+            Method method = null;
+            for (Class<?> c = shader.getClass(); c != null && method == null; c = c.getSuperclass()) {
+                try {
+                    method = c.getDeclaredMethod("getProgramId");
+                } catch (NoSuchMethodException ignored) {
+                }
+            }
+            if (method == null) {
+                return 0;
+            }
+            method.setAccessible(true);
+            Object id = method.invoke(shader);
+            if (id instanceof Number number) {
+                return number.intValue();
+            }
+        } catch (Throwable t) {
+            logOnce("resolve shader program id", t);
+        }
+        return 0;
+    }
+
+    private static int getGlTextureId(Object obj) {
+        if (obj == null) {
+            return 0;
+        }
+        try {
+            if (obj.getClass().getSimpleName().contains("TextureViewAndSampler")) {
+                Object view = invokeNoArgs(obj, "view");
+                return getGlTextureId(view);
+            }
+            try {
+                Method glIdMethod = obj.getClass().getMethod("glId");
+                glIdMethod.setAccessible(true);
+                Object id = glIdMethod.invoke(obj);
+                if (id instanceof Number n && n.intValue() > 0) {
+                    return n.intValue();
+                }
+            } catch (NoSuchMethodException ignored) {
+            }
+
+            try {
+                Method irisGlIdMethod = obj.getClass().getMethod("iris$getGlId");
+                irisGlIdMethod.setAccessible(true);
+                Object id = irisGlIdMethod.invoke(obj);
+                if (id instanceof Number n && n.intValue() > 0) {
+                    return n.intValue();
+                }
+            } catch (NoSuchMethodException ignored) {
+            }
+
+            try {
+                Method textureMethod = obj.getClass().getMethod("texture");
+                textureMethod.setAccessible(true);
+                Object tex = textureMethod.invoke(obj);
+                if (tex != null && tex != obj) {
+                    int id = getGlTextureId(tex);
+                    if (id > 0) {
+                        return id;
+                    }
+                }
+            } catch (NoSuchMethodException ignored) {
+            }
+
+            try {
+                Field idField = obj.getClass().getDeclaredField("id");
+                idField.setAccessible(true);
+                Object id = idField.get(obj);
+                if (id instanceof Number n && n.intValue() > 0) {
+                    return n.intValue();
+                }
+            } catch (NoSuchFieldException ignored) {
+            }
+        } catch (Throwable t) {
+            logOnce("extract texture id", t);
+        }
+        return 0;
+    }
+
+    private static Object readField(Object target, String name) throws ReflectiveOperationException {
+        Field field = target.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        return field.get(target);
     }
 
     private static Object invokeNoArgs(Object target, String methodName) {
