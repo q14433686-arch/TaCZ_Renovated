@@ -95,6 +95,8 @@ public class RenderConfig {
     public static ModConfigSpec.BooleanValue SCOPE_PIP_RERENDER;
     /** 镜内二次渲染的分辨率缩放比例（0.25 到 1.0，默认 0.5）。面积开销按平方走，0.5 可省约 75% 像素光照填充。 */
     public static ModConfigSpec.DoubleValue SCOPE_PIP_RESOLUTION_SCALE;
+    /** 镜内二次渲染的更新间隔（帧）。1 = 每帧更新（默认）；2 = 隔帧更新（性能开销直降 50%）。 */
+    public static ModConfigSpec.IntValue SCOPE_PIP_UPDATE_INTERVAL;
     /**
      * 二次渲染 + 光影时，是否给镜内那一遍配一套独立的 Iris 管线。
      *
@@ -258,6 +260,14 @@ public class RenderConfig {
                         "by ~75% while maintaining sharp lens clarity on high-DPI displays.",
                         "Default: 0.5. Set to 1.0 for native 1:1 screen resolution.")
                 .defineInRange("ScopePipResolutionScale", 0.5d, 0.25d, 1.0d);
+        SCOPE_PIP_UPDATE_INTERVAL = builder
+                .comment("Update interval in frames for the secondary world render pass (1 to 4).",
+                        "Only used when ScopePipRerender is true.",
+                        "  1 = every frame (smoothest, default)",
+                        "  2 = every 2nd frame (half-rate; cuts dual-render CPU & GPU cost by 50%)",
+                        "When set to 2, the lens renders at half the game framerate, reusing the previous",
+                        "frame's rendered image between updates to eliminate CPU draw-call bottleneck.")
+                .defineInRange("ScopePipUpdateInterval", 1, 1, 4);
         SCOPE_PIP_SHADOW_SCALE = builder
                 .comment("Shadow map resolution for the scope pass, as a fraction of the pack's own.",
                         "Only used with ScopePipRerender + ScopePipIsolatePipeline + a shader pack.",

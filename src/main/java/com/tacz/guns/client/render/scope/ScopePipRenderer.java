@@ -413,6 +413,7 @@ public final class ScopePipRenderer {
     }
 
     private static boolean loggedFirstCapture = false;
+    private static int scopeFrameIndex = 0;
 
     private ScopePipRenderer() {
     }
@@ -862,6 +863,11 @@ public final class ScopePipRenderer {
             sceneCaptured = false;
             return;
         }
+        int interval = updateInterval();
+        scopeFrameIndex++;
+        if (interval > 1 && (scopeFrameIndex % interval) != 0 && sceneCaptured) {
+            return;
+        }
         CameraRenderState camera = gameRenderState.levelRenderState.cameraRenderState;
         if (camera == null || !camera.initialized || camera.isPanoramicMode) {
             sceneCaptured = false;
@@ -966,7 +972,7 @@ public final class ScopePipRenderer {
                         camera.viewRotationMatrix,
                         fogRenderer.getBuffer(FogRenderer.FogMode.WORLD),
                         camera.fogData.color,
-                        renderSky);
+                        false);
             } finally {
                 // 必须最先清：从这里往后（主画面那一遍）各 phase 要恢复
                 // 「取完就清空」的原样，否则节点会一直堆到下一帧去。
@@ -1287,6 +1293,11 @@ public final class ScopePipRenderer {
     private static float resolutionScale() {
         return RenderConfig.SCOPE_PIP_RESOLUTION_SCALE == null
                 ? 0.5f : Mth.clamp(RenderConfig.SCOPE_PIP_RESOLUTION_SCALE.get().floatValue(), 0.25f, 1.0f);
+    }
+
+    private static int updateInterval() {
+        return RenderConfig.SCOPE_PIP_UPDATE_INTERVAL == null
+                ? 1 : Mth.clamp(RenderConfig.SCOPE_PIP_UPDATE_INTERVAL.get(), 1, 4);
     }
 
     private static float sharpness() {
