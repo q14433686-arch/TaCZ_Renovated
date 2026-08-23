@@ -1,9 +1,9 @@
 <p align="center"><img src="src/main/resources/icon.png" width="128" alt="TaCZ: Renovated"></p>
 
+# [UNOFFICIAL] TaCZ: Renovated — Minecraft 26.1.2 / NeoForge
 [![CurseForge Downloads](https://cf.way2muchnoise.eu/full_1663324_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-renovated)
 [![CurseForge Versions](https://cf.way2muchnoise.eu/versions/1663324.svg)](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-renovated/files)
 [![GitHub Downloads](https://img.shields.io/github/downloads/q14433686-arch/TaCZ_Renovated/total?logo=github&label=GitHub%20Downloads)](https://github.com/q14433686-arch/TaCZ_Renovated/releases)
-# [UNOFFICIAL] TaCZ: Renovated — Minecraft 26.1.2 / NeoForge
 
 > **Unofficial NeoForge port of TaCZ (Timeless & Classics Guns: Zero) for Minecraft 26.1.2.
 > Open source, auditable GPL lineage. Not an official TaCZ release; not reviewed or
