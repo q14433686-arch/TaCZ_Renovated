@@ -34,6 +34,29 @@ check_file README.md 3
 check_file CHANGELOG.md 1
 
 echo "---"
+echo "MUKSC 骨架参考席位（三站文案 + Release 模板；口径见 README §7 / AGENTS.md §3.3）"
+# 席位靠 CI 强制，不靠记忆。降级措辞须先真正"退场"（见 RELEASE.md §6），顺序不得反过来。
+MUKSC_URL="https://github.com/MUKSC/TACZ-1.21.1"
+check_attribution() {
+    local f="$1"
+    if [ ! -f "$f" ]; then
+        echo "MISSING FILE: $f"
+        FAIL=1
+        return
+    fi
+    if grep -qF "$MUKSC_URL" "$f"; then
+        echo "OK: $f（含 NeoForge 移植骨架参考席位）"
+    else
+        echo "MISSING ATTRIBUTION: $f 未包含 ${MUKSC_URL}"
+        FAIL=1
+    fi
+}
+check_attribution docs/publish/CurseForge.md
+check_attribution docs/publish/Modrinth.md
+check_attribution docs/publish/MCMOD.md
+check_attribution docs/publish/RELEASE.md
+
+echo "---"
 if [ "$FAIL" -ne 0 ]; then
     echo "结果：不一致。发布/合并前必须修复（AGENTS.md §1）。"
     [ "$MODE" = "--strict" ] && exit 1

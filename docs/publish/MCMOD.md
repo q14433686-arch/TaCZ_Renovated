@@ -109,6 +109,8 @@ zip 可以直接放入，无需解压；也支持解压后的文件夹。无论�
 
 • [url=https://github.com/Sh1roCu/TACZ-Refabricated]直接上游：Sh1roCu / TACZ-Refabricated[/url]
 
+• [url=https://github.com/MUKSC/TACZ-1.21.1]NeoForge 移植骨架参考（GPL-3.0，辅，未采用其渲染代码）：MUKSC / TACZ-1.21.1[/url]
+
 • [url=https://github.com/LesRaisins-Studios/LesRaisins-Tactical-Equipements]LRTactical 原项目源码[/url]
 
 • [url=https://github.com/q14433686-arch/TaCZ_Renovated]本移植源码[/url]
@@ -146,4 +148,4 @@ zip 可以直接放入，无需解压；也支持解压后的文件夹。无论�
 2. Java、NeoForge 或必需前置变化时，以各分支 `gradle.properties` 和 Release 为准。
 3. 功能状态变化时先更新对应分支 README / CHANGELOG / 兼容矩阵，再改本页概括；未实测内容不得写成“支持”。
 4. 每个构建的修复列表只写在文件更新日志或 GitHub Release，不累积进百科正文。
-5. 链接变更时同时核对姊妹项目、原始项目、直接上游、源码、下载、Issues、LICENSE 与 LICENSES。
+5. 链接变更时同时核对姊妹项目、原始项目、直接上游、NeoForge 骨架参考（MUKSC）、源码、下载、Issues、LICENSE 与 LICENSES。

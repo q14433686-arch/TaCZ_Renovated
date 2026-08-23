@@ -106,6 +106,7 @@ this project, not to TaCZ, TaCZ Refabricated or LRTactical authors.
 
 - Original: [MCModderAnchor / TACZ](https://github.com/MCModderAnchor/TACZ)
 - Direct upstream: [Sh1roCu / TACZ-Refabricated](https://github.com/Sh1roCu/TACZ-Refabricated)
+- NeoForge port skeleton reference (GPL-3.0, auxiliary — rendering code not adopted): [MUKSC / TACZ-1.21.1](https://github.com/MUKSC/TACZ-1.21.1)
 - LRTactical original: [LesRaisins Tactical Equipements](https://github.com/LesRaisins-Studios/LesRaisins-Tactical-Equipements)
 - Fabric sister project: [TaCZ Refabricated Unofficial](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-refabricated)
 - This NeoForge port: source and issue tracker are available in this page's Links section
