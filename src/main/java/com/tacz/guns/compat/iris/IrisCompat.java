@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,14 +39,8 @@ public final class IrisCompat {
     }
 
     /**
-     * Iris 反射句柄，解析一次后缓存。
-     *
-     * <h3>为什么值得缓存</h3>
-     * {@link #isUsingRenderPack()} 与 {@link #isHandRendererActive()} 在全仓库有 30+ 个调用点，
-     * 其中好几个是<b>逐帧、甚至一帧多次</b>（手部 pass 判定、bob 事件、掩码与合成的闸门）。
-     * 缓存之后只剩一次 {@code invoke}，热路径上的分配直接归零。
+     * Iris 反射句柄，解析成功后缓存。
      */
-    private static boolean irisHandlesResolved;
     @Nullable
     private static Object irisApiInstance;
     @Nullable
@@ -54,35 +49,51 @@ public final class IrisCompat {
     private static Object handRendererInstance;
     @Nullable
     private static Method mHandRendererIsActive;
+    @Nullable
+    private static Field fHandRendererActive;
 
     private static void resolveIrisHandles() {
-        if (irisHandlesResolved) {
-            return;
+        if (irisApiInstance == null || mIsShaderPackInUse == null) {
+            try {
+                Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+                irisApiInstance = irisApiClass.getMethod("getInstance").invoke(null);
+                mIsShaderPackInUse = irisApiClass.getMethod("isShaderPackInUse");
+            } catch (Throwable ignored) {
+                irisApiInstance = null;
+                mIsShaderPackInUse = null;
+            }
         }
-        irisHandlesResolved = true;
-        try {
-            Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
-            irisApiInstance = irisApiClass.getMethod("getInstance").invoke(null);
-            mIsShaderPackInUse = irisApiClass.getMethod("isShaderPackInUse");
-        } catch (Throwable ignored) {
-            irisApiInstance = null;
-            mIsShaderPackInUse = null;
-        }
-        try {
-            Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
-            handRendererInstance = handRendererClass.getField("INSTANCE").get(null);
-            mHandRendererIsActive = handRendererClass.getMethod("isActive");
-        } catch (Throwable ignored) {
-            handRendererInstance = null;
-            mHandRendererIsActive = null;
+        if (handRendererInstance == null || (mHandRendererIsActive == null && fHandRendererActive == null)) {
+            try {
+                Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
+                try {
+                    Field f = handRendererClass.getDeclaredField("INSTANCE");
+                    f.setAccessible(true);
+                    handRendererInstance = f.get(null);
+                } catch (Throwable ignored) {
+                }
+                try {
+                    Method m = handRendererClass.getDeclaredMethod("isActive");
+                    m.setAccessible(true);
+                    mHandRendererIsActive = m;
+                } catch (Throwable ignored) {
+                }
+                try {
+                    Field f = handRendererClass.getDeclaredField("ACTIVE");
+                    f.setAccessible(true);
+                    fHandRendererActive = f;
+                } catch (Throwable ignored) {
+                }
+            } catch (Throwable ignored) {
+                handRendererInstance = null;
+                mHandRendererIsActive = null;
+                fHandRendererActive = null;
+            }
         }
     }
 
     /**
      * 本帧「是否在用光影包」的记忆值。
-     *
-     * <p>这个答案在一帧之内<b>不可能变</b>（切换光影是玩家操作，发生在帧与帧之间），
-     * 而它每帧要被问很多次，所以记一次就够。由 {@link #beginFrame()} 在帧首清空。
      */
     private static byte usingRenderPackThisFrame = -1;
 
@@ -187,14 +198,34 @@ public final class IrisCompat {
             return false;
         }
         resolveIrisHandles();
-        if (handRendererInstance == null || mHandRendererIsActive == null) {
-            return false;
+        if (handRendererInstance != null && mHandRendererIsActive != null) {
+            try {
+                return (Boolean) mHandRendererIsActive.invoke(handRendererInstance);
+            } catch (Throwable ignored) {
+            }
         }
+        if (fHandRendererActive != null) {
+            try {
+                return (Boolean) fHandRendererActive.get(null);
+            } catch (Throwable ignored) {
+            }
+        }
+        // Fallback: direct dynamic query
         try {
-            return (Boolean) mHandRendererIsActive.invoke(handRendererInstance);
+            Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
+            Field f = handRendererClass.getDeclaredField("INSTANCE");
+            f.setAccessible(true);
+            Object inst = f.get(null);
+            if (inst != null) {
+                handRendererInstance = inst;
+                Method m = handRendererClass.getDeclaredMethod("isActive");
+                m.setAccessible(true);
+                mHandRendererIsActive = m;
+                return (Boolean) m.invoke(inst);
+            }
         } catch (Throwable ignored) {
-            return false;
         }
+        return false;
     }
 
     /**
