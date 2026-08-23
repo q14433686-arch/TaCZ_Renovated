@@ -72,6 +72,7 @@
 - [Fabric 姊妹项目](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-refabricated)
 - [原始 TaCZ](https://github.com/MCModderAnchor/TACZ)
 - [直接上游](https://github.com/Sh1roCu/TACZ-Refabricated)
+- [NeoForge 移植骨架参考（GPL-3.0）](https://github.com/MUKSC/TACZ-1.21.1)
 
 代码 GPL-3.0-only；默认枪包资源 CC BY-NC-ND 4.0；其他组件见
 [LICENSES.md](https://github.com/q14433686-arch/TaCZ_Renovated/blob/[[分支]]/LICENSES.md)。
@@ -85,9 +86,10 @@
 4. 检查 jar 内版本元数据、mixin、AT 与 jar-in-jar 依赖。
 5. 平台文件的 Minecraft / NeoForge / Java / Loader 标签与 jar 一致。
 6. 文件 Changelog 只包含该版本事实，不复制别的分支的 PASS。
-7. 项目页保留非官方声明、来源、许可、姊妹项目及反馈链接。
-8. CurseForge Rewards 与 Modrinth Monetization 保持关闭。
-9. 发布后验证 GitHub、CurseForge、Modrinth 和 MC 百科链接没有失效。
+7. GitHub Release 正文按 §3 模板逐段填写（环境、本次变化、链接与署名），不得直接套用平台自动生成的 changelog。
+8. 项目页保留非官方声明、来源（原始项目 + 语义主线 + NeoForge 骨架参考（MUKSC））、许可、姊妹项目及反馈链接。
+9. CurseForge Rewards 与 Modrinth Monetization 保持关闭。
+10. 发布后验证 GitHub、CurseForge、Modrinth 和 MC 百科链接没有失效。
 
 ## 5. 项目级文案何时需要更新
 
@@ -108,3 +110,4 @@
 - “有回退路径”不能改写成“完整支持该图形后端或 shader pack”。
 - 26.1.2 的专服 PASS 不自动证明 26.2 或 1.21.11 已完成同一矩阵。
 - 反馈统一指向本项目 Issues，不引导用户向 TaCZ、TaCZ Refabricated 或 LRTactical 原作者报错。
+- MUKSC 当前如实列为 NeoForge 移植骨架参考（辅，未采用其渲染代码）。仅当 26.2+ 真正重写网络层、使该依赖实质"退场"之后，才可把措辞降级为历史致谢——**先退场、后降词，顺序不得反过来**；退场完成前不得提前弱化或删除该席位（CI 已对三站文案与 Release 模板的 MUKSC URL 设硬断言）。
