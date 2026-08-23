@@ -207,6 +207,37 @@ public abstract class AnimateGeoItemRenderer<M extends BedrockAnimatedModel, CTX
     }
 
     /**
+     * 开镜晃动缩放系数：腰射恒为 1，随开镜进度插值到 {@code AimingSwayIntensity}。
+     *
+     * <p>按开镜进度插值而不是「开镜就切换」，是为了避免抬镜那一瞬间晃动幅度突然跳一下 ——
+     * 那种跳变比晃动本身更容易被察觉。
+     *
+     * <p>整体包 try/catch：本方法在每帧的第一人称渲染路径上，
+     * 任何异常（配置尚未加载、玩家状态异常）都不该把持枪渲染带崩，
+     * 兜底返回 1 = 原有手感。
+     *
+     * @return 缩放系数；{@code 1} 表示与改动前完全一致
+     */
+    protected static float aimingSwayScale(LocalPlayer player, float partialTick) {
+        try {
+            if (com.tacz.guns.config.client.RenderConfig.AIMING_SWAY_INTENSITY == null) {
+                return 1.0F;
+            }
+            float intensity = com.tacz.guns.config.client.RenderConfig.AIMING_SWAY_INTENSITY.get().floatValue();
+            if (intensity == 1.0F) {
+                // 常见情形直接短路，省掉一次开镜进度查询。
+                return 1.0F;
+            }
+            float aimingProgress = Mth.clamp(
+                    com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator.fromLocalPlayer(player)
+                            .getClientAimingProgress(partialTick), 0.0F, 1.0F);
+            return Mth.lerp(aimingProgress, 1.0F, intensity);
+        } catch (Throwable ignored) {
+            return 1.0F;
+        }
+    }
+
+    /**
      * 应用状态机的手持物品摄像机动画，暂时只用于玩家
      */
     public void applyItemInHandCameraAnimation(BeforeRenderHandEvent event, ItemStack stack, LocalPlayer player) {
@@ -243,16 +274,17 @@ public abstract class AnimateGeoItemRenderer<M extends BedrockAnimatedModel, CTX
             float yRotOffset = Mth.lerp(partialTick, player.yBobO, player.yBob);
             float xRot = player.getViewXRot(partialTick) - xRotOffset;
             float yRot = player.getViewYRot(partialTick) - yRotOffset;
-            poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F));
-            poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F));
+            float swayScale = aimingSwayScale(player, partialTick);
+            poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F * swayScale));
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F * swayScale));
             BedrockPart rootNode = model.getRootNode();
             if (rootNode != null) {
                 xRot = (float) Math.tanh(xRot / 25) * 25;
                 yRot = (float) Math.tanh(yRot / 25) * 25;
-                rootNode.offsetX += yRot * 0.1F / 16F / 3F;
-                rootNode.offsetY += -xRot * 0.1F / 16F / 3F;
-                rootNode.additionalQuaternion.mul(Axis.XP.rotationDegrees(xRot * 0.05F));
-                rootNode.additionalQuaternion.mul(Axis.YP.rotationDegrees(yRot * 0.05F));
+                rootNode.offsetX += (yRot * 0.1F / 16F / 3F) * swayScale;
+                rootNode.offsetY += (-xRot * 0.1F / 16F / 3F) * swayScale;
+                rootNode.additionalQuaternion.mul(Axis.XP.rotationDegrees(xRot * 0.05F * swayScale));
+                rootNode.additionalQuaternion.mul(Axis.YP.rotationDegrees(yRot * 0.05F * swayScale));
             }
 
             // 从渲染原点 (0, 24, 0) 移动到模型原点 (0, 0, 0)

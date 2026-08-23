@@ -238,16 +238,17 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
             float yRotOffset = Mth.lerp(partialTick, player.yBobO, player.yBob);
             float xRot = player.getViewXRot(partialTick) - xRotOffset;
             float yRot = player.getViewYRot(partialTick) - yRotOffset;
-            poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F));
-            poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F));
+            float swayScale = aimingSwayScale(player, partialTick);
+            poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F * swayScale));
+            poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F * swayScale));
             BedrockPart rootNode = gunModel.getRootNode();
             if (rootNode != null) {
                 xRot = (float) Math.tanh(xRot / 25) * 25;
                 yRot = (float) Math.tanh(yRot / 25) * 25;
-                rootNode.offsetX += yRot * 0.1F / 16F / 3F;
-                rootNode.offsetY += -xRot * 0.1F / 16F / 3F;
-                rootNode.additionalQuaternion.mul(Axis.XP.rotationDegrees(xRot * 0.05F));
-                rootNode.additionalQuaternion.mul(Axis.YP.rotationDegrees(yRot * 0.05F));
+                rootNode.offsetX += (yRot * 0.1F / 16F / 3F) * swayScale;
+                rootNode.offsetY += (-xRot * 0.1F / 16F / 3F) * swayScale;
+                rootNode.additionalQuaternion.mul(Axis.XP.rotationDegrees(xRot * 0.05F * swayScale));
+                rootNode.additionalQuaternion.mul(Axis.YP.rotationDegrees(yRot * 0.05F * swayScale));
             }
             // 从渲染原点 (0, 24, 0) 移动到模型原点 (0, 0, 0)
             poseStack.translate(0, 1.5f, 0);
