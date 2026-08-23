@@ -880,7 +880,10 @@ public final class ScopePipRenderer {
         // 光影下不重定向渲染目标，所以离屏纹理只当「拷贝目的地」用，不需要深度附件；
         // 无光影下我们要把整遍世界画进它，没有深度就没有遮挡关系。
         boolean iris = IrisCompat.isUsingRenderPack();
-        TextureTarget pip = ScopePipTarget.getOrCreate(main.width, main.height, mainColor.getFormat(), !iris);
+        float scale = resolutionScale();
+        int targetW = iris ? main.width : Math.max(256, Math.round(main.width * scale));
+        int targetH = iris ? main.height : Math.max(256, Math.round(main.height * scale));
+        TextureTarget pip = ScopePipTarget.getOrCreate(targetW, targetH, mainColor.getFormat(), !iris);
         if (pip == null) {
             failed = true;
             sceneCaptured = false;
@@ -1279,6 +1282,11 @@ public final class ScopePipRenderer {
     private static float minAimingProgress() {
         return RenderConfig.SCOPE_PIP_MIN_AIMING_PROGRESS == null
                 ? 0.05f : RenderConfig.SCOPE_PIP_MIN_AIMING_PROGRESS.get().floatValue();
+    }
+
+    private static float resolutionScale() {
+        return RenderConfig.SCOPE_PIP_RESOLUTION_SCALE == null
+                ? 0.5f : Mth.clamp(RenderConfig.SCOPE_PIP_RESOLUTION_SCALE.get().floatValue(), 0.25f, 1.0f);
     }
 
     private static float sharpness() {

@@ -93,6 +93,8 @@ public class RenderConfig {
      * 早前的实现还出现过「镜外实体消失」，尚未定位，所以默认关闭、按需自测。
      */
     public static ModConfigSpec.BooleanValue SCOPE_PIP_RERENDER;
+    /** 镜内二次渲染的分辨率缩放比例（0.25 到 1.0，默认 0.5）。面积开销按平方走，0.5 可省约 75% 像素光照填充。 */
+    public static ModConfigSpec.DoubleValue SCOPE_PIP_RESOLUTION_SCALE;
     /**
      * 二次渲染 + 光影时，是否给镜内那一遍配一套独立的 Iris 管线。
      *
@@ -249,6 +251,13 @@ public class RenderConfig {
                         "EXPERIMENTAL: an earlier attempt made entities vanish from the main view.",
                         "Default off.")
                 .define("ScopePipRerender", false);
+        SCOPE_PIP_RESOLUTION_SCALE = builder
+                .comment("Resolution scale for the secondary world render pass (0.25 to 1.0).",
+                        "Only used when ScopePipRerender is true.",
+                        "Rendering at 0.5 (half resolution) cuts the pixel fillrate and lighting cost",
+                        "by ~75% while maintaining sharp lens clarity on high-DPI displays.",
+                        "Default: 0.5. Set to 1.0 for native 1:1 screen resolution.")
+                .defineInRange("ScopePipResolutionScale", 0.5d, 0.25d, 1.0d);
         SCOPE_PIP_SHADOW_SCALE = builder
                 .comment("Shadow map resolution for the scope pass, as a fraction of the pack's own.",
                         "Only used with ScopePipRerender + ScopePipIsolatePipeline + a shader pack.",
