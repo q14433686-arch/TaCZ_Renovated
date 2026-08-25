@@ -11,17 +11,18 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 驱动 LRTactical 物品的<b>待机 / 行走 / 奔跑</b>动画状态转移。
+ * 驱动 LRTactical 物品的动画状态转移。
  *
  * <p>与 TACZ 的 {@code TickAnimationEvent} 是同一件事的两份实现 ——
  * 之所以不能合并，是因为那一份的入口写死了
  * {@code TimelessAPI.getGunDisplay(mainHandItem)}（只认枪械的 display）。
  *
- * <h2>为什么这一步不可省略</h2>
- * 状态机的 {@code trigger(INPUT_IDLE/WALK/RUN)} 必须<b>每 tick</b> 被调用一次。
+ * <h2>为什么近战位移 tick 不可省略</h2>
+ * 近战状态机的 {@code trigger(INPUT_IDLE/WALK/RUN)} 必须<b>每 tick</b> 被调用一次。
  * 缺了它，动画会永远停在 {@code draw} 结束时的那一帧：
  * 玩家跑动时刀不摆、站定时也不回到 idle 姿势 ——
  * 看起来像「模型卡住了」，但其实模型和动画都加载成功了。
+ * 投掷物没有位移轨道，且官方脚本把 {@code "idle"} 用作取消拔销，不能共用这组输入。
  *
  * <h2>26.2 差异</h2>
  * <ul>
@@ -41,7 +42,18 @@ public final class LrTickAnimationEvent {
     }
 
     /**
-     * 每客户端 tick：按玩家移动状态推进主手物品的动画状态机。
+     * 每客户端 tick：按玩家移动状态推进<b>近战</b>状态机。
+     *
+     * <p>官方 LR {@code ClientEventsHandler#tickAnimation} 只给
+     * {@code MeleeItemRenderer} / {@code FlashShieldItemRenderer} 发
+     * {@code INPUT_IDLE/WALK/RUN}。本仓战略遗弃 flash_shield，因此这里只驱动近战。</p>
+     *
+     * <p><b>不能</b>把同一组输入打给投掷物。官方手雷脚本把取消拔销写成
+     * {@code trigger("idle")} / {@code input == "idle"}，与
+     * {@link GunAnimationConstant#INPUT_IDLE} 的字面量 {@code "idle"} 完全相同。
+     * 站立时每 tick 再发一次 {@code INPUT_IDLE}，会把正在播的 {@code unlock_safe}
+     * 掐掉并退回 idle，然后 {@code isUsing()} 仍为 true 又立刻 {@code start_use}，
+     * 表现为静止拉栓反复抖动、一走动（改发 walk/run）反而正常。</p>
      */
     public static void tickAnimation(Minecraft client) {
         LocalPlayer player = client.player;
@@ -49,11 +61,8 @@ public final class LrTickAnimationEvent {
             return;
         }
         ItemStack mainHandItem = player.getMainHandItem();
-        if (!isLrAnimatedItem(mainHandItem)) {
-            return;
-        }
         var renderer = BuiltinItemRendererRegistry.INSTANCE.get(mainHandItem.getItem());
-        if (!(renderer instanceof AnimateGeoItemRenderer<?, ?> geoRenderer)) {
+        if (!(renderer instanceof MeleeItemRenderer geoRenderer)) {
             return;
         }
         var stateMachine = geoRenderer.getStateMachine(mainHandItem);
