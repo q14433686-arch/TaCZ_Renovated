@@ -169,6 +169,8 @@ public class MeleeDisplayInstance implements ICustomSoundSupplier {
             Identifier slotTextureLocation,
             @SerializedName("transforms")
             JsonObject transforms,
+            @SerializedName("display_offset")
+            Vector3f displayOffset,
             @SerializedName("sounds")
             Map<String, Identifier> sounds
     ) {
