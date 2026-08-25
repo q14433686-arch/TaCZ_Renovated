@@ -17,6 +17,7 @@
 | Carry On | 有 NeoForge release：2.11.0 | optional mixin/反射，无 compile dependency |
 | First-person Model | **无 NeoForge 26.2**；2.7.2 只有 Fabric 26.2 | 不加依赖，反射桥 dormant |
 | Not Enough Animations | **无 NeoForge 26.2**；1.12.4 NeoForge 止于 26.1.2 | 不加依赖，反射桥 dormant |
+| Punchy! | 有 NeoForge 26.2：`2.7d`，Curse file `8697217` | 不加依赖；可选 mixin + plugin 门控 |
 
 公开页面：
 
@@ -30,6 +31,7 @@
 - <https://www.curseforge.com/minecraft/mc-mods/carry-on/files/all>
 - <https://www.curseforge.com/minecraft/mc-mods/first-person-model/files/all>
 - <https://www.curseforge.com/minecraft/mc-mods/not-enough-animations/files/all>
+- <https://www.curseforge.com/minecraft/mc-mods/punchy/files/8697217>
 
 未下载、未接触 `tacz-port` jar。
 
@@ -45,7 +47,10 @@
 - Iris 26.2：`8f3a7a35d780fe80c8cd3c8517f3fa3c4df3f18a`；
 - Carry On `v2.11.0`：`b82a8ccfe8b4a9af98b7485826c2162e8faaae81`；
 - First-person Model `2.7.2`：`eef8f91206c9f0ad1681111235c0d802349f986a`；
-- Not Enough Animations `1.12.4`：`dd7e5e191839de8044b8bc942304e2b1ead7950f`。
+- Not Enough Animations `1.12.4`：`dd7e5e191839de8044b8bc942304e2b1ead7950f`；
+- Punchy 本体 ARR、无公开源码。未下载/反编译。class/method 由
+  `TaCZ_Refabricated_Unofficial` Punchy mixin、Scorched Guns NeoForge
+  `client.compat.punchy.*`、Epic Fight Compat `mixins.punchy.*` 交叉核对。
 
 ### 代码调整
 
@@ -62,6 +67,12 @@
 7. `RenderHelper` 的直接 AvatarRenderer 左/右手提交用 try/finally 包住 NEA guard。
 8. REI `reloadPlugins(MutableLong,ReloadStage)` 两参入口、JEI NeoForge
    `RecipesReceivedEvent` 启动顺序已按 26.2 source 重验。
+9. Punchy：可选 `tacz.punchy.mixins.json` + `PunchyCompatMixinPlugin` 按
+   `LoadingModList#getModFileById("punchy")` 门控。持 TACZ viewmodel 时：
+   `HandEquipStateMachine#wasItemBlacklisted` 返回 true；取消
+   `PunchyArmRenderer#renderFirstPerson`；跳过 `MovementStateMachine` 的
+   walk/sprint/camera-lag 矩阵；隐藏 `HandRenderBobContext` bob sample。
+   这是姊妹项目已验证的游戏语义，不是把两套手臂叠在一起。
 
 ## 静态验证边界
 

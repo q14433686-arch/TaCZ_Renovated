@@ -55,6 +55,7 @@ FML 的模块类加载器看不到这些本地库，会在 `GunMod` 构造期触
 | Iris | LGPL-3.0 |
 | Carry On | LGPL-3.0 |
 | First-person Model | MIT |
+| Punchy! | ARR（不打包；仅可选 mixin 目标） |
 
 实际发布前仍需对最终解析到的 artifact 内许可文件做一次归档核对；本文不是对第三方许可
 条款的替代。

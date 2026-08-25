@@ -14,7 +14,7 @@
 | WP-262-1 构建骨架 | MC 26.2 / NF 26.2.0.64 / Java 25 | LR-integrated R1 clean build / L0 / L1 |
 | WP-262-2 非渲染 | Gui/HUD/AT；R1 network/getName 回流；LR payload/reload/dedicated 接线 | 当前 HEAD L2/L3/L2.5 |
 | WP-262-3 渲染 | stage-boundary ocular mask、Feature/PiP/Gizmo/hand API、Iris bridge | OpenGL/Iris/Vulkan 完整 GPU 矩阵 |
-| WP-262-4 可选兼容 | 26.2 坐标重钉、Carry On 2.11、FPM/NEA dormant bridge、矩阵文档 | `COMPATIBILITY.md` 全部游戏内项目 |
+| WP-262-4 可选兼容 | 26.2 坐标重钉、Carry On 2.11、FPM/NEA dormant bridge、Punchy 让出 mixin、矩阵文档 | `COMPATIBILITY.md` 全部游戏内项目 |
 | WP-262-LR | 26.1.2 R1 的 109 Java LR 层、资源、四处接线；粒子/药效/mixin/item-model 对齐 26.2 | LR 单机、专服、多人、内容包专项 |
 | WP-262-5 发布准备 | README/CHANGELOG/LICENSES/状态文档 | **发布 jar 与源码包被上述构建/实测闸门阻塞** |
 

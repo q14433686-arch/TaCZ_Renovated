@@ -34,6 +34,8 @@
 - 修复 `neoforge.mods.toml` 注释中的未知 dollar-brace 被 Groovy template engine 求值的问题。
 - 低倍 sight 的 reticle containment 与 full-viewmodel clipping 拆分：低倍使用
   reticle-only mask，高倍使用完整镜身/枪身/配件/火光 mask。
+- 安装 Punchy! 时右手脱离枪身、枪+手臂整体摆幅过大：按姊妹项目语义接入可选 mixin，
+  持枪期间让 Punchy 的独立手臂与位移矩阵让出给 TACZ 第一人称状态机。
 
 ### 新增：LRTactical 内置层
 
@@ -66,6 +68,8 @@
 - Carry On 对齐 2.11 的 `ItemStackTemplate#create()` 渲染路径。
 - First-person Model / Not Enough Animations 只有反射 handoff 预留；核验日没有 NeoForge
   26.2 发布文件，不作为可安装兼容宣传。
+- Punchy!：持有带模型的 TACZ/LR viewmodel 时走其官方 blacklist 让出路径，取消独立手臂
+  与 walk/sprint/camera-lag 叠层；普通物品仍由 Punchy 控制。未实机。
 - ImmediatelyFast hook 为明确 no-op；Accelerated Rendering 强制关闭；Aperture 未硬依赖接入。
 
 ### 移除

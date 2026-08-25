@@ -62,6 +62,9 @@ config="tacz.iris.mixins.json"
 config="tacz.carryon.mixins.json"
 
 [[mixins]]
+config="tacz.punchy.mixins.json"
+
+[[mixins]]
 config="lrtactical.mixins.json"
 
 # The [[accessTransformers]] block allows you to declare where your AT file is.
@@ -101,6 +104,13 @@ file="META-INF/accesstransformer.cfg"
 
 [[dependencies.${mod_id}]]
     modId="iris"
+    type="optional"
+    versionRange="*"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="punchy"
     type="optional"
     versionRange="*"
     ordering="NONE"
