@@ -4,6 +4,7 @@ import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.tacz.guns.client.animation.statemachine.GunAnimationConstant;
 import com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer;
+import me.xjqsh.lrtactical.client.renderer.item.ConsumableItemRenderer;
 import me.xjqsh.lrtactical.client.renderer.item.MeleeItemRenderer;
 import me.xjqsh.lrtactical.client.renderer.item.ThrowableItemRendererWrapper;
 import net.minecraft.client.Minecraft;
@@ -130,6 +131,8 @@ public final class LrTickAnimationEvent {
      */
     private static boolean isLrAnimatedItem(ItemStack stack) {
         var renderer = BuiltinItemRendererRegistry.INSTANCE.get(stack.getItem());
-        return renderer instanceof MeleeItemRenderer || renderer instanceof ThrowableItemRendererWrapper;
+        return renderer instanceof MeleeItemRenderer
+                || renderer instanceof ThrowableItemRendererWrapper
+                || renderer instanceof ConsumableItemRenderer;
     }
 }

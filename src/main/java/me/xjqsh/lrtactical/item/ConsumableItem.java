@@ -30,8 +30,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-/** 基础消耗品实现（药品/食物）。第一版先实现服务端效果与组件自愈，动画渲染后续再补。 */
-public class ConsumableItem extends Item implements IConsumable, com.tacz.guns.api.item.IAnimationItem {
+/** 基础消耗品实现（药品/食物）。服务端效果 + 有内容包时的 Bedrock/Lua 第一人称渲染。 */
+public class ConsumableItem extends Item implements IConsumable, com.tacz.guns.api.item.IAnimationItem,
+        me.xjqsh.lrtactical.api.item.ILrItemExtension {
     public ConsumableItem(Properties properties) {
         super(properties.stacksTo(Item.ABSOLUTE_MAX_STACK_SIZE));
     }
@@ -178,5 +179,15 @@ public class ConsumableItem extends Item implements IConsumable, com.tacz.guns.a
         return this.getConsumableIndex(stack).isPresent()
                 ? Optional.of(new me.xjqsh.lrtactical.inventory.tooltip.ConsumableTooltip(stack))
                 : Optional.empty();
+    }
+
+    @Override
+    public com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry.DynamicItemRenderer getCustomRenderer() {
+        return me.xjqsh.lrtactical.client.renderer.item.ConsumableItemRenderer.INSTANCE.get();
+    }
+
+    @Override
+    public boolean tacz$onEntitySwing(ItemStack stack, LivingEntity entity) {
+        return true;
     }
 }

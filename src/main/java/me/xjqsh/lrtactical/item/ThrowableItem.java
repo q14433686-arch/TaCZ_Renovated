@@ -280,10 +280,11 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
             if (!data.isCookable()) {
                 return;
             }
-            // 留 10% 余量：手里预燃太久就直接在手上炸
-            int maxCookTime = (int) (data.getEntityData().getLifeTime() * 0.9);
+            // 官方 0.4.3：预燃满 prepare + 完整 lifeTime 才在手上炸。
+            // 26.2 必须先 stopUsingItem 再 onThrow（见方法注释），不能照抄官方的 throw-then-stop。
             int ticksUsingItem = entity.getTicksUsingItem();
-            if (ticksUsingItem >= data.getPrepareTime() + maxCookTime && !level.isClientSide()) {
+            if (ticksUsingItem >= data.getPrepareTime() + data.getEntityData().getLifeTime()
+                    && !level.isClientSide()) {
                 // 顺序至关重要：必须先 stopUsingItem 再 onThrow，理由见方法注释。
                 // 反过来（或改用 releaseUsingItem）会导致无限递归 + 无限生成手雷。
                 //

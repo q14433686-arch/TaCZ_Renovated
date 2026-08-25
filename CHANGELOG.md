@@ -38,6 +38,11 @@
   持枪期间让 Punchy 的独立手臂与位移矩阵让出给 TACZ 第一人称状态机。
 - 投掷物静止拉栓反复抖动：官方手雷脚本用字面量 `idle` 表示取消拔销，移植层却把近战
   专用的 `INPUT_IDLE` 每 tick 打给投掷物，两者撞名。位移 tick 改回只驱动近战。
+- 跟官方 0.4.3 能跟的契约：烟雾粒子改采环境光（邻格回退、最低 2，不再全亮
+  `0xF000F0`）；可预燃投掷物在手上炸改为 `prepare + 完整 lifeTime`（26.2 仍先
+  `stopUsingItem` 再 `onThrow`）；display 增加 `display_offset` /
+  `entity_transform`；消耗品补 `ConsumableItemRenderer` 与 display 通道。
+  tooltip 自定义描述本仓已有，未改。未实机。
 
 ### 新增：LRTactical 内置层
 
@@ -88,6 +93,13 @@
 - NeoForge Vulkan 需在 `config/fml.toml` 设置 `earlyWindowControl=false` 绕过仍开放的
   NeoForge#3230 ELS 问题；关闭后用户报告 Vulkan 启动 PASS。
 - 当前 LR-integrated R1 只完成源码/API 静态前滚，尚无 JDK 25 生产构建或实机 PASS。
+- 官方 0.4.3 调查、留给下一轮（本轮不做）：
+  - TACZ 第三人称枪口锁定：官方 LR 自己的 player_animator 旋转层会给所有玩家手臂加 pitch；
+    本仓没有这套层。TACZ PAL 的 `PalRotationAdjustment` 已对 `is3rdFixedHand` 跳过手臂，
+    官方那条「枪口被锁」的病根这里不存在。下一轮只有在接入 LR 旋转层时才需要复做豁免。
+  - 近战第三人称 player_animator：官方是独立 upper/lower/rotation 层 + display 的
+    `third_person_animation` + 攻击/idle 监听，体积大、要内容包动画、可能和 TACZ PAL
+    抢层。本轮只读完源码，不接入。
 
 ### 发布前仍需完成
 

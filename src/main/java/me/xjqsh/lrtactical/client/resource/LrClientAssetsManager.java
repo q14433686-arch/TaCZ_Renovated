@@ -4,10 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
 import com.tacz.guns.GunMod;
+import com.tacz.guns.client.resource.serialize.Vector3fSerializer;
+import me.xjqsh.lrtactical.client.resource.display.ConsumableDisplayInstance;
 import me.xjqsh.lrtactical.client.resource.display.MeleeDisplayInstance;
 import me.xjqsh.lrtactical.client.resource.display.ThrowableDisplayInstance;
+import me.xjqsh.lrtactical.client.resource.manager.ConsumableDisplayManager;
 import me.xjqsh.lrtactical.client.resource.manager.MeleeDisplayManager;
 import me.xjqsh.lrtactical.client.resource.manager.ThrowableDisplayManager;
+import org.joml.Vector3f;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -16,13 +20,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
 
 /**
  * LRTactical 的<b>客户端</b>资源管理器：所有 display 数据缓存在此。
  *
  * <p>结构对齐 TACZ 的 {@code ClientAssetsManager}，但只管 LRTactical 自己的
- * {@code display/melee} 与 {@code display/throwable} 两类。
+ * {@code display/melee}、{@code display/throwable} 与 {@code display/consumable} 三类。
  * 模型（{@code geo_models}）、动画（{@code animations}）、Lua 脚本（{@code scripts}）
  * <b>刻意不重复加载</b> —— 直接复用 TACZ 的管理器，理由见下。
  *
@@ -74,6 +77,7 @@ public enum LrClientAssetsManager {
             .registerTypeAdapter(Identifier.class,
                     (com.google.gson.JsonSerializer<Identifier>) (src, type, ctx) ->
                             new JsonPrimitive(src.toString()))
+            .registerTypeAdapter(Vector3f.class, new Vector3fSerializer())
             .create();
 
     /**
@@ -105,6 +109,8 @@ public enum LrClientAssetsManager {
     private ThrowableDisplayManager throwableDisplay;
     @Nullable
     private MeleeDisplayManager meleeDisplay;
+    @Nullable
+    private ConsumableDisplayManager consumableDisplay;
 
     /**
      * 建立并注册两个 display listener。
@@ -127,9 +133,11 @@ public enum LrClientAssetsManager {
         if (throwableDisplay == null) {
             throwableDisplay = new ThrowableDisplayManager(GSON);
             meleeDisplay = new MeleeDisplayManager(GSON);
+            consumableDisplay = new ConsumableDisplayManager(GSON);
         }
         register.accept(me.xjqsh.lrtactical.EquipmentMod.id("throwable_display"), throwableDisplay);
         register.accept(me.xjqsh.lrtactical.EquipmentMod.id("melee_display"), meleeDisplay);
+        register.accept(me.xjqsh.lrtactical.EquipmentMod.id("consumable_display"), consumableDisplay);
     }
 
     @Nullable
@@ -150,6 +158,15 @@ public enum LrClientAssetsManager {
         return exact != null ? exact : findUniqueMeleeDisplayByPath(id);
     }
 
+    @Nullable
+    public ConsumableDisplayInstance getConsumableDisplay(Identifier id) {
+        if (consumableDisplay == null) {
+            return null;
+        }
+        ConsumableDisplayInstance exact = consumableDisplay.getData(id);
+        return exact != null ? exact : findUniqueConsumableDisplayByPath(id);
+    }
+
     /**
      * 有些组合枪包的服务端 index id 与客户端 display id 只在命名空间上不同
      * （例如 {@code data/<pack_ns>/index/throwable/foo.json} 对应
@@ -163,6 +180,25 @@ public enum LrClientAssetsManager {
         }
         ThrowableDisplayInstance match = null;
         for (var entry : throwableDisplay.getAllData().entrySet()) {
+            if (!entry.getKey().getPath().equals(id.getPath())) {
+                continue;
+            }
+            if (match != null) {
+                return null;
+            }
+            match = entry.getValue();
+        }
+        return match;
+    }
+
+    /** 消耗品 display 的 path-only 唯一匹配回退，规则同投掷物。 */
+    @Nullable
+    private ConsumableDisplayInstance findUniqueConsumableDisplayByPath(Identifier id) {
+        if (consumableDisplay == null) {
+            return null;
+        }
+        ConsumableDisplayInstance match = null;
+        for (var entry : consumableDisplay.getAllData().entrySet()) {
             if (!entry.getKey().getPath().equals(id.getPath())) {
                 continue;
             }
