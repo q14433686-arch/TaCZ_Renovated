@@ -200,7 +200,6 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
         });
     }
 
-    @Override
     /**
      * Scales first-person view-lag so an ADS optic does not orbit faster than the
      * magnified world FOV. Hipfire stays at 1; full ADS falls off as {@code 1/zoom}.
@@ -215,6 +214,7 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
         return 1.0F - aimingProgress + aimingProgress / zoom;
     }
 
+    @Override
     public void renderFirstPerson(LocalPlayer player, ItemStack stack, ItemDisplayContext ctx, PoseStack poseStack, SubmitNodeCollector collector,
                                   int light, float partialTick) {
         if (!(stack.getItem() instanceof IGun)) {
