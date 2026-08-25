@@ -195,7 +195,9 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
             return false;
         }
 
-        // 预燃（cook）：按住越久，飞出去后剩余引信越短
+        // 预燃（cook）：按住越久，飞出去后剩余引信越短。
+        // 满进度时 remaining 被夹到 0。0 不是“永不爆炸”，实体首 tick 就会 onDeath；
+        // 只有 C4 这类 life_time = -1 的遥控物才跳过超时引爆。
         if (index.getData().isCookable()) {
             int cooked = ticksUsingItem - index.getData().getPrepareTime();
             throwable.setLife(Math.max(throwable.getLife() - cooked, 0));

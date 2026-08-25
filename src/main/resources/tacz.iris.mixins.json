@@ -6,7 +6,10 @@
   "plugin": "com.tacz.guns.mixin.client.iris.IrisCompatMixinPlugin",
   "client": [
     "IrisShaderCreatorMixin",
+    "IrisGlShaderMixin",
+    "IrisProgramBuilderMixin",
     "IrisGlCommandEncoderMixin",
+    "IrisGlRenderPassMixin",
     "IrisExtendedShaderMixin"
   ],
   "injectors": {

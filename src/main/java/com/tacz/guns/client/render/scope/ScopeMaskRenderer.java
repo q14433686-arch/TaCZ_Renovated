@@ -183,6 +183,33 @@ public final class ScopeMaskRenderer {
     }
 
     /**
+     * Draws the already-registered ocular mask immediately and leaves the
+     * viewmodel-clip flag set. Iris' HAND path can encode clipped geometry
+     * during {@code submit}, before {@link #renderAtPhaseBoundary()} runs; the
+     * mask has to exist before that encode. If a render pass is already open
+     * the draw is skipped and the cubes stay queued for the phase boundary.
+     */
+    public static void flushCapturedMaskForImmediateHandPass() {
+        if (failed || ScopeMaskGeometry.isEmpty() || !RenderConfig.SCOPE_MASK_ENABLE.get()) {
+            return;
+        }
+        TextureTarget target = ScopeMaskTarget.getOrCreate();
+        if (target == null) {
+            return;
+        }
+        try {
+            drawMask(target);
+            ScopeMaskGeometry.clearEntriesOnly();
+        } catch (IllegalStateException openPass) {
+            // Still inside another pass: keep the cubes for the phase-boundary path.
+        } catch (Exception e) {
+            failed = true;
+            GunMod.LOGGER.error("[TACZ Scope] Failed to flush ocular mask for the Iris hand pass; mask disabled.", e);
+            ScopeMaskGeometry.clear();
+        }
+    }
+
+    /**
      * 在阶段边界把当帧登记的目镜几何画进掩码 target。
      *
      * <p>无论成败，末尾都会清空当帧清单 —— 见 {@code finally}。

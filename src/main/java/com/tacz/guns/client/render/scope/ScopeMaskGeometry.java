@@ -89,4 +89,13 @@ public final class ScopeMaskGeometry {
         ENTRIES.clear();
         viewmodelClipEnabled = false;
     }
+
+    /**
+     * Drops captured cubes after an early mask flush, but keeps
+     * {@link #viewmodelClipEnabled} so later viewmodel components in the same
+     * first-person submit can still select the outside-mask pipeline.
+     */
+    public static void clearEntriesOnly() {
+        ENTRIES.clear();
+    }
 }

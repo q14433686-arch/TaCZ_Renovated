@@ -201,6 +201,20 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
     }
 
     @Override
+    /**
+     * Scales first-person view-lag so an ADS optic does not orbit faster than the
+     * magnified world FOV. Hipfire stays at 1; full ADS falls off as {@code 1/zoom}.
+     */
+    private static float aimingViewLagMultiplier(ItemStack stack, LocalPlayer player, float partialTick) {
+        if (!(stack.getItem() instanceof IGun iGun)) {
+            return 1.0F;
+        }
+        float aimingProgress = IClientPlayerGunOperator.fromLocalPlayer(player)
+                .getClientAimingProgress(partialTick);
+        float zoom = Math.max(iGun.getAimingZoom(stack), 1.0F);
+        return 1.0F - aimingProgress + aimingProgress / zoom;
+    }
+
     public void renderFirstPerson(LocalPlayer player, ItemStack stack, ItemDisplayContext ctx, PoseStack poseStack, SubmitNodeCollector collector,
                                   int light, float partialTick) {
         if (!(stack.getItem() instanceof IGun)) {
@@ -233,11 +247,16 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
             } else {
                 handCameraRotation.set(Minecraft.getInstance().gameRenderer.mainCamera().rotation());
             }
-            // 逆转原版施加在手上的延滞效果，改为写入模型动画数据中
+            // 逆转原版施加在手上的延滞效果，改为写入模型动画数据中。
+            // 开镜后 scope_view 被锁在相机原点，这组绕模型原点的滞后旋转会变成
+            // 目镜在画面里的平移；世界 FOV 再按倍率缩小后，高低倍/组合镜都会被放大。
+            // 用与摄像机动画相同的瞄准权重，并按倍率（不是 sqrt）衰减，使视模
+            // 相对放大后的世界画面不再额外甩动。
+            float viewLag = aimingViewLagMultiplier(stack, player, partialTick);
             float xRotOffset = Mth.lerp(partialTick, player.xBobO, player.xBob);
             float yRotOffset = Mth.lerp(partialTick, player.yBobO, player.yBob);
-            float xRot = player.getViewXRot(partialTick) - xRotOffset;
-            float yRot = player.getViewYRot(partialTick) - yRotOffset;
+            float xRot = (player.getViewXRot(partialTick) - xRotOffset) * viewLag;
+            float yRot = (player.getViewYRot(partialTick) - yRotOffset) * viewLag;
             poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F));
             poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F));
             BedrockPart rootNode = gunModel.getRootNode();
