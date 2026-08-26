@@ -82,7 +82,8 @@ REI、Iris 与 Carry On。构建通过不等于游戏内兼容；逐项版本、
 [`COMPATIBILITY.md`](COMPATIBILITY.md)。
 
 First-person Model 与 Not Enough Animations 在核验日没有 NeoForge 26.2 发布文件；源码中的
-反射桥仅为 dormant 预留，不作为可安装兼容宣传。
+反射桥仅为 dormant 预留，不作为可安装兼容宣传。Punchy! 2.7d 有 NeoForge 26.2 文件，本仓
+用可选 mixin 在持枪时让出其手臂/位移层；未实机，不标 PASS。
 
 ## 6. 开发与验证
 

@@ -84,6 +84,7 @@ public final class ModEntitiesRender {
     public static void registerItemRenderers() {
         register(ModItems.MELEE.get());
         register(ModItems.THROWABLE.get());
+        register(ModItems.CONSUMABLE.get());
     }
 
     private static void register(Item item) {

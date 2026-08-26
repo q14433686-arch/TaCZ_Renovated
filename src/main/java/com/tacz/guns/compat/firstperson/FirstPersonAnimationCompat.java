@@ -17,10 +17,18 @@ import java.lang.reflect.Proxy;
 /**
  * Makes generic first-person body/animation mods yield while TACZ owns the viewmodel.
  *
- * <p>The bridge is reflection-only: normal items stay under the other mod's control, while an
- * animated TACZ item with a loaded model keeps its authored gun/hand animation without a second
- * arm rig. As of 2026-08-21 FPM/NEA do not publish NeoForge 26.2 files, so these hooks are dormant
- * until a matching build is actually installed.</p>
+ * <p>The compatibility contract is one-way: ordinary items stay under the other mod's control,
+ * while an animated TACZ/LRTactical {@link AnimateGeoItemRenderer} with a loaded model keeps its
+ * authored gun/hand animation without a second arm rig.</p>
+ *
+ * <ul>
+ *   <li>First-person Model / Not Enough Animations: reflection-only public API bridges. As of
+ *       2026-08-21 they do not publish NeoForge 26.2 files, so those hooks stay dormant until a
+ *       matching build is installed.</li>
+ *   <li>Punchy: no public Java disable API. Optional {@code @Pseudo} mixins route TACZ viewmodels
+ *       through Punchy's supported item-blacklist / yield path. See
+ *       {@code com.tacz.guns.mixin.compat.punchy}.</li>
+ * </ul>
  */
 public final class FirstPersonAnimationCompat {
     private static final String FIRST_PERSON_MODEL = "firstperson";
@@ -43,6 +51,9 @@ public final class FirstPersonAnimationCompat {
             registerFirstPersonModelHandler();
         }
         neaInstalled = ModList.get().isLoaded(NOT_ENOUGH_ANIMATIONS);
+        if (ModList.get().isLoaded("punchy")) {
+            GunMod.LOGGER.info("Punchy detected; TACZ viewmodels use the blacklist/yield mixins");
+        }
     }
 
     /** Returns the kept/main-hand stack that TACZ will actually draw this frame. */

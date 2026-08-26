@@ -109,6 +109,7 @@ git diff --check
 python -m json.tool src/main/resources/tacz.mixins.json
 python -m json.tool src/main/resources/tacz.iris.mixins.json
 python -m json.tool src/main/resources/tacz.carryon.mixins.json
+python -m json.tool src/main/resources/tacz.punchy.mixins.json
 ```
 
 没有用户实测就不要在 README、CHANGELOG 或兼容矩阵写 PASS。构建、专服、GPU、可选 Mod

@@ -36,6 +36,7 @@
 | Carry On | `2.11.0` NeoForge 26.2 | 多格工作台 root/companion、放置预检、携带模型 BlockId | 2.11.0 descriptor 已核；未实机 |
 | First-person Model | **无 NeoForge 26.2 文件**；2.7.2 只有 Fabric 26.2，NeoForge 止于 26.1.2 | 反射 ActivationHandler 已按 2.7.2 API 预留 | 当前不列为可安装兼容；桥保持 dormant |
 | Not Enough Animations | **无 NeoForge 26.2 文件**；1.12.4 的 NeoForge 文件止于 26.1.2 | 直接手臂提交 guard 已按 1.12.4 API 预留 | 当前不列为可安装兼容；桥保持 dormant |
+| Punchy! | 有 NeoForge 26.2：`2.7d`，Curse file `8697217` | 可选 `@Pseudo` mixin 走 Punchy 既有 blacklist / 让出路径 | API/target 已核；未实机。无 Punchy 时 plugin 不应用 mixin |
 
 ## 源码证据
 
@@ -77,6 +78,15 @@
   `NEAnimationsLoader.INSTANCE.playerTransformer` /
   `PlayerTransformer#renderingFirstPersonArm(boolean)`。当前只是未来兼容预留，因为无
   NeoForge 26.2 发布文件。
+- **Punchy! 2.7d NeoForge 26.2**：本体 ARR、无公开源码，未下载/反编译 jar。class/method
+  目标由公开兼容层交叉核对：姊妹项目
+  `TaCZ_Refabricated_Unofficial` 的 Punchy `@Pseudo` mixin、Scorched Guns NeoForge
+  `top.ribs.scguns.mixin.client.compat.punchy.*`，以及 Epic Fight Compat
+  `dev.khanhtimn.efcompat.mixins.punchy.*`（直接 import `punchy.client.render.PunchyArmRenderer`、
+  `punchy.client.state.HandEquipStateMachine`、`punchy.client.state.MovementStateMachine`，
+  并 wrap `wasItemBlacklisted` / `renderFirstPerson`）。本仓只取“持 TACZ viewmodel 时让出”
+  的游戏语义，不复制 Fabric API 表面。`@Pseudo + require=0`：目标改名时无 Punchy 实例不崩，
+  有 Punchy 时仍需按矩阵复测。
 
 ## 图形后端边界
 
@@ -110,5 +120,7 @@
 9. Vulkan：阶段边界 target 切换、mask debug 预览、无 device loss、镜身/准星/火光裁剪。
 10. LRTactical：单机与专服分别验证 tooltip/HUD、投掷/近战/消耗品、烟雾/闪光、
     index 同步、实体 tracking、分类冷却及至少一个 LR 内容包。
+11. Punchy! 2.7d：普通工具动画仍由 Punchy 控制；枪/刀/手雷无第二套手臂、无
+    walk/sprint/camera-lag 叠层，右手贴在枪上；收起后恢复。
 
 完成上述测试前，只能写“API/坐标已核”，不能写“兼容 PASS”。
