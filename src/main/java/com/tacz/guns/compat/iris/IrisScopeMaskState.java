@@ -68,9 +68,9 @@ public final class IrisScopeMaskState {
 
             int programId = GL11C.glGetInteger(GL20C.GL_CURRENT_PROGRAM);
             if (programId <= 0) {
-                Object glPipeline = readFieldSilent(glRenderPass, "pipeline", "glPipeline");
+                Object glPipeline = readField(glRenderPass, "pipeline");
                 if (glPipeline != null) {
-                    Object glProg = invokeSilent(glPipeline, "program", "getProgram");
+                    Object glProg = invokeNoArgs(glPipeline, "program");
                     programId = getProgramId(glProg);
                 }
             }
@@ -122,30 +122,29 @@ public final class IrisScopeMaskState {
             if (glRenderPass == null) {
                 return 0;
             }
-            Object renderPipeline = findRenderPipeline(glRenderPass);
+            Object glPipeline = readField(glRenderPass, "pipeline");
+            if (glPipeline == null) {
+                return 0;
+            }
+            Object renderPipeline = invokeNoArgs(glPipeline, "info");
             if (renderPipeline == null) {
                 return 0;
             }
-            Object location = invokeFirst(renderPipeline, "getLocation", "location");
+            Object location = invokeNoArgs(renderPipeline, "getLocation");
             if (location == null) {
                 return 0;
             }
-            String namespace = String.valueOf(invokeFirst(location, "getNamespace"));
-            String path = String.valueOf(invokeFirst(location, "getPath"));
+            String namespace = String.valueOf(invokeNoArgs(location, "getNamespace"));
+            String path = String.valueOf(invokeNoArgs(location, "getPath"));
             if (!GunMod.MOD_ID.equals(namespace)) {
                 return 0;
             }
             String normalized = path.toLowerCase(Locale.ROOT);
             if (BODY_PIPELINE.equals(normalized) || FLASH_TRANSLUCENT_PIPELINE.equals(normalized)
-                    || FLASH_SWIRL_PIPELINE.equals(normalized)
-                    || normalized.endsWith("scope_body_clipped")
-                    || normalized.endsWith("scope_flash_translucent_clipped")
-                    || normalized.endsWith("scope_flash_swirl_clipped")) {
+                    || FLASH_SWIRL_PIPELINE.equals(normalized)) {
                 return 1;
             }
-            if (RETICLE_PIPELINE.equals(normalized) || RETICLE_EMISSIVE_PIPELINE.equals(normalized)
-                    || normalized.endsWith("scope_reticle_clipped")
-                    || normalized.endsWith("scope_reticle_emissive_clipped")) {
+            if (RETICLE_PIPELINE.equals(normalized) || RETICLE_EMISSIVE_PIPELINE.equals(normalized)) {
                 return 2;
             }
         } catch (Throwable t) {
@@ -154,21 +153,9 @@ public final class IrisScopeMaskState {
         return 0;
     }
 
-    private static Object findRenderPipeline(Object glRenderPass) {
-        Object glPipeline = readFieldSilent(glRenderPass, "pipeline", "glPipeline", "renderPipeline");
-        if (glPipeline == null) {
-            glPipeline = invokeSilent(glRenderPass, "pipeline", "getPipeline", "info");
-        }
-        if (glPipeline == null) {
-            return null;
-        }
-        Object info = invokeSilent(glPipeline, "info", "getPipeline", "getInfo");
-        return info != null ? info : glPipeline;
-    }
-
     private static int resolveMaskTextureId(Object glRenderPass) {
         try {
-            Object samplersObj = readFieldSilent(glRenderPass, "samplers");
+            Object samplersObj = readField(glRenderPass, "samplers");
             if (samplersObj instanceof Map<?, ?> samplers) {
                 Object tvs = samplers.get(MASK_SAMPLER);
                 if (tvs != null) {
@@ -235,7 +222,7 @@ public final class IrisScopeMaskState {
         }
         try {
             if (obj.getClass().getSimpleName().contains("TextureViewAndSampler")) {
-                Object view = invokeSilent(obj, "view");
+                Object view = invokeNoArgs(obj, "view");
                 return getGlTextureId(view);
             }
             try {
@@ -292,38 +279,10 @@ public final class IrisScopeMaskState {
         return field.get(target);
     }
 
-    private static Object readFieldSilent(Object target, String... names) {
-        for (String name : names) {
-            try {
-                return readField(target, name);
-            } catch (ReflectiveOperationException ignored) {
-            }
-        }
-        return null;
-    }
-
     private static Object invokeNoArgs(Object target, String name) throws ReflectiveOperationException {
         Method method = target.getClass().getMethod(name);
         method.setAccessible(true);
         return method.invoke(target);
-    }
-
-    private static Object invokeSilent(Object target, String... names) {
-        for (String name : names) {
-            try {
-                return invokeNoArgs(target, name);
-            } catch (ReflectiveOperationException ignored) {
-            }
-        }
-        return null;
-    }
-
-    private static Object invokeFirst(Object target, String... names) {
-        Object value = invokeSilent(target, names);
-        if (value != null) {
-            return value;
-        }
-        return readFieldSilent(target, names);
     }
 
     private static void logOnce(String action, Throwable t) {

@@ -10,7 +10,6 @@ import com.tacz.guns.client.render.scope.IReticleRenderer;
 import com.tacz.guns.client.render.scope.ReticleRendererRegistry;
 import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
 import com.tacz.guns.client.render.scope.ScopeMaskGeometry;
-import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
 import com.tacz.guns.client.render.scope.ScopeMaskTextureHandle;
 import com.tacz.guns.compat.iris.IrisCompat;
 import com.tacz.guns.client.render.scope.ScopeNodeSet;
@@ -603,9 +602,6 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
                 // Other viewmodel components query this separately from geometry presence, so a
                 // low-power reticle mask does not punch the gun/attachments/flash out of the lens.
                 ScopeMaskGeometry.enableViewmodelClip();
-            }
-            if (IrisCompat.isUsingRenderPack()) {
-                ScopeMaskRenderer.flushCapturedMaskForImmediateHandPass();
             }
         }
 
