@@ -3,12 +3,36 @@
 日期：2026-08-26  
 本仓分支：`arena/01a03b03-tacz-renovated`  
 用户复测：`5f6b9e7` / `2ef8fab` **未修好**问题 2、问题 3。  
-状态：**不得标 PASS**。问题 2/3 的尝试代码已回退到 `305bed1` 对应文件。  
+状态：**不得标 PASS**。问题 2/3 的**失败尝试代码**已从运行路径撤走；负结果与诊断仍是本分支内容。  
 问题 1（温雷满进度永不爆）保留：`life >= 0 && tickCount >= life`，C4 `-1` 仍不超时。
 
 姊妹仓：`q14433686-arch/TaCZ_Refabricated_Unofficial` `26.2(main)` 尖端约 `7f6d1bf`（2026-08-25）。  
 官方：`MCModderAnchor/TACZ` 1.20.1 / 0.4.3 语义。  
 宪章：refab 只取游戏语义，不抄 Fabric API 表面。
+
+---
+
+## 0. 本分支已落地内容（全部算数，禁止当不存在）
+
+从 `cc6deec`（`26.2`）切出本会话分支后，下列提交**已经是仓库内容**。回退的只是 `5f6b9e7` 里被用户打回的 Iris 散弹注入和 `xBob` 缩放，不是整条分支。
+
+| 提交 | 内容 | 下一任必须 |
+|---|---|---|
+| `8431e68` | Punchy! 持 TACZ/LR viewmodel 时走 blacklist，取消独立右臂与 walk/sprint/camera-lag 叠层 | 保留 mixin / plugin / `tacz.punchy.mixins.json` |
+| `ce0d245` | 投掷物静止不再广播近战 `INPUT_IDLE`（官方手雷脚本字面量 `idle` 会取消拔销） | 保留 `LrTickAnimationEvent` 分流 |
+| `c3acff7` | 官方 0.4.3：烟雾环境光、cook=`prepare+lifeTime`、`display_offset`、`entity_transform`、消耗品 Bedrock/Lua 渲染器 | 保留粒子/display/ConsumableItemRenderer |
+| `305bed1` | `MeleeDisplay` record 补 `displayOffset` 组件（否则 `create()` 编不过） | 保留 |
+| 本 HEAD | 温雷 `life>=0`；本审计文档 | 保留 fuse；负结果当证据用 |
+
+失败尝试本身也是内容：`5f6b9e7` 证明「缩放 bob」和「多 hook Iris 编译入口」过不了用户复测。写在本文 §2，供下一任当禁区，不是「没做过」。
+
+未复验、仍算本分支内容（禁止从提示词里消失）：
+
+- 拉栓抖动修 = `ce0d245`，源码闭环，**未实机**。
+- muzzle vs PAL：官方 0.4.3 第三人称枪口锁的病根是 LR `AdjustmentYRotModifier`；本仓没有这层，PAL 已对 `is3rdFixedHand` 跳过手臂。**NO-GO**，不要当本轮活。
+- 近战 3P player_animator：源码已读，体积大、要内容包、可能和 PAL 抢层。**下一轮**，本轮不接入。
+
+详见 `docs/records/LR_043_FOLLOWUP_20260826.md`。
 
 ---
 
@@ -123,9 +147,19 @@
 下面整段可原样粘贴。不要再把问题 2/3 当「缺一个缩放/缺一个 mixin 下标」。
 
 ```
-你在 TaCZ_Renovated（NeoForge 26.2，分支 arena/01a03b03-tacz-renovated）修两个已被用户打回的客户端 bug。先读 AGENTS.md、CHARTER.md、docs/records/SCOPE_IRIS_VIEWLAG_AUDIT_20260826.md。refab 只取游戏语义，禁止抄 Fabric API，禁止碰 tacz-port jar。不要声称未实机 PASS。
+你在 TaCZ_Renovated（NeoForge 26.2，分支 arena/01a03b03-tacz-renovated）。先读 AGENTS.md、CHARTER.md、docs/records/SCOPE_IRIS_VIEWLAG_AUDIT_20260826.md 全文（尤其 §0 已落地清单）、docs/records/LR_043_FOLLOWUP_20260826.md。refab 只取游戏语义，禁止抄 Fabric API，禁止碰 tacz-port jar。不要声称未实机 PASS。
 
-【用户验收】
+【本分支已有内容，全部算数，禁止当空白仓、禁止回退、禁止重做一遍】
+- 8431e68 Punchy 让出（tacz.punchy.mixins.json + 四个 mixin + plugin）
+- ce0d245 投掷物不再吃近战 INPUT_IDLE
+- c3acff7 烟雾环境光、cook=prepare+lifeTime、display_offset、entity_transform、ConsumableItemRenderer
+- 305bed1 MeleeDisplay.displayOffset 组件（编译所需）
+- ThrowableItemEntity：life>=0 才超时；C4 -1 仍不炸
+- 阶段边界 ocular mask、低倍 reticle-only / 高倍 viewmodel clip、ocular_ring 重画
+- 本审计 §2 的负结果：缩放 xBob、Iris 多入口散弹注入，已复测失败
+- 拉栓抖动修已落地、未实机；muzzle vs PAL 已判 NO-GO；近战 3P player_animator 已读源、留给下一轮。见 LR_043_FOLLOWUP
+
+【仓库不是空白。上一任已经落地 Punchy / 0.4.3 / fuse / display。这一轮只补两个被打回的洞】
 A. 开 Iris 光影包后，高倍筒镜目镜必须按目镜投影裁剪（镜内不该看到完整不透明目镜板/枪管穿镜）。无光影不要回退。低倍 sight 按上游 renderSight：不裁镜身，只约束准星。
 B. 高倍镜与组合镜（高低倍两档都要测）开镜后，转视角时枪体不得出现被放大的滞后、俯仰、水平偏转。腰射保持官方手感。
 
@@ -135,7 +169,7 @@ B. 高倍镜与组合镜（高低倍两档都要测）开镜后，转视角时�
 3. 不要把 shouldDisableScopeMaskUnderShaderPack 扩成 Iris。那是 sulkan 失败回退，不是修裁剪。
 4. 不要整文件搬姊妹 IrisScopePipelineCompat / VoxyScopePipelineCompat。
 5. 不要在 submit 中途无保护地切 RenderPass。
-6. 不要动温雷 life>=0 那处（问题 1 已留着）。
+6. 不要动、不要重写 §0 清单里的已落地提交。
 7. 不要为了「看起来稳」关掉约束或开镜定位。
 
 【问题 B 调查顺序】
@@ -158,9 +192,12 @@ B. 高倍镜与组合镜（高低倍两档都要测）开镜后，转视角时�
 
 ---
 
-## 7. 本仓现状（回退后）
+## 7. 本仓现状
 
-- HEAD 相对 `305bed1`：只多温雷 fuse 与本审计文档。
+相对会话基线 `cc6deec`，本分支**已经有** Punchy 让出、投掷物 idle 分流、0.4.3 display/cook/烟雾/消耗品渲染、`MeleeDisplay.displayOffset`、温雷 `life>=0`，以及本文。这些都算内容。
+
+相对 `305bed1`，运行路径上只多了温雷 fuse；`5f6b9e7` 的 Iris/bob 尝试已从代码撤走，负结果留在本文当禁区，不是「没做过」。
+
 - 开镜视模 bob = 官方未缩放 `* 0.1`。
-- Iris 桥 = 回退前的 `ShaderCreator.link` 下标 5 + `trySetup` + ExtendedShader reset。已知脆弱，但比无效散弹更干净。
+- Iris 桥 = `ShaderCreator.link` 下标 5 + `trySetup` + ExtendedShader reset。已知脆弱；加宽钩子已复测无效。
 - 约束公式仍是本仓 `Bᵀ·C·B` 三明治，未经本用户高倍/组合镜验收。

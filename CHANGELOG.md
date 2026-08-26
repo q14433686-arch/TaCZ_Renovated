@@ -47,7 +47,8 @@
   `0` 当帧炸，C4 `-1` 仍不超时。未再被用户打回。
 - `5f6b9e7` 曾给开镜 `xBob` 乘 `1/zoom`、并加宽 Iris HAND 片元注入。用户复测
   高倍目镜仍不裁、开镜滞后仍在。相关代码已回退到 `305bed1`。审计与下一任
-  提示词：`docs/records/SCOPE_IRIS_VIEWLAG_AUDIT_20260826.md`。不得标 PASS。
+  提示词：`docs/records/SCOPE_IRIS_VIEWLAG_AUDIT_20260826.md`（§0 清点本分支已落地
+  的 Punchy / 0.4.3 / fuse / display，禁止当下任空白仓）。不得标 PASS。
 
 ### 新增：LRTactical 内置层
 
