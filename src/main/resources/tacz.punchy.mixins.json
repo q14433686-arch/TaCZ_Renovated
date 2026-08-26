@@ -1,0 +1,16 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.tacz.guns.mixin.compat.punchy",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "com.tacz.guns.mixin.compat.punchy.PunchyCompatMixinPlugin",
+  "client": [
+    "PunchyArmRendererMixin",
+    "PunchyHandEquipStateMachineMixin",
+    "PunchyHandRenderBobContextMixin",
+    "PunchyMovementStateMachineMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

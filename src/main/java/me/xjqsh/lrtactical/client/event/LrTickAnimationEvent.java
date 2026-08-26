@@ -4,6 +4,7 @@ import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.tacz.guns.client.animation.statemachine.GunAnimationConstant;
 import com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer;
+import me.xjqsh.lrtactical.client.renderer.item.ConsumableItemRenderer;
 import me.xjqsh.lrtactical.client.renderer.item.MeleeItemRenderer;
 import me.xjqsh.lrtactical.client.renderer.item.ThrowableItemRendererWrapper;
 import net.minecraft.client.Minecraft;
@@ -41,7 +42,18 @@ public final class LrTickAnimationEvent {
     }
 
     /**
-     * 每客户端 tick：按玩家移动状态推进主手物品的动画状态机。
+     * 每客户端 tick：按玩家移动状态推进<b>近战</b>状态机。
+     *
+     * <p>官方 LR {@code ClientEventsHandler#tickAnimation} 只给
+     * {@code MeleeItemRenderer} / {@code FlashShieldItemRenderer} 发
+     * {@code INPUT_IDLE/WALK/RUN}。本仓战略遗弃 flash_shield，因此这里只驱动近战。</p>
+     *
+     * <p><b>不能</b>把同一组输入打给投掷物。官方手雷脚本把取消拔销写成
+     * {@code trigger("idle")} / {@code input == "idle"}，与
+     * {@link GunAnimationConstant#INPUT_IDLE} 的字面量 {@code "idle"} 完全相同。
+     * 站立时每 tick 再发一次 {@code INPUT_IDLE}，会把正在播的 {@code unlock_safe}
+     * 掐掉并退回 idle，然后 {@code isUsing()} 仍为 true 又立刻 {@code start_use}，
+     * 表现为静止拉栓反复抖动、一走动（改发 walk/run）反而正常。</p>
      */
     public static void tickAnimation(Minecraft client) {
         LocalPlayer player = client.player;
@@ -49,11 +61,8 @@ public final class LrTickAnimationEvent {
             return;
         }
         ItemStack mainHandItem = player.getMainHandItem();
-        if (!isLrAnimatedItem(mainHandItem)) {
-            return;
-        }
         var renderer = BuiltinItemRendererRegistry.INSTANCE.get(mainHandItem.getItem());
-        if (!(renderer instanceof AnimateGeoItemRenderer<?, ?> geoRenderer)) {
+        if (!(renderer instanceof MeleeItemRenderer geoRenderer)) {
             return;
         }
         var stateMachine = geoRenderer.getStateMachine(mainHandItem);
@@ -121,6 +130,8 @@ public final class LrTickAnimationEvent {
      */
     private static boolean isLrAnimatedItem(ItemStack stack) {
         var renderer = BuiltinItemRendererRegistry.INSTANCE.get(stack.getItem());
-        return renderer instanceof MeleeItemRenderer || renderer instanceof ThrowableItemRendererWrapper;
+        return renderer instanceof MeleeItemRenderer
+                || renderer instanceof ThrowableItemRendererWrapper
+                || renderer instanceof ConsumableItemRenderer;
     }
 }

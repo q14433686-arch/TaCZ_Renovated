@@ -43,7 +43,7 @@
 | 本 mod | **`1.1.8+neoforge.1.21.11.R1`** |
 
 可选集成（Cloth Config 图形配置、Iris 光影、Player Animation Library 第三人称动画、
-Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
+Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model、Punchy）的
 **验证版本号与状态矩阵**见 [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md)。
 
 本仓库只提供 NeoForge 构建，不能与 Fabric 版 TaCZ 混装。
