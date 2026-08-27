@@ -8,6 +8,8 @@
     "PunchyArmRendererMixin",
     "PunchyHandEquipStateMachineMixin",
     "PunchyHandRenderBobContextMixin",
+    "PunchyItemInHandRendererMixin",
+    "PunchyLookInputMixin",
     "PunchyMovementStateMachineMixin"
   ],
   "injectors": {

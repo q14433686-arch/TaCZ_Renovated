@@ -18,8 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Pseudo
 @Mixin(targets = "punchy.client.render.PunchyArmRenderer", remap = false)
 public abstract class PunchyArmRendererMixin {
-    @Inject(method = "renderFirstPerson", at = @At("HEAD"), cancellable = true,
-            require = 0, remap = false)
+    @Inject(method = {
+            "renderFirstPerson",
+            "renderFirstPersonModel",
+            "applyHandTransform",
+            "applyCameraLag"
+    }, at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private static void tacz$yieldFirstPersonRenderer(CallbackInfo ci) {
         if (FirstPersonAnimationCompat.shouldUseTaczRenderer(Minecraft.getInstance().player)) {
             ci.cancel();

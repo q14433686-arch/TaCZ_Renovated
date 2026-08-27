@@ -51,9 +51,27 @@ public final class FirstPersonAnimationCompat {
             registerFirstPersonModelHandler();
         }
         neaInstalled = ModList.get().isLoaded(NOT_ENOUGH_ANIMATIONS);
-        if (ModList.get().isLoaded("punchy")) {
+        punchyInstalled = ModList.get().isLoaded("punchy");
+        if (punchyInstalled) {
             GunMod.LOGGER.info("Punchy detected; TACZ viewmodels use the blacklist/yield mixins");
         }
+    }
+
+    public static boolean isPunchyLoaded() {
+        if (!punchyInstalled) {
+            punchyInstalled = ModList.get().isLoaded("punchy");
+        }
+        return punchyInstalled;
+    }
+
+    /**
+     * Punchy can rewrite the delayed-draw ModelView after TACZ submits the gun.
+     * Premultiplying the submit-time ModelView then pins the ocular mask to a
+     * different basis than the Iris HAND draw, so clipping and reticle
+     * containment look like they are off even though the mask log is clean.
+     */
+    public static boolean shouldBakeSubmitModelViewIntoScopeMask() {
+        return !isPunchyLoaded();
     }
 
     /** Returns the kept/main-hand stack that TACZ will actually draw this frame. */

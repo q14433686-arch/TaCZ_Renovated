@@ -36,6 +36,9 @@
   reticle-only mask，高倍使用完整镜身/枪身/配件/火光 mask。
 - 安装 Punchy! 时右手脱离枪身、枪+手臂整体摆幅过大：按姊妹项目语义接入可选 mixin，
   持枪期间让 Punchy 的独立手臂与位移矩阵让出给 TACZ 第一人称状态机。
+- Punchy! + 光影开镜：目镜掩码不再把 submit 时的 ModelView 烘焙进几何（Punchy 会在
+  delayed HAND draw 改写该矩阵，日志仍显示 mask drawn 但裁切/低倍准星约束失效）。
+  开镜灵敏度改走客户端 aiming 进度，并挡住 Punchy 自己的 look/FOV 补偿路径。未实机。
 - 投掷物静止拉栓反复抖动：官方手雷脚本用字面量 `idle` 表示取消拔销，移植层却把近战
   专用的 `INPUT_IDLE` 每 tick 打给投掷物，两者撞名。位移 tick 改回只驱动近战。
 - 跟官方 0.4.3 能跟的契约：烟雾粒子改采环境光（邻格回退、最低 2，不再全亮

@@ -11,6 +11,7 @@ import com.tacz.guns.client.render.scope.ReticleRendererRegistry;
 import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
 import com.tacz.guns.client.render.scope.ScopeMaskGeometry;
 import com.tacz.guns.client.render.scope.ScopeMaskTextureHandle;
+import com.tacz.guns.compat.firstperson.FirstPersonAnimationCompat;
 import com.tacz.guns.compat.iris.IrisCompat;
 import com.tacz.guns.client.render.scope.ScopeNodeSet;
 import com.tacz.guns.client.model.functional.TextShowRender;
@@ -1039,7 +1040,14 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
                 // 若掩码 pass 到阶段边界后再取当前 ModelView，Iris hand path 下会拿到与提交时
                 // 不一致的矩阵，表现为裁剪区域固定在 world north。这里提前合成，mask pass 里
                 // 使用 identity ModelView，保证采样区域跟随提交时的第一人称瞄具。
-                Matrix4f bakedPose = new Matrix4f(RenderSystem.getModelViewMatrixCopy()).mul(poseStack.last().pose());
+                Matrix4f bakedPose = new Matrix4f(poseStack.last().pose());
+                if (FirstPersonAnimationCompat.shouldBakeSubmitModelViewIntoScopeMask()) {
+                    // Iris HAND can present a stale world-facing ModelView at the phase
+                    // boundary. Bake the submit-time matrix so the mask stays on the gun.
+                    // Punchy rewrites that matrix for the delayed draw, so baking would
+                    // freeze the mask on the submit basis while the gun/reticle move.
+                    bakedPose = new Matrix4f(RenderSystem.getModelViewMatrixCopy()).mul(bakedPose);
+                }
                 ScopeMaskGeometry.add(bakedPose, part.cubes);
             }
             for (BedrockPart child : part.children) {
