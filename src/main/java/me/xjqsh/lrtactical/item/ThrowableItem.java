@@ -117,42 +117,42 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
     /**
      * 右键开始「拔销」。
      *
-     * <h2>【本轮修复】为什么两端必须做出<b>相同</b>的决定</h2>
-     * 这里曾是「投出一颗后就再也投不出、必须等它炸掉」的根因。
+     * <h2>【2026-08-27】两端都查冷却 —— 修「读了个空条」</h2>
+     * 旧写法<b>只在服务端做冷却判定</b>，客户端一律乐观放行。
+     * 于是服务端冷却中、客户端却 {@code startUsingItem} 的分叉<b>每次都会发生</b>：
+     * 客户端走完这轮读条也不会消耗任何东西
+     * （{@code finishUsingItem} 的效果段有 {@code !level.isClientSide()} 门禁），
+     * 表现为「读了个空条」。
      *
-     * <p>客户端 {@code MultiPlayerGameMode#useItem} 会<b>本地预测</b>执行一次
+     * <p>现在<b>两端都查各自那张表</b>（{@code ModCapabilities#coolDowns} 已按端返回
+     * {@code SERVER_COOL_DOWNS} / {@code CLIENT_COOL_DOWNS}）。客户端表能当门禁的
+     * 三条依据（均已核对）：
+     * <ol>
+     *   <li><b>客户端表确实在走</b>：{@code ModCapabilities#init} 把
+     *       {@code coolDowns(player).tick()} 挂在 NeoForge 的
+     *       {@code PlayerTickEvent.Pre}，而该事件<b>客户端与服务端玩家都会触发</b>，
+     *       配合按端分表，两侧各自每游戏刻恰好 tick 一次。</li>
+     *   <li><b>偏差方向安全</b>：客户端 {@code startTime} 取自收到
+     *       {@code ServerMessageCustomCooldown} 那一刻的本地 {@code tickCount}，
+     *       必然<b>不早于</b>服务端起点 ⇒ 只会「多拒一会儿」，不会「少拒」。
+     *       多拒一次 = 玩家再按一下；少拒一次 = 卡死。</li>
+     *   <li><b>窗口会被显式收口</b>：服务端冷却到期时 {@code onCooldownEnded}
+     *       再发一条 {@code duration=0}，客户端立刻 {@code removeCooldown}，
+     *       多拒窗口≈一个单向延迟。</li>
+     * </ol>
+     *
+     * <p>服务端仍是唯一权威：真正投不投出仍由 {@link #releaseUsing} 的服务端判定决定。
+     *
+     * <h2>历史（守住审计线索）</h2>
+     * 本方法曾是「投出一颗后就再也投不出、必须等它炸掉」的根因。
+     * 客户端 {@code MultiPlayerGameMode#useItem} 会<b>本地预测</b>执行一次
      * {@code ItemStack#use}（字节码确认走 {@code startPrediction}），
-     * 服务端 {@code ServerPlayerGameMode#useItem} 再真正执行一次。
+     * 服务端 {@code ServerPlayerGameMode#useItem} 再真正执行一次，
      * 两端<b>各自独立</b>地决定要不要 {@code startUsingItem}。
-     *
-     * <p>冷却的<b>判定</b>仍是纯服务端权威；客户端表现在由
-     * {@code ServerMessageCustomCooldown} 同步，仅用于图标遮罩。这里仍不能用客户端
-     * 预测结果拒绝 {@code startUsingItem}，否则网络延迟会让两端分叉。
-     * 因此旧写法必然分叉：
-     * <ul>
-     *   <li><b>服务端</b>：冷却中 → 不 {@code startUsingItem}；</li>
-     *   <li><b>客户端</b>：显示表可能因包延迟仍为空/已过期 → 照常
-     *       {@code startUsingItem}，进入“使用中”。</li>
-     * </ul>
-     *
-     * <p>客户端一旦进入「使用中」，{@code LivingEntity#startUsingItem} 开头那句
-     * {@code if (isUsingItem()) return;}（字节码 offset 14-20 确认）
-     * 就会<b>吞掉之后所有的右键</b>；而松手时服务端没有 {@code useItem} 可释放，
-     * 状态再也回不到一致，表现为「右键彻底没反应」。
-     *
-     * <p>之所以看起来像「世界上只允许存在一颗手雷」，是因为示例配置里
-     * {@code life_time}=60 tick(3秒) <b>远大于</b> {@code cooldown}=20 tick(1秒)：
-     * 玩家总是在手雷还在空中时重试，而那时冷却其实早就结束了。
-     * 真正的约束是<b>状态分叉</b>，与实体数量无关 —— 多人游戏同样会复现。
-     *
-     * <h2>修法</h2>
-     * <b>只在服务端做冷却判定</b>，客户端一律放行。
-     * 这样两端都会 {@code startUsingItem}（动画一致），
-     * 而是否真的投出由服务端的 {@link #releaseUsing} 说了算 ——
-     * 那里本来就有同一份冷却校验，不会漏判。
-     *
-     * <p>这也是原版的通行做法：客户端只做乐观预测，权威判定始终在服务端。
-     * 当前客户端冷却表严格限定为 HUD 数据源，绝不进入本方法的行为门禁。
+     * 全因客户端 {@code LivingEntity#startUsingItem} 开头那句
+     * {@code if (isUsingItem()) return;}（字节码 offset 14-20 确认）会<b>吞掉之后所有的右键</b>。
+     * 现在的「两端都查」把已知的分叉来源堵掉了；剩下无法枚举的原因由
+     * {@link me.xjqsh.lrtactical.client.input.StuckUseRecovery} 兜底。
      */
     @Override
     public @NotNull InteractionResult use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
@@ -160,16 +160,13 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
             return InteractionResult.FAIL;
         }
         ItemStack stack = player.getItemInHand(hand);
-        // 客户端同步表只供 HUD；网络延迟下不能作为行为门禁。
-        // 故客户端一律乐观放行，权威判定交给服务端。
-        boolean onCooldown = false;
-        if (!level.isClientSide()) {
-            CustomItemCoolDowns coolDowns = ModCapabilities.coolDowns(player);
-            onCooldown = getThrowableIndex(stack)
-                    .map(index -> index.getData().getCooldownCategory())
-                    .map(coolDowns::isOnCooldown)
-                    .orElse(false);
-        }
+        // 两端都查各自那张表（服务端 SERVER_COOL_DOWNS / 客户端 CLIENT_COOL_DOWNS，
+        // 由 ModCapabilities#coolDowns 按端选）。判定依据与偏差方向见方法注释。
+        CustomItemCoolDowns coolDowns = ModCapabilities.coolDowns(player);
+        boolean onCooldown = getThrowableIndex(stack)
+                .map(index -> index.getData().getCooldownCategory())
+                .map(coolDowns::isOnCooldown)
+                .orElse(false);
         if (!onCooldown) {
             player.startUsingItem(hand);
         }

@@ -4,6 +4,8 @@ import me.xjqsh.lrtactical.client.audio.DeafenState;
 import me.xjqsh.lrtactical.client.event.LrTickAnimationEvent;
 import me.xjqsh.lrtactical.client.init.ModEntitiesRender;
 import me.xjqsh.lrtactical.client.input.MeleeAttackKeys;
+import me.xjqsh.lrtactical.client.input.StuckUseRecovery;
+import me.xjqsh.lrtactical.client.input.UsePressGate;
 import me.xjqsh.lrtactical.init.ModCapabilities;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -95,6 +97,11 @@ public final class LrClientEvents {
         Minecraft mc = Minecraft.getInstance();
         LrTickAnimationEvent.tickAnimation(mc);
         DeafenState.tick(mc);
+        // 一次按压只消耗一次使用：必须在本 tick 末尾采样，
+        // 才能在「使用结束」的那一次 tick 内看到下降沿（见 UsePressGate 类注释）。
+        UsePressGate.onClientTick(mc);
+        // 分叉兜底：客户端若陷进服务端不存在的使用状态，自动停止（见类注释）。
+        StuckUseRecovery.onClientTick(mc);
         // 客户端玩家换代检测（小退/重进清客户端冷却表，见 ModCapabilities 注释）
         ModCapabilities.onClientPlayerTick(mc.player);
     }
