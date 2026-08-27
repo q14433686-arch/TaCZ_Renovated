@@ -121,6 +121,7 @@
 10. LRTactical：单机与专服分别验证 tooltip/HUD、投掷/近战/消耗品、烟雾/闪光、
     index 同步、实体 tracking、分类冷却及至少一个 LR 内容包。
 11. Punchy! 2.7d：普通工具动画仍由 Punchy 控制；枪/刀/手雷无第二套手臂、无
-    walk/sprint/camera-lag 叠层，右手贴在枪上；收起后恢复。
+    walk/sprint/camera-lag 叠层，右手贴在枪上；收起后恢复。另测开镜灵敏度与无
+    Punchy 时同量级。光影目镜裁切不在本轮修复范围内。
 
 完成上述测试前，只能写“API/坐标已核”，不能写“兼容 PASS”。
