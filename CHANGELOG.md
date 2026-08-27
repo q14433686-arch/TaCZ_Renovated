@@ -51,7 +51,10 @@
 - `docs/publish/RELEASE.md` 改为覆盖 26.2、26.1.2、1.21.11 的内部更新规范，明确
   活文档 → Release notes → 平台 Changelog 的同步顺序及“测试结论不得跨分支继承”。
 
-## 1.1.8+neoforge.26.1.2.R1.hotfix — 2026-08-27
+## 1.1.8+neoforge.26.1.2.R1-hotfix — 2026-08-27
+
+> 版本号写法自 `R1.hotfix` 统一为 `R1-hotfix`（连字符风格，与 refab 来源分支的
+> `R2-hotfix2` 一致；`-` 位于 `+` 之后的 build metadata 内部，不构成 pre-release）。
 
 R1 后从 26.2 分支回传的修复与功能跟进（Iris 高倍镜裁剪 / ADS bob-scale 尝试
 已在 26.2 上游实证失败后回退，本版本不含）。
