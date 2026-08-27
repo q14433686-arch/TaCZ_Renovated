@@ -3,7 +3,7 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 1.1.8+neoforge.1.21.11.R1-hotfix2 — 2026-08-27
+## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-08-27
 
 ### 长按右键的「幽灵使用」与耳鸣资源（同步姊妹项目 2026-08-27 跟进）
 
@@ -31,8 +31,6 @@
 - 新增 `scripts/verify_lr_assets.py` / `scripts/gen_effect_icons.py`，
   可用 `python3 scripts/verify_lr_assets.py --strict` 自检资源。
 - **未实机**：本环境无 JDK/MC，上述均为源码级闭环，须按共用核心 §6 实机清单回归。
-
-## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-08-27
 
 ### 兼容性与修复（同步 26.2 最新提交）
 

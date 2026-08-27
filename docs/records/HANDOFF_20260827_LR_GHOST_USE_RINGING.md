@@ -56,8 +56,8 @@ python3 scripts/verify_lr_assets.py --strict   # sounds.json 结构 / ogg / 效�
 bash scripts/check_release_consistency.sh --strict   # 版本号三处 README + CHANGELOG（通过）
 ```
 
-版本号已按约定升到 `1.1.8+neoforge.1.21.11.R1-hotfix2`（hotfix 序号直接接 `hotfix`，
-不放 `.`/`-`/`_`），并同步 README 4 处与 CHANGELOG。
+版本号沿用 `1.1.8+neoforge.1.21.11.R1-hotfix`（产物文件名
+`tacz-1.1.8+neoforge.1.21.11.R1-hotfix.jar`），并同步 README 4 处与 CHANGELOG。
 
 ## 未实机的边界（如实记录）
 
