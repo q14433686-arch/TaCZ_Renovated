@@ -4,6 +4,8 @@ import me.xjqsh.lrtactical.client.audio.DeafenState;
 import me.xjqsh.lrtactical.client.event.LrTickAnimationEvent;
 import me.xjqsh.lrtactical.client.init.ModEntitiesRender;
 import me.xjqsh.lrtactical.client.input.MeleeAttackKeys;
+import me.xjqsh.lrtactical.client.input.StuckUseRecovery;
+import me.xjqsh.lrtactical.client.input.UsePressGate;
 import me.xjqsh.lrtactical.init.ModCapabilities;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -95,6 +97,8 @@ public final class LrClientEvents {
         Minecraft mc = Minecraft.getInstance();
         LrTickAnimationEvent.tickAnimation(mc);
         DeafenState.tick(mc);
+        UsePressGate.onClientTick(mc);
+        StuckUseRecovery.onClientTick(mc);
         // 客户端玩家换代检测（小退/重进清客户端冷却表，见 ModCapabilities 注释）
         ModCapabilities.onClientPlayerTick(mc.player);
     }

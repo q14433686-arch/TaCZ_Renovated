@@ -1,8 +1,8 @@
 # 移植状态
 
 目标版本：Minecraft **26.2** + NeoForge **26.2.0.64**（release）。
-当前源码版本：**1.1.8+neoforge.26.2.R1**。
-状态：**未发布 R1 候选；LRTactical 已前滚，当前 LR-integrated HEAD 待 JDK 25 构建与全矩阵复测。**
+当前源码版本：**1.1.8+neoforge.26.2.R1-hotfix**。
+状态：**未发布 R1-hotfix 候选；LRTactical 已前滚，当前 LR-integrated HEAD 待 JDK 25 构建与全矩阵复测。**
 
 > 最后更新：2026-08-22。本文只记录诚实状态；README 不作为逐包进度日志。
 

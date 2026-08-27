@@ -7,7 +7,7 @@
 
 > **非官方移植。请勿向 MCModderAnchor / Serene Wave Studio 报告本移植的问题。**
 >
-> 当前源码版本：**`1.1.8+neoforge.26.2.R1`**；状态：**R1 已发布**（2026-08-22，
+> 当前源码版本：**`1.1.8+neoforge.26.2.R1-hotfix`**；状态：**R1-hotfix 候选**（基于 2026-08-22 已发布的 R1，
 > [GitHub Release `26.2_R1`](https://github.com/q14433686-arch/TaCZ-Renovated/releases/tag/26.2_R1) /
 > [CurseForge 1663324](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-renovated)）
 
@@ -21,7 +21,7 @@
 | Minecraft | **26.2** |
 | NeoForge | **26.2.0.64** release |
 | Java | **25** |
-| 本 Mod | **1.1.8+neoforge.26.2.R1** |
+| 本 Mod | **1.1.8+neoforge.26.2.R1-hotfix** |
 | Gradle / ModDevGradle | 9.2.1 / 2.0.144 |
 | 专用服务器与基础多人 | 暂无bug |
 | LRTactical 内置层 | 已前滚；26.1.2/26.2 源基线单机/专服测试pass  |
@@ -55,7 +55,7 @@ L0-L3、L2.5 与 LR 专项；26.1.2 的 LR PASS 只作为源基线证据。
 ## 3. 安装
 
 1. 安装 Minecraft 26.2、NeoForge 26.2.0.64 与 Java 25。
-2. 将构建产物 `tacz-1.1.8+neoforge.26.2.R1.jar` 放入实例 `mods/`。
+2. 将构建产物 `tacz-1.1.8+neoforge.26.2.R1-hotfix.jar` 放入实例 `mods/`。
 3. 客户端若使用 Vulkan，将 `config/fml.toml` 中的 `earlyWindowControl` 改为 `false`。
 4. 服务端搭建与完整 L0-L4 流程见
    [`docs/DEDICATED_SERVER_TEST.md`](docs/DEDICATED_SERVER_TEST.md)。
