@@ -31,12 +31,17 @@
   也没有引用任何 `com.tacz.guns.client.render.*` 类
   （`import com.tacz.*` 全量清单里没有 render/scope 包）。
 
-**但这不等于它与症状无关。** 它自己不会关掉裁剪，可是它进入 mod 列表会改变
-mixin config 的应用顺序，而本仓的镜内裁剪在那个顺序上是**脆的**（§3）。
-所以「装上它才坏、卸掉又好」是真实的因果链，只是链条不经过它的代码。
+**它与症状的关系目前无法定论。** 本文先后写过两种说法，都不成立：
 
-> 本文先前一版曾写成「tacztweaks 是相关不是因果、真正开关只是光影本身」——
-> 那句是错的，已按 §3 的取证更正。
+1. 先前一版：「是相关不是因果，真正开关只是光影本身」——**错**，因为本仓裁剪
+   确实存在对 mixin 注册顺序的依赖（§3），不是纯光影问题；
+2. 中途一版：「它进入 mod 列表会改变 mixin config 应用顺序」——**同样未被证实**。
+   §7 的日志证据显示，在**不含 tacztweaks** 的那次会话里，tacz 的 mixin config
+   就已经排在 Iris 之前（即坏的顺序）。坏顺序并不需要 tacztweaks 才出现。
+
+现状：坏的顺序在**没有** tacztweaks 时已存在（§7 日志）。要定论 tacztweaks 的作用，
+需要同一光影设置下装 / 不装两次的完整 `latest.log` 做 A/B。在此之前本文只主张
+「本仓裁剪对 mixin 注册顺序有依赖，这个依赖是真实缺陷且已消除」，不主张 tacztweaks 的因果角色。
 
 ## 3. 病灶 A（主因）：draw 时的 uniform / 采样器状态被 Iris 覆盖，且修复依赖 mixin 顺序
 
@@ -79,13 +84,17 @@ private void iris$clearState(CallbackInfo ci) {
 没有人再把 mode 写回去 —— 镜身（mode 1）与准星（mode 2）**一起**失效，
 正是「开光影开镜，镜内裁切直接失效，低倍镜准星也不再被限制在目镜内」。
 
-**两个 RETURN 处理器的先后由 mixin config 的应用顺序决定，而它随已安装 mod 集合变化。**
-这就是「装了 tacztweaks 才坏、卸掉又好」的合理机制 —— tacztweaks 自己没有一行渲染代码
-（§2），但它进入 mod 列表后足以改变这个顺序。
+**两个 RETURN 处理器的先后由 mixin config 的注册顺序决定。**
+`latest.log` 给出了这台机器上的实际顺序：tacz 的 `tacz.iris.mixins.json` 在
+`19:28:19.083` 注册，Iris 的三个 mixin config 在 `19:28:19.094` 注册 ——
+**tacz 先、Iris 后，即坏的那一行**（完整引文见 §7）。
 
-> 无法从日志证明用户那次会话落在哪一种顺序：`Iris scope-mask bridge active (mode=1…)`
-> 只说明我们**写过** mode=1，不能说明它有没有随后被写回 0。所以修法是
-> **让它与顺序无关**，而不是去赌顺序。
+注意：那次会话的 mod 列表里**没有 tacztweaks**，所以坏顺序与它无关。
+tacztweaks 的因果角色见 §2，目前未定论。
+
+> `Iris scope-mask bridge active (mode=1…)` 这行日志只说明我们**写过** mode=1，
+> 不能说明它有没有随后被写回 0 —— 所以顺序结论靠的是上面的 config 注册时间戳，
+> 不是这行。修法也据此定为**让它与顺序无关**，而不是去赌顺序。
 
 ### 顺带修掉的一处真实错误
 
@@ -239,16 +248,21 @@ NDC.y = P11 * y / -z = P11 * slopeY      slopeY = y / -z
 §3 那个「两个 `trySetup` RETURN 处理器争先后」的缺陷**不是本分支独有的**。
 对 `q14433686-arch` 三个仓库共 17 条分支逐条查了暴露面与内容：
 
-### 有同一缺陷（6 条，待修）
+### 带同一潜在脆弱性（6 条）—— 注意：**不等于都会发作**
 
-| 仓库 | 分支 | P1 只有 RETURN 注入 | P2 盲写 `resetShaderProgram` | P3 跨程序写 location |
-|---|---|---|---|---|
-| `TaCZ_Renovated` | `26.2` | ✅ | ✅ | ✅ |
-| `TaCZ_Renovated` | `arena/01a044db-tacz-renovated` | ✅ | ✅ | ✅ |
-| `TaCZ_Refabricated_Unofficial` | `26.2(main)` | ✅ | ✅ | ✅ |
-| `TaCZ_Refabricated_Unofficial` | `arena/01a00a58-…` | ✅ | ✅ | ✅ |
-| `TaCZ_Refabricated_Unofficial` | `arena/01a00da4-…` | ✅ | ✅ | ✅ |
-| `TaCZ_Refabricated_Unofficial` | `arena/01a0147a-…` | ✅ | ✅ | ✅ |
+> **本节先前一版把这 6 条一律标成「有同一缺陷（待修）」，那个措辞是错的。**
+> 代码相同只说明**脆弱性相同**；是否发作取决于 mixin config 的注册顺序，
+> 而这是随 loader / mod 集合变化的。用户实测 refab `26.2(main)` **不发作**，
+> 与本节判据不冲突，但本节的措辞把「潜在」写成了「已发生」。已更正。
+
+| 仓库 | 分支 | P1 只有 RETURN 注入 | P2 盲写 `resetShaderProgram` | P3 跨程序写 location | 实测是否发作 |
+|---|---|---|---|---|---|
+| `TaCZ_Renovated` | `26.2` | ✅ | ✅ | ✅ | 用户报**发作** |
+| `TaCZ_Renovated` | `arena/01a044db-tacz-renovated` | ✅ | ✅ | ✅ | 同上（代码相同） |
+| `TaCZ_Refabricated_Unofficial` | `26.2(main)` | ✅ | ✅ | ✅ | 用户报**不发作** |
+| `TaCZ_Refabricated_Unofficial` | `arena/01a00a58-…` | ✅ | ✅ | ✅ | 未测 |
+| `TaCZ_Refabricated_Unofficial` | `arena/01a00da4-…` | ✅ | ✅ | ✅ | 未测 |
+| `TaCZ_Refabricated_Unofficial` | `arena/01a0147a-…` | ✅ | ✅ | ✅ | 未测 |
 
 判据（三条，任一成立即命中）：
 
@@ -262,10 +276,52 @@ NDC.y = P11 * y / -z = P11 * slopeY      slopeY = y / -z
 
 `origin/26.2` 与 `origin/arena/01a044db-tacz-renovated` 的这三个文件与
 **修复前的本分支逐字节相同**（`git diff --stat` 对 `855989c` 为空）。
-refab 四条的 P1/P2 也与本分支修复前一致，只是行号不同。
 
-> 注意：refab 是 Fabric 侧，Iris 是同一份代码，`MixinGlCommandEncoder` 的
-> `trySetup` RETURN 注入同样存在，所以这 4 条的暴露面与 NeoForge 侧完全相同。
+refab `26.2(main)` 与本分支修复前（`855989c`）的逐文件 diff：
+
+| 文件 | diff 行数 |
+|---|---|
+| `IrisGlCommandEncoderMixin.java` | **0（逐字节相同）** |
+| `IrisExtendedShaderMixin.java` | **0（逐字节相同）** |
+| `IrisScopeMaskState.java` | 186 —— 差异**全部**是 refab 多出的反射结果缓存（`cachedPassClass` / `cachedPipelineField` / 管线→mode 记忆），语义等价，与顺序无关 |
+
+所以「脆弱性相同」是硬的；**「发作与否」不是**。
+
+### 为什么 refab 不发作 —— 注册顺序的直接证据
+
+`latest.log`（用户实机，`iris-neoforge-1.11.2+mc26.2.jar`）：
+
+```
+19:28:19.083  [com.tacz.guns.GunMod] [TACZ Scope] Iris compat mixin config loaded: package=com.tacz.guns.mixin.client.iris, irisLoaded=true
+19:28:19.094  [mixin] Reference map 'iris.refmap.json' for mixins.iris.json could not be read
+19:28:19.094  [mixin] Reference map 'iris.refmap.json' for mixins.iris.vertexformat.json ...
+19:28:19.094  [mixin] Reference map 'iris.refmap.json' for mixins.iris.compat.sodium.json ...
+```
+
+tacz 的 `tacz.iris.mixins.json` 比 Iris 的三个 mixin config **早 11 ms 注册**。
+Mixin 在同一注入点上按 config 注册顺序挂处理器，所以在这台机器上
+`trySetup` RETURN 的处理器顺序是 **tacz 先、Iris 后** —— 正是 §3 表里那一行坏的顺序。
+
+这也说明**坏的顺序与 tacztweaks 无关**（这次会话的 mod 列表里没有它）。
+先前「装 tacztweaks 才改变顺序」的说法在这条日志面前不成立，已撤回；
+tacztweaks 更可能只是让用户换了次启动、或改变了别的时序，需要 A/B 日志才能定论。
+
+### 未取证的部分（不要当成结论）
+
+- **没有 Fabric 侧的启动日志**，所以无法说明 refab 为什么落在好的那一行：
+  可能是 Fabric Loader 的 mixin config 注册顺序把 iris 排在 tacz 之前，
+  也可能 Fabric 版 Iris 的构建与 `26.2` tip 有差异。两者都没查。
+- 因此 refab 那 4 条应描述为**「带同一潜在脆弱性、当前未观察到发作」**，
+  对它们的改动属于**加固**（消除对顺序的依赖），不是修一个正在发生的 bug。
+
+### 版本核对（本轮补做）
+
+`8f3a7a35d780fe80c8cd3c8517f3fa3c4df3f18a` 经 `compare` 确认**就是
+`IrisShaders/Iris` 分支 `26.2` 的 tip**（status `identical`，ahead/behind 均 0），
+Iris 现多 loader 同仓构建，用户跑的 `iris-neoforge-1.11.2+mc26.2` 出自该树。
+`26.2` 分支上 `MixinGlCommandEncoder`（blob `a919d34`）共 3 个注入：
+`trySetup @ HEAD`、`trySetup @ RETURN`、`submitRenderPass @ HEAD` ——
+与 §3 引用的 RETURN 注入一致。
 
 ### 无暴露面（10 条，不需要动）
 
