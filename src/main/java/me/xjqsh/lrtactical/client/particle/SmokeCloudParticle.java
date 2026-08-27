@@ -6,12 +6,15 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.LightLayer;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 烟雾弹的烟雾粒子 —— 大体积、不受重力、无碰撞、全亮度。
+ * 烟雾弹的烟雾粒子 —— 大体积、不受重力、无碰撞，按环境光采样（最低 2）。
  *
  * <h2>26.2 移植要点：粒子系统整体重组（均字节码确认）</h2>
  * <table border="1">
@@ -63,19 +66,35 @@ public class SmokeCloudParticle extends SingleQuadParticle {
     }
 
     /**
-     * 全亮度：烟雾不该在暗处变黑，否则夜战时形同虚设。
-     *
-     * <p><b>26.2 改名</b>：上游覆写的是 {@code getLightColor(float)}，
-     * 但 26.2 的 {@code Particle} 上<b>只有 {@code getLightCoords(float)}</b>
-     * （字节码逐方法核对确认，全类无 {@code getLightColor}）。
-     * 返回值 15728880 = 0xF000F0，即天光/块光都拉满。
-     *
-     * <p>它在 {@code Particle} 上是 <b>protected</b>（字节码确认），
-     * 这里保持同样的可见性 —— 放宽成 public 虽然合法，但没有理由对外暴露。
+     * 官方 0.4.3：采环境光，天光/块光都至少为 2；两者都 ≤2 时再扫六个邻格取较大值。
+     * 旧移植写成全亮 0xF000F0，暗处烟幕会不自然地发光。
      */
     @Override
     protected int getLightColor(float partialTick) {
-        return 15728880;
+        BlockPos pos = BlockPos.containing(this.x, this.y, this.z);
+        int packed = packedLight(pos);
+        int sky = packed >> 20 & 15;
+        int block = packed >> 4 & 15;
+        if (sky <= 2) {
+            sky = 2;
+        }
+        if (block <= 2) {
+            block = 2;
+        }
+        if (sky <= 2 && block <= 2) {
+            for (Direction direction : Direction.values()) {
+                int neighbor = packedLight(pos.relative(direction));
+                sky = Math.max(sky, neighbor >> 20 & 15);
+                block = Math.max(block, neighbor >> 4 & 15);
+            }
+        }
+        return sky << 20 | block << 4;
+    }
+
+    private int packedLight(BlockPos pos) {
+        int block = this.level.getBrightness(LightLayer.BLOCK, pos);
+        int sky = this.level.getBrightness(LightLayer.SKY, pos);
+        return sky << 20 | block << 4;
     }
 
     @Override

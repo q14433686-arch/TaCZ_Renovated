@@ -4,13 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
 import com.tacz.guns.GunMod;
+import com.tacz.guns.client.resource.serialize.Vector3fSerializer;
+import me.xjqsh.lrtactical.client.resource.display.ConsumableDisplayInstance;
 import me.xjqsh.lrtactical.client.resource.display.MeleeDisplayInstance;
 import me.xjqsh.lrtactical.client.resource.display.ThrowableDisplayInstance;
+import me.xjqsh.lrtactical.client.resource.manager.ConsumableDisplayManager;
 import me.xjqsh.lrtactical.client.resource.manager.MeleeDisplayManager;
 import me.xjqsh.lrtactical.client.resource.manager.ThrowableDisplayManager;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,6 +78,7 @@ public enum LrClientAssetsManager {
             .registerTypeAdapter(Identifier.class,
                     (com.google.gson.JsonSerializer<Identifier>) (src, type, ctx) ->
                             new JsonPrimitive(src.toString()))
+            .registerTypeAdapter(Vector3f.class, new Vector3fSerializer())
             .create();
 
     /**
@@ -105,6 +110,8 @@ public enum LrClientAssetsManager {
     private ThrowableDisplayManager throwableDisplay;
     @Nullable
     private MeleeDisplayManager meleeDisplay;
+    @Nullable
+    private ConsumableDisplayManager consumableDisplay;
 
     /**
      * 建立并注册两个 display listener。
@@ -127,9 +134,11 @@ public enum LrClientAssetsManager {
         if (throwableDisplay == null) {
             throwableDisplay = new ThrowableDisplayManager(GSON);
             meleeDisplay = new MeleeDisplayManager(GSON);
+            consumableDisplay = new ConsumableDisplayManager(GSON);
         }
         register.accept(me.xjqsh.lrtactical.EquipmentMod.id("throwable_display"), throwableDisplay);
         register.accept(me.xjqsh.lrtactical.EquipmentMod.id("melee_display"), meleeDisplay);
+        register.accept(me.xjqsh.lrtactical.EquipmentMod.id("consumable_display"), consumableDisplay);
     }
 
     @Nullable
@@ -148,6 +157,34 @@ public enum LrClientAssetsManager {
         }
         MeleeDisplayInstance exact = meleeDisplay.getData(id);
         return exact != null ? exact : findUniqueMeleeDisplayByPath(id);
+    }
+
+    @Nullable
+    public ConsumableDisplayInstance getConsumableDisplay(Identifier id) {
+        if (consumableDisplay == null) {
+            return null;
+        }
+        ConsumableDisplayInstance exact = consumableDisplay.getData(id);
+        return exact != null ? exact : findUniqueConsumableDisplayByPath(id);
+    }
+
+    /** 消耗品 display 的 path-only 唯一匹配回退，规则同投掷物。 */
+    @Nullable
+    private ConsumableDisplayInstance findUniqueConsumableDisplayByPath(Identifier id) {
+        if (consumableDisplay == null) {
+            return null;
+        }
+        ConsumableDisplayInstance match = null;
+        for (var entry : consumableDisplay.getAllData().entrySet()) {
+            if (!entry.getKey().getPath().equals(id.getPath())) {
+                continue;
+            }
+            if (match != null) {
+                return null;
+            }
+            match = entry.getValue();
+        }
+        return match;
     }
 
     /**

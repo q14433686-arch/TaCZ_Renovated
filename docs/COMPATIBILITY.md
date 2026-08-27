@@ -23,6 +23,7 @@
 | REI | ✅ 可用 | 26.1.2 对应版 | 配方查看 |
 | Carry On | ✅ 可用 | — | 搬运枪械工作台等方块 |
 | FirstPerson Model | ✅ 可用 | — | 第一人称身体模型共存 |
+| Punchy! | ✅ 可用 | 2.7d | 可选 mixin 让出；持枪/近战/手雷时 Punchy 独立手臂与位移让出给 TACZ |
 | ImmediatelyFast | ✅ 无需适配 | — | 26.x 渲染架构下无需集成，装了也不冲突 |
 | Just Zoom | ❌ 不适配 | — | 无上游先例，项目决定不做原创适配 |
 | Zoomify | — | — | 26.1 线无 NeoForge 版，无从适配 |

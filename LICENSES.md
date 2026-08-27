@@ -36,3 +36,25 @@
 | `libs/luaj-jse-3.0.1.jar`（`org.luaj.vm2`） | 枪包 Lua 脚本（开火/换弹/动画状态机） | MIT（LuaJ） |
 | `libs/commons-math3-3.6.1.jar` | 后坐力样条插值（`GunRecoil`） | Apache-2.0 |
 | SimpleBedrockModel v1 | 基岩版几何渲染；本仓库以源码形式 vendored（`com.github.mcmodderanchor.simplebedrockmodel`） | GPL-3.0 ← [`MCModderAnchor/SimpleBedrockModel`](https://github.com/MCModderAnchor/SimpleBedrockModel) |
+
+## 可选 compile-only / 运行时兼容
+
+这些 Mod 不会被打进 TaCZ jar；玩家按需单独安装。版本、artifact 与验证状态见
+[`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)。
+
+| 组件 | 许可 |
+|---|---|
+| Cloth Config | LGPL-3.0 |
+| Player Animation Library | MIT |
+| Controllable | MIT |
+| Shoulder Surfing Reloaded | MIT |
+| JEI | MIT |
+| REI | MIT |
+| Architectury API | LGPL-3.0 |
+| Iris | LGPL-3.0 |
+| Carry On | LGPL-3.0 |
+| First-person Model | MIT |
+| Punchy! | ARR（不打包；仅可选 mixin 目标） |
+
+实际发布前仍需对最终解析到的 artifact 内许可文件做一次归档核对；本文不是对第三方许可
+条款的替代。
