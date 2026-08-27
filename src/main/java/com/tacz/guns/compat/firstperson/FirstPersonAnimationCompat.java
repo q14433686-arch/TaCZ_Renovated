@@ -37,6 +37,8 @@ public final class FirstPersonAnimationCompat {
     private static boolean fpmRegistrationAttempted;
     private static Object fpmActivationHandler;
     private static boolean neaInstalled;
+    private static boolean punchyInstalled;
+    private static boolean punchyLookupAttempted;
 
     private static boolean neaLookupAttempted;
     private static @Nullable Field neaInstanceField;
