@@ -4,6 +4,8 @@ import me.xjqsh.lrtactical.client.audio.DeafenState;
 import me.xjqsh.lrtactical.client.event.LrTickAnimationEvent;
 import me.xjqsh.lrtactical.client.init.ModEntitiesRender;
 import me.xjqsh.lrtactical.client.input.MeleeAttackKeys;
+import me.xjqsh.lrtactical.client.input.StuckUseRecovery;
+import me.xjqsh.lrtactical.client.input.UsePressGate;
 import me.xjqsh.lrtactical.init.ModCapabilities;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -97,6 +99,10 @@ public final class LrClientEvents {
         DeafenState.tick(mc);
         // 客户端玩家换代检测（小退/重进清客户端冷却表，见 ModCapabilities 注释）
         ModCapabilities.onClientPlayerTick(mc.player);
+        // 长按右键的「幽灵使用」门禁 + 分叉兜底（必须挂在 tick 末尾，
+        // 才能在「使用结束」同一次 tick 内采到下降沿 —— 见各自类注释的时序论证）。
+        UsePressGate.onClientTick(mc);
+        StuckUseRecovery.onClientTick(mc);
     }
 
     /** D-12 备注：tickAnimation 双重载，此处经显式类型形参消歧。 */
