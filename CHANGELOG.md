@@ -5,6 +5,37 @@
 
 ## Unreleased
 
+### 修复
+
+- **LR 长按右键的「幽灵使用」**：手雷 / 闪光弹 / 消耗品用完还没松手时，原版输入循环
+  会立刻再开一次使用（`Minecraft#startUseItem`），导致进度条空读一遍、姿势与进度
+  定格卡住。新增 `UsePressGate`（一次按压只消耗一次使用，右键抬起才解锁）+
+  `MinecraftUseRestartMixin`（`startUseItem` HEAD 取消），并新增 `StuckUseRecovery`
+  兜底：可预燃投掷物若陷进服务端不存在的使用状态，超过最长预燃 + 20 tick 余量后
+  本地 `stopUsingItem()` 自行恢复（不发包、不误触发投掷）。
+- **LR 冷却两端分叉**：`ThrowableItem#use` / `ConsumableItem#use` 改为两端都查各自的
+  冷却表（服务端 `SERVER_COOL_DOWNS` / 客户端 `CLIENT_COOL_DOWNS`），不再「客户端
+  一律乐观放行」——消除「服务端在冷却中、客户端却凭空起一轮使用」的状态分叉；
+  服务端仍是投掷/消耗的唯一权威。
+- **耳鸣消声注入点**：从 `SoundEngine#calculateVolume(SoundInstance)` 搬到
+  `AbstractSoundInstance#getVolume()`。26.x 引擎里 `play()` 不经过外层重载
+  （refab 对 26.2 字节码核对），旧注入点只压到「可 tick 音效」与改滑条重算的那批，
+  表现为「有时闷有时不闷」；新注入点覆盖新播放 / tick 更新 / 改滑条三条路径，
+  耳鸣声以 `instanceof` 豁免，不再依赖 `SoundSource` 类别（保持 `PLAYERS`）。
+
+### 资源
+
+- 新增 `assets/lrtactical/sounds.json`（顶层无 `_comment`，逐字节照抄 refab；顶层
+  注释键会让引擎整体反序列化失败，耳鸣声 `NOT_STARTED` 的根因）。
+- 新增 `sounds/stun_ringing.ogg`（28566 B）、`textures/mob_effect/deafened.png`（302 B）、
+  `textures/mob_effect/blinded.png`（188 B）—— 之前缺文件，效果图标显示为紫黑块、
+  耳鸣声无音源。
+- 新增 `scripts/verify_lr_assets.py`（`--strict` 校验 sounds.json 结构 / ogg / 效果图标）
+  与 `scripts/gen_effect_icons.py`（自绘 18×18 图标，不依赖 Pillow）。
+- `DeafenState#tick` 接住 `SoundManager#play` 的返回结果，非 `STARTED` 时 WARN 一次，
+  消息内列出三个已知坑（sounds.json 顶层坏键 / ogg 缺失 / 音量滑条为 0），
+  避免「耳鸣不响却无日志」的排查盲区。
+
 ### 品牌
 
 - 新增本仓库原创 `icon.png` / `logo.png`（青色四段瞄具环 + 铜色 R），并写入
@@ -20,7 +51,10 @@
 - `docs/publish/RELEASE.md` 改为覆盖 26.2、26.1.2、1.21.11 的内部更新规范，明确
   活文档 → Release notes → 平台 Changelog 的同步顺序及“测试结论不得跨分支继承”。
 
-## 1.1.8+neoforge.26.1.2.R1.hotfix — 2026-08-27
+## 1.1.8+neoforge.26.1.2.R1-hotfix — 2026-08-27
+
+> 版本号写法自 `R1.hotfix` 统一为 `R1-hotfix`（连字符风格，与 refab 来源分支的
+> `R2-hotfix2` 一致；`-` 位于 `+` 之后的 build metadata 内部，不构成 pre-release）。
 
 R1 后从 26.2 分支回传的修复与功能跟进（Iris 高倍镜裁剪 / ADS bob-scale 尝试
 已在 26.2 上游实证失败后回退，本版本不含）。

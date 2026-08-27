@@ -18,10 +18,11 @@ import net.minecraft.world.effect.MobEffectInstance;
  * 合在一起才是完整的「被震聋」：周围安静下来 + 耳朵里嗡嗡响。
  *
  * <h2>为什么必须豁免自身的消声</h2>
- * {@code SoundEngineMixin} 会压低所有非 UI 音效，而耳鸣声正是在
+ * {@code SoundInstanceVolumeMixin} 会压低所有非 UI 音效，而耳鸣声正是在
  * {@code DEAFENED} 生效期间播放的 —— 若不豁免，它会把自己也压到几乎听不见，
  * 变成「什么都听不到」而不是「耳朵在响」。
- * 豁免方式见 {@code DeafenState#isRingingSound}。
+ * 豁免方式见 {@code SoundInstanceVolumeMixin}（{@code instanceof StunRingingSound}，
+ * 与 {@code SoundSource} 类别无关 —— 本类保持 {@code PLAYERS} 不动）。
  *
  * <h2>26.2 移植要点</h2>
  * <ul>
