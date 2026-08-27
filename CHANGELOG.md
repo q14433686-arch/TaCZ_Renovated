@@ -3,6 +3,35 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 1.1.8+neoforge.1.21.11.R1-hotfix2 — 2026-08-27
+
+### 长按右键的「幽灵使用」与耳鸣资源（同步姊妹项目 2026-08-27 跟进）
+
+- **长按右键不松手时进度条再读一次 / 姿势定格**：根因是原版输入循环在「使用结束」后
+  的下一 tick 自动重新 `startUseItem`（对原版食物是特性，对 LR 有使用时长的物品是 bug）。
+  新增 `UsePressGate` + `MinecraftUseRestartMixin`：一次按压只消耗一次使用，
+  仅在「右键仍按着、刚用完的是 LR 物品、手里还是同一件物品」三个条件同时成立时
+  拦下自动重开；松手即解锁，不影响连点投掷。纯客户端、无反射。
+- **`use()` 两端都查冷却**：`ThrowableItem#use` / `ConsumableItem#use` 不再只查服务端，
+  改用 `ModCapabilities#coolDowns` 按端返回的 `SERVER_COOL_DOWNS` / `CLIENT_COOL_DOWNS`
+  两端各查一次，修掉「服务端在冷却、客户端却 startUsingItem → 读了个空条」的分叉。
+  服务端仍是唯一权威（真正投出仍由 `releaseUsing` 服务端判定）。
+- **`StuckUseRecovery` 兜底**：客户端若陷进服务端不存在的使用状态，越过
+  「最长预燃 + 20 tick 延迟余量」就本地 `stopUsingItem()`（不是 `releaseUsingItem()`，
+  那会真的把手雷扔出去）。只处理可预燃且 `life_time > 0` 的投掷物。
+- **耳鸣声资源补齐**（此前三条 NeoForge 线全缺、效果图标为紫黑块）：
+  - 新建 `assets/lrtactical/sounds.json`（顶层无反序列化注解键），
+    音源 `sounds/stun_ringing.ogg`、效果图标 `textures/mob_effect/deafened.png` /
+    `blinded.png`；
+  - `DeafenState#tick` 接住 `SoundManager#play` 的 `PlayResult`，非 `STARTED` 时
+    WARN 一次并把三个已知坑写进消息，避免「耳鸣声听不见但日志一无所有」。
+- 本线**未改**耳鸣消声注入点（`SoundEngineMixin` 仍注入
+  `SoundEngine#calculateVolume(SoundInstance)`）：用户实测 1.21.11 消声生效，
+  与 26.x 的引擎行为不同，不应照搬 `AbstractSoundInstance#getVolume()` 改动。
+- 新增 `scripts/verify_lr_assets.py` / `scripts/gen_effect_icons.py`，
+  可用 `python3 scripts/verify_lr_assets.py --strict` 自检资源。
+- **未实机**：本环境无 JDK/MC，上述均为源码级闭环，须按共用核心 §6 实机清单回归。
+
 ## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-08-27
 
 ### 兼容性与修复（同步 26.2 最新提交）
