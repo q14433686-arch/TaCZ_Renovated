@@ -297,7 +297,7 @@ public final class ScopeMaskRenderer {
                                 // baked into their pose. Do not multiply the phase-boundary ModelView again here:
                                 // under Iris that matrix can represent a stale/world-facing hand state, which pins
                                 // the mask to north. Using identity makes the mask pass consume the exact clip-space
-                                basis captured when the scope geometry was submitted.
+                                // basis captured when the scope geometry was submitted.
                                 new Matrix4f(),
                                 // R = 1：被目镜盖到的像素，红通道恒为 1（掩码本体）。
                                 // G = 开镜进度：镜身/准星 shader 用它做屏幕空间的渐进收缩。
