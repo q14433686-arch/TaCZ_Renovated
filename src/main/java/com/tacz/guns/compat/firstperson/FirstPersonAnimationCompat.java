@@ -51,6 +51,7 @@ public final class FirstPersonAnimationCompat {
             registerFirstPersonModelHandler();
         }
         neaInstalled = ModList.get().isLoaded(NOT_ENOUGH_ANIMATIONS);
+        punchyLookupAttempted = true;
         punchyInstalled = ModList.get().isLoaded("punchy");
         if (punchyInstalled) {
             GunMod.LOGGER.info("Punchy detected; TACZ viewmodels use the blacklist/yield mixins");
@@ -58,7 +59,8 @@ public final class FirstPersonAnimationCompat {
     }
 
     public static boolean isPunchyLoaded() {
-        if (!punchyInstalled) {
+        if (!punchyLookupAttempted) {
+            punchyLookupAttempted = true;
             punchyInstalled = ModList.get().isLoaded("punchy");
         }
         return punchyInstalled;
