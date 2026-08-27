@@ -6,6 +6,8 @@
   "plugin": "com.tacz.guns.mixin.compat.punchy.PunchyCompatMixinPlugin",
   "client": [
     "PunchyArmRendererMixin",
+    "PunchyCameraAnimationStateMixin",
+    "PunchyConfigMixin",
     "PunchyHandEquipStateMachineMixin",
     "PunchyHandRenderBobContextMixin",
     "PunchyMovementStateMachineMixin"

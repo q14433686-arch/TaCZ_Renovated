@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.attachment.AttachmentType;
@@ -54,7 +55,13 @@ public class MouseHandlerMixin {
             }
         }
         Minecraft minecraft = Minecraft.getInstance();
-        float progress = IGunOperator.fromLivingEntity(player).getSynAimingProgress();
+        float progress;
+        if (player.equals(minecraft.player)) {
+            float partialTicks = minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true);
+            progress = IClientPlayerGunOperator.fromLocalPlayer(player).getClientAimingProgress(partialTicks);
+        } else {
+            progress = IGunOperator.fromLivingEntity(player).getSynAimingProgress();
+        }
         // 开镜灵敏度系数
         double sensitivityMultiplier = ZoomConfig.ZOOM_SENSITIVITY_BASE_MULTIPLIER.get();
         sensitivityMultiplier = 1 + (sensitivityMultiplier - 1) * progress;
