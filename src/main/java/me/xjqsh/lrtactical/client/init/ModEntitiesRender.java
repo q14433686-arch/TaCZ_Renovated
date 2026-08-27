@@ -30,9 +30,9 @@ import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 /**
  * LR 客户端注册面（WP-LR2：refab 的显式调用链 → NeoForge 事件形态）。
  *
- * <p>各方法由 tacz 的 {@code ClientSetupEvent} 对应事件处理器转调
- * （LR2-4 接线）；{@link #registerItemRenderers()} 必须在
- * {@code FMLClientSetupEvent.enqueueWork} 之后调用——r29 教训：
+ * <p>各事件方法由 {@code LrClientEvents} 转调；{@link #registerItemRenderers()} 则由
+ * tacz 的 {@code GunModClient} 在 {@code FMLClientSetupEvent.enqueueWork} 中调用——
+ * 26.1.2 LR2 的注册时序教训：
  * 构造期调用时 DeferredRegister 字段尚未填充，注册静默跳过。
  */
 public final class ModEntitiesRender {
@@ -84,6 +84,7 @@ public final class ModEntitiesRender {
     public static void registerItemRenderers() {
         register(ModItems.MELEE.get());
         register(ModItems.THROWABLE.get());
+        register(ModItems.CONSUMABLE.get());
     }
 
     private static void register(Item item) {

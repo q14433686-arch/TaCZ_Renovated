@@ -39,6 +39,9 @@ config="tacz.iris.mixins.json"
 config="tacz.carryon.mixins.json"
 
 [[mixins]]
+config="tacz.punchy.mixins.json"
+
+[[mixins]]
 config="lrtactical.mixins.json"
 
 [[accessTransformers]]
@@ -60,6 +63,13 @@ file="META-INF/accesstransformer.cfg"
 
 [[dependencies.${mod_id}]]
     modId="iris"
+    type="optional"
+    versionRange="*"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="punchy"
     type="optional"
     versionRange="*"
     ordering="NONE"
