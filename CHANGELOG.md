@@ -3,7 +3,7 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
-## Unreleased — 1.1.8+neoforge.26.2.R1
+## Unreleased — 1.1.8+neoforge.26.2.R1-hotfix
 
 ### 目标环境
 
@@ -21,6 +21,8 @@
   禁止再创作），决策快照见 `docs/records/BRANDING.md`。
 
 ### 修复
+
+- 修复 LRTactical 长按使用状态分叉，并补齐耳鸣音效与药效图标资源。
 
 - 修复 26.2 首次生产编译暴露的 FOV event、HUD tick、AvatarRenderer descriptor 与三个
   transformed member AT 问题。

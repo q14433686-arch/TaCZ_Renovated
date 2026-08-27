@@ -1,7 +1,7 @@
 # 26.2 开发指南
 
 目标：Minecraft 26.2 + NeoForge 26.2.0.64 + Java 25。当前版本：
-`1.1.8+neoforge.26.2.R1`。
+`1.1.8+neoforge.26.2.R1-hotfix`。
 
 ## 1. 工具链
 
@@ -88,7 +88,7 @@ ScopeMaskDebug=true
 `mod_version` 使用：
 
 ```properties
-mod_version=1.1.8+neoforge.26.2.R1
+mod_version=1.1.8+neoforge.26.2.R1-hotfix
 ```
 
 `+` 是 build metadata；禁止改成 `-neoforge`。改版本后必须运行：

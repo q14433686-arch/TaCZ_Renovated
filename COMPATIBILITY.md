@@ -1,6 +1,6 @@
 # TaCZ: Renovated 26.2 兼容矩阵
 
-适用构建：`1.1.8+neoforge.26.2.R1`
+适用构建：`1.1.8+neoforge.26.2.R1-hotfix`
 
 游戏 / 加载器：Minecraft 26.2 / NeoForge 26.2.0.64  
 核验日期：2026-08-22
