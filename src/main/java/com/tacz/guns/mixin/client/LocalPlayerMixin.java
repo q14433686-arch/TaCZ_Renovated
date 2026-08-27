@@ -102,12 +102,6 @@ public abstract class LocalPlayerMixin implements IClientPlayerGunOperator {
         return tac$shoot.getClientShootCoolDown();
     }
 
-    @WrapOperation(method = "turn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;turn(DD)V"), require = 0)
-    private void tacz$adsSensitivityFromPunchyLook(LocalPlayer player, double yaw, double pitch, Operation<Void> original) {
-        // Punchy may call turn() from its own mouse path, skipping MouseHandlerMixin.
-        AdsMouseSensitivity.turn(player, yaw, pitch, original);
-    }
-
     @Inject(method = "tick", at = @At("HEAD"))
     public void onTickClientSide(CallbackInfo ci) {
         LocalPlayer player = (LocalPlayer) (Object) this;
