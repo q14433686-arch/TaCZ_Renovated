@@ -7,8 +7,7 @@
   "client": [
     "IrisShaderCreatorMixin",
     "IrisGlCommandEncoderMixin",
-    "IrisExtendedShaderMixin",
-    "IrisHandRendererMixin"
+    "IrisExtendedShaderMixin"
   ],
   "injectors": {
     "defaultRequire": 0

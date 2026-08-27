@@ -163,6 +163,19 @@ public final class ScopeMaskRenderer {
      */
     private static boolean inHandPass = false;
 
+    /**
+     * 本帧掩码 target 里是否真有一张画好的掩码。
+     *
+     * <p>{@link ScopeMaskGeometry} 在 {@link #renderAtPhaseBoundary()} 的 finally 里
+     * 被无条件清空，所以合成/Uniform 判定阶段没法再靠「清单空不空」判断本帧有没有掩码。</p>
+     */
+    private static boolean maskDrawnThisFrame = false;
+
+    /**
+     * 上一帧的 {@link #maskDrawnThisFrame} 快照。
+     */
+    private static boolean maskDrawnLastFrame = false;
+
     private ScopeMaskRenderer() {
     }
 
@@ -177,6 +190,24 @@ public final class ScopeMaskRenderer {
 
     public static boolean isInHandPass() {
         return inHandPass || IrisCompat.isHandRendererActive();
+    }
+
+    /**
+     * 每帧开头调用一次，快照上一帧结果并把本帧归零。
+     */
+    public static void beginFrame() {
+        maskDrawnLastFrame = maskDrawnThisFrame;
+        maskDrawnThisFrame = false;
+    }
+
+    /** 本帧掩码是否已成功画进 target。 */
+    public static boolean hasMaskThisFrame() {
+        return maskDrawnThisFrame;
+    }
+
+    /** 上一帧是否画出过掩码。 */
+    public static boolean hadMaskLastFrame() {
+        return maskDrawnLastFrame;
     }
 
     /**
@@ -239,74 +270,93 @@ public final class ScopeMaskRenderer {
         }
         try (mesh) {
             MeshData.DrawState draw = mesh.drawState();
-            GpuBuffer vertexBuffer = null;
-            try {
-                vertexBuffer = RenderSystem.getDevice().createBuffer(
-                        () -> "tacz_scope_mask_vertices",
-                        GpuBuffer.USAGE_VERTEX,
-                        mesh.vertexBuffer());
+            GpuBuffer vertexBuffer = acquireVertexBuffer(mesh.vertexBuffer());
 
-                // 共享的四边形索引缓冲：把 QUADS 展开成三角形。
-                // 用 vanilla 现成的，不必自己生成索引。
-                RenderSystem.AutoStorageIndexBuffer indices =
-                        RenderSystem.getSequentialBuffer(draw.primitiveTopology());
-                GpuBuffer indexBuffer = indices.getBuffer(draw.indexCount());
+            // 共享的四边形索引缓冲：把 QUADS 展开成三角形。
+            // 用 vanilla 现成的，不必自己生成索引。
+            RenderSystem.AutoStorageIndexBuffer indices =
+                    RenderSystem.getSequentialBuffer(draw.primitiveTopology());
+            GpuBuffer indexBuffer = indices.getBuffer(draw.indexCount());
 
-                CommandEncoder encoder = RenderSystem.getDevice().createCommandEncoder();
-                try (RenderPass pass = encoder.createRenderPass(
-                        () -> "tacz_scope_mask",
-                        target.getColorTextureView(),
-                        // 每帧从全黑重来。掩码是「当帧目镜盖到哪」，没有历史含义。
-                        Optional.of(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f)))) {
-                    pass.setPipeline(MASK_PIPELINE);
-                    // 这两句缺一不可，是照 PreparedRenderType#drawFromBuffer 抄的：
-                    //   bindDefaultUniforms 提供 Projection / Fog 等全局 uniform；
-                    //   DynamicTransforms 提供 ModelViewMat 与 ColorModulator。
-                    // 少任何一句，shader 都会因为 uniform 缺失而画不出正确结果
-                    // （症状类似 r46 的 "Unable to find shader defined uniform"）。
-                    RenderSystem.bindDefaultUniforms(pass);
-                    pass.setUniform("DynamicTransforms",
-                            RenderSystem.getDynamicUniforms().writeTransform(
-                                    // ScopeMaskGeometry entries are captured with the submit-time ModelView already
-                                    // baked into their pose. Do not multiply the phase-boundary ModelView again here:
-                                    // under Iris that matrix can represent a stale/world-facing hand state, which pins
-                                    // the mask to north. Using identity makes the mask pass consume the exact clip-space
-                                    // basis captured when the scope geometry was submitted.
-                                    new Matrix4f(),
-                                    // R = 1：被目镜盖到的像素，红通道恒为 1（掩码本体）。
-                                    // G = 开镜进度：镜身/准星 shader 用它做屏幕空间的渐进收缩。
-                                    //
-                                    // 为什么把进度塞进颜色通道而不是新加一个 uniform：
-                                    // 掩码管线本就要写 ColorModulator，绿通道是现成的空闲载体；
-                                    // 新增 uniform 意味着再改一次 bind group layout，
-                                    // 而那正是 r46/r52 两次崩溃的来源。能不动就不动。
-                                    new Vector4f(1.0f, currentAimingProgress(), 1.0f, 1.0f)));
-                    pass.setVertexBuffer(0, vertexBuffer.slice());
-                    pass.setIndexBuffer(indexBuffer, indices.type());
-                    // 【参数顺序照字节码抄】RenderPass#drawIndexed 是 5 个 int。
-                    // vanilla PreparedRenderType#drawFromBuffer 偏移 227-237 的实参依次是：
-                    //     aload  indexCount(局部槽6)
-                    //     iconst_1
-                    //     iload  firstIndex(槽5)
-                    //     iload  baseVertex(槽4)
-                    //     iconst_0
-                    // 即 drawIndexed(indexCount, 1, firstIndex, baseVertex, 0)。
-                    // 我们的顶点/索引都是从头开始的单批，所以 firstIndex 与 baseVertex 都是 0。
-                    pass.drawIndexed(draw.indexCount(), 1, 0, 0, 0);
-                }
-                if (!loggedSuccess) {
-                    loggedSuccess = true;
-                    GunMod.LOGGER.info("[TACZ Scope] Ocular mask drawn: {} indices from {} batches.",
-                            draw.indexCount(), ScopeMaskGeometry.entries().size());
-                }
-            } finally {
-                if (vertexBuffer != null) {
-                    // 每帧新建、每帧释放。这里不做缓冲池 —— 目镜几何量极小
-                    // （单个瞄具几个 cube），过早优化只会增加生命周期出错的机会。
-                    vertexBuffer.close();
-                }
+            CommandEncoder encoder = RenderSystem.getDevice().createCommandEncoder();
+            try (RenderPass pass = encoder.createRenderPass(
+                    () -> "tacz_scope_mask",
+                    target.getColorTextureView(),
+                    // 每帧从全黑重来。掩码是「当帧目镜盖到哪」，没有历史含义。
+                    Optional.of(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f)))) {
+                pass.setPipeline(MASK_PIPELINE);
+                // 这两句缺一不可，是照 PreparedRenderType#drawFromBuffer 抄的：
+                //   bindDefaultUniforms 提供 Projection / Fog 等全局 uniform；
+                //   DynamicTransforms 提供 ModelViewMat 与 ColorModulator。
+                // 少任何一句，shader 都会因为 uniform 缺失而画不出正确结果
+                // （症状类似 r46 的 "Unable to find shader defined uniform"）。
+                RenderSystem.bindDefaultUniforms(pass);
+                pass.setUniform("DynamicTransforms",
+                        RenderSystem.getDynamicUniforms().writeTransform(
+                                // ScopeMaskGeometry entries are captured with the submit-time ModelView already
+                                // baked into their pose. Do not multiply the phase-boundary ModelView again here:
+                                // under Iris that matrix can represent a stale/world-facing hand state, which pins
+                                // the mask to north. Using identity makes the mask pass consume the exact clip-space
+                                basis captured when the scope geometry was submitted.
+                                new Matrix4f(),
+                                // R = 1：被目镜盖到的像素，红通道恒为 1（掩码本体）。
+                                // G = 开镜进度：镜身/准星 shader 用它做屏幕空间的渐进收缩。
+                                //
+                                // 为什么把进度塞进颜色通道而不是新加一个 uniform：
+                                // 掩码管线本就要写 ColorModulator，绿通道是现成的空闲载体；
+                                // 新增 uniform 意味着再改一次 bind group layout，
+                                // 而那正是 r46/r52 两次崩溃的来源。能不动就不动。
+                                new Vector4f(1.0f, currentAimingProgress(), 1.0f, 1.0f)));
+                pass.setVertexBuffer(0, vertexBuffer.slice(0, mesh.vertexBuffer().remaining()));
+                pass.setIndexBuffer(indexBuffer, indices.type());
+                // 【参数顺序照字节码抄】RenderPass#drawIndexed 是 5 个 int。
+                // vanilla PreparedRenderType#drawFromBuffer 偏移 227-237 的实参依次是：
+                //     aload  indexCount(局部槽6)
+                //     iconst_1
+                //     iload  firstIndex(槽5)
+                //     iload  baseVertex(槽4)
+                //     iconst_0
+                // 即 drawIndexed(indexCount, 1, firstIndex, baseVertex, 0)。
+                // 我们的顶点/索引都是从头开始的单批，所以 firstIndex 与 baseVertex 都是 0。
+                pass.drawIndexed(draw.indexCount(), 1, 0, 0, 0);
+            }
+            maskDrawnThisFrame = true;
+            if (!loggedSuccess) {
+                loggedSuccess = true;
+                GunMod.LOGGER.info("[TACZ Scope] Ocular mask drawn: {} indices from {} batches.",
+                        draw.indexCount(), ScopeMaskGeometry.entries().size());
             }
         }
+    }
+
+    @Nullable
+    private static GpuBuffer pooledVertexBuffer;
+    private static int pooledVertexCapacity;
+
+    private static GpuBuffer acquireVertexBuffer(java.nio.ByteBuffer data) {
+        int needed = data.remaining();
+        if (pooledVertexBuffer == null || pooledVertexCapacity < needed) {
+            if (pooledVertexBuffer != null) {
+                pooledVertexBuffer.close();
+            }
+            pooledVertexBuffer = RenderSystem.getDevice().createBuffer(
+                    () -> "tacz_scope_mask_vertices",
+                    GpuBuffer.USAGE_VERTEX | GpuBuffer.USAGE_COPY_DST,
+                    data);
+            pooledVertexCapacity = needed;
+            return pooledVertexBuffer;
+        }
+        RenderSystem.getDevice().createCommandEncoder()
+                .writeToBuffer(pooledVertexBuffer.slice(0, needed), data);
+        return pooledVertexBuffer;
+    }
+
+    public static void close() {
+        if (pooledVertexBuffer != null) {
+            pooledVertexBuffer.close();
+            pooledVertexBuffer = null;
+        }
+        pooledVertexCapacity = 0;
     }
 
     /**

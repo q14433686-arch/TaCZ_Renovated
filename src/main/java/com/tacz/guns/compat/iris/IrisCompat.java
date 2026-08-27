@@ -16,10 +16,45 @@ public final class IrisCompat {
     private static final Set<RenderPipeline> ASSIGNED_SCOPE_PIPELINES = new HashSet<>();
     private static boolean loggedScopePipelineFailure;
 
+    private static boolean irisHandlesResolved;
+    private static Object irisApiInstance;
+    private static java.lang.reflect.Method mIsShaderPackInUse;
+    private static Object handRendererInstance;
+    private static java.lang.reflect.Method mHandRendererIsActive;
+
+    private static byte usingRenderPackThisFrame = -1;
+
     private IrisCompat() {
     }
 
     public static void initCompat() {
+    }
+
+    public static void beginFrame() {
+        usingRenderPackThisFrame = -1;
+    }
+
+    private static void resolveIrisHandles() {
+        if (irisHandlesResolved) {
+            return;
+        }
+        irisHandlesResolved = true;
+        try {
+            Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+            irisApiInstance = irisApiClass.getMethod("getInstance").invoke(null);
+            mIsShaderPackInUse = irisApiClass.getMethod("isShaderPackInUse");
+        } catch (Throwable ignored) {
+            irisApiInstance = null;
+            mIsShaderPackInUse = null;
+        }
+        try {
+            Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
+            handRendererInstance = handRendererClass.getField("INSTANCE").get(null);
+            mHandRendererIsActive = handRendererClass.getMethod("isActive");
+        } catch (Throwable ignored) {
+            handRendererInstance = null;
+            mHandRendererIsActive = null;
+        }
     }
 
     public static boolean isRenderShadow() {
@@ -36,13 +71,24 @@ public final class IrisCompat {
     }
 
     public static boolean isUsingRenderPack() {
+        if (usingRenderPackThisFrame >= 0) {
+            return usingRenderPackThisFrame != 0;
+        }
+        boolean result = computeUsingRenderPack();
+        usingRenderPackThisFrame = (byte) (result ? 1 : 0);
+        return result;
+    }
+
+    private static boolean computeUsingRenderPack() {
         if (!ModList.get().isLoaded(CompatRegistry.IRIS)) {
             return false;
         }
+        resolveIrisHandles();
+        if (irisApiInstance == null || mIsShaderPackInUse == null) {
+            return false;
+        }
         try {
-            Class<?> apiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
-            Object api = apiClass.getMethod("getInstance").invoke(null);
-            return (Boolean) apiClass.getMethod("isShaderPackInUse").invoke(api);
+            return (Boolean) mIsShaderPackInUse.invoke(irisApiInstance);
         } catch (Throwable ignored) {
             return false;
         }
@@ -123,37 +169,14 @@ public final class IrisCompat {
         if (!ModList.get().isLoaded(CompatRegistry.IRIS) || !isUsingRenderPack()) {
             return false;
         }
-        try {
-            Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
-            Object instance = handRendererClass.getField("INSTANCE").get(null);
-            return (Boolean) handRendererClass.getMethod("isActive").invoke(instance);
-        } catch (Throwable ignored) {
+        resolveIrisHandles();
+        if (handRendererInstance == null || mHandRendererIsActive == null) {
             return false;
         }
-    }
-
-    /**
-     * Mirrors Iris' {@code MixinItemInHandRenderer#iris$skipTranslucentHands} phase gate.
-     * When Iris is not in a shader-pack hand pass this returns true. During an Iris hand pass,
-     * solid items render only in the solid phase; translucent items only in the translucent phase.
-     */
-    public static boolean shouldRenderInCurrentHandPhase(ItemStack stack) {
-        if (!ModList.get().isLoaded(CompatRegistry.IRIS) || !isUsingRenderPack()) {
-            return true;
-        }
         try {
-            Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
-            Object instance = handRendererClass.getField("INSTANCE").get(null);
-            boolean active = (Boolean) handRendererClass.getMethod("isActive").invoke(instance);
-            if (!active) {
-                return true;
-            }
-            boolean renderingSolid = (Boolean) handRendererClass.getMethod("isRenderingSolid").invoke(instance);
-            boolean itemTranslucent = (Boolean) handRendererClass.getMethod("isHandTranslucent", ItemStack.class)
-                    .invoke(instance, stack);
-            return renderingSolid != itemTranslucent;
+            return (Boolean) mHandRendererIsActive.invoke(handRendererInstance);
         } catch (Throwable ignored) {
-            return true;
+            return false;
         }
     }
 

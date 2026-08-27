@@ -7,7 +7,6 @@ import com.tacz.guns.api.client.event.BeforeRenderHandEvent;
 import com.tacz.guns.api.client.other.KeepingItemRenderer;
 import com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer;
 import com.tacz.guns.compat.firstperson.FirstPersonAnimationCompat;
-import com.tacz.guns.compat.shader.ShaderCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -118,10 +117,6 @@ public class ItemInHandRendererMixin implements KeepingItemRenderer {
                 || geoRenderer.getModel(renderStack) == null) {
             original.call(instance, player, frameInterp, xRot, hand, attack, itemStack,
                     inverseArmHeight, poseStack, collector, lightCoords);
-            return;
-        }
-
-        if (!ShaderCompat.shouldRenderInCurrentHandPhase(renderStack)) {
             return;
         }
 

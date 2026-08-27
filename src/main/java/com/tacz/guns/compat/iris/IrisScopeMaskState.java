@@ -2,6 +2,7 @@ package com.tacz.guns.compat.iris;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.tacz.guns.GunMod;
+import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
 import com.tacz.guns.client.render.scope.ScopeMaskTarget;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
@@ -33,6 +34,22 @@ public final class IrisScopeMaskState {
     private static boolean loggedFailure;
     private static boolean loggedApply;
 
+    /**
+     * GlRenderPass.pipeline field cached by class to eliminate reflection allocations per draw.
+     */
+    private static Class<?> cachedPassClass;
+    private static Field cachedPipelineField;
+    private static boolean pipelineFieldResolved;
+
+    /**
+     * Map caching the resolved mode for each GlRenderPipeline instance.
+     */
+    private static final java.util.Map<Object, Integer> MODE_BY_PIPELINE = new java.util.IdentityHashMap<>();
+    private static final int MODE_CACHE_LIMIT = 512;
+
+    /** Cached driver constant for max texture units. */
+    private static int cachedMaxTextureUnits = -1;
+
     private IrisScopeMaskState() {
     }
 
@@ -62,6 +79,9 @@ public final class IrisScopeMaskState {
     public static void applyToGlRenderPass(Object glRenderPass) {
         try {
             if (glRenderPass == null) {
+                return;
+            }
+            if (!ScopeMaskRenderer.hasMaskThisFrame() && !ScopeMaskRenderer.hadMaskLastFrame()) {
                 return;
             }
             int mode = resolveMode(glRenderPass);
@@ -100,13 +120,14 @@ public final class IrisScopeMaskState {
                 return;
             }
 
-            int maxUnits = GL11C.glGetInteger(GL20C.GL_MAX_TEXTURE_IMAGE_UNITS);
-            int unit = Math.max(15, maxUnits - 1);
+            if (cachedMaxTextureUnits < 0) {
+                cachedMaxTextureUnits = GL11C.glGetInteger(GL20C.GL_MAX_TEXTURE_IMAGE_UNITS);
+            }
+            int unit = Math.max(15, cachedMaxTextureUnits - 1);
             if (!loggedApply) {
                 loggedApply = true;
                 GunMod.LOGGER.info("[TACZ Scope] Iris scope-mask bridge active (mode={}, textureUnit={}, textureId={}).", mode, unit, textureId);
             }
-
             GL20C.glUniform1i(modeLocation, mode);
             GL20C.glUniform1i(samplerLocation, unit);
             GL13C.glActiveTexture(GL13C.GL_TEXTURE0 + unit);
@@ -117,15 +138,55 @@ public final class IrisScopeMaskState {
         }
     }
 
+    private static Field pipelineField(Object glRenderPass) {
+        Class<?> cls = glRenderPass.getClass();
+        if (cls != cachedPassClass || !pipelineFieldResolved) {
+            cachedPassClass = cls;
+            cachedPipelineField = null;
+            for (Class<?> c = cls; c != null && cachedPipelineField == null; c = c.getSuperclass()) {
+                try {
+                    Field f = c.getDeclaredField("pipeline");
+                    f.setAccessible(true);
+                    cachedPipelineField = f;
+                } catch (NoSuchFieldException ignored) {
+                }
+            }
+            pipelineFieldResolved = true;
+        }
+        return cachedPipelineField;
+    }
+
     private static int resolveMode(Object glRenderPass) {
         try {
             if (glRenderPass == null) {
                 return 0;
             }
-            Object glPipeline = readField(glRenderPass, "pipeline");
+            Field pipelineField = pipelineField(glRenderPass);
+            if (pipelineField == null) {
+                return 0;
+            }
+            Object glPipeline = pipelineField.get(glRenderPass);
             if (glPipeline == null) {
                 return 0;
             }
+            Integer remembered = MODE_BY_PIPELINE.get(glPipeline);
+            if (remembered != null) {
+                return remembered;
+            }
+            int resolved = resolveModeUncached(glPipeline);
+            if (MODE_BY_PIPELINE.size() >= MODE_CACHE_LIMIT) {
+                MODE_BY_PIPELINE.clear();
+            }
+            MODE_BY_PIPELINE.put(glPipeline, resolved);
+            return resolved;
+        } catch (Throwable t) {
+            logOnce("resolve scope render pass", t);
+        }
+        return 0;
+    }
+
+    private static int resolveModeUncached(Object glPipeline) {
+        try {
             Object renderPipeline = invokeNoArgs(glPipeline, "info");
             if (renderPipeline == null) {
                 return 0;
@@ -140,7 +201,10 @@ public final class IrisScopeMaskState {
                 return 0;
             }
             String normalized = path.toLowerCase(Locale.ROOT);
-            if (BODY_PIPELINE.equals(normalized) || FLASH_TRANSLUCENT_PIPELINE.equals(normalized)
+            if (BODY_PIPELINE.equals(normalized)) {
+                return 1;
+            }
+            if (FLASH_TRANSLUCENT_PIPELINE.equals(normalized)
                     || FLASH_SWIRL_PIPELINE.equals(normalized)) {
                 return 1;
             }
