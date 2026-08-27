@@ -93,7 +93,7 @@
 | 后端 | 状态 |
 |---|---|
 | OpenGL（无 Iris） | 阶段边界离屏 ocular mask 已接入；GPU 未实测 |
-| OpenGL + Iris 1.11.2 | HAND pipeline 分类、linked-fragment dormant branch 与逐 draw mask uniform bridge 已接入；GPU 未实测 |
+| OpenGL + Iris 1.11.2 | HAND pipeline 分类、linked-fragment dormant branch 与逐 draw mask uniform bridge 已接入；GPU 未实测。凸包孔径填充已改为斜率空间、不再读投影 UBO（旧实现开光影后必抛 `Buffer is not readable` 而每帧回退描摹），**待复测** |
 | Vulkan | `earlyWindowControl=false` 后用户启动 PASS；低倍准星 containment 报告 FAIL，已拆分 reticle-only/full-viewmodel mask 修复，当前 HEAD 待复测 |
 | 其他 shader replacement / Aperture | 没有已核 bridge 时走普通未掩码回退；未作为硬依赖接入 |
 
@@ -104,6 +104,11 @@
 - **Accelerated Rendering**：没有已核的 26.2 Feature Rendering API；加速路径强制关闭，
   普通渲染不受影响。
 - **Zoomify**：没有 NeoForge 26.2 构建，hook 为 no-op。
+- **TaCZ Tweaks（`tacztweaks`）**：第三方 addon，本仓不接入、不依赖。
+  `2.14.2+neoforge.26.2.Beta-1`（源码 `q14433686-arch/TaCZTweaks_Unofficial` 分支
+  `26.2-neoforge`）已逐文件核对：不含任何渲染 / 光影 / 掩码代码，也没有 Iris mixin。
+  「装上它之后开光影镜内裁切失效」是相关不是因果，真因见
+  [`docs/records/SCOPE_MASK_HULL_SLOPESPACE_20260827.md`](docs/records/SCOPE_MASK_HULL_SLOPESPACE_20260827.md)。
 - **Carry On**：`tacz:target` / `tacz:statue` 仍在黑名单；多格工作台不在黑名单，依赖
   optional mixin 做原子 root/companion 处理。
 
