@@ -233,3 +233,73 @@ NDC.y = P11 * y / -z = P11 * slopeY      slopeY = y / -z
 - 没有搬姊妹仓的 `ScopePipRenderer` / `IrisScopePipelineCompat` /
   `VoxyScopePipelineCompat`（Fabric 表面 + PIP 是另一条工作包，本仓 PR #17 已关闭未合）；
 - 没有动开镜视模 bob 或约束公式（问题 3 的禁区不变）。
+
+## 7. 同族分支横查（2026-08-28 追加）
+
+§3 那个「两个 `trySetup` RETURN 处理器争先后」的缺陷**不是本分支独有的**。
+对 `q14433686-arch` 三个仓库共 17 条分支逐条查了暴露面与内容：
+
+### 有同一缺陷（6 条，待修）
+
+| 仓库 | 分支 | P1 只有 RETURN 注入 | P2 盲写 `resetShaderProgram` | P3 跨程序写 location |
+|---|---|---|---|---|
+| `TaCZ_Renovated` | `26.2` | ✅ | ✅ | ✅ |
+| `TaCZ_Renovated` | `arena/01a044db-tacz-renovated` | ✅ | ✅ | ✅ |
+| `TaCZ_Refabricated_Unofficial` | `26.2(main)` | ✅ | ✅ | ✅ |
+| `TaCZ_Refabricated_Unofficial` | `arena/01a00a58-…` | ✅ | ✅ | ✅ |
+| `TaCZ_Refabricated_Unofficial` | `arena/01a00da4-…` | ✅ | ✅ | ✅ |
+| `TaCZ_Refabricated_Unofficial` | `arena/01a0147a-…` | ✅ | ✅ | ✅ |
+
+判据（三条，任一成立即命中）：
+
+- **P1** `IrisGlCommandEncoderMixin` 只有 `@Inject(method="trySetup", at=@At("RETURN"))`，
+  没有 HEAD 注入记录 pass —— 即没有第二个写入点；
+- **P2** `IrisExtendedShaderMixin` 在 `iris$setupState` RETURN 调
+  `IrisScopeMaskState.resetShaderProgram` —— 即无条件把 mode 写回 0；
+- **P3** `IrisScopeMaskState.applyToGlRenderPass` 存在
+  `programId = getProgramId(invokeNoArgs(glPipeline, "program"))` 这条退回分支，
+  随后拿它去 `glGetUniformLocation`。
+
+`origin/26.2` 与 `origin/arena/01a044db-tacz-renovated` 的这三个文件与
+**修复前的本分支逐字节相同**（`git diff --stat` 对 `855989c` 为空）。
+refab 四条的 P1/P2 也与本分支修复前一致，只是行号不同。
+
+> 注意：refab 是 Fabric 侧，Iris 是同一份代码，`MixinGlCommandEncoder` 的
+> `trySetup` RETURN 注入同样存在，所以这 4 条的暴露面与 NeoForge 侧完全相同。
+
+### 无暴露面（10 条，不需要动）
+
+- `TaCZ_Renovated` @ `1.21.11`、`26.1.2`
+- `TaCZ_Refabricated_Unofficial` @ `1.21.11`、`26.1.2`
+- `TaCZTweaks_Unofficial` 全部 6 条：`1.21.11`、`1.21.11-neoforge`、`26.1.2`、
+  `26.1.2-neoforge`、`26.2(main)`、`26.2-neoforge`
+
+判据：全树无 `IrisScopeMaskState` / `IrisGlCommandEncoderMixin` /
+`IrisExtendedShaderMixin`（Renovated 的 `1.21.11`/`26.1.2` 只有
+`IrisCompatMixinPlugin`，没有 mask bridge）。tacztweaks 每条分支的 blob 数只有
+169–254，全仓不含渲染代码。
+
+### 已修
+
+仅 `TaCZ_Renovated` @ `arena/01a0457c-tacz-renovated`（commit `5c02c5f`）。
+
+### 同类风险的其他位置（已查，未发现新的严重项）
+
+- **`IrisShaderCreatorMixin`**：`@ModifyVariable(method="link", at=@At("HEAD"),
+  argsOnly=true, index=5, require=0)`。已按钉死 commit `8f3a7a3` 核对
+  `ShaderCreator.link` 签名共 8 个参数，index 5 确为 `String fragment` —— 索引正确。
+  但 `require=0` 意味着**参数索引一旦漂移就静默不注入**：dormant 分支没进
+  fragment 源码 → `tacz_ScopeMaskMode` 这个 uniform 根本不存在 →
+  `glGetUniformLocation` 返回 -1 → `writeScopeMaskState` 直接 return ——
+  **症状与 §3 完全一样（镜内裁切失效）且日志无任何报错**。
+  这是同一类「静默失效」风险，不是时序问题，但排查时要一并排除：
+  看日志里有没有 `[TACZ Scope] Injecting dormant scope-mask branch …` 这一行。
+- **纹理单元选择** `unit = max(15, GL_MAX_TEXTURE_IMAGE_UNITS - 1)`：
+  Iris 的 `ProgramSamplers.Builder` 从 `nextUnit=0` 起、跳过保留单元
+  `WORLD_RESERVED_TEXTURE_UNITS={0,1,2}`，逐个 +1 分配，`remainingUnits =
+  maxTextureUnits - 3`，耗尽时抛 `No more available texture units`。
+  所以只有光影包用到 **≥29 个动态采样器**时才会占到单元 31 与我们相撞。
+  低概率，且那种包本身已到硬件上限。**记录为已知低危，未改。**
+- 本仓唯一含裸 GL 调用（绕过 `GlStateManager` 缓存）的文件是
+  `IrisScopeMaskState.java`，就是本次改的这个；其余渲染代码走 Sodium/原版
+  渲染状态封装，无同类隐患。
