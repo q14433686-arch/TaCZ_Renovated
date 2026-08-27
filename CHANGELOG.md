@@ -3,6 +3,23 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-08-27
+
+### 兼容性与修复（同步 26.2 最新提交）
+
+- 安装 Punchy! 时右手脱离枪身、枪+手臂整体摆幅过大：按姊妹项目语义接入可选 mixin，
+  持枪期间让 Punchy 的独立手臂与位移矩阵让出给 TACZ 第一人称状态机。
+- 投掷物静止拉栓反复抖动：官方手雷脚本用字面量 `idle` 表示取消拔销，移植层却把近战
+  专用的 `INPUT_IDLE` 每 tick 打给投掷物，两者撞名。位移 tick 改回只驱动近战。
+- 跟官方 0.4.3 能跟的契约：烟雾粒子改采环境光（邻格回退、最低 2，不再全亮
+  `0xF000F0`）；可预燃投掷物在手上炸改为 `prepare + 完整 lifeTime`；display
+  增加 `display_offset` / `entity_transform`；消耗品补 `ConsumableItemRenderer`
+  与 display 通道。tooltip 自定义描述本仓已有，未改。未实机。
+- 可预燃满进度后 `life` 被夹到 0：实体 tick 改为 `life >= 0` 才超时引爆，
+  `0` 当帧炸，C4 `-1` 仍不超时。未再被用户打回。
+- 跨仓审计与负结果入档：`docs/records/SCOPE_IRIS_VIEWLAG_AUDIT_20260826.md`、
+  `docs/records/LR_043_FOLLOWUP_20260826.md`。
+
 ## 1.1.8+neoforge.1.21.11.R1 — 2026-08-22
 
 ### WP-11211-5a 光影下准星被云/粒子覆盖的修复（用户实机反馈）
