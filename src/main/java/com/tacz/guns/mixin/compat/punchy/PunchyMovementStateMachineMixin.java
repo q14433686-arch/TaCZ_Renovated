@@ -23,13 +23,7 @@ public abstract class PunchyMovementStateMachineMixin {
             "applyToMatrix",
             "applyRootSpaceMotion",
             "applyCameraLookToRoot",
-            "applyCameraYawLagToArm",
-            "applyLookLag",
-            "applyCameraLag",
-            "applyMouseLook",
-            "modifyMouseDelta",
-            "applyFov",
-            "modifyFov"
+            "applyCameraYawLagToArm"
     }, at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void tacz$skipMovementMatrices(CallbackInfo ci) {
         if (tacz$shouldYield()) {
