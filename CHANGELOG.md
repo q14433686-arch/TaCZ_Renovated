@@ -20,6 +20,40 @@
 - `docs/publish/RELEASE.md` 改为覆盖 26.2、26.1.2、1.21.11 的内部更新规范，明确
   活文档 → Release notes → 平台 Changelog 的同步顺序及“测试结论不得跨分支继承”。
 
+## 1.1.8+neoforge.26.1.2.R1.hotfix — 2026-08-27
+
+R1 后从 26.2 分支回传的修复与功能跟进（Iris 高倍镜裁剪 / ADS bob-scale 尝试
+已在 26.2 上游实证失败后回退，本版本不含）。
+
+### 修复
+
+- **LR 投掷物**：站立不动时每 tick 向所有 LR 动画状态机广播 `INPUT_IDLE`，与官方手雷脚本里
+  用作取消拔销的字面量 `"idle"` 撞名，导致静止拉栓反复抖动、走动反而正常。移动输入
+  现只发给近战，匹配官方 LR `ClientEventsHandler#tickAnimation` 语义。
+- **LR 投掷物**：可烹饪手雷（cookable）在满引信（remaining = 0）时实体首 tick 因
+  `life > 0` 判断跳过 `onDeath` 导致不爆炸；条件改为 `life >= 0`，C4 等
+  `life_time = -1` 的遥控物仍然永生。
+- **LR 投掷物**：使用进度条（`UsingProgressOverlay`）分母按 90% 引信长度算，导致满烹饪
+  时进度条永远到不了头；改为完整 `lifeTime`，匹配手中即引爆的行为。
+- **LR 近战**：`MeleeDisplay` record 缺失 `display_offset` 字段声明，而 `create()`
+  已读取 `pojo.displayOffset`，从源码构建会直接 `compileJava` 失败。
+- **Punchy 兼容**：Punchy 在第一人称独立叠加手臂骨骼与行走/冲刺/视角滞后矩阵，
+  覆盖了 TaCZ/LR 已烘焙好的枪+手动画。新增 5 个 `@Pseudo` mixin + `PunchyCompatMixinPlugin`
+  （仅当 Punchy 在加载列表时启用），让 TaCZ 手持模型走 Punchy 支持的物品黑名单/
+  让步路径，普通物品仍由 Punchy 接管。
+- **烟雾粒子**：烟雾弹粒子硬编码全亮 `0xF000F0`，夜战时烟幕自身发光不自然；改按官方
+  0.4.3 采环境光（天光/块光最低各 2，两者都 ≤2 时再扫六邻格取较大值）。
+
+### 新增
+
+- **LR 0.4.3 跟进**：display JSON 新增 `display_offset` 与 `entity_transform` 字段，
+  近战/投掷物第一人称及飞行实体姿态按内容包定义应用变换；投掷物实体无 display 时
+  沿用旧占位姿态。
+- **LR 消耗品**：新增 `ConsumableItemRenderer`、`ConsumableDisplayInstance`、
+  `ConsumableDisplayManager`、`ConsumableAnimationStateContext`，消耗品物品在内容包
+  提供 display JSON 时走 Bedrock/Lua 第一人称渲染（服务端效果与 R1 一致）；
+  `HasCustomDisplayProperty`、`LrClientAssetsManager`、`LrTacticalAPI` 同步扩展。
+
 ## 1.1.8+neoforge.26.1.2.R1 — 2026-08-22
 
 首个发布版。三条战线在同一版本收口，全部经用户实机验收
