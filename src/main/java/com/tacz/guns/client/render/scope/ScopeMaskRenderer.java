@@ -1,7 +1,6 @@
 package com.tacz.guns.client.render.scope;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -146,15 +145,40 @@ public final class ScopeMaskRenderer {
             .withPrimitiveTopology(PrimitiveTopology.QUADS)
             .build();
 
+    /**
+     * 凸包顶点的<b>视空间光线斜率</b>（{@code x/-z}、{@code y/-z}）合理范围。
+     *
+     * <h3>它是干什么的（近平面炸包保护）</h3>
+     * 目镜是第一人称视模，离相机只有几厘米，而近平面是 0.05 —— 大幅转身 / 开镜过渡时
+     * 目镜的个别顶点会擦过近平面，{@code -z} 落到 0.001 这种量级，斜率直接飙到 ±1000。
+     * 凸包只要吃进一个这样的点就会撑满整个屏幕，掩码于是「全屏为真」，
+     * 视模整块消失 —— 姊妹仓 26.2 在 NDC 空间用 {@code NDC_SANITY_LIMIT = 2.0} 挡的就是这个。
+     *
+     * <p>本仓改在斜率空间做凸包（见 {@link #writeHullFill}），所以阈值也换到斜率空间。
+     * 合法目镜投影的斜率上界 ≈ {@code aspect * tan(fov/2)}（最宽 FOV + 最宽屏也就 ~3），
+     * 而近平面伪影是 100 以上，取 16 两边都留足余量。</p>
+     */
+    private static final float SLOPE_SANITY_LIMIT = 16.0f;
+
+    /**
+     * 凸包扇面写入时使用的视深度下限。
+     *
+     * <p>整个扇面共用一个深度，而 NDC 只由斜率决定（{@code NDC.x = P00 * x/-z}），
+     * 所以这个深度取多少<b>不影响</b>画出来的形状，只需要保证它落在近/远平面之间、
+     * 不会被视锥裁掉。近平面 0.05，取 0.1 留一倍余量。</p>
+     */
+    private static final float HULL_DEPTH_MIN = 0.1f;
+
     /** 顶点暂存区。复用同一个，避免每帧分配。 */
     private static final ByteBufferBuilder SCRATCH = new ByteBufferBuilder(4096);
 
     private static boolean failed = false;
     private static boolean loggedSuccess = false;
-    /** 凸包模式读投影 UBO 失败只喊一次（之后每帧静默回退逐立方体描摹）。 */
-    private static boolean loggedProjReadFailure = false;
     /** 「开着调试却没有任何目镜几何」只警告一次，避免刷屏。 */
     private static boolean loggedEmpty = false;
+    /** 诊断：累计走凸包填充 / 回退逐立方体描摹的条目数，只随首条成功日志报一次。 */
+    private static int hullFilledEntries = 0;
+    private static int tracedEntries = 0;
 
     /**
      * 当前是否正在渲染手持物（第一人称枪械）。
@@ -299,8 +323,12 @@ public final class ScopeMaskRenderer {
                 }
                 if (!loggedSuccess) {
                     loggedSuccess = true;
-                    GunMod.LOGGER.info("[TACZ Scope] Ocular mask drawn: {} indices from {} batches.",
-                            draw.indexCount(), ScopeMaskGeometry.entries().size());
+                    // 凸包 / 描摹 计数是判断「掩码到底是孔径填充还是只剩板条」的唯一线索：
+                    // 开光影后若 hull 恒为 0、traced 恒等于批次数，说明孔径填充没生效。
+                    GunMod.LOGGER.info("[TACZ Scope] Ocular mask drawn: {} indices from {} batches "
+                                    + "(hull-filled entries={}, traced-fallback entries={}).",
+                            draw.indexCount(), ScopeMaskGeometry.entries().size(),
+                            hullFilledEntries, tracedEntries);
                 }
             } finally {
                 if (vertexBuffer != null) {
@@ -351,8 +379,10 @@ public final class ScopeMaskRenderer {
         boolean hullFill = RenderConfig.SCOPE_MASK_HULL_FILL.get();
         for (ScopeMaskGeometry.Entry entry : ScopeMaskGeometry.entries()) {
             if (hullFill && writeHullFill(builder, entry.pose(), entry.cubes())) {
+                hullFilledEntries++;
                 continue;
             }
+            tracedEntries++;
             for (BedrockCube cube : entry.cubes()) {
                 // 通过接口取面，【不做 instanceof 判断】。
                 //
@@ -377,63 +407,81 @@ public final class ScopeMaskRenderer {
      * 镜片里残留灰块（AUG 实测最明显）。板条的张开跨度恰好勾勒孔径的内接多边形，
      * 故取凸包即得「孔径近似」，覆盖面严格不小于板条描摹（漏裁类残块必消）。
      *
-     * <h2>做法（矩阵链与 {@link #writeCube} 严格同源）</h2>
-     * <ol>
-     *   <li>条目顶点先按 {@code pos/16 → mul(pose)} 得到绘制空间坐标（与描摹路径一致）；</li>
-     *   <li>用<b>本 pass 将实际使用的同一投影矩阵</b>投影到 NDC（xy 做透视除法）；</li>
-     *   <li>对 NDC 平面点集求 Andrew 单调链凸包；</li>
-     *   <li>凸包顶点用投影的逆变回绘制空间，按<b>退化四边形扇</b>
-     *       (v0, hi, hi+1, hi+1) 写出 —— 复用 QUADS 展开索引即可成三角扇，
-     *       不动管线与索引结构。着色阶段 DynamicTransforms=单位阵，
-     *       顶点再过一次同一投影 ⇒ 精确落回凸包 NDC。</li>
-     * </ol>
+     * <h2>【2026-08-27 重写】为什么不再读投影 UBO</h2>
+     * 旧实现要把目镜顶点投到 NDC，就必须拿到<b>本 pass 真正使用的投影矩阵</b>；
+     * 26.2 的 {@code RenderSystem} 没有 {@code getProjectionMatrix()}，于是它去
+     * {@code getProjectionMatrixBuffer().map(true, false)} 读回那 64 字节。
+     * <b>开光影后这条读回必然抛异常</b>（本仓 {@code latest.log} 实录，Iris
+     * 1.11.2+mc26.2，掩码 pass 由 {@code HandRenderer#renderSolid} 驱动）：
+     * <pre>
+     * [TACZ Scope] Hull-fill: could not read back the projection UBO; ...
+     * java.lang.IllegalStateException: Buffer is not readable
+     *     at com.mojang.blaze3d.opengl.GlBuffer$Direct.map(GlBuffer.java:101)
+     *     at com.tacz.guns...ScopeMaskRenderer.writeHullFill(...)
+     * </pre>
+     * 于是 {@code return false} 每帧生效，凸包填充<b>在有光影时从来没跑过</b>，
+     * 掩码永远退回逐立方体描摹 —— 板条目镜的孔径没填，表现为「开光影后开镜，
+     * 镜内裁切直接失效、低倍镜准星也不再被限制在目镜内」。
      *
-     * @return 有效点不足（凸包退化，如全重合）时返回 false，调用方回退逐立方体描摹
+     * <h2>新做法：在<b>光线斜率空间</b>做凸包，彻底不碰投影矩阵</h2>
+     * 标准透视投影（Minecraft {@code Matrix4f#perspective}，{@code m32 = -1} ⇒
+     * {@code clip.w = -z}）下：
+     * <pre>
+     * NDC.x = P00 * x / -z = P00 * slopeX        slopeX = x / -z
+     * NDC.y = P11 * y / -z = P11 * slopeY        slopeY = y / -z
+     * </pre>
+     * {@code P00}、{@code P11} 恒正，所以「斜率 → NDC」是一个<b>正系数轴向缩放</b>，
+     * 是保凸包的仿射双射：斜率空间的凸包顶点，映射过去就是 NDC 凸包的顶点，
+     * 顺序也不变。于是<b>凸包本身根本不需要投影矩阵</b>。
+     *
+     * <p>写回绘制空间同样不需要逆投影：斜率 {@code (sx, sy)} 在<b>任意</b>深度
+     * {@code d > 0} 上都对应同一个 NDC 点，取绘制空间点
+     * {@code (sx*d, sy*d, -d)} 即可（掩码 target 无深度附件，深度取值不参与遮挡）。
+     * 整个扇面共用一个 {@code d}，因此它是平面扇，光栅化后覆盖的区域
+     * 精确等于凸包多边形，与逐立方体描摹走的是<b>同一条</b>投影管线 ⇒ 两者天然对齐。</p>
+     *
+     * <p>额外收益：不再有每帧 64B 的 GPU 读回；也不再存在「读回的投影 ≠ pass 实际
+     * 使用的投影」这一类错位 —— 现在无论 pass 用的是世界 FOV 还是开镜 FOV，
+     * 掩码都是<b>目镜在该投影下投影的凸包</b>，语义唯一。</p>
+     *
+     * @return 有效点不足（凸包退化，如全重合 / 全在相机后方）时返回 false，
+     *         调用方回退逐立方体描摹
      */
     private static boolean writeHullFill(BufferBuilder builder, Matrix4f pose, java.util.List<BedrockCube> cubes) {
         java.util.List<float[]> pts = new java.util.ArrayList<>();
-        // 【26.2 取证】RenderSystem 已没有 getProjectionMatrix()——投影矩阵只以
-        // GpuBufferSlice（UBO）形式躺在 GPU 侧（字段投影 PROJECTION_MATRIX_UBO_SIZE，
-        // 布局即一个 std140 mat4：列主序 16 个 float）。CPU 侧做凸包就必须把它
-        // 读回来：slice.map(read, write) 拿到 MappedView.data()，读 64 字节。
-        // 关键在同源：掩码 pass 稍后 bindDefaultUniforms 用的就是
-        // RenderSystem.getProjectionMatrixBuffer() 这同一个 slice，所以这里读到的
-        // 与着色器实际消费的是【同一份字节】，凸包与画面严丝合缝。
-        // 成本是每帧至多一次 64B 的读回；UBO 是本帧刚上传的 ring 段，不是重同步。
-        // 读失败（驱动/Iris 怪异状态）一次 warn，本帧该条目回退逐立方体描摹。
-        Matrix4f proj = new Matrix4f();
-        try (GpuBufferSlice.MappedView view = RenderSystem.getProjectionMatrixBuffer().map(true, false)) {
-            proj.set(view.data());
-        } catch (Exception e) {
-            if (!loggedProjReadFailure) {
-                loggedProjReadFailure = true;
-                GunMod.LOGGER.warn("[TACZ Scope] Hull-fill: could not read back the projection UBO; this entry falls back to legacy per-cube tracing.", e);
-            }
-            return false;
-        }
         Vector4f tmp = new Vector4f();
+        float depthSum = 0.0f;
+        int depthCount = 0;
         for (BedrockCube cube : cubes) {
             for (var polygon : cube.getPolygons()) {
                 if (polygon == null) {
                     continue;
                 }
                 for (var vertex : polygon.vertices) {
+                    // 矩阵链与 writeCube 逐行一致：pos/16 → mul(pose)
                     tmp.set(vertex.pos.x() / 16.0F, vertex.pos.y() / 16.0F, vertex.pos.z() / 16.0F, 1.0F);
                     tmp.mul(pose);
-                    tmp.mul(proj);
-                    // 只收「相机前方」的点：w<=0 的顶点经过透视除法会被翻到
-                    // NDC 对面（x/w、y/w 符号反转）。瞄具在极端侧头/切视角瞬间可能
-                    // 有顶点落到相机平面后方，若照收，凸包会被这类镜像点拉到屏幕
-                    // 另一端，当帧大片画面被错判成“镜内”而整块消失。
+                    // 只收「相机前方」的点：-z<=0 的顶点在透视除法后会被翻到屏幕对面，
+                    // 若照收，凸包会被这类镜像点拉到另一端，当帧大片画面被错判成「镜内」。
                     // 丢掉后凸包不足 3 点会回退逐立方体描摹（=旧行为），安全。
-                    if (tmp.w <= 1.0e-6f) {
+                    float depth = -tmp.z();
+                    if (depth <= 1.0e-4f) {
                         continue;
                     }
-                    pts.add(new float[]{tmp.x() / tmp.w, tmp.y() / tmp.w});
+                    float slopeX = tmp.x() / depth;
+                    float slopeY = tmp.y() / depth;
+                    // 近平面炸包保护，见 SLOPE_SANITY_LIMIT。
+                    if (!Float.isFinite(slopeX) || !Float.isFinite(slopeY)
+                            || Math.abs(slopeX) > SLOPE_SANITY_LIMIT || Math.abs(slopeY) > SLOPE_SANITY_LIMIT) {
+                        continue;
+                    }
+                    pts.add(new float[]{slopeX, slopeY});
+                    depthSum += depth;
+                    depthCount++;
                 }
             }
         }
-        if (pts.size() < 3) {
+        if (pts.size() < 3 || depthCount == 0) {
             return false;
         }
         // Andrew 单调链凸包（输入先按 x、再按 y 排序去重）
@@ -475,11 +523,12 @@ public final class ScopeMaskRenderer {
         if (hull.size() < 3) {
             return false;
         }
-        // 凸包顶点（NDC）逆投影回绘制空间，按退化四边形扇写出
-        Matrix4f invProj = proj.invert(new Matrix4f());
+        // 扇面深度：取目镜顶点的平均视深度（只影响扇面落在视锥里的位置，不影响形状）。
+        // 夹到近平面之外，避免个别擦近平面的顶点把整片扇面拖到被裁掉的位置。
+        float depth = Math.max(HULL_DEPTH_MIN, depthSum / depthCount);
         float[] p0 = hull.get(0);
         for (int i = 1; i + 1 < hull.size(); i++) {
-            emitNdcAsQuad(builder, invProj, p0, hull.get(i), hull.get(i + 1));
+            emitSlopeAsQuad(builder, depth, p0, hull.get(i), hull.get(i + 1));
         }
         return true;
     }
@@ -489,22 +538,28 @@ public final class ScopeMaskRenderer {
         return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
     }
 
-    /** 把三个 NDC 点写成一个退化四边形（第 4 顶点重复），顺带回绘制空间。 */
-    private static void emitNdcAsQuad(BufferBuilder builder, Matrix4f invProj,
-                                      float[] a, float[] b, float[] c) {
-        emitNdcVertex(builder, invProj, a);
-        emitNdcVertex(builder, invProj, b);
-        emitNdcVertex(builder, invProj, c);
-        emitNdcVertex(builder, invProj, c);
+    /**
+     * 把三个斜率空间的点写成一个退化四边形（第 4 顶点重复）。
+     *
+     * <p>退化四边形经 QUADS→三角形展开后 = 三角形 (a,b,c) + 一个零面积三角形，
+     * 于是整圈 {@code (p0, pi, pi+1)} 就是一个三角扇，不需要动管线与索引结构。</p>
+     */
+    private static void emitSlopeAsQuad(BufferBuilder builder, float depth,
+                                        float[] a, float[] b, float[] c) {
+        emitSlopeVertex(builder, depth, a);
+        emitSlopeVertex(builder, depth, b);
+        emitSlopeVertex(builder, depth, c);
+        emitSlopeVertex(builder, depth, c);
     }
 
-    private static void emitNdcVertex(BufferBuilder builder, Matrix4f invProj, float[] ndc) {
-        Vector4f v = new Vector4f(ndc[0], ndc[1], 0.0f, 1.0f);
-        v.mul(invProj);
-        if (Math.abs(v.w) > 1.0e-6f) {
-            v.div(v.w);
-        }
-        builder.addVertex(v.x(), v.y(), v.z());
+    /**
+     * 斜率 {@code (sx, sy)} 在深度 {@code depth} 上的绘制空间点 = {@code (sx*d, sy*d, -d)}。
+     *
+     * <p>验证：该点的斜率 = {@code (sx*d) / -(-d) = sx}，与输入一致；
+     * 而 NDC 只由斜率决定，所以任何 {@code d} 都投到同一个屏幕点。</p>
+     */
+    private static void emitSlopeVertex(BufferBuilder builder, float depth, float[] slope) {
+        builder.addVertex(slope[0] * depth, slope[1] * depth, -depth);
     }
 
     /**

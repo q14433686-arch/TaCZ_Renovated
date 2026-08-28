@@ -60,6 +60,23 @@ bash scripts/check_release_consistency.sh --strict
 6. **多人门禁**：当前 HEAD 必须执行 `docs/DEDICATED_SERVER_TEST.md` 的 L0-L2、L2.5
    与 L3；单机正常不等于完成。
 7. **进度不进 README**：工作包与证据放 `docs/`；README 只写用户需要的当前边界。
+8. **上游纪元机制失效不是 bug，不逐个"修"**：凡症状可追溯到「只在 1.20.1 / 1.21.1
+   上游存在的机制」，在 26.2 下**必然失效，属预期结果**。这一类的共同特征是靠上游
+   纪元的机制写入行为，而 26.2 换了整套底座（`GlCommandEncoder` / `RenderPipeline` /
+   FrameGraph / Feature Rendering；1.21.1 还是 stencil 纪元、无 Feature Rendering）。
+   已见过的同类：`entity_transform` 沿用 1.20.1 的 pixel×1/16 解析与姿态语义
+   （26.2 的 `ItemTransform#apply` 会把中心移到 −0.5，见
+   `docs/records/LR_043_FOLLOWUP_20260826.md`）；1.21.1 的约束位移在 26.2 没有对应
+   基座（见 `docs/records/SCOPE_IRIS_VIEWLAG_AUDIT_20260826.md` 症状表）；mod 构造期
+   注册表在 26.1 已冻结、与 1.20.1 老 Forge 相反（见 `docs/WP07_LRTACTICAL_PLAN.md`）。
+
+   处置口径：
+   - 归类为**「不适用（上游纪元）」**，写进对应状态文档并给出上游机制的指认，
+     **不修、不绕、不写进 `CHANGELOG.md` 的修复项**；
+   - 不得为了让它"看起来生效"而加 fallback、no-op 或旁路（与 §2 一致）；
+   - 若确实需要该行为，按 26.2 机制**重做**并另开工作包，不是"修复移植遗漏"；
+   - 判据是**机制归属**，不是症状轻重：能指认到上游纪元机制的即归此类，
+     指认不到的才按普通缺陷走正常流程。不要预设清单，逐个案例逐个判。
 
 ## 4. 文档地图
 
@@ -81,4 +98,6 @@ bash scripts/check_release_consistency.sh --strict
 - [ ] 没有把未执行项写成 PASS
 - [ ] 新 API 有证据；从 refab 复制的内容已去除 Fabric 表面
 - [ ] 双端方法与 EMPTY ItemStack 已审计
+- [ ] 报为缺陷的症状已判过机制归属：能指认到 1.20.1 / 1.21.1 上游纪元机制的
+      已归为「不适用（上游纪元）」，没有被当成移植遗漏去修
 - [ ] 当前分支仍是固定 Arena 分支，未切换或创建其他分支

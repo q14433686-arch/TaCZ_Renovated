@@ -22,6 +22,31 @@
 
 ### 修复
 
+- 修复开光影后镜内裁切整体失效（含低倍镜准星溢出目镜）—— **draw 时的 uniform /
+  采样器状态被覆盖**。Iris 的 `MixinGlCommandEncoder` 也在 `GlCommandEncoder#trySetup`
+  的 RETURN 注入，并在那里调用 `ExtendedShader#iris$setupState`
+  （`_glUseProgram` + `ProgramSamplers#update()` + `ProgramUniforms#update()`），
+  而本仓写 `tacz_ScopeMaskMode` 的 hook 挂在**同一个 RETURN 点**、
+  `IrisExtendedShaderMixin` 又在 `iris$setupState` 的 RETURN 把它无脑写回 0。
+  两个处理器的先后由 mixin config 应用顺序决定，一旦本仓排在 Iris 之前，
+  mode 就被写回 0 且本 pass 内无人再写 —— 镜身与准星一起不裁。
+  改为**两个写入点**（`trySetup` RETURN + `iris$setupState` RETURN，
+  pass 在 `trySetup` HEAD 记录），谁最后跑都得到正确值，与 mixin 顺序无关；
+  并修掉「拿 A 程序的 uniform location 去 `glUniform1i` 当前程序」的静默无效写入。
+  取证（含 Iris 钉死 commit `8f3a7a3` 的 `MixinGlCommandEncoder` 原文）与复测清单见
+  `docs/records/SCOPE_MASK_HULL_SLOPESPACE_20260827.md`。**未实机。**
+
+- 修复开光影后镜内裁切整体失效（含低倍镜准星溢出目镜）：`ScopeMaskRenderer` 的
+  凸包孔径填充原先要把投影 UBO 读回 CPU，开光影后该读回必抛
+  `IllegalStateException: Buffer is not readable`（本仓 `latest.log` 实录，Iris
+  `1.11.2+mc26.2`），于是凸包每帧回退逐立方体描摹，板条目镜的孔径没被填上。
+  改为在**光线斜率空间**求凸包（`NDC = (P00·x/-z, P11·y/-z)` 是保凸包的正系数
+  轴向缩放），写回时整片扇面共用一个视深度 —— 不再需要投影矩阵与其逆，
+  也去掉每帧 64B 的 GPU 读回；并补上姊妹仓已有、本仓缺失的近平面炸包保护
+  （`SLOPE_SANITY_LIMIT`）。`ScopeMaskHullFill=false` 仍是即时回退开关。
+  取证与复测清单见 `docs/records/SCOPE_MASK_HULL_SLOPESPACE_20260827.md`。
+  **源码级修复，沙箱无 JDK 无法编译，未实机。**
+
 - 修复 LRTactical 长按使用状态分叉，并补齐耳鸣音效与药效图标资源。
 
 - 修复 26.2 首次生产编译暴露的 FOV event、HUD tick、AvatarRenderer descriptor 与三个
