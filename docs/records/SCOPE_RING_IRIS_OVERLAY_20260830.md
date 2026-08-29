@@ -1,7 +1,16 @@
 # 光影下遮光环被镜内合成盖掉（2026-08-30）
 
-状态：**已动源码，未编译、未实机**（沙箱无 JDK / Maven 源）。禁止写 PASS。
-复测：开光影 + `ScopePipEnable=true` + `ScopePipAllowShaderPacks=true`，对着光源开镜。
+状态：**实机 PASS（用户 2026-08-30 复测）**。依据：用户本地 `gradlew build`
+编译通过 + 开光影开镜对着光源复测，遮光环恢复为不透明黑环。
+
+| 轮次 | 结果 |
+|---|---|
+| 第 1 轮（推送 `0c446f4`） | 编译失败：`RenderSystem.getModelViewMatrix()` 在 26.2 不存在（26.2 叫 `getModelViewMatrixCopy()`，本仓 `BedrockAttachmentModel:1053` 有同款写法）。只此一处错误 —— 本次新引入的三处 26.2 API 全部编译通过。 |
+| 第 2 轮（推送 `ce24ef8`） | 编译通过 + 实机 PASS |
+
+复现条件（用户原话：**必须开 PIP 且开光影才出现**）：
+`ScopePipEnable=true` + `ScopePipAllowShaderPacks=true` + 光影包生效 + 第一人称
++ 对着光源开镜。
 
 ---
 
@@ -74,6 +83,13 @@ poseStack（世界坐标）、节点 pose 是单位矩阵，落点完全取决�
 矩阵 —— 取错就整个飘出画面。阶段边界正是「矩阵就位、手部几何未画」的那一刻，
 与 `ScopeMaskRenderer#renderAtPhaseBoundary` 取掩码投影的位置逐字相同。
 （只取切片对象，不读回内容 —— 那 64 字节在光影下不可读，本仓日志有实录。）
+
+## 5.1 实机验证到哪一步
+
+- ✔ 遮光环恢复不透明（主要症状消失）。
+- ✔ 目镜框位置/大小正确 —— 说明「阶段边界捕获手持投影 + 模型视图」这条路走对了。
+- ✔ 目镜框可见 —— 说明沿用 vanilla entity cutout 的深度测试没有把它判成遮挡。
+- ❓ 蚀刻/发光准星在光影 + PIP 下是否也被盖住（见下）：本次未修，待用户确认。
 
 ## 6. 未验证点 / 已知缺口
 

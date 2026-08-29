@@ -164,7 +164,7 @@
   路径有这个问题。机制随 1.21.11 邻链 `2710c7c` 移植（排队 → 合成之后用「无掩码
   + 无雾」的原版 entity 管线重画），并按 26.2 改了三处（不自建
   `FeatureRenderDispatcher`、不调 `SubmitNodeStorage#endFrame`、刷新点不是 Iris 的
-  `finalizeLevelRendering`）。**未编译、未实机。** 见
+  `finalizeLevelRendering`）。**本机编译 + 实机 PASS（用户 2026-08-30 复测）** —— 对着光源开镜，遮光环恢复为不透明黑环，位置与大小均正确。见
   `docs/records/SCOPE_RING_IRIS_OVERLAY_20260830.md`。
 
 ### 可选兼容
