@@ -122,7 +122,10 @@ public final class ScopeFinalRingOverlay {
             return;
         }
         handTransform = new HandTransform(
-                new Matrix4f(RenderSystem.getModelViewMatrix()),
+                // 26.2 里这个方法叫 getModelViewMatrixCopy()（不是 1.21.11 的
+                // getModelViewMatrix() —— 它在本版本已被移除，照抄会编译不过）。
+                // 与 BedrockAttachmentModel#getMirrorGeometry 那处同款写法。
+                new Matrix4f(RenderSystem.getModelViewMatrixCopy()),
                 RenderSystem.getProjectionMatrixBuffer(),
                 RenderSystem.getProjectionType());
     }
