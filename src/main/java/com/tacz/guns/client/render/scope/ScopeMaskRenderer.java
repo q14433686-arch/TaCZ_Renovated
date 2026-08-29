@@ -25,7 +25,9 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector4f;
 
 import java.util.Optional;
@@ -190,7 +192,167 @@ public final class ScopeMaskRenderer {
      */
     private static boolean inHandPass = false;
 
+    // ------------------------------------------------------------------
+    // 帧状态：镜内画中画（ScopePipRenderer）要读的四样东西
+    // ------------------------------------------------------------------
+
+    /** 本帧掩码是否已成功画进 target（合成阶段跑在掩码之后，看这个）。 */
+    private static boolean maskDrawnThisFrame = false;
+    /**
+     * 上一帧的 {@link #maskDrawnThisFrame} 快照。
+     *
+     * <p>为什么需要它：掩码画在手部渲染里，而两个消费者跑在那之前 ——
+     * FOV 事件在 {@code extract} 阶段、镜内画面的抓取在 {@code renderLevel} 里。
+     * 它们要问的是「上一帧有没有掩码」，读当帧的值只会恒得 false。</p>
+     */
+    private static boolean maskDrawnLastFrame = false;
+    /**
+     * 「镜内画面本帧已经合成过」的一次性闸门。
+     *
+     * <p>Iris 的 {@code HandRenderer} 一帧调用两次 {@code renderAllFeatures}
+     * （solid 与 translucent），合成若两次都跑，第二次会把 solid 阶段已经画进
+     * 孔径的东西（蚀刻准星等）整片覆盖掉。只允许本帧第一次手部 pass 合成。</p>
+     */
+    private static boolean compositedThisFrame = false;
+
+    /**
+     * 透视投影的两个轴向系数（{@code m00} / {@code m11}）。
+     *
+     * <p>本仓的掩码走<b>斜率空间</b>（见 {@link #writeHullFill}），不碰投影矩阵，
+     * 所以把「目镜在屏幕上占多大」换算回 NDC 时要用到这两个系数：
+     * <pre>
+     * NDC.x = P00 * slopeX      NDC.y = P11 * slopeY
+     * </pre>
+     * 由 {@code GameRendererMixin} 在 {@code renderItemInHand} 的 HEAD 处送进来
+     * —— 那是手持那一遍真正使用的投影。
+     * 取不到（例如光影接管了手部渲染、这个注入点没跑到）时恒为 0，
+     * 于是 {@link #hasMaskBounds()} 返回 false，合成退回纯掩码约束。
+     */
+    private static float projectionP00 = 0.0f;
+    private static float projectionP11 = 0.0f;
+
+    /** 本帧目镜几何在<b>斜率空间</b>的包围盒，{@code {minX, minY, maxX, maxY}}。 */
+    private static final float[] SLOPE_BOUNDS = new float[4];
+    private static boolean slopeBoundsValid = false;
+    /** 换算后的 NDC 包围盒（懒换算，算一次就缓存）。 */
+    private static final float[] MASK_BOUNDS_NDC = new float[4];
+    private static boolean maskBoundsValid = false;
+
+    /**
+     * NDC 的合理范围。视口是 [-1,1]，留一倍余量容纳部分出屏的目镜。
+     *
+     * <p>超出即判为近平面伪影：第一人称视模离相机极近，顶点擦过近平面时斜率会飙到
+     * 很大，一个这样的点就能把包围盒撑满全屏 —— 那种包围盒<b>比没有更糟</b>，
+     * 因为它会把合成的硬件剪裁放开到整屏，等于撤销了那道保险。
+     */
+    private static final float NDC_SANITY_LIMIT = 2.0f;
+
     private ScopeMaskRenderer() {
+    }
+
+    /**
+     * 每帧开头调用一次，快照上一帧结果并把本帧归零。
+     *
+     * <p>接在 {@code GameRenderer#extract} 的 HEAD 上 —— 那是
+     * {@code Minecraft#runTick} 里 <b>extract → render</b> 这条顺序的最前面，
+     * 于是本帧所有消费者（FOV 事件、镜内抓取、合成）看到的都是同一份、定义明确的状态。
+     *
+     * <p>刻意<b>不</b>放在手部 pass 里：Iris 一帧有两次手部 pass，放那儿会被第二次抹掉。
+     */
+    public static void beginFrame() {
+        maskDrawnLastFrame = maskDrawnThisFrame;
+        maskDrawnThisFrame = false;
+        compositedThisFrame = false;
+        slopeBoundsValid = false;
+        maskBoundsValid = false;
+    }
+
+    /** 本帧掩码是否已成功画进 target（供合成阶段判定 —— 它跑在掩码之后）。 */
+    public static boolean hasMaskThisFrame() {
+        return maskDrawnThisFrame;
+    }
+
+    /** 上一帧是否画出过掩码（供 FOV 让位与镜内抓取判定 —— 它们跑在掩码之前）。 */
+    public static boolean hadMaskLastFrame() {
+        return maskDrawnLastFrame;
+    }
+
+    /** @return true 表示本次调用取得了合成资格（每帧只有第一次调用会返回 true） */
+    public static boolean claimCompositeSlot() {
+        if (compositedThisFrame) {
+            return false;
+        }
+        compositedThisFrame = true;
+        return true;
+    }
+
+    /** 手持那一遍的投影矩阵；用于把斜率空间的包围盒换算成屏幕 NDC。 */
+    public static void setHandProjection(@Nullable Matrix4fc projection) {
+        if (projection == null) {
+            projectionP00 = 0.0f;
+            projectionP11 = 0.0f;
+            return;
+        }
+        projectionP00 = projection.m00();
+        projectionP11 = projection.m11();
+    }
+
+    /**
+     * 本帧是否算出了可用的目镜屏幕包围盒。
+     *
+     * <p>它是合成的<b>硬件剪裁</b>依据：着色器里「掩码为假就 discard」是<b>软</b>约束，
+     * 掩码纹理一旦有任何问题，那张放大的世界就会被整屏糊上去；
+     * 而目镜的屏幕包围盒是我们本来就算得出来的东西，用它开 scissor 就物理上
+     * 不可能画到镜片之外。两道约束一软一硬，一道失效还有另一道。
+     */
+    public static boolean hasMaskBounds() {
+        if (maskBoundsValid) {
+            return true;
+        }
+        if (!slopeBoundsValid || projectionP00 <= 0.0f || projectionP11 <= 0.0f) {
+            return false;
+        }
+        float minX = projectionP00 * SLOPE_BOUNDS[0];
+        float maxX = projectionP00 * SLOPE_BOUNDS[2];
+        float minY = projectionP11 * SLOPE_BOUNDS[1];
+        float maxY = projectionP11 * SLOPE_BOUNDS[3];
+        if (minX < -NDC_SANITY_LIMIT || maxX > NDC_SANITY_LIMIT
+                || minY < -NDC_SANITY_LIMIT || maxY > NDC_SANITY_LIMIT) {
+            // 近平面伪影：宁可不开剪裁，也不要一个被撑爆的包围盒。
+            return false;
+        }
+        MASK_BOUNDS_NDC[0] = minX;
+        MASK_BOUNDS_NDC[1] = minY;
+        MASK_BOUNDS_NDC[2] = maxX;
+        MASK_BOUNDS_NDC[3] = maxY;
+        maskBoundsValid = true;
+        return true;
+    }
+
+    /** @return {@code {minX, minY, maxX, maxY}}，NDC 空间；仅在 {@link #hasMaskBounds()} 为真时有效 */
+    public static float[] maskBoundsNdc() {
+        return MASK_BOUNDS_NDC;
+    }
+
+    /**
+     * 把一个斜率空间的点并入本帧包围盒。
+     *
+     * <p>写入掩码的顶点都来自同一个斜率空间（凸包扇面与逐立方体描摹两条路径一致），
+     * 所以它同时覆盖两种填充方式。
+     */
+    private static void accumulateSlopeBounds(float slopeX, float slopeY) {
+        if (!slopeBoundsValid) {
+            slopeBoundsValid = true;
+            SLOPE_BOUNDS[0] = slopeX;
+            SLOPE_BOUNDS[1] = slopeY;
+            SLOPE_BOUNDS[2] = slopeX;
+            SLOPE_BOUNDS[3] = slopeY;
+            return;
+        }
+        SLOPE_BOUNDS[0] = Math.min(SLOPE_BOUNDS[0], slopeX);
+        SLOPE_BOUNDS[1] = Math.min(SLOPE_BOUNDS[1], slopeY);
+        SLOPE_BOUNDS[2] = Math.max(SLOPE_BOUNDS[2], slopeX);
+        SLOPE_BOUNDS[3] = Math.max(SLOPE_BOUNDS[3], slopeY);
     }
 
     /** Registers the off-screen mask pipeline through NeoForge's 26.2 mod-bus API. */
@@ -321,6 +483,9 @@ public final class ScopeMaskRenderer {
                     // 我们的顶点/索引都是从头开始的单批，所以 firstIndex 与 baseVertex 都是 0。
                     pass.drawIndexed(draw.indexCount(), 1, 0, 0, 0);
                 }
+                // 走到这里 pass 已经关闭、绘制已提交 —— 掩码 target 里确实有东西了。
+                // 镜内画中画的合成阶段就等这一位。
+                maskDrawnThisFrame = true;
                 if (!loggedSuccess) {
                     loggedSuccess = true;
                     // 凸包 / 描摹 计数是判断「掩码到底是孔径填充还是只剩板条」的唯一线索：
@@ -476,6 +641,9 @@ public final class ScopeMaskRenderer {
                         continue;
                     }
                     pts.add(new float[]{slopeX, slopeY});
+                    // 顺带累积目镜的屏幕包围盒（镜内画中画的合成用它开硬件剪裁）。
+                    // 用过滤后的斜率点，所以近平面伪影不会把盒子撑爆。
+                    accumulateSlopeBounds(slopeX, slopeY);
                     depthSum += depth;
                     depthCount++;
                 }
@@ -581,6 +749,18 @@ public final class ScopeMaskRenderer {
                 Vector4f v = new Vector4f(x, y, z, 1.0F);
                 v.mul(pose);
                 builder.addVertex(v.x(), v.y(), v.z());
+                // 与凸包那条路同一个包围盒：这里写的是绘制空间点，先还原成斜率再累积。
+                // 相机后方的点（depth<=0）会翻到屏幕对面，与凸包路径一样直接丢掉。
+                float depth = -v.z();
+                if (depth > 1.0e-4f) {
+                    float slopeX = v.x() / depth;
+                    float slopeY = v.y() / depth;
+                    if (Float.isFinite(slopeX) && Float.isFinite(slopeY)
+                            && Math.abs(slopeX) <= SLOPE_SANITY_LIMIT
+                            && Math.abs(slopeY) <= SLOPE_SANITY_LIMIT) {
+                        accumulateSlopeBounds(slopeX, slopeY);
+                    }
+                }
             }
         }
     }

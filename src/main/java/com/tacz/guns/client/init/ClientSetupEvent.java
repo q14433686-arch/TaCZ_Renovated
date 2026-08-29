@@ -30,6 +30,7 @@ import com.tacz.guns.client.renderer.item.GunSmithTableItemRenderer;
 import com.tacz.guns.client.renderer.item.TaczDynamicItemModel;
 import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
 import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
+import com.tacz.guns.client.render.scope.ScopePipRenderer;
 import com.tacz.guns.client.resource.ClientAssetsManager;
 import com.tacz.guns.client.tooltip.ClientAmmoBoxTooltip;
 import com.tacz.guns.client.tooltip.ClientAttachmentItemTooltip;
@@ -129,6 +130,8 @@ public class ClientSetupEvent {
     public static void onRegisterRenderPipelines(RegisterRenderPipelinesEvent event) {
         ScopeMaskRenderer.registerPipeline(event);
         ScopeBodyRenderTypes.registerPipelines(event);
+        // 镜内画中画的合成管线。注册失败只让 PIP 自我停用，不影响进游戏。
+        ScopePipRenderer.registerPipeline(event);
     }
 
     @SubscribeEvent

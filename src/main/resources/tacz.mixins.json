@@ -19,13 +19,19 @@
     "client.ItemInHandLayerMixin",
     "client.ItemInHandRendererMixin",
     "client.LanguageMixin",
+    "client.LevelExtractorScopePassMixin",
+    "client.LevelRendererAccessor",
     "client.LocalPlayerMixin",
     "client.MinecraftUseRestartMixin",
     "client.MouseHandlerMixin",
     "client.PlayerModelMixin",
+    "client.PreparedFrameAccessor",
     "client.ScreenAccessor",
+    "client.SimpleFeatureRenderPhaseMixin",
+    "client.SkyRendererMixin",
     "client.SoundManagerPreparationsMixin",
-    "client.StairBlockAccessor"
+    "client.StairBlockAccessor",
+    "client.TranslucentFeatureRenderPhaseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

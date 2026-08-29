@@ -91,6 +91,27 @@
 - 不含 flash_shield，不打包 LRTactical 原作 ARR 美术。26.1.2 源基线已有单机/专服 PASS，
   但 26.2 LR 实机矩阵仍待执行。
 
+### 新增：镜内画中画（Scope PIP，默认关闭）
+
+- 从姊妹分支 `TaCZ_Refabricated_Unofficial` 的 `26.2(main)`（尖端 `fcaa2b8`，上一同步点
+  `7f6d1bf`）按本仓 NeoForge 表面重写接入：重投影模式（默认）+ 实验性二次渲染模式
+  （`ScopePipRerender`），以及 Iris / Voxy / Sodium / PhysicsMod 四条兼容层。
+  仅 `client.*` 包、不引入 Fabric 注解；`FabricLoader` → `ModList`，ForgeConfigAPIPort →
+  `ModConfigSpec`，管线走 `RegisterRenderPipelinesEvent`。
+- 新增 12 个 `ScopePip*` 选项，默认值与值域**逐项跟随姊妹分支**（`ScopePipEnable=false`、
+  `ScopePipAllowShaderPacks=false`），便于两边 A/B 对照。关闭时运行路径与合入前逐位等价；
+  运行期任何异常自我停用并退回整屏变焦。
+- 目镜包围盒改走本仓 855989c 的**斜率空间**（不读投影 UBO，不碰投影矩阵），
+  取不到手部投影时退回纯掩码约束。
+- 含姊妹分支 `052e600` 的修复：只有主画面的 `LevelRenderer.submitNodeStorage` 需要保留
+  提交节点，Iris `ShadowRenderer` 那份专用存储每帧照常清空；此前无差别拦截会让
+  Iris 阴影队列永不释放（每开镜帧沉积 ~3.7 个 Submit/DrawCommand，地板 ~7 FPS）。
+  取证与复测协议：`docs/records/REFAB_SCOPE_PIP_FPS_DECAY_20260829.md`。
+- 按裁决**不同步**那批实验装置（`ScopePipResourceProbe`、`ScopePipDebugGpuMem`、
+  `ScopePipReleaseIdlePipeline`）；它们的调查记录随同步存档。完整取舍与未验证清单：
+  `docs/records/REFAB_SCOPE_PIP_SYNC_20260830.md`。
+- **源码级移植，未经本仓编译与实机验证**（沙箱无 JDK / Maven 源）。禁止写 PASS。
+
 ### 变更
 
 - 从包含多人修复与 LRTactical 的完整 NeoForge 26.1.2 R1 稳定基线前滚到 26.2；不是重写。
