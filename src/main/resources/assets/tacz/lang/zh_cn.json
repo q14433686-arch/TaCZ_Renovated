@@ -88,6 +88,8 @@
   "config.tacz.client.render.enable_tooltip_id.desc": "当高级提示框(F3+H)开启时，在tooltips中显示tacz的枪械/弹药/配件ID",
   "config.tacz.client.render.scope_pip_enable": "瞄具画中画（PIP）",
   "config.tacz.client.render.scope_pip_enable.desc": "启用倍镜镜内画中画放大。开启后镜外保持 1x 视野，只有目镜内放大目标。",
+  "config.tacz.client.render.scope_pip_min_magnification": "PIP 最低启用倍率",
+  "config.tacz.client.render.scope_pip_min_magnification.desc": "当前档位倍率达到该值才启用画中画，低于则回退经典全屏变焦。低倍镜（2x-3x）全屏变焦观感本就自然，跳过 PIP 可省下其每帧开销。组合镜按当前所选档位判定。1.0 = 所有倍镜都启用 PIP。",
   "config.tacz.client.render.scope_pip_rerender": "PIP 二次渲染模式",
   "config.tacz.client.render.scope_pip_rerender.desc": "以真实窄 FOV 再画一遍世界，得到原生分辨率（对 6x-8x 倍镜最明显）。关闭则为重投影模式（几乎零开销）。实验性：每帧会驱动两遍世界渲染。",
   "config.tacz.client.render.scope_pip_resolution_scale": "PIP 渲染分辨率缩放",

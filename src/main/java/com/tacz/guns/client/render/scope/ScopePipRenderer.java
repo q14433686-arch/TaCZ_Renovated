@@ -504,6 +504,15 @@ public final class ScopePipRenderer {
         if (scopeMagnification() <= 1.0f) {
             return "held gun has no scope attachment with zoom > 1 (iron sights and 1x optics keep the old FOV zoom)";
         }
+        // 【倍率下限】低倍镜不值得付 PIP 的每帧全屏拷贝（二次渲染模式下是整遍世界重画），
+        // 而且 2×/3× 下整屏变焦的观感本来就自然。组合镜按当前档位判定 ——
+        // scopeMagnification() 取的就是 zoom[zoomNumber]，切档自动跟随。
+        // 这道闸门放在「有倍镜」判据之后：两者都回整屏变焦，但理由要分开报，
+        // 玩家调 ScopePipMinMagnification 时才知道是这个旋钮在起作用。
+        if (scopeMagnification() < minMagnification()) {
+            return "current zoom level " + scopeMagnification() + "x is below ScopePipMinMagnification ("
+                    + minMagnification() + "x); using classic full-screen zoom";
+        }
         // 最后一道，也是最容易被误判成「PIP 坏了」的一道：目镜掩码到底有没有产出。
         // 【两个快照都认】本方法被三个时机调用，各自该看哪一份并不相同：
         //   FOV 让位（extract 阶段）、镜内抓取（renderLevel 里）→ 本帧掩码还没画，看上一帧；
@@ -596,6 +605,10 @@ public final class ScopePipRenderer {
             return false;
         }
         if (scopeMagnification() <= 1.0f) {
+            return false;
+        }
+        // 与无光影路径同一道倍率下限（见 inactiveReason 里的说明）。
+        if (scopeMagnification() < minMagnification()) {
             return false;
         }
         if (currentAimingProgress() <= minAimingProgress()) {
@@ -1063,6 +1076,16 @@ public final class ScopePipRenderer {
     private static float minAimingProgress() {
         return RenderConfig.SCOPE_PIP_MIN_AIMING_PROGRESS == null
                 ? 0.05f : RenderConfig.SCOPE_PIP_MIN_AIMING_PROGRESS.get().floatValue();
+    }
+
+    /**
+     * PIP 的最低启用倍率（当前档位倍率低于它就不做 PIP）。
+     *
+     * <p>配置可能尚未加载，一律带 null 兜底；默认值与姊妹分支一致（4.0）。
+     */
+    private static float minMagnification() {
+        return RenderConfig.SCOPE_PIP_MIN_MAGNIFICATION == null
+                ? 4.0f : RenderConfig.SCOPE_PIP_MIN_MAGNIFICATION.get().floatValue();
     }
 
     private static float sharpness() {

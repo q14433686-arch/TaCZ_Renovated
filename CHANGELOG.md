@@ -101,6 +101,12 @@
 - 新增 12 个 `ScopePip*` 选项，默认值与值域**逐项跟随姊妹分支**（`ScopePipEnable=false`、
   `ScopePipAllowShaderPacks=false`），便于两边 A/B 对照。关闭时运行路径与合入前逐位等价；
   运行期任何异常自我停用并退回整屏变焦。
+- 同步姊妹分支 `5a96423` + `c74b34b`：新增倍率下限闸门 `ScopePipMinMagnification`
+  （默认 4.0，1.0~100.0）—— 当前档位倍率低于该值时 PIP 让位、回经典整屏变焦。
+  低倍镜（2×/3×）下整屏变焦观感本就自然，而 PIP 每帧要付一次全屏拷贝（二次渲染
+  模式下是整遍世界重画）。组合镜按当前档位判定，切档自动跟随；`inactiveReason()`
+  与 `wantsIrisComposite()` 两处加闸门即可覆盖四个时机（已逐行核对调用点）。
+  已接入游戏内菜单与中英文文案。**未编译、未实机。**
 - 镜内合成的边界**只有着色器里的软掩码约束**（掩码为假即 discard），与姊妹分支一致。
 - 含姊妹分支 `052e600` 的修复：只有主画面的 `LevelRenderer.submitNodeStorage` 需要保留
   提交节点，Iris `ShadowRenderer` 那份专用存储每帧照常清空；此前无差别拦截会让
@@ -134,6 +140,20 @@
 - 普通 mask 只使用 `TextureTarget` / `RenderPass` backend 抽象，可进入 OpenGL/Vulkan。
 - Iris 改用 HAND pipeline 分类、linked-fragment dormant branch 与逐 draw uniform/texture binding。
 - 版本 metadata 定名为 `1.1.8+neoforge.26.2.R1`。
+
+### 工程
+
+- 新增编译验证配方 `docs/ci/compile-check.yml`（**暂存在 docs/ci/，需项目成员移入
+  `.github/workflows/` 才生效** —— 沙箱凭据无 `workflows` 权限，直接推会被拒）：
+  编译在 GitHub Actions 上跑，日志经
+  Contents API 写回分支的 `build-reports/compile-java.log`，供网络受限的环境用
+  `gh api contents` 读回 —— 配方随姊妹分支 `arena/01a04e96` 同步（她的 v3，
+  v2 的 commit 回推曾因 push 竞争多次失败）。只在本仓 `arena/**` 分支触发，
+  `paths-ignore: build-reports/**` 防死循环；`.gitignore` 把该目录排除在提交之外。
+- 记录姊妹分支 `arena/01a04e96` 的同步取舍：内置 Mesh Loader（`8c6ad27`，第三方
+  `VellEagle/TacZMeshLoader` 的 poly_mesh 渲染，第 0 步、无 GPU 路径、上游 4 次
+  被关 PR）**暂不移植**，等确认是否真有 mesh 枪包需求再单独立项。
+  见 `docs/records/REFAB_SYNC_01A04E96_20260830.md`。
 
 ### 可选兼容
 

@@ -308,6 +308,8 @@
   "config.tacz.client.render.laser_fadeout.desc": "Whether or not apply fadeout effect on the laser beam. Close this may improve laser performance under some shaders.",
   "config.tacz.client.render.scope_pip_enable": "Scope Picture-in-Picture (PIP)",
   "config.tacz.client.render.scope_pip_enable.desc": "Enable picture-in-picture optic magnification. Keeps the outside view at 1x while magnifying the target inside the scope lens.",
+  "config.tacz.client.render.scope_pip_min_magnification": "PIP Minimum Magnification",
+  "config.tacz.client.render.scope_pip_min_magnification.desc": "Only use picture-in-picture when the scope's current zoom level is at least this value; weaker optics fall back to classic full-screen zoom. Low-power scopes (2x-3x) look fine with full-screen zoom, and skipping PIP saves its per-frame cost. Variable scopes are judged by the currently selected zoom level. 1.0 = PIP for every scope.",
   "config.tacz.client.render.scope_pip_rerender": "PIP Second-Render Pass",
   "config.tacz.client.render.scope_pip_rerender.desc": "Render the world a second time with a narrow FOV for native resolution (helps 6x-8x optics). Off uses screen re-projection with near-zero overhead. EXPERIMENTAL: drives the level renderer twice per frame.",
   "config.tacz.client.render.scope_pip_resolution_scale": "PIP Render Resolution Scale",

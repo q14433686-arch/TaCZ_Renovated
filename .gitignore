@@ -1,0 +1,3 @@
+# CI 编译日志由 compile-check 工作流经 Contents API 写回本分支，
+# 不走 git，也不该进提交（沙箱用 `gh api contents` 读取）。
+build-reports/

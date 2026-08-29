@@ -49,6 +49,16 @@ public class RenderConfig {
     /** 开镜进度低于该值时不做 PIP（此时孔径几乎闭合，拷贝纯属浪费）。 */
     public static ModConfigSpec.DoubleValue SCOPE_PIP_MIN_AIMING_PROGRESS;
     /**
+     * 瞄具倍率低于该值时不做 PIP，改走原来的整屏变焦。
+     *
+     * <p>PIP 对低倍镜是笔亏本买卖：2×/3× 下整屏变焦的观感本来就自然
+     * （视野收窄不明显），PIP 却照付全套成本 —— 每帧一次全屏拷贝，
+     * 二次渲染模式下更是整遍世界重画。高倍镜才是 PIP 的目标场景
+     * （8× 整屏变焦会把周边视野压没）。组合镜按<b>当前档位</b>判定，
+     * 切到低倍档自动回整屏变焦，切回高倍档自动回 PIP。
+     */
+    public static ModConfigSpec.DoubleValue SCOPE_PIP_MIN_MAGNIFICATION;
+    /**
      * 镜内锐化强度（0 = 关）。镜内画面是按倍率放大来的，锐化不能凭空造出细节，
      * 但能挽回主观锐度；实际强度按倍率线性加权，低倍镜不会被过度处理。
      */
@@ -180,6 +190,15 @@ public class RenderConfig {
                 .comment("Skip the picture-in-picture work while the aiming progress is below this value",
                         "(the ocular aperture is still nearly closed down there).")
                 .defineInRange("ScopePipMinAimingProgress", 0.05d, 0.0d, 1.0d);
+        SCOPE_PIP_MIN_MAGNIFICATION = builder
+                .comment("Only use picture-in-picture when the scope's CURRENT zoom level is at least",
+                        "this value; weaker optics fall back to the classic full-screen zoom.",
+                        "Low-power scopes (2x-3x) look fine with full-screen zoom and PIP costs a",
+                        "fullscreen copy every frame (or a full world re-render in rerender mode),",
+                        "so paying that price only for high-power optics is usually the better deal.",
+                        "Variable scopes are judged by the zoom level currently selected.",
+                        "1.0 = PIP for every scope (old behavior).")
+                .defineInRange("ScopePipMinMagnification", 4.0d, 1.0d, 100.0d);
         SCOPE_PIP_SHARPNESS = builder
                 .comment("Sharpening applied to the scope image (0 = off). The lens magnifies a centre crop",
                         "of the frame by exactly the scope's zoom factor, so high-power optics are soft;",
