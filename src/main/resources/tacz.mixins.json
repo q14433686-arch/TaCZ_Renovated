@@ -25,7 +25,13 @@
     "client.PlayerModelMixin",
     "client.ScreenAccessor",
     "client.SoundManagerPreparationsMixin",
-    "client.StairBlockAccessor"
+    "client.StairBlockAccessor",
+    "client.LevelExtractorScopePassMixin",
+    "client.SkyRendererMixin",
+    "client.PreparedFrameAccessor",
+    "client.SimpleFeatureRenderPhaseMixin",
+    "client.TranslucentFeatureRenderPhaseMixin",
+    "client.LevelRendererAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

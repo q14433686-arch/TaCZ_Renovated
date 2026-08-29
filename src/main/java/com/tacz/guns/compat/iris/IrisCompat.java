@@ -7,7 +7,10 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
+import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,14 +38,89 @@ public final class IrisCompat {
         }
     }
 
+    /**
+     * Iris 反射句柄，解析成功后缓存。
+     */
+    @Nullable
+    private static Object irisApiInstance;
+    @Nullable
+    private static Method mIsShaderPackInUse;
+    @Nullable
+    private static Object handRendererInstance;
+    @Nullable
+    private static Method mHandRendererIsActive;
+    @Nullable
+    private static Field fHandRendererActive;
+
+    private static void resolveIrisHandles() {
+        if (irisApiInstance == null || mIsShaderPackInUse == null) {
+            try {
+                Class<?> irisApiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+                irisApiInstance = irisApiClass.getMethod("getInstance").invoke(null);
+                mIsShaderPackInUse = irisApiClass.getMethod("isShaderPackInUse");
+            } catch (Throwable ignored) {
+                irisApiInstance = null;
+                mIsShaderPackInUse = null;
+            }
+        }
+        if (handRendererInstance == null || (mHandRendererIsActive == null && fHandRendererActive == null)) {
+            try {
+                Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
+                try {
+                    Field f = handRendererClass.getDeclaredField("INSTANCE");
+                    f.setAccessible(true);
+                    handRendererInstance = f.get(null);
+                } catch (Throwable ignored) {
+                }
+                try {
+                    Method m = handRendererClass.getDeclaredMethod("isActive");
+                    m.setAccessible(true);
+                    mHandRendererIsActive = m;
+                } catch (Throwable ignored) {
+                }
+                try {
+                    Field f = handRendererClass.getDeclaredField("ACTIVE");
+                    f.setAccessible(true);
+                    fHandRendererActive = f;
+                } catch (Throwable ignored) {
+                }
+            } catch (Throwable ignored) {
+                handRendererInstance = null;
+                mHandRendererIsActive = null;
+                fHandRendererActive = null;
+            }
+        }
+    }
+
+    /**
+     * 本帧「是否在用光影包」的记忆值。
+     */
+    private static byte usingRenderPackThisFrame = -1;
+
+    /** 每帧清一次帧内记忆值。挂在 {@code GameRenderer#extract} 的 HEAD。 */
+    public static void beginFrame() {
+        usingRenderPackThisFrame = -1;
+    }
+
     public static boolean isUsingRenderPack() {
+        if (usingRenderPackThisFrame >= 0) {
+            return usingRenderPackThisFrame != 0;
+        }
+        boolean result = computeUsingRenderPack();
+        usingRenderPackThisFrame = (byte) (result ? 1 : 0);
+        return result;
+    }
+
+    private static boolean computeUsingRenderPack() {
         if (!ModList.get().isLoaded(CompatRegistry.IRIS)) {
             return false;
         }
+        resolveIrisHandles();
+        if (irisApiInstance == null || mIsShaderPackInUse == null) {
+            return false;
+        }
         try {
-            Class<?> apiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
-            Object api = apiClass.getMethod("getInstance").invoke(null);
-            return (Boolean) apiClass.getMethod("isShaderPackInUse").invoke(api);
+            return (Boolean) mIsShaderPackInUse.invoke(irisApiInstance);
         } catch (Throwable ignored) {
             return false;
         }
@@ -72,10 +150,6 @@ public final class IrisCompat {
             GunMod.LOGGER.info("[TACZ Iris] Assigned {} to the Iris {} program.", debugName, irisProgramName);
             return true;
         } catch (Throwable t) {
-            // Iris 1.11.3+mc26.1.2 起会对常见 entity 管线做自动分类（日志
-            // "Found fine program match ..."），此时重复 assign 会抛
-            // IllegalStateException("Shader already assigned")。Iris 已分类 = 目的已达成，
-            // 视为成功，不再告警（2026-08-21 LAN 实测日志，docs/records/SERVER_TEST_20260821_LAN.md）。
             Throwable cause = t;
             while (cause != null) {
                 if (cause instanceof IllegalStateException
@@ -123,13 +197,35 @@ public final class IrisCompat {
         if (!ModList.get().isLoaded(CompatRegistry.IRIS) || !isUsingRenderPack()) {
             return false;
         }
+        resolveIrisHandles();
+        if (handRendererInstance != null && mHandRendererIsActive != null) {
+            try {
+                return (Boolean) mHandRendererIsActive.invoke(handRendererInstance);
+            } catch (Throwable ignored) {
+            }
+        }
+        if (fHandRendererActive != null) {
+            try {
+                return (Boolean) fHandRendererActive.get(null);
+            } catch (Throwable ignored) {
+            }
+        }
+        // Fallback: direct dynamic query
         try {
             Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
-            Object instance = handRendererClass.getField("INSTANCE").get(null);
-            return (Boolean) handRendererClass.getMethod("isActive").invoke(instance);
+            Field f = handRendererClass.getDeclaredField("INSTANCE");
+            f.setAccessible(true);
+            Object inst = f.get(null);
+            if (inst != null) {
+                handRendererInstance = inst;
+                Method m = handRendererClass.getDeclaredMethod("isActive");
+                m.setAccessible(true);
+                mHandRendererIsActive = m;
+                return (Boolean) m.invoke(inst);
+            }
         } catch (Throwable ignored) {
-            return false;
         }
+        return false;
     }
 
     /**

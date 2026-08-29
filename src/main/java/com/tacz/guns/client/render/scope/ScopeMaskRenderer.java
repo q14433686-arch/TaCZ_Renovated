@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -172,7 +173,38 @@ public final class ScopeMaskRenderer {
     /** 顶点暂存区。复用同一个，避免每帧分配。 */
     private static final ByteBufferBuilder SCRATCH = new ByteBufferBuilder(4096);
 
+    private static final float[] MASK_BOUNDS_NDC = new float[4];
+    private static boolean maskBoundsValid = false;
+
+    public static boolean hasMaskBounds() {
+        return maskBoundsValid;
+    }
+
+    public static float[] maskBoundsNdc() {
+        return MASK_BOUNDS_NDC;
+    }
+
+    private static void accumulateBounds(float ndcX, float ndcY) {
+        if (!maskBoundsValid) {
+            maskBoundsValid = true;
+            MASK_BOUNDS_NDC[0] = ndcX;
+            MASK_BOUNDS_NDC[1] = ndcY;
+            MASK_BOUNDS_NDC[2] = ndcX;
+            MASK_BOUNDS_NDC[3] = ndcY;
+            return;
+        }
+        MASK_BOUNDS_NDC[0] = Math.min(MASK_BOUNDS_NDC[0], ndcX);
+        MASK_BOUNDS_NDC[1] = Math.min(MASK_BOUNDS_NDC[1], ndcY);
+        MASK_BOUNDS_NDC[2] = Math.max(MASK_BOUNDS_NDC[2], ndcX);
+        MASK_BOUNDS_NDC[3] = Math.max(MASK_BOUNDS_NDC[3], ndcY);
+    }
+
+
     private static boolean failed = false;
+        private static boolean maskDrawnThisFrame = false;
+    public static boolean wasMaskDrawnThisFrame() { return maskDrawnThisFrame; }
+    public static void clearMaskDrawnFlag() { maskDrawnThisFrame = false; }
+
     private static boolean loggedSuccess = false;
     /** 「开着调试却没有任何目镜几何」只警告一次，避免刷屏。 */
     private static boolean loggedEmpty = false;
@@ -189,6 +221,39 @@ public final class ScopeMaskRenderer {
      * 由 {@code GameRendererMixin} 的 {@code renderItemInHand} HEAD/RETURN 维护。</p>
      */
     private static boolean inHandPass = false;
+
+    /**
+     * 本帧掩码 target 里是否真有一张画好的掩码。
+     *
+     * <p>{@link ScopeMaskGeometry} 在 {@link #renderAtPhaseBoundary()} 的 finally 里
+     * 被无条件清空，所以<b>合成阶段没法再靠「清单空不空」判断本帧有没有掩码</b>。
+     * {@code ScopePipRenderer} 紧跟在掩码之后合成镜内画面，需要这个答案。</p>
+     *
+     * <h3>语义是「本帧任意时刻画过」，因此只能<b>每帧</b>清一次</h3>
+     * 早前的实现把它清在「每次手部 pass 开始时」，那在原版下没问题（一帧只有一次手部
+     * {@code renderAllFeatures}），但在 <b>Iris 光影下是错的</b>：
+     * {@code HandRenderer} 一帧里调用两次 —— {@code renderSolid} 与
+     * {@code renderTranslucent}，两次的 {@code ACTIVE} 都是 true（字节码实读）。于是：
+     * <pre>
+     * ① solid       清零 → 目镜几何在册 → 画掩码 → true
+     * ② translucent 清零 → 几何已被 ① 消费掉，清单是空的 → 提前 return → 【false】
+     * </pre>
+     * 每帧结束时恒为 false，{@code ScopePipRenderer} 于是永远看不到掩码，
+     * PIP 在光影下整个不工作、退回整屏变焦 —— 这正是用户实测到的现象。
+     *
+     * <p>改为每帧清一次之后，本标志在一帧之内是<b>单调</b>的（false → true，不会回落），
+     * 「本帧画过没有」这个语义才真正成立。
+     */
+    private static boolean maskDrawnThisFrame = false;
+
+    /**
+     * 上一帧的 {@link #maskDrawnThisFrame} 快照。
+     *
+     * <p>为什么需要它：掩码画在手部渲染里，而两个消费者跑在那之前 ——
+     * FOV 事件在 {@code extract} 阶段、镜内画面的抓取在 {@code renderLevel} 里。
+     * 它们要问的是「上一帧有没有掩码」，读当帧的值只会恒得 false。</p>
+     */
+    private static boolean maskDrawnLastFrame = false;
 
     private ScopeMaskRenderer() {
     }
@@ -207,15 +272,57 @@ public final class ScopeMaskRenderer {
     }
 
     /**
+     * 每帧开头调用一次，快照上一帧结果并把本帧归零。
+     *
+     * <p>接在 {@code GameRenderer#extract} 的 HEAD 上 —— 那是
+     * {@code Minecraft#runTick} 里 <b>extract(偏移 441) → render(偏移 520)</b>
+     * 这条顺序的最前面，因此本帧所有消费者（FOV 事件、镜内抓取、合成）
+     * 看到的都是同一份、定义明确的状态。</p>
+     *
+     * <p>刻意<b>不</b>放在手部 pass 里：Iris 一帧有两次手部 pass，
+     * 放那儿会被第二次抹掉，见 {@link #maskDrawnThisFrame} 的注释。</p>
+     */
+    public static void beginFrame() {
+        maskDrawnLastFrame = maskDrawnThisFrame;
+        maskDrawnThisFrame = false;
+        compositedThisFrame = false;
+    }
+
+    /** 本帧掩码是否已成功画进 target（供合成阶段判定 —— 它跑在掩码之后）。 */
+    public static boolean hasMaskThisFrame() {
+        return maskDrawnThisFrame;
+    }
+
+    /** 上一帧是否画出过掩码（供 FOV 让位与镜内抓取判定 —— 它们跑在掩码之前）。 */
+    public static boolean hadMaskLastFrame() {
+        return maskDrawnLastFrame;
+    }
+
+    /**
+     * 「镜内画面本帧已经合成过」的一次性闸门。
+     *
+     * <p>同样是 Iris 双手部 pass 惹的：合成若在 solid 与 translucent 两次都跑，
+     * 第二次会把 solid 阶段已经画进孔径的东西（蚀刻准星等）整片覆盖掉。
+     * 只允许本帧第一次手部 pass 合成。</p>
+     */
+    private static boolean compositedThisFrame = false;
+
+    /** @return true 表示本次调用取得了合成资格（每帧只有第一次调用会返回 true） */
+    public static boolean claimCompositeSlot() {
+        if (compositedThisFrame) {
+            return false;
+        }
+        compositedThisFrame = true;
+        return true;
+    }
+
+    /**
      * 在阶段边界把当帧登记的目镜几何画进掩码 target。
      *
      * <p>无论成败，末尾都会清空当帧清单 —— 见 {@code finally}。
      */
     public static void renderAtPhaseBoundary() {
         boolean activeHandPass = isInHandPass();
-        // 【诊断】上一版实测「预览全黑 + 日志一行都没有」，原因是几何一个都没登记，
-        // isEmpty() 直接 return，于是连个说法都没有。静默失败最难查，
-        // 所以这里补一条：开着调试却收不到任何目镜几何时，明确说出来（只说一次）。
         if (activeHandPass && RenderConfig.SCOPE_MASK_ENABLE.get()
                 && ScopeMaskGeometry.isEmpty() && !loggedEmpty) {
             loggedEmpty = true;
@@ -223,17 +330,9 @@ public final class ScopeMaskRenderer {
                     + "Either no scope is equipped/aimed, or ocular collection is broken.");
         }
         if (!activeHandPass) {
-            // 世界渲染那次直接跳过，且【不清空】清单 ——
-            // 目镜是在手持渲染的 submit 阶段登记的，而手持渲染发生在世界之后，
-            // 所以此刻清单本就是空的；真要清反而会误伤（万一顺序变了）。
-            //
-            // 那会不会漏清？不会：登记只发生在第一人称手持路径，
-            // 而该路径必然紧跟着一次 inHandPass=true 的 renderAllFeatures，
-            // 那次的 finally 会兜底清空。
             return;
         }
         if (!RenderConfig.SCOPE_MASK_ENABLE.get()) {
-            // 功能没开也要清，否则清单会无限增长。
             ScopeMaskGeometry.clear();
             return;
         }
@@ -250,8 +349,6 @@ public final class ScopeMaskRenderer {
             failed = true;
             GunMod.LOGGER.error("[TACZ Scope] Failed to render ocular mask; mask disabled.", e);
         } finally {
-            // 关键：无条件清空。哪怕上面 return 了，也不能把几何留到下一帧 ——
-            // 否则收起瞄具后掩码会「粘住」不消失。
             ScopeMaskGeometry.clear();
         }
     }
@@ -259,19 +356,13 @@ public final class ScopeMaskRenderer {
     private static void drawMask(TextureTarget target) {
         MeshData mesh = buildMesh();
         if (mesh == null) {
-            // 没有可画的几何：仍然开一次 pass 把掩码清空。
-            // 否则上一帧的白色形状会残留在纹理里（target 不会自己变黑）。
             clearOnly(target);
             return;
         }
         try (mesh) {
             MeshData.DrawState draw = mesh.drawState();
-            GpuBuffer vertexBuffer = null;
-            try {
-                vertexBuffer = RenderSystem.getDevice().createBuffer(
-                        () -> "tacz_scope_mask_vertices",
-                        GpuBuffer.USAGE_VERTEX,
-                        mesh.vertexBuffer());
+            {
+                GpuBuffer vertexBuffer = acquireVertexBuffer(mesh.vertexBuffer());
 
                 // 共享的四边形索引缓冲：把 QUADS 展开成三角形。
                 // 用 vanilla 现成的，不必自己生成索引。
@@ -321,6 +412,7 @@ public final class ScopeMaskRenderer {
                     // 我们的顶点/索引都是从头开始的单批，所以 firstIndex 与 baseVertex 都是 0。
                     pass.drawIndexed(draw.indexCount(), 1, 0, 0, 0);
                 }
+                maskDrawnThisFrame = true;
                 if (!loggedSuccess) {
                     loggedSuccess = true;
                     // 凸包 / 描摹 计数是判断「掩码到底是孔径填充还是只剩板条」的唯一线索：
@@ -329,12 +421,6 @@ public final class ScopeMaskRenderer {
                                     + "(hull-filled entries={}, traced-fallback entries={}).",
                             draw.indexCount(), ScopeMaskGeometry.entries().size(),
                             hullFilledEntries, tracedEntries);
-                }
-            } finally {
-                if (vertexBuffer != null) {
-                    // 每帧新建、每帧释放。这里不做缓冲池 —— 目镜几何量极小
-                    // （单个瞄具几个 cube），过早优化只会增加生命周期出错的机会。
-                    vertexBuffer.close();
                 }
             }
         }
@@ -377,6 +463,7 @@ public final class ScopeMaskRenderer {
     private static MeshData buildMesh() {
         BufferBuilder builder = new BufferBuilder(SCRATCH, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION);
         boolean hullFill = RenderConfig.SCOPE_MASK_HULL_FILL.get();
+        maskBoundsValid = false;
         for (ScopeMaskGeometry.Entry entry : ScopeMaskGeometry.entries()) {
             if (hullFill && writeHullFill(builder, entry.pose(), entry.cubes())) {
                 hullFilledEntries++;
@@ -531,6 +618,50 @@ public final class ScopeMaskRenderer {
             emitSlopeAsQuad(builder, depth, p0, hull.get(i), hull.get(i + 1));
         }
         return true;
+    }
+
+    /**
+     * 算出本帧全部目镜几何在 NDC 里的包围盒。
+     *
+     * <p>投影矩阵的取法与 {@link #writeHullFill} 完全同源（读同一份投影 UBO），
+     * 所以盒子与掩码画出来的形状严格在同一个坐标系里，不会错位。
+     * 读不到投影就不设包围盒 —— 合成阶段随之跳过剪裁，退回纯掩码约束（= 旧行为）。
+     */
+    private static void computeMaskBounds() {
+        if (ScopeMaskGeometry.isEmpty()) {
+            return;
+        }
+        Matrix4f proj = new Matrix4f();
+        try (GpuBufferSlice.MappedView view = RenderSystem.getProjectionMatrixBuffer().map(true, false)) {
+            proj.set(view.data());
+        } catch (Exception e) {
+            return;
+        }
+        Vector4f tmp = new Vector4f();
+        for (ScopeMaskGeometry.Entry entry : ScopeMaskGeometry.entries()) {
+            for (BedrockCube cube : entry.cubes()) {
+                for (var polygon : cube.getPolygons()) {
+                    if (polygon == null) {
+                        continue;
+                    }
+                    for (var vertex : polygon.vertices) {
+                        tmp.set(vertex.pos.x() / 16.0F, vertex.pos.y() / 16.0F, vertex.pos.z() / 16.0F, 1.0F);
+                        tmp.mul(entry.pose());
+                        tmp.mul(proj);
+                        if (tmp.w <= 1.0e-6f) {
+                            continue;
+                        }
+                        float ndcX = tmp.x() / tmp.w;
+                        float ndcY = tmp.y() / tmp.w;
+                        if (!Float.isFinite(ndcX) || !Float.isFinite(ndcY)
+                                || Math.abs(ndcX) > NDC_SANITY_LIMIT || Math.abs(ndcY) > NDC_SANITY_LIMIT) {
+                            continue;
+                        }
+                        accumulateBounds(ndcX, ndcY);
+                    }
+                }
+            }
+        }
     }
 
     /** 单调链叉积：(b−a)×(c−a) 的 z 分量。 */

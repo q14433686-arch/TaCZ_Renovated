@@ -2,6 +2,7 @@ package com.tacz.guns.compat.iris;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.tacz.guns.GunMod;
+import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
 import com.tacz.guns.client.render.scope.ScopeMaskTarget;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13C;
@@ -13,19 +14,18 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Runtime bridge for the Iris HAND shader scope-mask integration.
+ * Bridges TACZ's off-screen ocular mask texture into Iris shaders when a shader pack is active.
  *
- * <p>This class manages the per-draw uniform state for patched Iris shaders so that
- * custom scope clipping runs accurately when scope body or reticle passes are submitted,
- * while all standard passes (gun body, attachments, player hands, entities) are explicitly
- * set to {@code mode = 0} on every draw call to prevent uniform leakage and random clipping.</p>
+ * <p>During each draw setup via {@link #applyToGlRenderPass}, this helper inspects the active
+ * pipeline name from Iris' internal GlRenderPass and sets uniforms on the bound OpenGL program:
+ * <ul>
+ *   <li>{@code tacz_ScopeMaskMode}: 0 = off, 1 = discard inside mask (body), 2 = discard outside (reticle)</li>
+ *   <li>{@code tacz_ScopeMaskSampler}: bound texture unit index pointing to the mask texture</li>
+ * </ul>
+ * If no mask texture is available or reflection fails, the uniform stays 0 (disabled), leaving the
+ * shader pack unaffected.</p>
  */
 public final class IrisScopeMaskState {
-    private static final String BODY_PIPELINE = "pipeline/scope_body_clipped";
-    private static final String FLASH_TRANSLUCENT_PIPELINE = "pipeline/scope_flash_translucent_clipped";
-    private static final String FLASH_SWIRL_PIPELINE = "pipeline/scope_flash_swirl_clipped";
-    private static final String RETICLE_PIPELINE = "pipeline/scope_reticle_clipped";
-    private static final String RETICLE_EMISSIVE_PIPELINE = "pipeline/scope_reticle_emissive_clipped";
     private static final String MASK_SAMPLER = "ScopeMaskSampler";
     private static final String UNIFORM_MODE = "tacz_ScopeMaskMode";
     private static final String UNIFORM_SAMPLER = "tacz_ScopeMaskSampler";
@@ -112,12 +112,13 @@ public final class IrisScopeMaskState {
     }
 
     /**
-     * Updates the active Iris shader program uniforms for the current GlRenderPass draw call.
-     * If the draw call is {@code scope_body_clipped}, mode is set to 1.
-     * If the draw call is {@code scope_reticle_clipped}, mode is set to 2.
-     * Otherwise (gun body, attachments, hands, entities, particles), mode is set to 0.
+     * Inspects the active GlRenderPass and injects scope-mask uniform state if supported.
+     * Invoked from {@code IrisGlCommandEncoderMixin} right before executing a draw command.
      */
     public static void applyToGlRenderPass(Object glRenderPass) {
+        if (!IrisCompat.isUsingRenderPack()) {
+            return;
+        }
         try {
             if (glRenderPass == null) {
                 return;
@@ -194,33 +195,76 @@ public final class IrisScopeMaskState {
             if (glRenderPass == null) {
                 return 0;
             }
-            Object glPipeline = readField(glRenderPass, "pipeline");
+            Field pField = pipelineField(glRenderPass);
+            if (pField == null) {
+                return 0;
+            }
+            Object glPipeline = pField.get(glRenderPass);
             if (glPipeline == null) {
                 return 0;
             }
+            Integer remembered = MODE_BY_PIPELINE.get(glPipeline);
+            if (remembered != null) {
+                return remembered;
+            }
+            int resolved = resolveModeUncached(glPipeline);
+            if (MODE_BY_PIPELINE.size() >= MODE_CACHE_LIMIT) {
+                MODE_BY_PIPELINE.clear();
+            }
+            MODE_BY_PIPELINE.put(glPipeline, resolved);
+            return resolved;
+        } catch (Throwable t) {
+            logOnce("resolve scope render pass", t);
+        }
+        return 0;
+    }
+
+    /** 真正去问「这套管线是不是我们的镜身/准星管线」。只在每个管线实例上跑一次。 */
+    private static int resolveModeUncached(Object glPipeline) {
+        try {
             Object renderPipeline = invokeNoArgs(glPipeline, "info");
+            if (renderPipeline == null) {
+                renderPipeline = invokeNoArgs(glPipeline, "getInfo");
+            }
+            if (renderPipeline == null) {
+                renderPipeline = readField(glPipeline, "info");
+            }
+            if (renderPipeline == null) {
+                renderPipeline = readField(glPipeline, "renderPipeline");
+            }
             if (renderPipeline == null) {
                 return 0;
             }
             Object location = invokeNoArgs(renderPipeline, "getLocation");
             if (location == null) {
+                location = invokeNoArgs(renderPipeline, "location");
+            }
+            if (location == null) {
+                location = readField(renderPipeline, "location");
+            }
+            if (location == null) {
                 return 0;
             }
-            String namespace = String.valueOf(invokeNoArgs(location, "getNamespace"));
-            String path = String.valueOf(invokeNoArgs(location, "getPath"));
-            if (!GunMod.MOD_ID.equals(namespace)) {
+            String path = location.toString();
+            if (path == null) {
                 return 0;
             }
             String normalized = path.toLowerCase(Locale.ROOT);
-            if (BODY_PIPELINE.equals(normalized) || FLASH_TRANSLUCENT_PIPELINE.equals(normalized)
-                    || FLASH_SWIRL_PIPELINE.equals(normalized)) {
+            if (normalized.endsWith("scope_body_clipped")) {
                 return 1;
             }
-            if (RETICLE_PIPELINE.equals(normalized) || RETICLE_EMISSIVE_PIPELINE.equals(normalized)) {
+            if (normalized.endsWith("scope_flash_translucent_clipped")
+                    || normalized.endsWith("scope_flash_swirl_clipped")
+                    || normalized.endsWith("muzzle_flash_translucent")
+                    || normalized.endsWith("muzzle_flash_swirl")) {
+                return 1;
+            }
+            if (normalized.endsWith("scope_reticle_clipped")
+                    || normalized.endsWith("scope_reticle_emissive_clipped")
+                    || normalized.endsWith("scope_reticle_emissive")) {
                 return 2;
             }
-        } catch (Throwable t) {
-            logOnce("resolve scope render pass", t);
+        } catch (Throwable ignored) {
         }
         return 0;
     }
@@ -277,6 +321,12 @@ public final class IrisScopeMaskState {
                     method = c.getDeclaredMethod("getProgramId");
                 } catch (NoSuchMethodException ignored) {
                 }
+                if (method == null) {
+                    try {
+                        method = c.getDeclaredMethod("getProgram");
+                    } catch (NoSuchMethodException ignored) {
+                    }
+                }
             }
             if (method == null) {
                 return 0;
@@ -301,47 +351,60 @@ public final class IrisScopeMaskState {
                 Object view = invokeNoArgs(obj, "view");
                 return getGlTextureId(view);
             }
-            try {
-                Method glIdMethod = obj.getClass().getMethod("glId");
-                glIdMethod.setAccessible(true);
-                Object id = glIdMethod.invoke(obj);
-                if (id instanceof Number n && n.intValue() > 0) {
-                    return n.intValue();
+            // Check method glId() / getGlId() / iris$getGlId() / id() / getId()
+            for (String mName : new String[]{"glId", "getGlId", "iris$getGlId", "id", "getId"}) {
+                try {
+                    Method m = obj.getClass().getMethod(mName);
+                    m.setAccessible(true);
+                    Object id = m.invoke(obj);
+                    if (id instanceof Number n && n.intValue() > 0) {
+                        return n.intValue();
+                    }
+                } catch (Throwable ignored) {
                 }
-            } catch (NoSuchMethodException ignored) {
             }
-
-            try {
-                Method irisGlIdMethod = obj.getClass().getMethod("iris$getGlId");
-                irisGlIdMethod.setAccessible(true);
-                Object id = irisGlIdMethod.invoke(obj);
-                if (id instanceof Number n && n.intValue() > 0) {
-                    return n.intValue();
+            // Check method texture() / getTexture()
+            for (String mName : new String[]{"texture", "getTexture"}) {
+                try {
+                    Method m = obj.getClass().getMethod(mName);
+                    m.setAccessible(true);
+                    Object tex = m.invoke(obj);
+                    if (tex != null && tex != obj) {
+                        int id = getGlTextureId(tex);
+                        if (id > 0) {
+                            return id;
+                        }
+                    }
+                } catch (Throwable ignored) {
                 }
-            } catch (NoSuchMethodException ignored) {
             }
-
-            try {
-                Method textureMethod = obj.getClass().getMethod("texture");
-                textureMethod.setAccessible(true);
-                Object tex = textureMethod.invoke(obj);
-                if (tex != null && tex != obj) {
-                    int id = getGlTextureId(tex);
-                    if (id > 0) {
-                        return id;
+            // Check field id / glId across class hierarchy
+            for (Class<?> c = obj.getClass(); c != null; c = c.getSuperclass()) {
+                for (String fName : new String[]{"id", "glId", "textureId"}) {
+                    try {
+                        Field f = c.getDeclaredField(fName);
+                        f.setAccessible(true);
+                        Object id = f.get(obj);
+                        if (id instanceof Number n && n.intValue() > 0) {
+                            return n.intValue();
+                        }
+                    } catch (Throwable ignored) {
                     }
                 }
-            } catch (NoSuchMethodException ignored) {
-            }
-
-            try {
-                Field idField = obj.getClass().getDeclaredField("id");
-                idField.setAccessible(true);
-                Object id = idField.get(obj);
-                if (id instanceof Number n && n.intValue() > 0) {
-                    return n.intValue();
+                for (String fName : new String[]{"texture", "tex"}) {
+                    try {
+                        Field f = c.getDeclaredField(fName);
+                        f.setAccessible(true);
+                        Object tex = f.get(obj);
+                        if (tex != null && tex != obj) {
+                            int id = getGlTextureId(tex);
+                            if (id > 0) {
+                                return id;
+                            }
+                        }
+                    } catch (Throwable ignored) {
+                    }
                 }
-            } catch (NoSuchFieldException ignored) {
             }
         } catch (Throwable t) {
             logOnce("extract texture id", t);
@@ -350,21 +413,33 @@ public final class IrisScopeMaskState {
     }
 
     private static Object readField(Object target, String name) throws ReflectiveOperationException {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        return field.get(target);
+        for (Class<?> c = target.getClass(); c != null; c = c.getSuperclass()) {
+            try {
+                Field field = c.getDeclaredField(name);
+                field.setAccessible(true);
+                return field.get(target);
+            } catch (NoSuchFieldException ignored) {
+            }
+        }
+        return null;
     }
 
-    private static Object invokeNoArgs(Object target, String name) throws ReflectiveOperationException {
-        Method method = target.getClass().getMethod(name);
-        method.setAccessible(true);
-        return method.invoke(target);
+    private static Object invokeNoArgs(Object target, String methodName) {
+        for (Class<?> c = target.getClass(); c != null; c = c.getSuperclass()) {
+            try {
+                Method method = c.getDeclaredMethod(methodName);
+                method.setAccessible(true);
+                return method.invoke(target);
+            } catch (Throwable ignored) {
+            }
+        }
+        return null;
     }
 
-    private static void logOnce(String action, Throwable t) {
+    private static void logOnce(String what, Throwable t) {
         if (!loggedFailure) {
             loggedFailure = true;
-            GunMod.LOGGER.warn("[TACZ Scope] Iris scope-mask bridge failed to {}. Scope clipping will fall back for this draw.", action, t);
+            GunMod.LOGGER.warn("[TACZ Scope] Failed to {} in Iris GL command bridge; fallback behavior active.", what, t);
         }
     }
 }
