@@ -535,6 +535,9 @@ public final class ScopePipRenderer {
     /** 每帧清一次帧内记忆值。挂在 {@code GameRenderer#extract} 的 HEAD。 */
     public static void beginFrame() {
         magnificationThisFrame = Float.NaN;
+        // 遮光环最终覆盖层的队列也在这里归零 —— 排队发生在手部 pass、
+        // 刷新发生在合成之后，万一某一帧没走到刷新点，残留快照不能留到下一帧。
+        ScopeFinalRingOverlay.beginFrame();
     }
 
     private static float scopeMagnification() {

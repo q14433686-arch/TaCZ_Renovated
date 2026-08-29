@@ -7,6 +7,7 @@ import com.tacz.guns.api.client.event.RenderItemInHandBobEvent;
 import com.tacz.guns.api.client.event.RenderLevelBobEvent;
 import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
 import com.tacz.guns.client.render.scope.ScopePipRenderer;
+import com.tacz.guns.client.render.scope.ScopeFinalRingOverlay;
 import com.tacz.guns.client.render.scope.ScopePipTrace;
 import com.tacz.guns.client.renderer.other.GunHurtBobTweak;
 import com.tacz.guns.compat.shader.ShaderCompat;
@@ -147,6 +148,12 @@ public abstract class GameRendererMixin {
         // 【光影路径】无光影时这一句立即返回（合成仍在阶段边界完成，
         // 那里才能让准星盖在 PIP 之上）。
         ScopePipRenderer.compositeAfterLevelUnderShaders();
+        // 【遮光环最终覆盖】光影下上面那次合成画在手持【之后】
+        // （Iris 把整个手部 pass 搬进了 LevelRenderer#render），会把刚画好的
+        // 物理目镜框整片盖掉 —— 孔径里那一圈变成放大的世界，对着光就是
+        // 「遮光环半透明」。这里把排队中的目镜框重画到合成之上。
+        // 无排队时立即返回，开销就是一次判空。
+        ScopeFinalRingOverlay.flush();
     }
 
     /**

@@ -205,6 +205,32 @@ public final class ScopeBodyRenderTypes {
             buildPipeline("scope_reticle_emissive", false, false, true);
 
     /**
+     * 【遮光环最终覆盖】物理目镜框的「无掩码 + 无雾」管线。
+     *
+     * <p>与 {@link #CLIPPED_PIPELINE} 的差异只有着色器：{@code core/scope_ring_final}
+     * 是 {@code core/scope_body} 去掉 SCOPE_MASK 那一段、再去掉 {@code apply_fog}
+     * 之后的形态（见该文件的头注释）。顶点着色器仍复用 {@code core/scope_body}
+     * （与 vanilla entity.vsh 逐字节相同）。</p>
+     *
+     * <h2>刻意<b>不</b>注册给 Iris 的 HAND 程序</h2>
+     * 下面 {@link #ensureIrisCompatibility} 给每条自定义管线都做了
+     * {@code assignScopePipelineToHand}，唯独这条<b>不能做</b>：本管线的全部意义就是
+     * 在 Iris 收工<b>之后</b>、用手持那一遍冻结下来的投影/模型视图直接画到主画面上。
+     * 一旦交给 Iris 接管，它就会被塞回光影管线里 —— 既拿不到无雾语义，
+     * 也会被 {@code ScopeFinalRingOverlay} 想躲开的那些后置 pass 再盖一次。
+     */
+    private static final RenderPipeline RING_FINAL_PIPELINE =
+            RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+                    .withLocation(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_ring_final"))
+                    .withVertexShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_body"))
+                    .withFragmentShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_ring_final"))
+                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+                    .withShaderDefine("PER_FACE_LIGHTING")
+                    .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
+                    .withCull(false)
+                    .build();
+
+    /**
      * 第一人称视模（枪身/非瞄具配件）的「镜内 discard」总入口。
      *
      * <h2>它补的是哪个洞（目镜内未裁切枪体、配件 一案）</h2>
@@ -271,6 +297,7 @@ public final class ScopeBodyRenderTypes {
     private static final Map<Identifier, RenderType> EMISSIVE_CACHE = new HashMap<>();
     private static final Map<Identifier, RenderType> FLASH_TRANSLUCENT_CACHE = new HashMap<>();
     private static final Map<Identifier, RenderType> FLASH_SWIRL_CACHE = new HashMap<>();
+    private static final Map<Identifier, RenderType> RING_FINAL_CACHE = new HashMap<>();
 
     private ScopeBodyRenderTypes() {
     }
@@ -283,6 +310,7 @@ public final class ScopeBodyRenderTypes {
         event.registerPipeline(RETICLE_PIPELINE);
         event.registerPipeline(RETICLE_EMISSIVE_PIPELINE);
         event.registerPipeline(EMISSIVE_PIPELINE);
+        event.registerPipeline(RING_FINAL_PIPELINE);
     }
 
     /**
@@ -320,6 +348,18 @@ public final class ScopeBodyRenderTypes {
         ensureIrisCompatibility();
         return EMISSIVE_CACHE.computeIfAbsent(texture,
                 tex -> create("tacz_scope_reticle_emissive", EMISSIVE_PIPELINE, tex, false));
+    }
+
+    /**
+     * 【遮光环最终覆盖】物理目镜框：不裁、不过雾，画在光影收工与镜内合成之后。
+     *
+     * <p>见 {@link ScopeFinalRingOverlay} 与 {@code core/scope_ring_final.fsh} 的头注释。
+     * 这里复用 {@link #create} 的 {@code bindMask=false} 分支 —— 该管线没有声明
+     * 掩码采样器，多绑一个反而会抛 {@code Missing sampler}。</p>
+     */
+    public static RenderType ringFinal(Identifier texture) {
+        return RING_FINAL_CACHE.computeIfAbsent(texture,
+                tex -> create("tacz_scope_ring_final", RING_FINAL_PIPELINE, tex, false));
     }
 
     /**

@@ -155,6 +155,18 @@
   被关 PR）**暂不移植**，等确认是否真有 mesh 枪包需求再单独立项。
   见 `docs/records/REFAB_SYNC_01A04E96_20260830.md`。
 
+### 修复
+
+- **光影下开镜，目镜遮光环被镜内画中画的合成整片盖掉（对着光时表现为「遮光环变
+  半透明」）**：光影路径的合成跑在 `LevelRenderer#render` 之后 —— Iris 把整个手部
+  pass 搬进了那里 —— 也就是**画在手持之后**，于是把案例⑨ 救回来的物理目镜框
+  （`ocular_ring`）重新盖掉；无光影时合成在阶段边界、画在手持之前，所以只有光影
+  路径有这个问题。机制随 1.21.11 邻链 `2710c7c` 移植（排队 → 合成之后用「无掩码
+  + 无雾」的原版 entity 管线重画），并按 26.2 改了三处（不自建
+  `FeatureRenderDispatcher`、不调 `SubmitNodeStorage#endFrame`、刷新点不是 Iris 的
+  `finalizeLevelRendering`）。**未编译、未实机。** 见
+  `docs/records/SCOPE_RING_IRIS_OVERLAY_20260830.md`。
+
 ### 可选兼容
 
 - 重钉 Cloth Config、PAL、Controllable、Shoulder Surfing、JEI、REI、Architectury 的 26.2

@@ -2,6 +2,7 @@ package com.tacz.guns.mixin.client;
 
 import com.tacz.guns.GunMod;
 import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
+import com.tacz.guns.client.render.scope.ScopeFinalRingOverlay;
 import com.tacz.guns.client.render.scope.ScopePipRenderer;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureFrameContext;
@@ -144,6 +145,11 @@ public abstract class FeatureRenderDispatcherMixin {
     private void tacz$scopeMaskAtPhaseBoundary(SubmitNodeStorage storage, CallbackInfo ci) {
         // 【Step 2】画真正的目镜掩码。
         ScopeMaskRenderer.renderAtPhaseBoundary();
+        // 【遮光环最终覆盖】就在此刻快照手持那一遍的投影/模型视图 —— 再晚一点
+        // （手部几何画完之后）这两个矩阵就被还原成世界的了，延后重画会飘。
+        if (ScopeMaskRenderer.isInHandPass()) {
+            ScopeFinalRingOverlay.captureHandTransform();
+        }
         // 【镜内画中画】紧跟掩码之后合成。三者的先后关系是硬约束：
         //
         //   掩码           -> 知道镜内是哪些像素
