@@ -110,7 +110,16 @@
 - 按裁决**不同步**那批实验装置（`ScopePipResourceProbe`、`ScopePipDebugGpuMem`、
   `ScopePipReleaseIdlePipeline`）；它们的调查记录随同步存档。完整取舍与未验证清单：
   `docs/records/REFAB_SCOPE_PIP_SYNC_20260830.md`。
-- **源码级移植，未经本仓编译与实机验证**（沙箱无 JDK / Maven 源）。禁止写 PASS。
+- 修复实机第一轮报的「朝南半个球面 PIP 被切成矩形」（越朝正南且视角越平时越大、
+  往东西偏长度变小、往上下偏宽度变窄）：`GameRendererMixin` 把
+  `renderItemInHand` 的第三个参数当成投影矩阵送给了剪裁盒换算，而它在 26.2 上是
+  **视图矩阵**（`m00 ∝ cos(yaw)`、`m11 ∝ cos(pitch)`）—— 既随朝向胀缩，又在两个半球
+  之间变号，而 `hasMaskBounds()` 的 `projectionP00 > 0` 判据会在变负的那半边直接关闸，
+  所以那半边「正常」、另一半边被盒子切成矩形。改成按 `m33 == 0`（透视投影独有）
+  判定，优先用 `CameraRenderState#projectionMatrix`，都不是就不开硬件剪裁。
+  **未复验**，取证见 `docs/records/REFAB_SCOPE_PIP_SYNC_20260830.md` §5.5。
+- **源码级移植，未经本仓编译与实机验证**（沙箱无 JDK / Maven 源）；上面这条修正
+  同样**未经实机复验**。禁止写 PASS。
 
 ### 变更
 

@@ -3,6 +3,7 @@ package com.tacz.guns.mixin.client;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.resource.CrossFrameResourcePool;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.tacz.guns.GunMod;
 import com.tacz.guns.api.client.event.RenderItemInHandBobEvent;
 import com.tacz.guns.api.client.event.RenderLevelBobEvent;
 import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
@@ -18,6 +19,8 @@ import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.client.renderer.state.GameRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.neoforged.neoforge.common.NeoForge;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -64,7 +67,74 @@ public abstract class GameRendererMixin {
         ScopeMaskRenderer.setInHandPass(true);
         // 记下手持这一遍真正使用的投影。镜内画中画的合成要拿它把目镜的斜率空间
         // 包围盒换算成屏幕 NDC，从而给合成加一道硬件剪裁（见 ScopeMaskRenderer）。
-        ScopeMaskRenderer.setHandProjection(projection);
+        ScopeMaskRenderer.setHandProjection(tacz$handProjection(cameraState, projection));
+    }
+
+    @Unique
+    private static boolean tacz$loggedProjectionFallback = false;
+
+    /**
+     * 挑出手持这一遍真正使用的<b>投影</b>矩阵。
+     *
+     * <h3>为什么不能直接用第三个参数</h3>
+     * 2026-08-30 实机（PIP 编译通过后的第一轮）报：朝北那半个球面一切正常，
+     * 朝南那半个球面「PIP 被切成一个矩形 —— 越朝正南且视角越平时越大，往东西偏则
+     * 长度变小，往上下偏则宽度变窄」。这个签名只可能是<b>把旋转矩阵当成了投影矩阵</b>：
+     * <ul>
+     *   <li>透视投影的 {@code m00 = 1/(aspect·tan(fovY/2))}、{@code m11 = 1/tan(fovY/2)}：
+     *       恒正、与朝向无关 —— 造不出「整个半球正常、另一个半球异常」的硬边界；</li>
+     *   <li>视图/旋转矩阵的 {@code m00 ∝ cos(yaw)}、{@code m11 ∝ cos(pitch)}：
+     *       随朝向胀缩（解释尺寸随 yaw/pitch 变化），并在两个半球之间<b>变号</b>
+     *       （解释硬边界 —— {@code hasMaskBounds()} 的 {@code projectionP00 > 0}
+     *       判据在变负的那半边直接关闸，剪裁压根没开，所以那半边看起来「正常」）。</li>
+     * </ul>
+     * 于是剪裁盒 = {@code |cos(yaw)| · slope}，比真实孔径小；着色器里的掩码是软约束，
+     * 只有盒子比孔径小时才会看见盒子 —— 看到的就是那个矩形。
+     *
+     * <h3>改成不猜</h3>
+     * 判定不靠参数名（混淆表里没有意义），而靠<b>透视投影的恒定特征</b>：
+     * {@code m33 == 0}（视图/模型矩阵恒为 1，正交投影也是 1）。
+     * 第三参数不是投影时，退回 {@link CameraRenderState#projectionMatrix} ——
+     * 那才是本仓已在用的真投影：{@code ScopePipRenderer#buildNarrowProjection}
+     * 正是从它的 {@code m11 = 1/tan(fovY/2)} 反解当帧 FOV。
+     *
+     * <p>PIP 默认 {@code WorldZoomShare = 0}，世界 FOV 不缩放，该投影与手持那一遍
+     * 用的是同一个；玩家把 share 调大（世界跟着缩放）时盒子只会偏大，
+     * 偏大时由掩码兜底，不会反过来切出矩形 —— 这是刻意的失败方向。</p>
+     *
+     * @return 可用的投影矩阵；两个候选都不是投影时返回 {@code null}（不开硬件剪裁，
+     *         退回纯掩码约束 = 旧行为）
+     */
+    @Unique
+    @Nullable
+    private static Matrix4fc tacz$handProjection(CameraRenderState cameraState, @Nullable Matrix4fc candidate) {
+        if (tacz$isPerspective(candidate)) {
+            return candidate;
+        }
+        Matrix4f stateProjection = cameraState == null ? null : cameraState.projectionMatrix;
+        if (tacz$isPerspective(stateProjection)) {
+            if (!tacz$loggedProjectionFallback) {
+                tacz$loggedProjectionFallback = true;
+                String desc = candidate == null ? "null"
+                        : "m33=" + candidate.m33() + ", m00=" + candidate.m00() + ", m11=" + candidate.m11();
+                GunMod.LOGGER.info("[TACZ Scope] renderItemInHand's 3rd argument is not a projection matrix ({}); "
+                        + "using CameraRenderState.projectionMatrix for the scope PIP lens scissor instead.", desc);
+            }
+            return stateProjection;
+        }
+        return null;
+    }
+
+    /**
+     * 是否是透视投影矩阵。
+     *
+     * <p>{@code m33 == 0} 是透视投影独有的（视图/模型矩阵与正交投影都是 1）；
+     * 另两条保证它至少是个「正的、没退化」的投影 —— {@code ScopeMaskRenderer}
+     * 后面要用 {@code m00 / m11 > 0} 做判据。</p>
+     */
+    @Unique
+    private static boolean tacz$isPerspective(@Nullable Matrix4fc m) {
+        return m != null && m.m33() == 0.0f && m.m00() > 0.0f && m.m11() > 0.0f;
     }
 
     @Inject(method = "renderItemInHand", at = @At("RETURN"))

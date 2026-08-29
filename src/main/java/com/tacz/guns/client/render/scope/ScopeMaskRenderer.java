@@ -286,9 +286,21 @@ public final class ScopeMaskRenderer {
         return true;
     }
 
-    /** 手持那一遍的投影矩阵；用于把斜率空间的包围盒换算成屏幕 NDC。 */
+    /**
+     * 手持那一遍的投影矩阵；用于把斜率空间的包围盒换算成屏幕 NDC。
+     *
+     * <p><b>只接受透视投影</b>（{@code m33 == 0}，见 {@code GameRendererMixin#tacz$isPerspective}）。
+     * 这不是洁癖，是 2026-08-30 实机踩出来的坑：曾经把 {@code renderItemInHand} 的第三个
+     * 参数当成投影传进来，而它在 26.2 上实测是<b>视图矩阵</b>
+     * （{@code m00 ∝ cos(yaw)}、{@code m11 ∝ cos(pitch)}），后果是
+     * 剪裁盒随朝向胀缩、并在 {@code m00} 变负的那个半球被 {@link #hasMaskBounds()}
+     * 静默关闸 —— 玩家看到的是「朝南时镜内画面被切成矩形」。
+     * 与其在每个调用点小心，不如在这里把门：不是投影就当取不到，
+     * 合成退回纯掩码约束（旧行为，不会更糟）。
+     */
     public static void setHandProjection(@Nullable Matrix4fc projection) {
-        if (projection == null) {
+        if (projection == null || projection.m33() != 0.0f
+                || projection.m00() <= 0.0f || projection.m11() <= 0.0f) {
             projectionP00 = 0.0f;
             projectionP11 = 0.0f;
             return;
