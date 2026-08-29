@@ -1033,11 +1033,6 @@ public final class ScopePipRenderer {
                     main.getColorTextureView(),
                     Optional.empty())) {
                 pass.setPipeline(compositePipeline());
-                // 【硬件剪裁 —— 越界的最后一道闸】
-                // 着色器里的「掩码为假就 discard」是【软】约束：掩码纹理一旦有任何问题，
-                // discard 不触发，这张放大的世界就会被整屏糊上去。
-                // 而目镜在屏幕上的包围盒是掩码阶段本来就算得出来的。
-                applyLensScissor(pass, main);
                 // Globals（ScreenSize）由它提供，收缩带的纵横比修正要用。
                 RenderSystem.bindDefaultUniforms(pass);
                 // 倍率与锐化强度经 ColorModulator 的 r/g 送进着色器。
@@ -1059,36 +1054,6 @@ public final class ScopePipRenderer {
             GunMod.LOGGER.error("[TACZ Scope] Scope PIP composite failed; PIP disabled, "
                     + "falling back to whole-screen FOV zoom.", e);
         }
-    }
-
-    /**
-     * 把合成限制在目镜的屏幕包围盒内。
-     *
-     * <p>包围盒来自 {@link ScopeMaskRenderer#maskBoundsNdc()}，与掩码同一坐标系、同一帧算出。
-     * 拿不到包围盒就不开剪裁，退回纯掩码约束 —— 即旧行为，不会更糟。
-     *
-     * <p>四周各留 2 像素余量：掩码的边缘羽化与 NDC→像素的取整都可能差一两个像素。
-     */
-    private static void applyLensScissor(RenderPass pass, RenderTarget target) {
-        if (!ScopeMaskRenderer.hasMaskBounds()) {
-            return;
-        }
-        float[] b = ScopeMaskRenderer.maskBoundsNdc();
-        int w = target.width;
-        int h = target.height;
-        // NDC[-1,1] → 像素。scissor 的原点在左下，与 NDC 的 y 方向一致，不需要翻转。
-        int x0 = (int) Math.floor((b[0] * 0.5f + 0.5f) * w) - 2;
-        int y0 = (int) Math.floor((b[1] * 0.5f + 0.5f) * h) - 2;
-        int x1 = (int) Math.ceil((b[2] * 0.5f + 0.5f) * w) + 2;
-        int y1 = (int) Math.ceil((b[3] * 0.5f + 0.5f) * h) + 2;
-        x0 = Mth.clamp(x0, 0, w);
-        y0 = Mth.clamp(y0, 0, h);
-        x1 = Mth.clamp(x1, 0, w);
-        y1 = Mth.clamp(y1, 0, h);
-        if (x1 <= x0 || y1 <= y0) {
-            return;
-        }
-        pass.enableScissor(x0, y0, x1 - x0, y1 - y0);
     }
 
     // ------------------------------------------------------------------

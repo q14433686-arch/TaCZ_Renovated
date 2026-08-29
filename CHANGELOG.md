@@ -101,8 +101,7 @@
 - 新增 12 个 `ScopePip*` 选项，默认值与值域**逐项跟随姊妹分支**（`ScopePipEnable=false`、
   `ScopePipAllowShaderPacks=false`），便于两边 A/B 对照。关闭时运行路径与合入前逐位等价；
   运行期任何异常自我停用并退回整屏变焦。
-- 目镜包围盒改走本仓 855989c 的**斜率空间**（不读投影 UBO，不碰投影矩阵），
-  取不到手部投影时退回纯掩码约束。
+- 镜内合成的边界**只有着色器里的软掩码约束**（掩码为假即 discard），与姊妹分支一致。
 - 含姊妹分支 `052e600` 的修复：只有主画面的 `LevelRenderer.submitNodeStorage` 需要保留
   提交节点，Iris `ShadowRenderer` 那份专用存储每帧照常清空；此前无差别拦截会让
   Iris 阴影队列永不释放（每开镜帧沉积 ~3.7 个 Submit/DrawCommand，地板 ~7 FPS）。
@@ -110,16 +109,19 @@
 - 按裁决**不同步**那批实验装置（`ScopePipResourceProbe`、`ScopePipDebugGpuMem`、
   `ScopePipReleaseIdlePipeline`）；它们的调查记录随同步存档。完整取舍与未验证清单：
   `docs/records/REFAB_SCOPE_PIP_SYNC_20260830.md`。
-- 修复实机第一轮报的「朝南半个球面 PIP 被切成矩形」（越朝正南且视角越平时越大、
-  往东西偏长度变小、往上下偏宽度变窄）：`GameRendererMixin` 把
-  `renderItemInHand` 的第三个参数当成投影矩阵送给了剪裁盒换算，而它在 26.2 上是
-  **视图矩阵**（`m00 ∝ cos(yaw)`、`m11 ∝ cos(pitch)`）—— 既随朝向胀缩，又在两个半球
-  之间变号，而 `hasMaskBounds()` 的 `projectionP00 > 0` 判据会在变负的那半边直接关闸，
-  所以那半边「正常」、另一半边被盒子切成矩形。改成按 `m33 == 0`（透视投影独有）
-  判定，优先用 `CameraRenderState#projectionMatrix`，都不是就不开硬件剪裁。
-  **未复验**，取证见 `docs/records/REFAB_SCOPE_PIP_SYNC_20260830.md` §5.5。
-- **源码级移植，未经本仓编译与实机验证**（沙箱无 JDK / Maven 源）；上面这条修正
-  同样**未经实机复验**。禁止写 PASS。
+- 实机两轮后**移除**移植时自加的「目镜包围盒 → 硬件剪裁（scissor）」：
+  它要拿手持那一遍的投影把斜率包围盒换算成屏幕 NDC，而 26.2 上 CPU 侧拿不到它 ——
+  ① `renderItemInHand` 第三参数实测是**视图矩阵**（`m00 ∝ cos(yaw)`，随朝向胀缩
+  且在两半球变号，于是朝南那半边被切成随朝向变化的矩形）；
+  ② 改用 `CameraRenderState#projectionMatrix` 后变成**恒矩形**，说明它是世界投影、
+  比手持那一遍更宽（手持用的是更窄的 FOV）；
+  ③ `RenderSystem#getProjectionMatrix()` 在 26.2 已不存在，投影 UBO 读回在有光影时
+  必抛 `Buffer is not readable`。既然无法被正确计算，就不再保留：相关字段、换算、
+  scissor 调用与矩阵采集全部删除。完整的两轮取证与「想加回来唯一正确的做法
+  （在着色器里用环境 Projection uniform 做斜率空间判定）」见
+  `docs/records/REFAB_SCOPE_PIP_SYNC_20260830.md` §5.5。
+- **源码级移植，未经本仓编译；上面这条移除同样未经实机复验**（沙箱无 JDK / Maven 源
+  与游戏）。禁止写 PASS。
 
 ### 变更
 
