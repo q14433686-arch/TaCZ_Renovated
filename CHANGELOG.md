@@ -22,6 +22,16 @@
 
 ### 修复
 
+- 同步姊妹分支 `arena/01a04e96` 的检视动画两连修（`4aa8d7b` + `12d6f3c`）：
+  `stopAnimation` 原先只停轨道上的当前 runner，而带过渡时长启动的动画在过渡完成前
+  是挂在旧 runner 的 `transitionTo` 上的 —— 开镜时检视（脚本 `inspect.transition`
+  的打断分支必然落在 0.2 秒过渡窗口内）停的是早已停止的旧残骸，检视动画成了无主
+  僵尸，状态机已回 idle、挂在 inspect 态上的打断手段全部失联，只有切枪/丢枪能救。
+  改法分两步且必须一起拿：先让 stop 连坐 `transitionTo`；再引入 runner 出生序号与
+  `AnimationStateMachine#trigger` 的转移前快照，豁免「本次 trigger 刚启动的后继
+  动画」—— 否则检视中换弹的换弹动画会被 exit 的 stop 当场误杀。
+  三文件基线已与姊妹侧逐字比对确认为其修复前状态。**源码级同步，未实机。**
+
 - 修复开光影后镜内裁切整体失效（含低倍镜准星溢出目镜）—— **draw 时的 uniform /
   采样器状态被覆盖**。Iris 的 `MixinGlCommandEncoder` 也在 `GlCommandEncoder#trySetup`
   的 RETURN 注入，并在那里调用 `ExtendedShader#iris$setupState`
