@@ -44,19 +44,43 @@ depth-aperture 分支是「光影包的后置 pass 盖掉它」，解法都是**
 
 - **同架构、同加载器**（都是本仓 NeoForge、都是 depth-aperture），所以这是本仓库里
   风险最低的一次搬运 —— 比跨仓库、跨加载器那几次都安全。
-- **版本差异仍然存在**（26.1.2 vs 1.21.11 是两个 MC 版本）。重点核对四处：
-  `RenderPipeline` 的 info 访问器（姊妹 `189a1bd` 就是在修这个）、
-  `GlCommandEncoder` 的 depth-copy 注入点、`ScopeRenderTypes` 的管线配方常量、
-  以及 `RenderSystem` 的投影/模型视图方法名（26.2 上 `getModelViewMatrix()` 已改名为
-  `getModelViewMatrixCopy()`，26.1.2 上也请先 grep 确认再动手）。
-- **案例⑨ 已经在 26.1.2 上**（`ocularRingPart` 存在），所以只需要补「延后重画」那一层，
-  不需要再动模型侧的摘除逻辑。
+- **案例⑨ 已经在 26.1.2 上**（`BedrockAttachmentModel:137` 的 `ocularRingPart`、
+  `:538` 的 `captureStandalonePart`、`:632` 的行内提交都在），所以只需要补
+  「延后重画」那一层，不需要再动模型侧的摘除逻辑。
+- **蓝本是现成的，不用自己摸索**：该功能在 1.21.11 上是**一次提交** `62532f1` 引入的，
+  而且**之后没有任何后续修正**。相关的 15 个路径我已经摘出来存成
+  [`26_1_2_catchup/final_overlay_62532f1.diff`](26_1_2_catchup/final_overlay_62532f1.diff)
+  （1678 行）。**别 `git apply`** —— 两个分支的 `BedrockAttachmentModel` /
+  `ScopeRenderTypes` 上下文不同，它是**蓝本不是补丁**。
+- **四个版本差异核对点我已经替你查过了**，答案（含 26.1.2 上每一处的实际现状）在
+  [`26_1_2_catchup/PORT_CONTRACT.md`](26_1_2_catchup/PORT_CONTRACT.md) §1.3 §2。
+  三句话的总结：
+  - `GlCommandEncoder` 的注入点两边**完全一致**，不用动；
+  - `ScopeRenderTypes` 的 `clonePipeline` 26.1.2 上**已有**，配方照抄，但要先确认
+    26.1.2 的 `DepthTestFunction` 有没有 `ALWAYS`（1.21.11 没有，所以搞了一套
+    「`NO_DEPTH_TEST` 声明 + encoder mixin 手动 `GL_ALWAYS`」的别扭机制）；
+  - `RenderSystem` 那 6 个符号在 26.1.2 本仓代码里**一个都没被用过**，必须对着
+    `minecraft-merged-0d09a28b48-26.1.2.jar` 核，尤其 `getModelViewMatrix()`
+    （26.2 上已改名 `getModelViewMatrixCopy()`）。
+- **两处可能整条路走不通，先证实再动手**：26.1.2 上那个 Iris 版本里
+  `IrisRenderingPipeline#finalizeLevelRendering()` 和
+  `HandRenderer#renderTranslucent()` / 字段 `submitNodeCollector` 是否还在
+  （1.21.11 只审计过 Iris **1.10.7**，26.1.2 上不一定是它）。详见 PORT_CONTRACT §1.1。
 
 ## 4. 【可直接粘贴】给 26.1.2 会话的提示词
 
 ```
 本分支（26.1.2，depth-aperture 架构）落后于本仓 1.21.11 分支一整套「延后重画」
 机制，请把 26.1.2 拉到 1.21.11 的水平。
+
+【现成材料（26.2 分支上已经替你备好，先读这两个）】
+docs/handoff/26_1_2_catchup/PORT_CONTRACT.md      —— 逐文件/逐 API 的移植契约
+docs/handoff/26_1_2_catchup/final_overlay_62532f1.diff —— 1.21.11 的原始改动集（15 路径）
+docs/handoff/26_1_2_catchup/README.md             —— 索引与用法
+注意：diff 是蓝本不是补丁，别 git apply；两边的 BedrockAttachmentModel /
+ScopeRenderTypes 上下文不同。四个版本差异核对点 PORT_CONTRACT §2 已经查过了，
+不用再 grep，但里面标「核 jar」的仍须你对着
+minecraft-merged-0d09a28b48-26.1.2.jar 核一遍。
 
 【差距（已逐文件对过，两边都是本仓 NeoForge、同架构）】
 26.1.2 缺、1.21.11 有：

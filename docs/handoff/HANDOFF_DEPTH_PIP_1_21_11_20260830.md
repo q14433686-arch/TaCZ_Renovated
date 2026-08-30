@@ -83,7 +83,11 @@ flush**（不开光影时也要在合成之后补一遍）—— 这是对 1.21.
 
 ## 5. 分步计划
 
-1. **先补访问器**：`ScopeDepthCopyState` 暴露两张深度纹理（不改任何行为）。
+1. **先补访问器**：`ScopeDepthCopyState` 暴露两张深度纹理（`WORLD_TARGET` /
+   `APERTURE_TARGET` 现在都是 `private static final`）。同时把 Iris 分支里那份
+   「私有世界深度拷贝」的触发条件从 `ScopeFinalOverlayState.hasPendingReticles()`
+   放宽成「有待重画准星 **或** 本帧 PIP 生效」—— 否则 Iris 下 PIP 拿不到世界深度
+   （见 §6.2）。这一步仍然不改任何可见行为。
 2. **最小验证**：写一个只画纯品红的全屏 pass，用 §2 的判据，确认「只有孔径被涂红」
    —— 这一步不过，后面全是空转（26.2 上 `ScopePipDebugPaintLens` 就是干这个的）。
 3. **接拷贝与重投影**：倍率传 1.0 先验证「孔径里是世界、且没有缩小的枪」。
@@ -98,9 +102,28 @@ flush**（不开光影时也要在合成之后补一遍）—— 这是对 1.21.
    （走 vanilla 的管线绑定），而合成是我们自己开的 `RenderPass#bindTexture`，
    要的是 `GpuTextureView`。`DepthTextureTarget` 能否直接给出可绑定的 view —— **未经证实**，
    可能要加一层。
-2. **Iris 下的世界深度**：1.21.11 上 Iris 走的是 `depthtex2`（`IRIS_WORLD_DEPTH_UNIFORM`）
-   而不是私有拷贝。我们在自己的裸 pass 里能否绑到它 —— **未经证实**。
-   真不行就先用「不开光影」路径做原型，Iris 路径后置。
+2. **Iris 下的世界深度 —— 已经找到现成机制，只剩「怎么绑」这一个未知数。**
+   我原本担心「Iris 下世界深度是 `depthtex2`，我们自己的裸 pass 绑不到」。
+   读 `ScopeDepthCopyState`（1.21.11）时发现 **1.21.11 已经为 final-overlay 解决了同一件事**：
+
+   ```java
+   // R11 final-overlay shaders intentionally run after Iris has stopped binding
+   // depthtex2. When a frozen final reticle exists, take one private copy now;
+   // it is the same pre-ocular world depth but remains sampleable after final
+   // composite. Ordinary Iris paths keep using depthtex2 without this blit.
+   if (ScopeFinalOverlayState.hasPendingReticles()) {
+       boolean copied = copyCurrentDepth(WORLD_TARGET, "final-overlay world depth");
+       worldDepthIdentity = copied ? captureDepthIdentity() : null;
+       if (!copied) { maskWorldValid = false; }
+   }
+   ```
+
+   也就是说：**只要把这份私有拷贝的触发条件从「有待重画准星」放宽到
+   「有待重画准星 **或** PIP 本帧生效」**，PIP 合成就能拿到一份在 final composite
+   之后仍然可采样的世界深度 —— 而且它拷的就是 `WORLD_TARGET`，正是 §2 判据里
+   `tacz_WorldDepthSampler` 读的那张。判据一行都不用改。
+   剩下的未知数只有 §6.1（怎么把 `DepthTextureTarget` 的纹理绑进我们自己开的
+   `RenderPass`）。拷失败时 `maskWorldValid = false`，PIP 必须跟着退回整屏变焦。
 3. 26.2 的经验：合成管线**不要**声明 DepthStencilState（不测深度也不写深度），
    否则后续画的准星会被判成遮挡。
 4. 本环境无 JDK / 无 Maven 源，**一行都没编译过**。
@@ -150,12 +173,26 @@ ScopeFinalOverlayState（排队 + 延后重画，目前只在 Iris 路径 flush�
 3) 接拷贝与重投影，倍率传 1.0，验「孔径里是世界、且没有缩小的枪」；
 4) 接倍率；5) 接最终覆盖（含不开光影那条路径）；6) 接 FOV 抑制；7) 配置化。
 
-【未取证，原型阶段先解决这两个】
-1) 深度纹理怎么绑进我们自己开的 RenderPass（准星那条路是绑进 RenderType 走
-   vanilla 绑定，我们要的是 GpuTextureView）—— DepthTextureTarget 能否直接给，
-   未证实；
-2) Iris 下世界深度用的是 depthtex2（IRIS_WORLD_DEPTH_UNIFORM），能否在我们的
-   裸 pass 里绑到，未证实。真不行就先用不开光影路径做原型，Iris 后置。
+【已知的 / 未取证的】
+1) Iris 下的世界深度【已有现成机制，不用自己造】：ScopeDepthCopyState 的 Iris 分支里
+   已经有这么一段（注释原文照抄）：
+     // R11 final-overlay shaders intentionally run after Iris has stopped binding
+     // depthtex2. When a frozen final reticle exists, take one private copy now;
+     // it is the same pre-ocular world depth but remains sampleable after final
+     // composite. Ordinary Iris paths keep using depthtex2 without this blit.
+     if (ScopeFinalOverlayState.hasPendingReticles()) {
+         boolean copied = copyCurrentDepth(WORLD_TARGET, "final-overlay world depth");
+         worldDepthIdentity = copied ? captureDepthIdentity() : null;
+         if (!copied) { maskWorldValid = false; }
+     }
+   所以只要把触发条件放宽成「有待重画准星 或 本帧 PIP 生效」，PIP 合成就有一份
+   在 final composite 之后仍可采样的世界深度，而且就是判据里 tacz_WorldDepthSampler
+   读的那张 WORLD_TARGET，判据一行都不用改。拷失败时 maskWorldValid=false，
+   PIP 必须跟着退回整屏变焦。
+2) 【仍未取证】深度纹理怎么绑进我们自己开的 RenderPass —— 准星那条路是绑进
+   RenderType 走 vanilla 绑定，我们要的是 GpuTextureView；DepthTextureTarget
+   能否直接给出可绑定的 view 未证实，可能要加一层包装。
+   这一条要是走不通，就先用不开光影路径做原型，Iris 路径后置。
 另：合成管线不要声明 DepthStencilState（不测不写深度），否则后续准星被判遮挡 ——
 这是 26.2 上踩过的。
 
