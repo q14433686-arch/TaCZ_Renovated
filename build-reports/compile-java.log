@@ -1,4 +1,4 @@
-commit: 0b7a5ff5aab43469cb890fa1a39e7692592607c4
+commit: c69205989b5d9a2de6326525b683941ae9bbe7f0
 Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
 ............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
 
@@ -22,31 +22,31 @@ Creating Minecraft artifacts without recompilation.
 Loaded 137 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
 [1m*** Started working on [4mdownloadManifest[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
- [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.35s
+ [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.33s
 [1m*** Started working on [4mdownloadJson[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
   ↓ https://piston-meta.mojang.com/v1/packages/f9e9e12c8b96ea9e04b7f87e36583a6ba0e2e9e6/26.2.json
- [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.09s
-[1m*** Started working on [4mdownloadServer[0m[0m
+ [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.11s
 [1m*** Started working on [4mdownloadClient[0m[0m
-  ↓ https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar
+[1m*** Started working on [4mdownloadServer[0m[0m
   ↓ https://piston-data.mojang.com/v1/objects/2dc72797acbc1b63fc16a11c4ac393605f453754/client.jar
- [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.81s
- [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.96s
+  ↓ https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar
+ [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.80s
+ [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.93s
 [1m*** Started working on [4mpreProcessJar[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.16:fatjar
- [1m[92m✓[0m Completed [4mpreProcessJar[0m in 2.96s
+ [1m[92m✓[0m Completed [4mpreProcessJar[0m in 2.97s
 [1m*** Started working on [4mbinaryPatch[0m[0m
   [33mWARNING: [0mnet.neoforged.installertools:binarypatcher:4.0.17:fatjar is not present in the artifact manifest
   ↓ https://maven.neoforged.net/releases/net/neoforged/installertools/binarypatcher/4.0.17/binarypatcher-4.0.17-fatjar.jar
  ↳ Running external tool net.neoforged.installertools:binarypatcher:4.0.17:fatjar
- [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.54s
+ [1m[92m✓[0m Completed [4mbinaryPatch[0m in 4.18s
 [1m*** Started working on [4mcopyUnpatchedClasses[0m[0m
- [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 2.90s
+ [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 2.98s
 [1m*** Started working on [4mapplyDevTransforms[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.12:fatjar
- [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 3.20s
-Total runtime: 14.68s
+ [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 3.22s
+Total runtime: 15.39s
 
 
 > Task :compileJava
@@ -54,7 +54,7 @@ Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1788119670585.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1788122730125.json
 
 [Incubating] Problems report is available at: file:///home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/reports/problems/problems-report.html
 
@@ -64,7 +64,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 10s
+BUILD SUCCESSFUL in 1m 7s
 2 actionable tasks: 2 executed
 Configuration cache entry stored.
 
