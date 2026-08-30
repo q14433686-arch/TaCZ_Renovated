@@ -220,6 +220,8 @@ public abstract class GameRendererMixin {
     private void tacz$beginScopeFrame(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
         ScopePipRenderer.beginFrame();
         ScopeMaskRenderer.beginFrame();
+        // poly_mesh GPU 绘制表：与掩码同点归零，一帧内单调累积、手部 pass 消费。
+        PolyMeshGpuRenderer.beginFrame();
         // 瞄具那套 Iris 管线在这里预热：extract 在世界渲染之前，不在任何 render pass 内，
         // 也不在镜内那一遍里 —— 是做「编译整份 shaderpack」这种重活的唯一安全位置。
         ScopePipRenderer.prewarmShaderPipelineIfNeeded();

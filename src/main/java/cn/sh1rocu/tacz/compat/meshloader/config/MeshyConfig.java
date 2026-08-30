@@ -5,13 +5,15 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 /**
  * TacZ Mesh Loader 客户端配置。挂在 TACZ 的 {@code ClientConfig} 上。
  *
- * <h2>范围（安全子集）</h2>
- * <p>本轮内置只包含 collector（VertexConsumer）渲染路径 + 解析缓存 +
- * 顶点预算闸门；<b>没有</b> GPU 静态烘焙 —— 关闭的 PR #33/#69/#70/#71/#72
- * 里 GPU 路径四次翻车（世界 pass 泄漏 / 深度声明 / 光影回退语义），
- * 按 docs/TML_PERF_DIRECTIONS_2026_08_29.md 的顺序，GPU 路径等
- * 无光影 PoC 通过后单独提交。因此这里没有 MeshGpuBaking 等键，
- * 避免出现「注册了但没人读」的配置陷阱（本仓有 HandViewLockFix 案底）。
+ * <h2>范围</h2>
+ * <p>collector（VertexConsumer）渲染路径 + 解析缓存 + 顶点预算闸门，
+ * 外加第一人称 GPU 静态烘焙（{@code MeshGpuBaking}，见
+ * {@code PolyMeshGpuRenderer} —— 只收手部 pass，规避关 PR
+ * #33/#69/#70/#71 的世界 pass 泄漏）。光影下默认走 vanilla RenderType
+ * 路线让 Iris 接管，{@code MeshGpuUnderShaders} 是实验性的 raw pass 强开。
+ *
+ * <p>两个键都有真实读者（{@code PolyMeshGpuRenderer}），不是「注册了没人读」的
+ * 配置陷阱 —— 本仓有 HandViewLockFix 案底，新增键一律先确认消费点。</p>
  */
 public final class MeshyConfig {
 
@@ -20,6 +22,8 @@ public final class MeshyConfig {
     public static ModConfigSpec.DoubleValue MAX_RENDER_DISTANCE;
     public static ModConfigSpec.BooleanValue POLY_IN_PREVIEW;
     public static ModConfigSpec.BooleanValue LOG_STATS;
+    public static ModConfigSpec.BooleanValue GPU_BAKING;
+    public static ModConfigSpec.BooleanValue GPU_UNDER_SHADERS;
     public static ModConfigSpec.IntValue GUI_MAX_VERTICES;
     public static ModConfigSpec.IntValue WORLD_MAX_VERTICES;
     public static ModConfigSpec.DoubleValue WORLD_FULL_DETAIL_DISTANCE;
@@ -48,6 +52,22 @@ public final class MeshyConfig {
 
         builder.comment("Log poly_mesh statistics (bone/vertex counts) when models load.");
         LOG_STATS = builder.define("MeshLogStats", true);
+
+        builder.comment("GPU static baking for FIRST-PERSON only: vertices stay in bone-local",
+                "space in a resident VBO; each frame uploads O(bones) matrices instead of",
+                "transforming every vertex on the CPU.",
+                "World/GUI/drops stay on the collector path so they cannot leak into",
+                "the world pass (that was the closed PRs' wrong-screenshot bug).",
+                "Falls back to the collector path if the GPU pass fails.");
+        GPU_BAKING = builder.define("MeshGpuBaking", true);
+
+        builder.comment("Shader packs: force the RAW GPU pass (custom pipeline) instead of the",
+                "default vanilla-RenderType route. The default route feeds the resident VBOs",
+                "through RenderType.prepare()/drawFromBuffer with the ENTITY_CUTOUT pipeline,",
+                "which Iris intercepts into its HAND program - gun body gets shader lighting.",
+                "true = bypass the shader pipeline entirely (NO shader lighting on the gun;",
+                "diagnostic fallback in case the default route misbehaves with some pack).");
+        GPU_UNDER_SHADERS = builder.define("MeshGpuUnderShaders", false);
 
         builder.comment("Vertex budget for poly_mesh in GUI/FIXED/HEAD. Icons above this",
                 "budget render cube-only (or the pack's LOD model when present).",

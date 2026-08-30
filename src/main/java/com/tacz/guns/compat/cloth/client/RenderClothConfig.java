@@ -175,5 +175,13 @@ public class RenderClothConfig {
         render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_max_model_vertices"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MAX_MODEL_VERTICES.get())
                 .setMin(0).setMax(10000000).setDefaultValue(120000).setTooltip(Component.translatable("config.tacz.client.render.mesh_max_model_vertices.desc"))
                 .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MAX_MODEL_VERTICES::set).build());
+
+        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_gpu_baking"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_BAKING.get())
+                .setDefaultValue(true).setTooltip(Component.translatable("config.tacz.client.render.mesh_gpu_baking.desc"))
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_BAKING::set).build());
+
+        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_gpu_under_shaders"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_UNDER_SHADERS.get())
+                .setDefaultValue(false).setTooltip(Component.translatable("config.tacz.client.render.mesh_gpu_under_shaders.desc"))
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_UNDER_SHADERS::set).build());
     }
 }
