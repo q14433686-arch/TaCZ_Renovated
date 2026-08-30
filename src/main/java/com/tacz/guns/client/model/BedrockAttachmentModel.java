@@ -483,11 +483,12 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
     public void setTextShowList(Map<String, TextShow> textShowList) {
         textShowList.forEach((name, textShow) -> this.setFunctionalRenderer(name,
                 bedrockPart -> {
-                    // 未开镜（或刚开始开镜）时不提交，避免文字溢出到镜孔之外。
+                    // 未开镜（或刚开始开镜）时不提交，见 javadoc「门禁为什么还留着」。
                     if (currentAimingProgress() <= TEXT_SHOW_AIM_START) {
                         return null;
                     }
-                    return new TextShowRender(this, textShow, currentGunItem);
+                    // 第四个参数 = 走目镜掩码裁剪管线（镜内文字）。
+                    return new TextShowRender(this, textShow, currentGunItem, true);
                 }));
     }
 

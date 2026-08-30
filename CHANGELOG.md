@@ -163,6 +163,20 @@
   的既有行为，绝不画错模型。
 - **源码级同步，未经本仓实机验证。**
 
+### 新增：镜内文字（同步姊妹 `9d03659`，她侧已 PASS）
+
+- 瞄具上的文字（MK5HD 弹药计数 / "AMMO" 标签一类）此前走 vanilla 字体管线 ——
+  `TextFeatureRenderer` 内部从 `GlyphRenderTypes` 三件套里挑 RenderType，
+  调用方无任何注入点，只能靠「开镜到 0.35 才显示」的门禁治标。
+- 改为徒手走 `Font#prepareText → visit` 后门拿字形几何，塞进新的 `scope_text`
+  裁剪管线（vanilla TEXT 配方 + `SCOPE_MASK`，语义同准星：只保留镜内）。
+  多页字体图集按页分组，每页复用 `ScopeMaskTextureHandle` 的空壳纹理思路。
+- 任一环不可用（总开关关 / 光影 / 掩码 target 失败）即回退 vanilla `submitText`，
+  行为退回「开镜才显示」的已验证现状，**绝不丢字**。枪身上的文字不受影响
+  （`clipToScopeMask=false`）。
+- 已知边界：第三方 ttf / unihex 灰度字体走回退路径（不裁但也不裂）。
+- **源码级同步，未经本仓实机验证。**
+
 ### 变更
 
 - 从包含多人修复与 LRTactical 的完整 NeoForge 26.1.2 R1 稳定基线前滚到 26.2；不是重写。
