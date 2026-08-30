@@ -59,6 +59,17 @@ public final class PolyMeshSnapshot {
 
     private void write(List<Command> commands, VertexConsumer consumer, int overlay,
                        float red, float green, float blue, float alpha) {
+        // 【撤回记录 · 2026-08-30，姊妹侧裁定，本仓同裁决】这里曾按
+        // ScopePipRenderer.isInsideScopeLevelRender() 在镜内那一遍早退，省掉重放时
+        // 的第二遍 CPU 顶点变换。撤回理由：
+        //   1. GPU 烘焙落地后，mesh 枪的主流路径根本不走本方法的 CPU compile，
+        //      这个优化所保护的成本已经不存在；
+        //   2. 它让镜内那一遍与主画面那一遍的内容出现分叉（那一遍缺 poly 部件），
+        //      而「孔径内反正被 discard」的论证只在掩码/合成全部正常时成立 ——
+        //      多一个行为分叉点就多一类难排查的镜内异常。
+        // 仍走 collector 的少数场景（MeshGpuBaking=false / 会话降级）两遍照写：
+        // 行为简单、两遍一致，代价只在开镜 + PIP 二次渲染的窗口内。
+        // 保留这段说明，是为了让下一次想捡回这个优化的人先看到代价。
         PoseStack scratch = new PoseStack();
         for (Command command : commands) {
             PoseStack.Pose pose = scratch.last();

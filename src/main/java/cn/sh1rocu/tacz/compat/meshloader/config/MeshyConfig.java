@@ -75,7 +75,8 @@ public final class MeshyConfig {
         GUI_MAX_VERTICES = builder.defineInRange("MeshGuiMaxVertices", 65536, 0, 10_000_000);
 
         builder.comment("Vertex budget for poly_mesh in third-person / dropped-item / frame",
-                "contexts. Above this budget only cubes are drawn. 0 = unlimited.");
+                "contexts. Above this budget only cubes are drawn. 0 = unlimited.",
+                "Within MeshWorldFullDetailDistance the budget is waived entirely.");
         WORLD_MAX_VERTICES = builder.defineInRange("MeshWorldMaxVertices", 120000, 0, 10_000_000);
 
         builder.comment("Within this distance (blocks), in-world poly_mesh (third-person,",

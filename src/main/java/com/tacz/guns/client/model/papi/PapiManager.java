@@ -1,7 +1,7 @@
 package com.tacz.guns.client.model.papi;
 
 import com.google.common.collect.Maps;
-import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.locale.Language;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Map;
@@ -42,12 +42,19 @@ public final class PapiManager {
      *
      * <p>结论：这里要的语义是「查得到就用翻译，查不到就原样返回键」，
      * 正是 {@code Language#getOrDefault}，而不是任何带格式化的包装。</p>
+     *
+     * <p><b>类名提醒</b>（2026-08-31 踩坑实据）：26.2 里这个类是
+     * {@code net.minecraft.locale.Language}，<b>不是</b>
+     * {@code net.minecraft.client.resources.language.Language} ——
+     * 后者在 26.2 根本不存在（本仓 ci-log(728ca3c) 的
+     * {@code cannot find symbol: class Language}）。{@code client.resources.language}
+     * 包下只有 {@code I18n} 和 {@code ClientLanguage}（{@code Language} 的子类，
+     * 本仓 {@code LanguageMixin} 挂的就是它）。</p>
      */
     public static String getTextShow(String textKey, ItemStack stack) {
-        // 26.2 的查表类叫 ClientLanguage（Language 是它的父类，字节码里看到的就是
-        // Language.getInstance()）。传 textKey 当兜底值 = 查不到原样返回键，与 1.20.1 的
-        // getOrDefault(key) 完全同义 —— 绝不能换成 I18n.get()，那会多走一步 String.format。
-        String text = ClientLanguage.getInstance().getOrDefault(textKey, textKey);
+        // 纯查表：查不到就原样返回键本身。绝不能换成 I18n.get() —— 那是【格式化】
+        // 接口，会多走一步 String.format（因果链见上面 javadoc）。
+        String text = Language.getInstance().getOrDefault(textKey);
         for (var entry : PAPI.entrySet()) {
             String placeholder = entry.getKey();
             String data = entry.getValue().apply(stack);
