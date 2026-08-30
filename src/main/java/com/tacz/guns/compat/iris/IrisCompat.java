@@ -93,6 +93,45 @@ public final class IrisCompat {
         assignPipelineToIris(RenderPipelines.ENTITY_TRANSLUCENT_EMISSIVE, "HAND_TRANSLUCENT", "entity_translucent_emissive");
     }
 
+    /**
+     * The post-composite overlay hook ({@code IrisRenderingPipeline#finalizeLevelRendering} TAIL)
+     * and the late translucent hand pass are bytecode-audited specifically against the Iris
+     * <b>26.1 分支</b>（1.11.x，本分支审计基线 commit
+     * f4c06978f3a1c64869e40cd5cc7c8ed383085cc0，对应 MC 26.1.2）。其他 Iris 构建保持原 solid-pass
+     * 行为，而不是冒险在内部 final 时序变化时得到一颗隐形准星。
+     * NeoForge 侧用 {@code ModList.getModContainerById} 读取版本字符串（与
+     * {@code GunHudOverlay} 同款用法），语义与 Fabric 侧
+     * {@code getFriendlyString().startsWith("1.11")} 一致。
+     */
+    public static boolean supportsFinalScopeOverlay() {
+        return ModList.get().getModContainerById(CompatRegistry.IRIS)
+                .map(container -> container.getModInfo().getVersion().toString().startsWith("1.11"))
+                .orElse(false);
+    }
+
+    /**
+     * @return whether the active Iris hand renderer is currently extracting its solid pass.
+     *         A scope reticle is frozen only in this pass and emitted later by the Iris-only
+     *         {@code HAND_TRANSLUCENT} bridge.
+     */
+    public static boolean isRenderingSolidHandPass() {
+        if (!ModList.get().isLoaded(CompatRegistry.IRIS) || !isUsingRenderPack()) {
+            return false;
+        }
+        try {
+            Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
+            Object instance = handRendererClass.getField("INSTANCE").get(null);
+            return (Boolean) handRendererClass.getMethod("isActive").invoke(instance)
+                    && (Boolean) handRendererClass.getMethod("isRenderingSolid").invoke(instance);
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    /**
+     * Iris renders hands from its own solid/translucent level phases and suppresses vanilla's hand call.
+     * This flag is also used by TACZ's view-bob handling.
+     */
     public static boolean isHandRendererActive() {
         if (!ModList.get().isLoaded(CompatRegistry.IRIS) || !isUsingRenderPack()) {
             return false;
