@@ -1,7 +1,7 @@
 package com.tacz.guns.client.model.papi;
 
 import com.google.common.collect.Maps;
-import net.minecraft.client.resources.language.Language;
+import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Map;
@@ -44,7 +44,10 @@ public final class PapiManager {
      * 正是 {@code Language#getOrDefault}，而不是任何带格式化的包装。</p>
      */
     public static String getTextShow(String textKey, ItemStack stack) {
-        String text = Language.getInstance().getOrDefault(textKey);
+        // 26.2 的查表类叫 ClientLanguage（Language 是它的父类，字节码里看到的就是
+        // Language.getInstance()）。传 textKey 当兜底值 = 查不到原样返回键，与 1.20.1 的
+        // getOrDefault(key) 完全同义 —— 绝不能换成 I18n.get()，那会多走一步 String.format。
+        String text = ClientLanguage.getInstance().getOrDefault(textKey, textKey);
         for (var entry : PAPI.entrySet()) {
             String placeholder = entry.getKey();
             String data = entry.getValue().apply(stack);
