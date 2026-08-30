@@ -149,6 +149,20 @@
 - **源码级移植，未经本仓编译；上面这条移除同样未经实机复验**（沙箱无 JDK / Maven 源
   与游戏）。禁止写 PASS。
 
+### 新增：镜内裁手（同步姊妹 `94179d4`，她侧已 PASS）
+
+- 高倍镜掩码就绪时，第一人称手臂改走「镜内 discard」管线：手臂的 RenderType 是
+  `AvatarRenderer#renderHand` 内部自己挑的 `entityTranslucent(skin)`（字节码实读），
+  调用点无法直接换 —— 用 collector 动态代理在提交穿过时把那个 RenderType 原地替换。
+  判据是 identity 比较：`RenderTypes.entityTranslucent` 按贴图 memoize，同皮肤恒同实例。
+- 管线复用火光那条 `FLASH_TRANSLUCENT_CLIPPED_PIPELINE`（同 blend / snippet / define），
+  但 RenderSetup **不能**复用 `create(...)` 助手 —— vanilla `entityTranslucent` 的 setup
+  比 `entityCutout` 多 `affectsCrumbling()` + `sortOnUpload()`，少了会出现二层袖压一层臂
+  的错序。
+- 掩码未就绪（低倍镜 / 光影 / 配置关闭）时原样返回真 collector：最坏回到「镜内见手臂」
+  的既有行为，绝不画错模型。
+- **源码级同步，未经本仓实机验证。**
+
 ### 变更
 
 - 从包含多人修复与 LRTactical 的完整 NeoForge 26.1.2 R1 稳定基线前滚到 26.2；不是重写。
