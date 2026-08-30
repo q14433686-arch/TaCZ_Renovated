@@ -105,6 +105,9 @@ public final class ScopeTextSubmitter {
      * shadow, false, backgroundColor)} —— 这里传 background=0（瞄具文字
      * 从不配底色，{@code TextShowRender} 现状也是传 0）。</p>
      *
+     * @param finalOverlay true = 用「不交给 Iris」的管线副本（{@code core/scope_text_final}），
+     *                     供光影下 LevelRenderer#render 之后的最终覆盖那一遍使用；
+     *                     false = 走手持 pass 里的常规裁剪管线
      * @return true = 已提交（可能是空文本的静默成功）；
      *         false = 本帧不可用（掩码没就绪），调用方应回退 vanilla submitText
      */
@@ -114,7 +117,8 @@ public final class ScopeTextSubmitter {
                                  FormattedCharSequence text,
                                  boolean shadow,
                                  int packedLight,
-                                 int color) {
+                                 int color,
+                                 boolean finalOverlay) {
         // 门禁与 resolveReticleRenderType 同一份：总开关、光影安全、掩码就绪。
         // （第一人称与开镜进度由调用方 BedrockAttachmentModel 的文字工厂把守。）
         if (!com.tacz.guns.config.client.RenderConfig.SCOPE_MASK_ENABLE.get()) {
@@ -162,7 +166,11 @@ public final class ScopeTextSubmitter {
             Identifier page = pageId(entry.getKey());
             List<TextRenderable> renderables = entry.getValue();
             PoseStack identity = new PoseStack();
-            collector.submitCustomGeometry(identity, ScopeTextRenderTypes.clippedText(page),
+            // finalOverlay = true 时换用「不交给 Iris」的那条管线副本，见
+            // ScopeTextRenderTypes#finalText —— 字形与裁剪完全一致，只是由我们的
+            // 着色器执行（光影下最后覆盖那一遍用）。
+            collector.submitCustomGeometry(identity,
+                    finalOverlay ? ScopeTextRenderTypes.finalText(page) : ScopeTextRenderTypes.clippedText(page),
                     (entryPose, consumer) ->
                             renderables.forEach(r -> r.render(pose, consumer, packedLight, false)));
         }

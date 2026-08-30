@@ -97,9 +97,37 @@ public final class ScopeTextRenderTypes {
                     .withBindGroupLayout(MASK_SAMPLER_LAYOUT)
                     .build();
 
+    /**
+     * 【最终覆盖版】文字管线：配方与 {@link #CLIPPED_TEXT_PIPELINE} 相同，只有两点不同 ——
+     * 换上 {@code core/scope_text_final}（去掉 apply_fog，避免二次加雾），
+     * 并且<b>刻意不 assign 给 Iris</b>。
+     *
+     * <h2>为什么必须有一条「不交给 Iris」的副本</h2>
+     * 交给 Iris 的管线在光影下由光影包的 HAND 程序接管着色，而文字用的是
+     * <b>TEXT 顶点格式</b>（{@code POSITION_TEX_LIGHTMAP_COLOR}，没有 Normal）——
+     * 光影包的手部着色器按实体格式取法线与 lightmap，语义对不上，字形就被画成
+     * <b>黑块</b>。注入分支 {@code tacz_ScopeMaskMode} 只做 discard、不接管着色，
+     * 补登记 mode 能救裁切，救不了黑块。
+     *
+     * <p>所以光影下的文字走 {@link com.tacz.guns.client.render.scope.ScopeFinalRingOverlay}
+     * 那条最终覆盖路（{@code LevelRenderer#render} 之后、用冻结的手持变换重画），
+     * 用本管线画 —— 字形 / alpha 裁剪 / 目镜裁剪全部回到我们自己的着色器手里。
+     * 与 {@code ScopeBodyRenderTypes#ringFinal} 是同一条先例：那条管线同样刻意
+     * 不注册给 Iris，否则会被塞回光影管线。</p>
+     */
+    private static final RenderPipeline FINAL_TEXT_PIPELINE =
+            RenderPipeline.builder(RenderPipelines.WORLD_TEXT_SNIPPET)
+                    .withLocation(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_text_final"))
+                    .withVertexShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_text"))
+                    .withFragmentShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_text_final"))
+                    .withShaderDefine("SCOPE_MASK")
+                    .withBindGroupLayout(MASK_SAMPLER_LAYOUT)
+                    .build();
+
     /** 本仓所有自定义管线都在这里登记；见类注释的移植说明。 */
     public static void registerPipeline(RegisterRenderPipelinesEvent event) {
         event.registerPipeline(CLIPPED_TEXT_PIPELINE);
+        event.registerPipeline(FINAL_TEXT_PIPELINE);
     }
 
     private static boolean irisAssignmentAttempted = false;
@@ -143,6 +171,25 @@ public final class ScopeTextRenderTypes {
                                 // useLightmap 提供 Sampler2 —— vanilla text
                                 // 的 RenderSetup（lambda$static$20 字节码实读）
                                 // 就这一项，别多也别少。
+                                .useLightmap()
+                                .createRenderSetup()));
+    }
+
+    /** 最终覆盖用的 RenderType 缓存（键同样是字体图集页的壳 Identifier）。 */
+    private static final Map<Identifier, RenderType> FINAL_PAGE_CACHE = new HashMap<>();
+
+    /**
+     * 拿到最终覆盖版的裁剪文字 RenderType（不交给 Iris，见 {@link #FINAL_TEXT_PIPELINE}）。
+     *
+     * <p>与 {@link #clippedText} 唯一的区别就是管线；RenderSetup 三件套
+     * （页纹理 / 掩码采样器 / lightmap）完全一致，因此换管线不会改字形、也不会改裁剪。</p>
+     */
+    public static RenderType finalText(Identifier pageId) {
+        return FINAL_PAGE_CACHE.computeIfAbsent(pageId,
+                id -> RenderType.create("tacz_scope_text_final",
+                        RenderSetup.builder(FINAL_TEXT_PIPELINE)
+                                .withTexture("Sampler0", id)
+                                .withTexture(MASK_SAMPLER, ScopeMaskTextureHandle.ID)
                                 .useLightmap()
                                 .createRenderSetup()));
     }

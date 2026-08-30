@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
@@ -73,6 +74,22 @@ public final class ScopeFinalRingOverlay {
     private static final List<RingDraw> PENDING = new ArrayList<>();
 
     /**
+     * 排队中的【镜内文字】。
+     *
+     * <p>与遮光环同一个队列机制、同一次刷新，但成因不同：环是被镜内画中画的合成
+     * 盖掉，文字除了被盖，还因为 TEXT 顶点格式（无 Normal）交给光影包的 HAND 程序后
+     * 被画成黑块 —— 所以文字不光要「晚画」，还要「换一条不交给 Iris 的管线画」。
+     * 见 {@code core/scope_text_final.fsh} 的头注释。</p>
+     */
+    private static final List<TextDraw> PENDING_TEXT = new ArrayList<>();
+
+    /** 提交的排序序号：文字排在遮光环之后（环是实体件，文字浮在最上层）。 */
+    private static final int FINAL_TEXT_ORDER = 20_002;
+
+    /** 手持变换是否<b>曾经</b>抓到过 —— 见 {@link #overlayAvailable()}。 */
+    private static boolean handTransformCapturedEver;
+
+    /**
      * 手持那一遍的变换快照。
      *
      * <p>快照里的几何已经把 ADS/后坐/视角摇晃烘进顶点，但<b>投影与模型视图</b>
@@ -84,6 +101,7 @@ public final class ScopeFinalRingOverlay {
     private static boolean loggedQueued;
     private static boolean loggedRendered;
     private static boolean loggedFailure;
+    private static boolean loggedTextQueued;
 
     private ScopeFinalRingOverlay() {
     }
@@ -96,7 +114,23 @@ public final class ScopeFinalRingOverlay {
      */
     public static void beginFrame() {
         PENDING.clear();
+        PENDING_TEXT.clear();
         handTransform = null;
+    }
+
+    /**
+     * 本帧的覆盖层是否可用 —— 排队方（{@code TextShowRender}）据此决定敢不敢把文字
+     * 交给我们而不是就地提交。
+     *
+     * <h2>为什么必须是「曾经抓到过」而不是「本帧抓到了」</h2>
+     * 排队发生在<b>提交</b>阶段，而手持变换是在稍后的阶段边界才抓的
+     * （见 {@link #captureHandTransform}）—— 同一帧内排队时它必然还是 null。
+     * 所以用「上一帧及以前是否抓到过」做粘性判据：机制真在工作就一直为真，
+     * 阶段边界注入没跑到（光影被临时关掉等）则一直为假，此时调用方维持
+     * 原来的就地提交行为，文字不会丢。
+     */
+    public static boolean overlayAvailable() {
+        return handTransformCapturedEver;
     }
 
     /**
@@ -121,6 +155,7 @@ public final class ScopeFinalRingOverlay {
         if (handTransform != null) {
             return;
         }
+        handTransformCapturedEver = true;
         handTransform = new HandTransform(
                 // 26.2 里这个方法叫 getModelViewMatrixCopy()（不是 1.21.11 的
                 // getModelViewMatrix() —— 它在本版本已被移除，照抄会编译不过）。
@@ -154,6 +189,23 @@ public final class ScopeFinalRingOverlay {
     }
 
     /**
+     * 把【镜内文字】排进最终覆盖层。
+     *
+     * <p>只有光影包在用时才需要走这条路（无光影时合成跑在阶段边界、文字画在它之后，
+     * 顺序本来就是对的）。排队方是 {@code TextShowRender}，入口判据是
+     * {@link #overlayAvailable()}。</p>
+     */
+    public static void queueText(PoseStack pose, float x, float y, FormattedCharSequence text,
+                                 boolean shadow, int packedLight, int color) {
+        PENDING_TEXT.add(new TextDraw(pose, x, y, text, shadow, packedLight, color));
+        if (!loggedTextQueued) {
+            loggedTextQueued = true;
+            GunMod.LOGGER.info("[TACZ Scope] Queued in-scope text for the post-composite overlay "
+                    + "(the Iris HAND program would otherwise draw glyph geometry as black blocks).");
+        }
+    }
+
+    /**
      * 把排队中的目镜框画到主画面上。
      *
      * <p>调用点在 {@code GameRendererMixin} 的 {@code LevelRenderer#render} 返回处，
@@ -161,7 +213,7 @@ public final class ScopeFinalRingOverlay {
      * 立刻返回，开销就是一次 List 判空。</p>
      */
     public static void flush() {
-        if (PENDING.isEmpty()) {
+        if (PENDING.isEmpty() && PENDING_TEXT.isEmpty()) {
             return;
         }
         if (handTransform == null) {
@@ -173,6 +225,7 @@ public final class ScopeFinalRingOverlay {
                         + "captured, so the ring would be drawn with the wrong projection.");
             }
             PENDING.clear();
+            PENDING_TEXT.clear();
             return;
         }
         Minecraft mc = Minecraft.getInstance();
@@ -182,8 +235,10 @@ public final class ScopeFinalRingOverlay {
             return;
         }
         List<RingDraw> rings = List.copyOf(PENDING);
+        List<TextDraw> texts = List.copyOf(PENDING_TEXT);
         HandTransform transform = handTransform;
         PENDING.clear();
+        PENDING_TEXT.clear();
         handTransform = null;
 
         GpuBufferSlice previousProjection = RenderSystem.getProjectionMatrixBuffer();
@@ -200,6 +255,22 @@ public final class ScopeFinalRingOverlay {
                 collector.submitCustomGeometry(new PoseStack(),
                         ScopeBodyRenderTypes.ringFinal(draw.texture()),
                         (entryPose, consumer) -> draw.snapshot().write(consumer));
+            }
+            if (!texts.isEmpty()) {
+                // 文字单独一个 order：排在遮光环之后，保证浮在最上层。
+                OrderedSubmitNodeCollector textCollector = storage.order(FINAL_TEXT_ORDER);
+                for (TextDraw draw : texts) {
+                    // 掩码没就绪时 submit 返回 false —— 此时画出去就是未裁剪的文字，
+                    // 宁可这一帧不画（下一帧掩码就绪后自动恢复），也不要穿出镜筒。
+                    if (!ScopeTextSubmitter.submit(textCollector, draw.pose(), draw.x(), draw.y(),
+                            draw.text(), draw.shadow(), draw.packedLight(), draw.color(), true)) {
+                        if (!loggedFailure) {
+                            loggedFailure = true;
+                            GunMod.LOGGER.warn("[TACZ Scope] Post-composite scope text skipped: the ocular mask "
+                                    + "was not ready, so the text would be drawn unclipped.");
+                        }
+                    }
+                }
             }
             mc.gameRenderer.featureRenderDispatcher().renderAllFeatures(storage);
             if (!loggedRendered) {
@@ -227,5 +298,9 @@ public final class ScopeFinalRingOverlay {
     }
 
     private record RingDraw(BedrockRenderSnapshot snapshot, Identifier texture) {
+    }
+
+    private record TextDraw(PoseStack pose, float x, float y, FormattedCharSequence text,
+                            boolean shadow, int packedLight, int color) {
     }
 }

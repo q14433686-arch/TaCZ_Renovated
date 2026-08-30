@@ -72,9 +72,27 @@ public class TextShowRender implements IFunctionalSubmitter {
             // 不再穿出镜筒（MK5HD 弹药计数一案）。submit 返回 false 表示本帧
             // 掩码不可用（配置关闭/光影/target 失败），回退 vanilla 路径 ——
             // 行为退回「开镜门禁 + 可能溢出」的已验证现状，绝不丢字。
+            // 【光影路径】光影包在用时，文字不能进 Iris 的手部 pass。
+            //
+            // 自定义管线被 assign 给 Iris 的 HAND 程序后，着色由光影包的手部着色器
+            // 接管；而文字用的是 TEXT 顶点格式（POSITION_TEX_LIGHTMAP_COLOR，
+            // 没有 Normal），光影包按实体格式取法线与 lightmap，语义对不上 ——
+            // 字形被画成一片黑块。注入分支 tacz_ScopeMaskMode 只做 discard、
+            // 不接管着色，补登记 mode 能救裁切，救不了黑块。
+            //
+            // 因此这里改为把文字排进 LevelRenderer#render 之后的最终覆盖层
+            // （与遮光环同一条路），用一条【不交给 Iris】的管线副本重画 ——
+            // 字形、alpha 裁剪、目镜裁剪全部回到我们自己的着色器手里。
+            if (clip
+                    && com.tacz.guns.compat.iris.IrisCompat.isUsingRenderPack()
+                    && com.tacz.guns.client.render.scope.ScopeFinalRingOverlay.overlayAvailable()) {
+                com.tacz.guns.client.render.scope.ScopeFinalRingOverlay.queueText(
+                        taskPose, -xOffset, -font.lineHeight / 2f, sequence, shadow, packedLight, color);
+                return;
+            }
             if (clip && com.tacz.guns.client.render.scope.ScopeTextSubmitter.submit(
                     collector, taskPose, -xOffset, -font.lineHeight / 2f, sequence,
-                    shadow, packedLight, color)) {
+                    shadow, packedLight, color, false)) {
                 return;
             }
             collector.submitText(taskPose, -xOffset, -font.lineHeight / 2f, sequence, shadow,
