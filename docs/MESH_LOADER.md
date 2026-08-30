@@ -1,5 +1,13 @@
 # 内置 TacZ Mesh Loader [TML] —— 安全子集（第 0 步）
 
+> **本仓移植说明**（NeoForge 26.2 / `TaCZ_Renovated`）：本文随姊妹分支
+> `TaCZ_Refabricated_Unofficial` `arena/01a04e96` 的 `8c6ad27` + `f70867d` 同步而来。
+> 代码部分两处适配：去掉 Fabric 的 `@Environment` 注解；`ForgeConfigSpec` →
+> `ModConfigSpec`；缓存失效监听器改走 NeoForge 的 `AddClientReloadListenersEvent`。
+> 配置面按维护者硬性惯例**同时接 TOML 与 Cloth**（本仓比姊妹侧多了一整个
+> mesh 配置分区）。GPU 烘焙（她侧路线图第 1 步）**本段未包含**，等本段实机
+> PASS 后再动。
+
 > 代码移植自 [VellEagle/TacZMeshLoader](https://github.com/VellEagle/TacZMeshLoader)
 > `1.21.1_fabric` v0.1.7，GPL-3.0。不是官方 TacZ 附属。
 >
@@ -36,6 +44,12 @@
   按 geo 路径缓存共享网格数据，资源重载时整体失效；统计日志按 geo 去重。
 - **顶点预算闸门**：GUI/FIXED/HEAD 超 `MeshGuiMaxVertices` 只画立方体；
   第三人称/掉落物/展示框超 `MeshWorldMaxVertices` 同理；另有距离闸门。
+  **近距离全模豁免**（`MeshWorldFullDetailDistance`，默认 16 格）：该距离内的
+  世界语境 poly 无条件画全模，世界预算只保护远处/密集场景——否则无 LOD
+  低模的高模枪（如 36 万顶点级枪包）在玩家眼前的第三人称/掉落物/展示台上
+  会整层消失只剩立方体。枪包若在 display JSON 里提供了 `lod` 字段，
+  TACZ 本体的 LOD 选择逻辑优先生效（`GunLodRenderDistance` 控制），
+  该豁免只兜底「没有 LOD 可退」的枪包。
 - **弹匣双通道**：主遍历 exclude `additional_magazine` 子树；立方体弹匣走
   26.2 原生 `IMirrorGeometry`；poly 弹匣在 `additional_magazine.visible` 时
   按该节点变换补画（与上游 TML `renderSubtreeDirect` 同构）。
@@ -95,6 +109,7 @@ poly_mesh geo）。`model_type: "mesh"` 只对枪本身必需；配件/弹药/�
 | `MeshPolyInPreview` | true | GUI/FIXED/HEAD 是否画 poly |
 | `MeshGuiMaxVertices` | 65536 | GUI 顶点预算（0=不限） |
 | `MeshWorldMaxVertices` | 120000 | 第三人称/掉落物顶点预算（0=不限） |
+| `MeshWorldFullDetailDistance` | 16 | 该距离（格）内世界 poly 免顶点预算画全模（0=关闭豁免；已接 Cloth Config 界面） |
 | `MeshMaxModelVertices` | 120000 | 加载时告警阈值（不影响渲染） |
 | `MeshLogStats` | true | 加载统计日志 |
 
