@@ -316,6 +316,8 @@
   "config.tacz.client.render.scope_pip_resolution_scale.desc": "Second-render mode only, without shader packs. Render resolution scale (0.25 to 1.0, default 0.75 = ~56% pixels). Under shader packs use 'PIP Shader Shadow Scale' instead.",
   "config.tacz.client.render.scope_pip_shadow_scale": "PIP Shader Shadow Scale",
   "config.tacz.client.render.scope_pip_shadow_scale.desc": "Shadow map resolution fraction for the scope pass under shader packs (0.25 to 1.0). Default 0.5 cuts that pass’s shadow cost to about a quarter without affecting the main view.",
+  "config.tacz.client.render.scope_pip_rerender_interval": "PIP Rerender Interval",
+  "config.tacz.client.render.scope_pip_rerender_interval.desc": "Rerender mode only: actually render the scope world pass every N frames, reusing the previous lens image in between (1 = every frame). The main lever under shaders, where the cost comes from running the whole shader pipeline twice per frame: 2 halves that extra cost, with about one frame of lens lag while turning. The main view always runs at full frame rate.",
   "config.tacz.client.render.scope_pip_allow_shader_packs": "Allow PIP with Shader Packs",
   "config.tacz.client.render.scope_pip_allow_shader_packs.desc": "Run the scope picture-in-picture while an Iris shader pack is active. Off by default as a precaution, not because it is known to be broken.",
   "config.tacz.client.render.scope_pip_isolate_pipeline": "PIP Isolated Shader Pipeline",
