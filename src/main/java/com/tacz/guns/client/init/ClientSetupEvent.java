@@ -28,6 +28,7 @@ import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.tacz.guns.client.renderer.item.GunItemRendererWrapper;
 import com.tacz.guns.client.renderer.item.GunSmithTableItemRenderer;
 import com.tacz.guns.client.renderer.item.TaczDynamicItemModel;
+import cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration;
 import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
 import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
 import com.tacz.guns.client.render.scope.ScopePipRenderer;
@@ -141,6 +142,8 @@ public class ClientSetupEvent {
     public static void onClientResourceReload(AddClientReloadListenersEvent event) {
         PlayerAnimatorCompat.init();
         PlayerAnimatorCompat.registerReloadListener(event::addListener);
+        // 内置 TacZ Mesh Loader：资源重载即失效 geo 解析缓存。
+        TaczMeshyIntegration.registerReloadListener(event::addListener);
         ClientAssetsManager.INSTANCE.reloadAndRegister(event);
     }
 
@@ -157,6 +160,8 @@ public class ClientSetupEvent {
         ARCompat.init();
         ZoomifyCompat.init();
         ImmediatelyFastCompat.init();
+        // 内置 TacZ Mesh Loader：注册 model_type=mesh。
+        TaczMeshyIntegration.onClientSetup();
     }
 
     public static void registerItemRenderers() {
