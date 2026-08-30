@@ -107,7 +107,14 @@ public final class ScopeTextRenderTypes {
     /**
      * 与 {@code ScopeBodyRenderTypes#ensureIrisCompatibility} 同一约定：
      * 让 Iris 把这条管线归到第一人称手部程序，避免光影下被判为未知管线。
-     * （实际上光影包激活时掩码整体禁用、走不到这里，这是双保险。）
+     *
+     * <p><b>这不是双保险，而是必选项</b>：光影包激活时掩码<b>没有</b>整体停用
+     * （那是 Iris 桥落地之前的旧政策，早已废弃）。桥落地后，光影下这条管线由
+     * 光影包的 HAND 程序接管，裁剪靠 {@code IrisShaderCreatorMixin} 注入的
+     * {@code tacz_ScopeMaskMode} 分支执行 —— 而分支的开关值来自
+     * {@code IrisScopeMaskState#resolveMode} 按管线 location 查表。
+     * 不 assign，管线就进不了 HAND 程序，那张表也就永远查不到它，
+     * 于是光影下文字与准星一样完全不裁。
      */
     private static void ensureIrisCompatibility() {
         if (irisAssignmentAttempted) {

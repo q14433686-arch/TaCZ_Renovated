@@ -121,7 +121,14 @@ public final class ScopeTextSubmitter {
             return false;
         }
         if (com.tacz.guns.compat.iris.IrisCompat.shouldDisableScopeMaskUnderShaderPack()) {
-            // 光影下掩码整体停用，target 里可能是陈旧内容 —— 采样它会裁错位置。
+            // 只有 Vulkan 系着色器替代（Sulkan）会整体停用掩码 —— 它没有
+            // 与 Iris 桥等价的注入通道，target 里可能是陈旧内容，采样会裁错位置。
+            // Iris 不在此列：光影下掩码是活的（由注入进光影着色器的
+            // tacz_ScopeMaskMode 分支执行），这里必须继续走裁剪管线。
+            //
+            // 早前这里写的是「光影下掩码整体停用」，那是 Iris 桥落地前的旧政策；
+            // 正是这句过时注释让 scope_text_clipped 漏登了 IrisScopeMaskState
+            // 的 mode 表，表现为「光影下镜内文字完全不裁」。注释必须跟着机制走。
             return false;
         }
         if (!ScopeMaskTextureHandle.syncToMaskTarget()) {
