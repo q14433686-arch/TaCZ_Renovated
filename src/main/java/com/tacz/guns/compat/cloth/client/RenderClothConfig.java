@@ -140,40 +140,40 @@ public class RenderClothConfig {
                 .setSaveConsumer(RenderConfig.SCOPE_PIP_SHARPNESS::set).build());
 
         // ---- 内置 TacZ Mesh Loader（poly_mesh）----
-        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_enable"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_ENABLE.get())
+        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_enable"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.ENABLE_MESH.get())
                 .setDefaultValue(true).setTooltip(Component.translatable("config.tacz.client.render.mesh_enable.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_ENABLE::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.ENABLE_MESH::set).build());
 
-        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_poly_in_shadow"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_POLY_IN_SHADOW.get())
+        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_poly_in_shadow"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.POLY_IN_SHADOW.get())
                 .setDefaultValue(false).setTooltip(Component.translatable("config.tacz.client.render.mesh_poly_in_shadow.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_POLY_IN_SHADOW::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.POLY_IN_SHADOW::set).build());
 
-        render.addEntry(entryBuilder.startDoubleField(Component.translatable("config.tacz.client.render.mesh_max_render_distance"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_MAX_RENDER_DISTANCE.get())
+        render.addEntry(entryBuilder.startDoubleField(Component.translatable("config.tacz.client.render.mesh_max_render_distance"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MAX_RENDER_DISTANCE.get())
                 .setMin(0.0).setMax(1024.0).setDefaultValue(48.0).setTooltip(Component.translatable("config.tacz.client.render.mesh_max_render_distance.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_MAX_RENDER_DISTANCE::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MAX_RENDER_DISTANCE::set).build());
 
-        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_poly_in_preview"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_POLY_IN_PREVIEW.get())
+        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_poly_in_preview"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.POLY_IN_PREVIEW.get())
                 .setDefaultValue(true).setTooltip(Component.translatable("config.tacz.client.render.mesh_poly_in_preview.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_POLY_IN_PREVIEW::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.POLY_IN_PREVIEW::set).build());
 
-        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_log_stats"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_LOG_STATS.get())
+        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_log_stats"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.LOG_STATS.get())
                 .setDefaultValue(true).setTooltip(Component.translatable("config.tacz.client.render.mesh_log_stats.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_LOG_STATS::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.LOG_STATS::set).build());
 
-        render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_gui_max_vertices"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_GUI_MAX_VERTICES.get())
+        render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_gui_max_vertices"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GUI_MAX_VERTICES.get())
                 .setMin(0).setMax(10000000).setDefaultValue(65536).setTooltip(Component.translatable("config.tacz.client.render.mesh_gui_max_vertices.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_GUI_MAX_VERTICES::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GUI_MAX_VERTICES::set).build());
 
-        render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_world_max_vertices"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_WORLD_MAX_VERTICES.get())
+        render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_world_max_vertices"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.WORLD_MAX_VERTICES.get())
                 .setMin(0).setMax(10000000).setDefaultValue(120000).setTooltip(Component.translatable("config.tacz.client.render.mesh_world_max_vertices.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_WORLD_MAX_VERTICES::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.WORLD_MAX_VERTICES::set).build());
 
-        render.addEntry(entryBuilder.startDoubleField(Component.translatable("config.tacz.client.render.mesh_world_full_detail_distance"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_WORLD_FULL_DETAIL_DISTANCE.get())
+        render.addEntry(entryBuilder.startDoubleField(Component.translatable("config.tacz.client.render.mesh_world_full_detail_distance"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.WORLD_FULL_DETAIL_DISTANCE.get())
                 .setMin(0.0).setMax(1024.0).setDefaultValue(16.0).setTooltip(Component.translatable("config.tacz.client.render.mesh_world_full_detail_distance.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_WORLD_FULL_DETAIL_DISTANCE::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.WORLD_FULL_DETAIL_DISTANCE::set).build());
 
-        render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_max_model_vertices"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_MAX_MODEL_VERTICES.get())
+        render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_max_model_vertices"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MAX_MODEL_VERTICES.get())
                 .setMin(0).setMax(10000000).setDefaultValue(120000).setTooltip(Component.translatable("config.tacz.client.render.mesh_max_model_vertices.desc"))
-                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MESH_MAX_MODEL_VERTICES::set).build());
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.MAX_MODEL_VERTICES::set).build());
     }
 }
