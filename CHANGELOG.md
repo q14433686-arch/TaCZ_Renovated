@@ -199,9 +199,12 @@
   v2 的 commit 回推曾因 push 竞争多次失败）。只在本仓 `arena/**` 分支触发，
   `paths-ignore: build-reports/**` 防死循环；`.gitignore` 把该目录排除在提交之外。
 - 记录姊妹分支 `arena/01a04e96` 的同步取舍：内置 Mesh Loader（`8c6ad27`，第三方
-  `VellEagle/TacZMeshLoader` 的 poly_mesh 渲染，第 0 步、无 GPU 路径、上游 4 次
-  被关 PR）**暂不移植**，等确认是否真有 mesh 枪包需求再单独立项。
-  见 `docs/records/REFAB_SYNC_01A04E96_20260830.md`。
+  `VellEagle/TacZMeshLoader` 的 poly_mesh 渲染，GPL-3.0）**已由维护者确认需求后立项**——
+  本仓用户确用 `model_type=mesh` 枪包，此前「暂不移植」的裁定作废。按姊妹
+  `SYNC_GUIDE_RENOV_262` §3 的二段式推进：第 1 段（安全子集：纯 collector 路径、无 GPU
+  烘焙）分三批，已落地第一批（8 个与加载器无关的核心文件，896 行，**只编译不生效**）；
+  第 2 段（GPU 静态烘焙）等第 1 段实机 PASS 再动。许可已登记进 `LICENSES.md`。
+  见 `docs/records/REFAB_SYNC_01A04E96_R2_20260830.md` §4.3。
 
 ### 修复
 
