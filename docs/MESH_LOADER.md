@@ -1,23 +1,29 @@
-# 内置 TacZ Mesh Loader [TML] —— 安全子集（第 0 步）
+# 内置 TacZ Mesh Loader [TML] —— 安全子集（第 0 步）+ GPU 静态烘焙（第 1 步）
 
 > **本仓移植说明**（NeoForge 26.2 / `TaCZ_Renovated`）：本文随姊妹分支
-> `TaCZ_Refabricated_Unofficial` `arena/01a04e96` 的 `8c6ad27` + `f70867d` 同步而来。
-> 代码部分两处适配：去掉 Fabric 的 `@Environment` 注解；`ForgeConfigSpec` →
-> `ModConfigSpec`；缓存失效监听器改走 NeoForge 的 `AddClientReloadListenersEvent`。
-> 配置面按维护者硬性惯例**同时接 TOML 与 Cloth**（本仓比姊妹侧多了一整个
-> mesh 配置分区）。GPU 烘焙（她侧路线图第 1 步）**本段未包含**，等本段实机
-> PASS 后再动。
+> `TaCZ_Refabricated_Unofficial` `arena/01a04e96` 同步，分两段落地：
+> - **第 0 步**（安全子集）← 她的 `8c6ad27` + `f70867d`；
+> - **第 1 步**（GPU 静态烘焙，见 §2.5）← 她的 `8191f6b` / `0ea0fb6` / `6e275d0` /
+>   `9f7412e` 四笔的**最终形态**（即 `f70867d→9f7412e` 的聚合差）。不逐笔照搬：
+>   后三笔全是对第一笔的修正，逐笔搬会把已经修掉的 bug 原样搬回来。
+>
+> 代码适配：去掉 Fabric 的 `@Environment`；`ForgeConfigSpec` → `ModConfigSpec`；
+> 缓存失效监听器走 NeoForge 的 `AddClientReloadListenersEvent`；目镜框挂点用本仓的
+> `ScopeFinalRingOverlay`（姊妹侧叫 `ScopeFinalOverlayState`）。配置面按维护者硬性
+> 惯例**同时接 TOML 与 Cloth**。她侧 `withinContextBudget` 的世界全细节距离那段
+> **没搬**——本仓已有 `PolyRenderPolicy.withinFullDetailDistance`。
 
 > 代码移植自 [VellEagle/TacZMeshLoader](https://github.com/VellEagle/TacZMeshLoader)
 > `1.21.1_fabric` v0.1.7，GPL-3.0。不是官方 TacZ 附属。
 >
-> **状态：源码完成，等待 CI 编译验证与实机验证。**
-> 按 AGENTS.md §2：本文没有一句「已实测修好」。
+> **状态：源码 + CI 编译通过（`bf2a16f` BUILD SUCCESSFUL），实机未验证。**
+> 按 AGENTS.md §2：本文没有一句「已实测修好」，第 1 步一律记 UNVERIFIED。
 >
 > 路线图见 [`TML_PERF_DIRECTIONS_2026_08_29.md`](TML_PERF_DIRECTIONS_2026_08_29.md)。
-> 本轮是其中的**第 0 步**：从干净基线重新内置「不含 GPU 赌注」的部分。
+> 第 0 步：从干净基线重新内置「不含 GPU 赌注」的部分。
+> 第 1 步：GPU 静态烘焙（§2.5），同步她四笔的最终形态。
 
-## 0. 与四个关闭 PR 的关系（为什么这是第五次、以及为什么这次砍掉了 GPU）
+## 0. 与四个关闭 PR 的关系（为什么这是第五次、以及第 0 步为什么砍掉了 GPU）
 
 | 版本 | 结局 | 教训（本轮如何处置） |
 |---|---|---|
@@ -59,10 +65,11 @@
 
 ### 明确不包含（后续步骤，见路线图）
 
-- **GPU 静态烘焙 / 逐骨骼 VBO**（路线图第 1 步）——关闭 PR 四次翻车的部分，
-  等无光影 PoC 通过后单独提交。**因此本轮对 36 万顶点级高模的第一人称
-  帧率成本没有量级改善**，只有闸门和缓存级别的削减。这是如实声明。
-- 光影下的 `assignPipeline(HAND)` 路线（路线图方向 1，依赖上一条）。
+- ~~**GPU 静态烘焙 / 逐骨骼 VBO**~~ —— 已落地，见 §2.5。注意它**只覆盖第一人称
+  手部 pass**：世界 / 掉落物 / GUI / 阴影恒走 collector。36 万顶点级高模的
+  **第一人称**成本才有量级改善，其它视角一分没减。这是如实声明。
+- 她侧最初的「光影下 `assignPipeline(HAND)`」形态：**没有搬**。裸 GPU pass 会绕过
+  光影拦截，改用她 `6e275d0` 之后的 vanilla `RenderType` 路线（§2.5 第 5 条）。
 - 姿态缓存 / 三角形配对（路线图方向 2）。
 - mesh 目镜（上游 TML 同样不支持：ocular 物体必须用立方体）。
 
@@ -78,6 +85,53 @@ poly 部分：`TaczPolyMeshGunModel#submit` 里
 4. `additional_magazine.visible` 时，把该节点到根的变换链乘进新 PoseStack，
    `captureSubtree(mirrorRoot=true)` 补画 `magazine` / `additional_magazine`
    的 poly（mirrorRoot=true = 根骨骼自身变换不再套用，因为已在变换链里）。
+
+## 2.5 GPU 静态烘焙（第 1 步，`PolyMeshGpuRenderer`）
+
+**做了什么**：静态骨骼的顶点按**骨骼本地坐标**一次烘进常驻 VBO
+（`DefaultVertexFormat.ENTITY`，光照档量化后烘进 UV2），此后每帧只写
+**O(骨骼)** 次 `DynamicTransforms`，而不是 O(顶点) 次 CPU 变换 + VertexConsumer。
+36 万顶点 / ~40 骨骼的高模，第一人称每帧的矩阵写次数从 36 万降到 40 量级。
+
+**生效条件**（`shouldSubmitGpu()`，四条全满足才走 GPU，否则静默回 collector）：
+
+1. `MeshGpuBaking=true`；
+2. **现在就在手部 pass 里** —— 判据是 `ScopeMaskRenderer.isInHandPass()`，
+   **不是** `transformType.firstPerson()`；
+3. **不在镜内那一遍**（`ScopePipRenderer.isInsideScopeLevelRender()` 为 false）；
+4. 烘焙成功（见第 4 条的部分失败规则）。
+
+**绘制点**：`FeatureRenderDispatcherMixin` 在 `PreparedFrame.executeSolid()`
+**之后**注入（`shift = AFTER`）——不在任何 render pass 内，且立方体深度已写入；
+与目镜掩码是同一个安全边界。帧表在 `GameRendererMixin#extract` HEAD 与掩码同点归零。
+
+### 关 PR #33/#69/#70/#71-72 的教训，逐条落地
+
+1. **HAND 表不用 `transformType.firstPerson()` 判**：26.2 里 `renderItemInHand`
+   与镜内重放都走那段，用它判会导致世界 pass 收不到、或镜内那一遍串进来。
+   用 `isInHandPass()` 才是「手上这一遍」的准确语义。
+2. **绘制时自乘 `RenderSystem.getModelViewMatrixCopy()`**（她 `0ea0fb6`）：
+   collector 路径是 `MV_draw × pose_submit` 两层，GPU 路径原先只写了后者，
+   表现为**枪朝向恒指北、不随视角转**。字节码依据：`RenderType.prepare()`
+   内部 `getModelViewMatrixCopy() -> writeDynamicTransforms(mv)`。
+3. **换弹 `additional_magazine` 恒走 collector**：它走 `mirrorRoot` 矩阵，
+   与主遍历的矩阵语义不同，烘进 VBO 会错位（`submitAdditionalMagazinePoly`
+   在 GPU 分支之外，无条件执行）。
+4. **失败即整体回退**：任何异常 → 本会话停用 GPU 路径并把 `MeshGpuBaking` 翻 off；
+   部分骨骼烘失败（`bakeBone` 返回 null）→ **整个模型**回 collector。
+   半 GPU 半 collector 的 cutout 集合无法对账（哪根骨骼谁画的说不清），二选一。
+
+### 光影与重烘
+
+5. **光影下默认走 vanilla `RenderType`**（她 `6e275d0`）：`RenderType.prepare()`
+   + `PreparedRenderType.drawFromBuffer()`，用 `RenderTypes.entityCutout`，
+   让 Iris 按 HAND program 接管。**裸 GPU pass 会绕过光影拦截**，所以
+   `MeshGpuUnderShaders` 默认 false，且它是诊断开关、不是常规选项。
+6. **重烘规则**：光照档变化（`quantizeLight` 档位变了）触发重烘，**节流 1 秒**；
+   但**光影包开关翻转导致的世代号不匹配立即重烘**，不受节流约束
+   （她 `9f7412e`）—— Iris 激活与否会改变实体顶点格式的写出布局，
+   旧 VBO 在新管线下属性错位就是模型拉伸，一帧都不能再画。
+   模型重载走 `loadPolyMesh` 开头的 `releaseBaked()`。
 
 ## 3. 枪包怎么用
 
@@ -112,9 +166,11 @@ poly_mesh geo）。`model_type: "mesh"` 只对枪本身必需；配件/弹药/�
 | `MeshWorldFullDetailDistance` | 16 | 该距离（格）内世界 poly 免顶点预算画全模（0=关闭豁免；已接 Cloth Config 界面） |
 | `MeshMaxModelVertices` | 120000 | 加载时告警阈值（不影响渲染） |
 | `MeshLogStats` | true | 加载统计日志 |
+| `MeshGpuBaking` | true | 第一人称手部 pass 的骨骼静态烘焙（§2.5）；关掉 = 全程 collector |
+| `MeshGpuUnderShaders` | false | 装了光影时仍强走裸 GPU pass（**诊断用**开关，非常规选项） |
 
-**注意没有 `MeshGpuBaking` 等键**——GPU 路径本轮不存在，
-不注册「没人读的配置」（本仓有 HandViewLockFix 配置陷阱案底）。
+两个 GPU 键都有真实消费点（`PolyMeshGpuRenderer#shouldSubmitGpu`），
+TOML + Cloth + 中英语言三处齐备，不是「没人读的配置」。
 
 ## 5. 验证清单
 
@@ -140,10 +196,28 @@ CI 闭环：push 触发 → Actions 跑 `./gradlew compileJava` →
    entityCutout 提交，Iris 按 HAND program 处理，与立方体同一路径）；
    阴影里枪影仍在（立方体提供）。
 7. 资源重载（F3+T）：poly 仍正常（解析缓存失效并重建）。
+8. **GPU 路径**（默认 `MeshGpuBaking=true`）：第一人称持枪时日志出现一次
+   `GPU-baked N bones (M vertices) for ... at quantized light 0x...`；
+   在同一把枪上来回走动（光照档变化）**不应每帧刷这一行**——1 秒节流生效。
+9. **GPU 路径的朝向**：第一人称左右转身 / 抬头低头 / 蹲下 / 开镜，枪必须跟着视模走。
+   若出现「枪朝向恒指北、不随视角转」，说明第 2 条那层 `getModelViewMatrixCopy()`
+   又丢了。
+10. **GPU 路径下的换弹**：枪上弹匣与手里弹匣都要在，且位置与
+    `MeshGpuBaking=false` 时一致（`additional_magazine` 恒走 collector，是故意的）。
+11. **光影开关翻转**（Iris + Complementary，`MeshGpuUnderShaders` 保持 false）：
+    进入 / 退出光影包时模型**不得拉伸错位**，且开关瞬间日志应重新出现一次
+    `GPU-baked`（世代号不匹配立即重烘）。
+12. **降级通道**：`MeshGpuBaking=false` 时，画面必须与第 1 步合并前完全一致。
 
 ### 5.3 已知边界（如实）
 
+- **GPU 路径只覆盖第一人称手部 pass**：世界 / 掉落物 / GUI / 展示框 / 阴影恒走
+  collector，那些场景的 O(顶点) 成本一分没减（只有 §1 的闸门和缓存级削减）。
+- **GPU 路径未上实机**：CI 只证明 `bf2a16f` 能编译（`BUILD SUCCESSFUL`）。
+  §5.2 的第 8–12 条一条都没跑过，按 AGENTS.md §2 一律记 **UNVERIFIED**，
+  不写 PASS。
 - 36 万顶点级高模第一人称**仍有帧率成本**（每帧 O(顶点) CPU 变换 +
   逐顶点 VertexConsumer 调用）。这是路线图第 1/2 步要解决的，本轮不解决。
+  （第 1 步已落地后，这句话只在 `MeshGpuBaking=false` 或非第一人称时成立。）
 - PIP 二次渲染（`ScopePipRerender=true`）时镜内那遍会重放 collector 回调，
   poly 成本 ×2。降级方案在路线图方向 3，待镜内行为实机确认后做。
