@@ -16,8 +16,10 @@
 > 代码移植自 [VellEagle/TacZMeshLoader](https://github.com/VellEagle/TacZMeshLoader)
 > `1.21.1_fabric` v0.1.7，GPL-3.0。不是官方 TacZ 附属。
 >
-> **状态：源码 + CI 编译通过（`bf2a16f` BUILD SUCCESSFUL），实机未验证。**
-> 按 AGENTS.md §2：本文没有一句「已实测修好」，第 1 步一律记 UNVERIFIED。
+> **状态：源码 + CI 编译通过（`bf2a16f` / `833d8ac` 均 BUILD SUCCESSFUL）；
+> 第 1 步（GPU 烘焙）的 §5.2 第 8–12 条由维护者 2026-08-31 实机复测全部通过。**
+> 未实测的部分（非第一人称各场景的帧率收益、ttf/unihex 字体路径）仍记 UNVERIFIED ——
+> 按 AGENTS.md §2，不是我自己跑出来的结果不写 PASS，是谁跑的写清楚。
 >
 > 路线图见 [`TML_PERF_DIRECTIONS_2026_08_29.md`](TML_PERF_DIRECTIONS_2026_08_29.md)。
 > 第 0 步：从干净基线重新内置「不含 GPU 赌注」的部分。
@@ -213,9 +215,12 @@ CI 闭环：push 触发 → Actions 跑 `./gradlew compileJava` →
 
 - **GPU 路径只覆盖第一人称手部 pass**：世界 / 掉落物 / GUI / 展示框 / 阴影恒走
   collector，那些场景的 O(顶点) 成本一分没减（只有 §1 的闸门和缓存级削减）。
-- **GPU 路径未上实机**：CI 只证明 `bf2a16f` 能编译（`BUILD SUCCESSFUL`）。
-  §5.2 的第 8–12 条一条都没跑过，按 AGENTS.md §2 一律记 **UNVERIFIED**，
-  不写 PASS。
+- **第 1 步的实机状态**（2026-08-31 回填）：维护者复测 §5.2 第 8–12 条**全部通过**
+  （GPU baked 日志节流正常、朝向随视模、换弹双弹匣位置正确、Iris 光影翻转不拉伸、
+  `MeshGpuBaking=false` 与合并前一致）。这条结论来自维护者实测，不是本 sandbox 跑出来的。
+- **仍未量化**：世界 / 掉落物 / GUI 走 collector 的**帧率收益数字**没人测过；
+  高模（36 万顶点级）第一人称的 fps 对比也还没有数字，只有「成本从 O(顶点) 降到
+  O(骨骼)」这个机制性结论。这是 §5.2 之外的一条空档。
 - 36 万顶点级高模第一人称**仍有帧率成本**（每帧 O(顶点) CPU 变换 +
   逐顶点 VertexConsumer 调用）。这是路线图第 1/2 步要解决的，本轮不解决。
   （第 1 步已落地后，这句话只在 `MeshGpuBaking=false` 或非第一人称时成立。）
