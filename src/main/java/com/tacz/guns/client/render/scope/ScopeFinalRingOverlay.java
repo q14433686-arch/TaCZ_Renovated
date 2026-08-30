@@ -262,8 +262,8 @@ public final class ScopeFinalRingOverlay {
                 for (TextDraw draw : texts) {
                     // 掩码没就绪时 submit 返回 false —— 此时画出去就是未裁剪的文字，
                     // 宁可这一帧不画（下一帧掩码就绪后自动恢复），也不要穿出镜筒。
-                    if (!ScopeTextSubmitter.submit(textCollector, draw.pose(), draw.x(), draw.y(),
-                            draw.text(), draw.shadow(), draw.packedLight(), draw.color(), true)) {
+                    if (!ScopeTextSubmitter.submitOrdered(textCollector, draw.pose(), draw.x(), draw.y(),
+                            draw.text(), draw.shadow(), draw.packedLight(), draw.color())) {
                         if (!loggedFailure) {
                             loggedFailure = true;
                             GunMod.LOGGER.warn("[TACZ Scope] Post-composite scope text skipped: the ocular mask "

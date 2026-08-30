@@ -8,6 +8,7 @@ import com.tacz.guns.GunMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.TextRenderable;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.Identifier;
@@ -119,10 +120,74 @@ public final class ScopeTextSubmitter {
                                  int packedLight,
                                  int color,
                                  boolean finalOverlay) {
+        Map<GpuTextureView, List<TextRenderable>> byPage = prepare(x, y, text, shadow, color);
+        if (byPage == null) {
+            return false;
+        }
+        if (byPage.isEmpty()) {
+            return true;
+        }
+        org.joml.Matrix4f pose = new org.joml.Matrix4f(poseStack.last().pose());
+        for (Map.Entry<GpuTextureView, List<TextRenderable>> entry : byPage.entrySet()) {
+            Identifier page = pageId(entry.getKey());
+            List<TextRenderable> renderables = entry.getValue();
+            // finalOverlay = true 时换用「不交给 Iris」的管线副本，见
+            // ScopeTextRenderTypes#finalText —— 字形与裁剪完全一致，只是由我们的
+            // 着色器执行（光影下最后覆盖那一遍用）。
+            collector.submitCustomGeometry(new PoseStack(),
+                    finalOverlay ? ScopeTextRenderTypes.finalText(page) : ScopeTextRenderTypes.clippedText(page),
+                    (entryPose, consumer) ->
+                            renderables.forEach(r -> r.render(pose, consumer, packedLight, false)));
+        }
+        return true;
+    }
+
+    /**
+     * 最终覆盖那一遍的入口 —— 与 {@link #submit} 唯一的不同是收集器类型。
+     *
+     * <p>26.2 里 {@code OrderedSubmitNodeCollector} 与 {@code SubmitNodeCollector}
+     * 是<b>平级</b>的两个类型（前者不是后者的子类），而
+     * {@code SubmitNodeStorage#order} 只能给出前者，所以两条入口只能并列存在。
+     * 除了提交动作，准备流程与 {@link #submit} 共用 {@link #prepare}。</p>
+     */
+    public static boolean submitOrdered(OrderedSubmitNodeCollector collector,
+                                        PoseStack poseStack,
+                                        float x, float y,
+                                        FormattedCharSequence text,
+                                        boolean shadow,
+                                        int packedLight,
+                                        int color) {
+        Map<GpuTextureView, List<TextRenderable>> byPage = prepare(x, y, text, shadow, color);
+        if (byPage == null) {
+            return false;
+        }
+        if (byPage.isEmpty()) {
+            return true;
+        }
+        org.joml.Matrix4f pose = new org.joml.Matrix4f(poseStack.last().pose());
+        for (Map.Entry<GpuTextureView, List<TextRenderable>> entry : byPage.entrySet()) {
+            Identifier page = pageId(entry.getKey());
+            List<TextRenderable> renderables = entry.getValue();
+            // 最终覆盖一律用「不交给 Iris」的管线副本，无例外。
+            collector.submitCustomGeometry(new PoseStack(), ScopeTextRenderTypes.finalText(page),
+                    (entryPose, consumer) ->
+                            renderables.forEach(r -> r.render(pose, consumer, packedLight, false)));
+        }
+        return true;
+    }
+
+    /**
+     * 门禁检查 + 按字体图集页分组。{@link #submit} 与 {@link #submitOrdered} 共用。
+     *
+     * @return {@code null} = 本帧不可用（调用方应回退/跳过）；空 map = 没有可画的字形（静默成功）
+     */
+    private static Map<GpuTextureView, List<TextRenderable>> prepare(float x, float y,
+                                                                    FormattedCharSequence text,
+                                                                    boolean shadow, int color) {
         // 门禁与 resolveReticleRenderType 同一份：总开关、光影安全、掩码就绪。
         // （第一人称与开镜进度由调用方 BedrockAttachmentModel 的文字工厂把守。）
         if (!com.tacz.guns.config.client.RenderConfig.SCOPE_MASK_ENABLE.get()) {
-            return false;
+            return null;
         }
         if (com.tacz.guns.compat.iris.IrisCompat.shouldDisableScopeMaskUnderShaderPack()) {
             // 只有 Vulkan 系着色器替代（Sulkan）会整体停用掩码 —— 它没有
@@ -133,15 +198,15 @@ public final class ScopeTextSubmitter {
             // 早前这里写的是「光影下掩码整体停用」，那是 Iris 桥落地前的旧政策；
             // 正是这句过时注释让 scope_text_clipped 漏登了 IrisScopeMaskState
             // 的 mode 表，表现为「光影下镜内文字完全不裁」。注释必须跟着机制走。
-            return false;
+            return null;
         }
         if (!ScopeMaskTextureHandle.syncToMaskTarget()) {
-            return false;
+            return null;
         }
         Font font = Minecraft.getInstance().font;
         Font.PreparedText prepared = font.prepareText(text, x, y, color, shadow, false, 0);
 
-        // 先按图集页分组，再逐组提交 —— 一组一个 RenderType，一次 custom geometry。
+        // 按图集页分组 —— 一组一个 RenderType，一次 custom geometry。
         Map<GpuTextureView, List<TextRenderable>> byPage = new HashMap<>();
         prepared.visit(new Font.GlyphVisitor() {
             @Override
@@ -154,27 +219,9 @@ public final class ScopeTextSubmitter {
                 byPage.computeIfAbsent(view, v -> new ArrayList<>()).add(renderable);
             }
         });
-        if (byPage.isEmpty()) {
-            return true;
-        }
-
-        // 快照矩阵：submitCustomGeometry 的回调在阶段边界才执行，
-        // 到时调用方的 poseStack 早就翻篇了（与 TextShowRender 的既有约定一致）。
-        org.joml.Matrix4f pose = new org.joml.Matrix4f(poseStack.last().pose());
-
-        for (Map.Entry<GpuTextureView, List<TextRenderable>> entry : byPage.entrySet()) {
-            Identifier page = pageId(entry.getKey());
-            List<TextRenderable> renderables = entry.getValue();
-            PoseStack identity = new PoseStack();
-            // finalOverlay = true 时换用「不交给 Iris」的那条管线副本，见
-            // ScopeTextRenderTypes#finalText —— 字形与裁剪完全一致，只是由我们的
-            // 着色器执行（光影下最后覆盖那一遍用）。
-            collector.submitCustomGeometry(identity,
-                    finalOverlay ? ScopeTextRenderTypes.finalText(page) : ScopeTextRenderTypes.clippedText(page),
-                    (entryPose, consumer) ->
-                            renderables.forEach(r -> r.render(pose, consumer, packedLight, false)));
-        }
-        return true;
+        // 空 = 没有可画的字形（空白文本等），调用方静默成功。
+        // 真正的提交留给两个入口 —— 它们的收集器类型不同，无法共用一个方法签名。
+        return byPage;
     }
 
     private ScopeTextSubmitter() {
