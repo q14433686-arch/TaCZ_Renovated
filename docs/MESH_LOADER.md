@@ -1,4 +1,4 @@
-# 内置 TacZ Mesh Loader [TML] —— 安全子集（第 0 步）+ GPU 静态烘焙（第 1 步）
+# 内置 TacZ Mesh Loader [TML] —— 安全子集（第 0 步）+ GPU 静态烘焙（第 1/2 步）
 
 > **本仓移植说明**（NeoForge 26.2 / `TaCZ_Renovated`）：本文随姊妹分支
 > `TaCZ_Refabricated_Unofficial` `arena/01a04e96` 同步，分两段落地：
@@ -16,9 +16,12 @@
 > 代码移植自 [VellEagle/TacZMeshLoader](https://github.com/VellEagle/TacZMeshLoader)
 > `1.21.1_fabric` v0.1.7，GPL-3.0。不是官方 TacZ 附属。
 >
-> **状态：源码 + CI 编译通过（`bf2a16f` / `833d8ac` 均 BUILD SUCCESSFUL）；
-> 第 1 步（GPU 烘焙）的 §5.2 第 8–12 条由维护者 2026-08-31 实机复测全部通过。**
-> 未实测的部分（非第一人称各场景的帧率收益、ttf/unihex 字体路径）仍记 UNVERIFIED ——
+> **状态：源码 + CI 编译通过（`bf2a16f` / `833d8ac` / `2a408c7` / `ba59ff5`
+> 均 BUILD SUCCESSFUL）；第 1 步（GPU 烘焙）的 §5.2 第 8–12 条由维护者
+> 2026-08-31 实机复测全部通过；第 2 步（世界语境烘焙，`ba59ff5`）已实装、
+> **未实机**（验证矩阵见 §5.4）。**
+> 未实测的部分（第 2 步全部、非第一人称各场景的帧率收益、ttf/unihex 字体路径）
+> 仍记 UNVERIFIED ——
 > 按 AGENTS.md §2，不是我自己跑出来的结果不写 PASS，是谁跑的写清楚。
 >
 > 路线图见 [`TML_PERF_DIRECTIONS_2026_08_29.md`](TML_PERF_DIRECTIONS_2026_08_29.md)。
@@ -158,6 +161,54 @@ poly 部分：`TaczPolyMeshGunModel#submit` 里
 > 复测重点（装光影包）：**反光方向是否与立方体部件一致**——第 1 条修的就是这个，
 > 之前位置正确所以看不出来。
 
+## 2.7 世界语境 GPU 烘焙（第 2 步，`MeshGpuWorld` 默认开，**未实机**）
+
+第 1 步只解决第一人称。多人场景下「每帧每枪 O(顶点)」仍在：别人手里的枪、掉落物、
+展示框、展示台雕像全走 collector 的 CPU 顶点变换。第 2 步让这些语境**共用同一套
+常驻骨骼 VBO**，每把枪每帧只往 `WORLD_DRAWS` 登记 O(骨骼) 个矩阵。
+
+### 消费点为什么不是 `renderAllFeatures`（她用字节码取证证明，本仓沿用）
+
+26.2 的世界实体 pass **根本不经过** `renderAllFeatures`：`LevelRenderer.render` 的
+帧图 lambda **直调** `PreparedFrame.executeSolid`（偏移 177）。而 `renderLevel`
+偏移 560 那次 `renderAllFeatures` 是收尾调用，**此时 MV 栈已 pop 回单位阵** ——
+在那里画 = 丢掉相机旋转整层 = 枪固定在视角空间（她实测复现）。
+
+⇒ 世界表挂在 `PreparedFrameSolidMixin`（`executeSolid` RETURN），调用者由
+`LevelRendererWorldPassMixin`（`LevelRenderer#render` 的 HEAD/RETURN 括号）区分：
+只有世界帧图那一类落在括号内，手部 / GUI / 收尾三类都在括号外，一律拒收。
+此时 MV 栈顶恰为 viewRotation，与手部两层变换完全同构。
+
+> 这与第 1 步当年「丢 MV_draw 层」是同一个病，只是丢法不同：当年是没乘，
+> 这次是在栈已经空了的地方乘。
+
+### 本仓唯一需要自己设计的表皮：Screen 提取窗口追踪
+
+她用 Fabric 的 `ScreenEvents.beforeExtract/afterExtract` 精确框住 Screen 提取窗口。
+**不能用**「有菜单开着」或时间戳窗口判定 —— 那会「玩家一开背包，地上/别人手里的
+全部 mesh 枪瞬间跌回 collector」，上游 TML 记载过同款事故（本仓 `RenderDistance.
+isGuiRender()` 正是那种时间戳窗口，第 2 步因此不拿它当闸门）。
+
+NeoForge 没有等价事件，本仓改为 mixin 注入 vanilla 的 `Screen#extractRenderState`
+（`ScreenExtractMixin`）。两处关键取舍：
+
+- **挂点存在性自证**：`GunRefitScreen extends Screen`（直接继承）覆写了
+  `extractRenderState(GuiGraphicsExtractor, int, int, float)` 并调 `super.…`
+  ⇒ 该方法在 `Screen` 上必然存在且可注入，不是猜的；
+- **深度计数而不是布尔**：子类覆写里调 `super.extractRenderState(...)` 时，
+  super 那次的 RETURN 会先触发，布尔会被它清零、外层剩下的提取阶段就漏了。
+
+### 光照、额度与失效
+
+- **光照档 LRU**（`MeshGpuLightCacheSize`，默认 4）：同屏不同光照的枪各用各的档；
+  逐出的 VBO **延迟一帧释放**（本帧绘制表可能还引用它）；
+- **每帧烘焙额度**（`MeshGpuBakeBudgetPerFrame`，默认 4）：病理场景（同帧光照档数
+  超容量）回退 collector，而不是逐帧「逐出—重烘」打摆；额度与缓存容量解耦
+  （缓存 = 显存开销，额度 = 每帧 CPU/上传开销，A6）；
+- **分表禁用**：世界 GPU 失败**不再拖垮已实测过的手部路径**（A2），
+  两者各有独立的会话标志；
+- 世代号失效链路与第 1 步共用（光影翻转 / stride 变化）。
+
 ## 3. 枪包怎么用
 
 display JSON：
@@ -193,6 +244,9 @@ poly_mesh geo）。`model_type: "mesh"` 只对枪本身必需；配件/弹药/�
 | `MeshLogStats` | true | 加载统计日志 |
 | `MeshGpuBaking` | true | 第一人称手部 pass 的骨骼静态烘焙（§2.5）；关掉 = 全程 collector |
 | `MeshGpuUnderShaders` | false | 装了光影时仍强走裸 GPU pass（**诊断用**开关，非常规选项） |
+| `MeshGpuWorld` | **true** | 世界语境（第三人称/掉落物/展示框/展示台）GPU 烘焙（§2.7，需 `MeshGpuBaking`） |
+| `MeshGpuLightCacheSize` | 4 | 每枪模保留的世界烘焙光照档数（LRU，1–16） |
+| `MeshGpuBakeBudgetPerFrame` | 4 | 每帧最多执行多少次世界烘焙（1–64；超出当帧回退 collector） |
 
 两个 GPU 键都有真实消费点（`PolyMeshGpuRenderer#shouldSubmitGpu`），
 TOML + Cloth + 中英语言三处齐备，不是「没人读的配置」。
@@ -236,16 +290,38 @@ CI 闭环：push 触发 → Actions 跑 `./gradlew compileJava` →
 
 ### 5.3 已知边界（如实）
 
-- **GPU 路径只覆盖第一人称手部 pass**：世界 / 掉落物 / GUI / 展示框 / 阴影恒走
-  collector，那些场景的 O(顶点) 成本一分没减（只有 §1 的闸门和缓存级削减）。
+- **第 2 步之前**的旧结论（已作废）：「GPU 路径只覆盖第一人称手部 pass，世界 /
+  掉落物 / 展示框恒走 collector」。`ba59ff5` 之后世界语境也走 GPU（§2.7），
+  **只剩 GUI/Screen 预览、translucent 骨骼、GPU 失败回退**三类还在 collector。
 - **第 1 步的实机状态**（2026-08-31 回填）：维护者复测 §5.2 第 8–12 条**全部通过**
   （GPU baked 日志节流正常、朝向随视模、换弹双弹匣位置正确、Iris 光影翻转不拉伸、
   `MeshGpuBaking=false` 与合并前一致）。这条结论来自维护者实测，不是本 sandbox 跑出来的。
-- **仍未量化**：世界 / 掉落物 / GUI 走 collector 的**帧率收益数字**没人测过；
-  高模（36 万顶点级）第一人称的 fps 对比也还没有数字，只有「成本从 O(顶点) 降到
-  O(骨骼)」这个机制性结论。这是 §5.2 之外的一条空档。
+- **仍未量化**：第 1/2 步的**帧率收益数字**一个都没有 —— 只有「成本从 O(顶点)
+  降到 O(骨骼)」这个机制性结论。多人满屏高模枪的 fps 对比是第 2 步最该出数字的
+  地方，至今无人跑过（§5.4 矩阵）。
 - 36 万顶点级高模第一人称**仍有帧率成本**（每帧 O(顶点) CPU 变换 +
   逐顶点 VertexConsumer 调用）。这是路线图第 1/2 步要解决的，本轮不解决。
   （第 1 步已落地后，这句话只在 `MeshGpuBaking=false` 或非第一人称时成立。）
 - PIP 二次渲染（`ScopePipRerender=true`）时镜内那遍会重放 collector 回调，
   poly 成本 ×2。降级方案在路线图方向 3，待镜内行为实机确认后做。
+
+### 5.4 世界 GPU 烘焙的验证矩阵（第 2 步，**全部未实测**）
+
+`MeshGpuWorld` 默认开，所以这一节是发版前必须走的。异常时先 `MeshGpuWorld=false`
+确认是否由第 2 步引起，再回报。
+
+1. 无光影：掉落一把高模 mesh 枪 → 位置/贴图/光照正确，日志出现 `GPU world-baked …`；
+2. 第三人称（F5 或第二个客户端）：手持高模枪正确，换弹/开火动画正常（逐骨骼矩阵
+   天然跟随动画）；
+3. 展示台雕像 / 物品展示框：位置与投影正确；
+4. **开背包 / 枪匠桌**：GUI 预览照常（collector），**同屏世界里的 mesh 枪不消失也
+   不掉帧** —— 这条专门验证 `ScreenExtractMixin` 的窗口是否框对（开背包若全场景
+   跌回 collector，说明窗口开太大，等同上游那起事故）；
+5. 明暗差异场景（洞口 / 火把旁）放多把枪：各枪光照正确，日志烘焙次数收敛
+   （不逐帧重烘）；
+6. 光影：世界 mesh 枪照明与立方体一致（gbuffers_entities 接管）—— **风险最高**，
+   异常时 `MeshGpuWorld=false` 回退并回报；
+7. 开镜（PIP）：镜内那遍世界枪仍在（不消失、不双影）；
+8. **多人满屏高模枪的 fps 对比**（`MeshGpuWorld` 开/关）—— 第 2 步最该出数字的一条，
+   至今无人跑过；
+9. 光影开关翻转：世界枪不拉伸（世代号失效链路与第 1 步共用）。
