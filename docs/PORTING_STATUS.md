@@ -18,7 +18,7 @@
 | WP-262-LR | 26.1.2 R1 的 109 Java LR 层、资源、四处接线；粒子/药效/mixin/item-model 对齐 26.2 | LR 单机、专服、多人、内容包专项 |
 | WP-262-5 发布准备 | README/CHANGELOG/LICENSES/状态文档 | **发布 jar 与源码包被上述构建/实测闸门阻塞** |
 
-基础证据：`docs/WP262_0_EVIDENCE.md` 至 `docs/WP262_5_EVIDENCE.md`。LR 前滚证据：
+基础证据：`docs/investigations/WP262_0_EVIDENCE.md` 至 `docs/investigations/WP262_5_EVIDENCE.md`。LR 前滚证据：
 `docs/records/LR_R1_SYNC_26_2_20260822.md`。
 
 ## 已有 PASS 的适用范围

@@ -24,7 +24,7 @@
 > 仍记 UNVERIFIED ——
 > 按 AGENTS.md §2，不是我自己跑出来的结果不写 PASS，是谁跑的写清楚。
 >
-> 路线图见 [`TML_PERF_DIRECTIONS_2026_08_29.md`](TML_PERF_DIRECTIONS_2026_08_29.md)。
+> 路线图见 [`investigations/TML_PERF_DIRECTIONS_2026_08_29.md`](investigations/TML_PERF_DIRECTIONS_2026_08_29.md)。
 > 第 0 步：从干净基线重新内置「不含 GPU 赌注」的部分。
 > 第 1 步：GPU 静态烘焙（§2.5），同步她四笔的最终形态。
 
