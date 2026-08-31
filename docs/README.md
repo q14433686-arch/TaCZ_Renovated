@@ -65,13 +65,14 @@ Fabric 分支，加载器表面不同不代表游戏语义不同 —— 回单�
 
 ## 工程与 CI
 
-`ci/` 存放 workflow 的仓库内副本（与 `.github/workflows/` 逐字一致），便于在
-`.github/` 之外评审配方。
+`ci/` 是**待上线稿的暂存区** —— 沙箱的 GitHub App 没有 `workflows` 权限，推不进
+`.github/workflows/`，新配方先落在这里，由项目成员上线。上线状态与逐项操作见
+[`ci/README.md`](ci/README.md)。
 
-| 配方 | 作用 |
-|---|---|
-| `compile-check.yml` | 编译验证闭环；日志经 Contents API 写回 `build-reports/compile-java.log` |
-| `changelog.yml` | **收尾用**：按提交前缀生成 CHANGELOG 条目草稿（见下） |
+| 配方 | 作用 | 状态 |
+|---|---|---|
+| `compile-check.yml` | 编译验证闭环；日志经 Contents API 写回 `build-reports/compile-java.log` | 改动待上线（跳过纯文档提交） |
+| `changelog.yml` | **收尾用**：按提交前缀生成 CHANGELOG 条目草稿（见下） | **待上线**（`.github/workflows/` 下还没有） |
 
 ## 收尾流程（每版必做）
 

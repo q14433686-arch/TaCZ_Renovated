@@ -1,0 +1,81 @@
+name: changelog
+
+# 收尾用 CHANGELOG 条目草稿生成器。
+#
+# 只在项目收尾时手工触发（workflow_dispatch），不随每次 push 跑：
+#   - 草稿没定稿就回推仓库会污染历史；
+#   - 也避免和 compile-check 的日志回推抢同一条分支。
+#
+# 产物默认只作为 artifact 下载；确实要留档时把 commit_back 勾上，草稿会经
+# Contents API 写进 docs/records/（与 compile-check 同一套写回方式，不用
+# git push，免 rebase/push 竞争）。写完的 commit 落在 docs/** 下，
+# 不会触发 compile-check（它的 paths-ignore 里有 docs/**）。
+#
+# 脚本只按提交前缀归类，机制描述与实机状态一律要人工核对后再并入 CHANGELOG.md。
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      since_ref:
+        description: '起点 ref（留空 = 与主干 26.2 的分叉点）'
+        required: false
+        default: ''
+      version:
+        description: '版本串，例如 1.1.8+neoforge.26.2.R2'
+        required: false
+        default: ''
+      commit_back:
+        description: '把草稿回推到 docs/records/（否则只作为 artifact）'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 需要完整历史才能算 起点..HEAD；默认 fetch-depth=1 会算不出范围
+          fetch-depth: 0
+
+      - name: 生成条目草稿
+        run: |
+          set -euo pipefail
+          # 不能用 `[ -n x ] && ARGS+=(...)`：条件为假时返回非 0，set -e 会直接结束这一步
+          ARGS=()
+          if [ -n "${{ inputs.since_ref }}" ]; then ARGS+=("${{ inputs.since_ref }}"); fi
+          if [ -n "${{ inputs.version }}" ]; then ARGS+=("--version" "${{ inputs.version }}"); fi
+          bash scripts/generate_changelog.sh "${ARGS[@]}" --out CHANGELOG_DRAFT.md
+          echo "----- 草稿 -----"
+          cat CHANGELOG_DRAFT.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: changelog-draft
+          path: CHANGELOG_DRAFT.md
+          if-no-files-found: error
+
+      - name: 回推草稿到 docs/records/（可选）
+        if: ${{ inputs.commit_back }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          STAMP="$(date +%F)"
+          VER="${{ inputs.version }}"
+          VER="${VER:-draft}"
+          LOG="docs/records/CHANGELOG_DRAFT_${VER}_${STAMP}.md"
+          cp CHANGELOG_DRAFT.md "$LOG"
+          BRANCH="${{ github.ref_name }}"
+          SHA=$(gh api "repos/${{ github.repository }}/contents/$LOG?ref=$BRANCH" --jq .sha 2>/dev/null || true)
+          ARGS=(-X PUT "repos/${{ github.repository }}/contents/$LOG"
+                -f message="docs(changelog): 收尾草稿 ${VER}（${STAMP}）"
+                -f branch="$BRANCH"
+                -f content="$(base64 -w0 "$LOG")")
+          if [ -n "$SHA" ]; then ARGS+=(-f sha="$SHA"); fi
+          gh api "${ARGS[@]}" --jq .commit.sha

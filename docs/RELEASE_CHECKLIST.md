@@ -65,9 +65,10 @@
 ## H. 源码与发布
 
 - [ ] 工作树干净，最终 commit 已记录。
-- [ ] **收尾 changelog**：跑 `scripts/generate_changelog.sh`（或触发
-      `changelog` workflow）生成条目草稿，**人工核对**后并入 `CHANGELOG.md`
-      —— 脚本只按提交前缀归类，不负责判断机制描述是否准确。
+- [ ] **收尾 changelog**：跑 `scripts/generate_changelog.sh`（或触发 `changelog`
+      workflow —— 该配方待上线，见 `docs/ci/README.md`）生成条目草稿，
+      **人工核对**后并入 `CHANGELOG.md` —— 脚本只按提交前缀归类，不负责判断
+      机制描述是否准确。
 - [ ] CHANGELOG 的 R2 条目日期改为实际发布日期，`## Unreleased` 增量并入下一版。
 - [ ] tag 名、jar 名、source archive 名与 R2 一致。
 - [ ] GPL 对应源码与二进制同时提供。

@@ -19,8 +19,12 @@ on:
     branches:
       - 'arena/**'
     # 防止“日志回推 commit”再次触发本流程造成死循环
+    # docs/** 与 *.md 不会改变编译结果，跳过（文档改动由 consistency 流程守着：
+    # 它跑版本号门禁 + 全仓 markdown 相对链接核验）
     paths-ignore:
       - 'build-reports/**'
+      - 'docs/**'
+      - '**/*.md'
   workflow_dispatch:
 
 jobs:
