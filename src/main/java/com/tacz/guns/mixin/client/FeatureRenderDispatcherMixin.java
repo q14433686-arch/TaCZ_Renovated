@@ -163,12 +163,20 @@ public abstract class FeatureRenderDispatcherMixin {
     }
 
     /**
-     * 第一人称 poly_mesh GPU 绘制：必须在 executeSolid <b>之后</b>。
+     * <b>第一人称</b> poly_mesh GPU 绘制：必须在 executeSolid <b>之后</b>。
+     *
+     * <p>本注入点只服务手部表（HAND_DRAWS）。MV-PROBE v2 字节码取证证明
+     * renderAllFeatures 的调用者只有手部（renderItemInHand 偏移 185）与
+     * GUI 系（GuiItemAtlas / PictureInPictureRenderer / renderLevel 560 的
+     * 收尾调用）—— <b>26.2 的世界实体 pass 不经过 renderAllFeatures</b>
+     * （LevelRenderer.render 的帧图 lambda 直调 executeSolid）。
+     * 世界表（WORLD_DRAWS）的消费点因此在 {@code PreparedFrameSolidMixin}
+     * （executeSolid RETURN，调用者判据见 {@code LevelRendererWorldPassMixin}）。</p>
      *
      * <p>关 PR（#33/#69/#70/#71）画在 executeSolid 之前、并且用一张全局 WORLD 表，
      * GUI / 掉落物于是会在<b>世界</b> pass 里被画出去（这就是「贴图不对」那类症状）。
      * 这里只在手部 pass 消费 HAND_DRAWS（{@code renderAfterSolid} 内部判
-     * {@code ScopeMaskRenderer#isInHandPass}），世界那次直接把残留清空。</p>
+     * {@code ScopeMaskRenderer#isInHandPass}），其余调用者直接把手部残留清空。</p>
      *
      * <p>时机安全性与上面掩码同理：executeSolid 返回后不在任何 render pass 内，
      * {@code createRenderPass} 的 isInRenderPass 断言不会触发；且立方体几何已进深度

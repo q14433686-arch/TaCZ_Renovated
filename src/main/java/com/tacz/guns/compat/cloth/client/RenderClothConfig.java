@@ -183,5 +183,17 @@ public class RenderClothConfig {
         render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_gpu_under_shaders"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_UNDER_SHADERS.get())
                 .setDefaultValue(false).setTooltip(Component.translatable("config.tacz.client.render.mesh_gpu_under_shaders.desc"))
                 .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_UNDER_SHADERS::set).build());
+
+        render.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.tacz.client.render.mesh_gpu_world"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_WORLD.get())
+                .setDefaultValue(true).setTooltip(Component.translatable("config.tacz.client.render.mesh_gpu_world.desc"))
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_WORLD::set).build());
+
+        render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_gpu_light_cache_size"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_LIGHT_CACHE_SIZE.get())
+                .setMin(1).setMax(16).setDefaultValue(4).setTooltip(Component.translatable("config.tacz.client.render.mesh_gpu_light_cache_size.desc"))
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_LIGHT_CACHE_SIZE::set).build());
+
+        render.addEntry(entryBuilder.startIntField(Component.translatable("config.tacz.client.render.mesh_gpu_bake_budget"), cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_BAKE_BUDGET_PER_FRAME.get())
+                .setMin(1).setMax(64).setDefaultValue(4).setTooltip(Component.translatable("config.tacz.client.render.mesh_gpu_bake_budget.desc"))
+                .setSaveConsumer(cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.GPU_BAKE_BUDGET_PER_FRAME::set).build());
     }
 }

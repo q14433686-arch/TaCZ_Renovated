@@ -23,6 +23,9 @@ public final class MeshyConfig {
     public static ModConfigSpec.BooleanValue POLY_IN_PREVIEW;
     public static ModConfigSpec.BooleanValue LOG_STATS;
     public static ModConfigSpec.BooleanValue GPU_BAKING;
+    public static ModConfigSpec.BooleanValue GPU_WORLD;
+    public static ModConfigSpec.IntValue GPU_LIGHT_CACHE_SIZE;
+    public static ModConfigSpec.IntValue GPU_BAKE_BUDGET_PER_FRAME;
     public static ModConfigSpec.BooleanValue GPU_UNDER_SHADERS;
     public static ModConfigSpec.IntValue GUI_MAX_VERTICES;
     public static ModConfigSpec.IntValue WORLD_MAX_VERTICES;
@@ -56,10 +59,36 @@ public final class MeshyConfig {
         builder.comment("GPU static baking for FIRST-PERSON only: vertices stay in bone-local",
                 "space in a resident VBO; each frame uploads O(bones) matrices instead of",
                 "transforming every vertex on the CPU.",
-                "World/GUI/drops stay on the collector path so they cannot leak into",
-                "the world pass (that was the closed PRs' wrong-screenshot bug).",
+                "World contexts have their own toggle below (MeshGpuWorld); GUI",
+                "previews and translucent bones stay on the collector path so",
+                "nothing can leak into the world pass (closed PRs' bug).",
                 "Falls back to the collector path if the GPU pass fails.");
         GPU_BAKING = builder.define("MeshGpuBaking", true);
+
+        builder.comment("GPU static baking for WORLD contexts: third-person (other players),",
+                "dropped items, item frames and display statues draw from",
+                "the same resident VBOs, uploading O(bones) matrices per gun per frame",
+                "instead of transforming every vertex on the CPU. This is what makes",
+                "multiplayer with many high-poly mesh guns playable. Light is handled by",
+                "a small per-light-level VBO cache (see MeshGpuLightCacheSize).",
+                "Under shader packs world guns draw via the vanilla RenderType route",
+                "(same mechanism as first-person). Requires MeshGpuBaking.",
+                "Falls back to the collector path if the GPU pass fails.");
+        GPU_WORLD = builder.define("MeshGpuWorld", true);
+
+        builder.comment("How many quantized light levels of baked world VBOs to keep per gun",
+                "model (LRU). Upstream TML uses 8 unquantized levels; we quantize light",
+                "to a coarse grid first, so even 4 covers nearly all scenes. Each cached",
+                "level costs GPU memory proportional to the model's vertex count.",
+                "First-person baking is unaffected (it keeps a single level).");
+        GPU_LIGHT_CACHE_SIZE = builder.defineInRange("MeshGpuLightCacheSize", 4, 1, 16);
+
+        builder.comment("How many world bakes may run in a single frame. Prevents evict-rebake",
+                "thrash when a scene spans more light levels than the cache holds - guns",
+                "beyond the budget fall back to the CPU path for that frame. Independent",
+                "of MeshGpuLightCacheSize (cache size = GPU memory; budget = per-frame",
+                "CPU/upload cost).");
+        GPU_BAKE_BUDGET_PER_FRAME = builder.defineInRange("MeshGpuBakeBudgetPerFrame", 4, 1, 64);
 
         builder.comment("Shader packs: force the RAW GPU pass (custom pipeline) instead of the",
                 "default vanilla-RenderType route. The default route feeds the resident VBOs",
