@@ -113,6 +113,14 @@ import java.util.OptionalInt;
  * NO_OVERLAY + NO_CARDINAL_LIGHTING}（顶点色直通 + lightmap 采样，与 collector 的
  * entityCutout 视觉差异只有 overlay）。lightmap 拿不到时退化 EMISSIVE 管线。</p>
  *
+ * <p><b>pass 体内不变量</b>：{@link #drawList} 自建 {@code RenderPass}，体内只允许
+ * bind/draw/scissor 这类记录型命令 —— 任何会 {@code map} 缓冲、写纹理或触发懒加载的调用
+ * 都必须挪到 {@code createRenderPass} 之前。这条不变量在本文件里有三例（都付过学费）：
+ * DynamicTransforms 切片要提前写、顺序索引缓冲要预热带到本帧最大 indexCount、纹理视图要
+ * 整批先解析（{@code TextureManager#getTexture} 对未加载纹理同步
+ * {@code registerAndLoad -> CommandEncoder#writeToTexture}，在 pass 内直接抛
+ * "Close the existing render pass before performing additional commands"）。</p>
+ *
  * <p>光影下把这两条管线经 {@code IrisApi.assignPipeline(pipeline, IrisProgram.HAND)} 登记到
  * Iris 的 hand program（{@code ShaderKey.findBestMatch} 会因 {@code ALPHA_CUTOUT} +
  * {@code IrisVertexFormats.ENTITY} 命中 {@code HAND_CUTOUT}）。顶点格式必须与 pass 实际
@@ -837,6 +845,8 @@ public final class PolyMeshGpuRenderer {
         boolean lit = lightmapView != null;
         RenderPipeline pipeline = lit ? LIT_PIPELINE : EMISSIVE_PIPELINE;
         GpuSampler linearSampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
+        // lightmap 的 sampler 也在这里取好：pass 体内只留 bind/draw（见下方「pass 体内不变量」注释）。
+        GpuSampler nearestSampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST);
 
         if (irisFlush) {
             // 自建管线不在 Iris 的 coreShaderMap 里，默认只能拿原版程序（= 无光影光照）。
@@ -918,6 +928,25 @@ public final class PolyMeshGpuRenderer {
         CommandEncoder encoder = RenderSystem.getDevice().createCommandEncoder();
         // 法线修复用的 MV 栈（见下方 per-draw 的 push/pop 注释；26.2 83daf16 同理移植）。
         Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
+
+        // 【纹理解析必须在开 pass 之前】与上面「UBO/索引缓冲 pass 前写」同一条不变量：
+        // resolveTextureView → TextureManager.getTexture 对未加载的纹理会同步懒加载
+        // （registerAndLoad → ReloadableTexture.apply → CommandEncoder.writeToTexture），
+        // 而 writeToTexture 在打开的 render pass 里被拒（"Close the existing render pass
+        // before performing additional commands"，维护者实机：duyupack kar98un 这类
+        // 「全部件都走 GPU、collector 从不请求其 UV 贴图」的高模枪，GPU pass 就是该纹理
+        // 的首个请求者 ⇒ 每帧在 pass 内炸 ⇒ 贴图错误）。解析结果（含 missing 回退）
+        // 在 pass 外求好，pass 内只做 bindTexture。
+        Map<Identifier, GpuTextureView> viewsByTexture = new HashMap<>();
+        for (Identifier textureId : byTexture.keySet()) {
+            GpuTextureView view = resolveTextureView(textureId);
+            if (view == null) {
+                view = resolveTextureView(MissingTextureAtlasSprite.getLocation());
+            }
+            if (view != null) {
+                viewsByTexture.put(textureId, view);
+            }
+        }
         // 这里不在任何 render pass 内（原版每个批次自己 createRenderPass + close），
         // createRenderPass 的断言安全。
         // 颜色 OptionalInt.empty() = 不清屏，深度 OptionalDouble.empty() = 不清深度。
@@ -936,16 +965,13 @@ public final class PolyMeshGpuRenderer {
             }
             RenderSystem.bindDefaultUniforms(pass);
             if (lit) {
-                pass.bindTexture("Sampler2", lightmapView,
-                        RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+                pass.bindTexture("Sampler2", lightmapView, nearestSampler);
             }
 
             for (Map.Entry<Identifier, List<DrawEntry>> group : byTexture.entrySet()) {
-                GpuTextureView textureView = resolveTextureView(group.getKey());
+                GpuTextureView textureView = viewsByTexture.get(group.getKey());
                 if (textureView == null) {
-                    textureView = resolveTextureView(MissingTextureAtlasSprite.getLocation());
-                }
-                if (textureView == null) {
+                    // pass 外解析失败（连 missing 视图都拿不到）：跳过该组，下一帧重试。
                     continue;
                 }
                 pass.bindTexture("Sampler0", textureView, linearSampler);
@@ -977,32 +1003,42 @@ public final class PolyMeshGpuRenderer {
                     }
                 }
             }
-            boolean already = worldPass ? loggedFirstWorldDraw : loggedFirstDraw;
-            if (!already) {
-                if (worldPass) {
-                    loggedFirstWorldDraw = true;
-                } else {
-                    loggedFirstDraw = true;
-                }
-                long indexTotal = 0;
-                for (DrawEntry entry : drawable) {
-                    indexTotal += entry.bone().indexCount;
-                }
-                LOGGER.info("[TacZMeshLoader] GPU mesh pass drew {} bones ({} indices) in {} {} flush:"
-                                + " lit={}, colorView={}, depthView={}, vertexFormat={}",
-                        drawable.size(), indexTotal, irisFlush ? "Iris" : "vanilla",
-                        worldPass ? "world" : "hand", lit,
-                        System.identityHashCode(colorView), System.identityHashCode(depthView),
-                        passFormat);
+        }
+
+        // 首帧判据日志放在 pass 关闭之后（姊妹 26bb33c5 语义）：drawList 体内字面满足
+        // 「只留 bind/draw/scissor」，日志只影响时序（同帧、pass 关闭后），绘制内容不变。
+        boolean already = worldPass ? loggedFirstWorldDraw : loggedFirstDraw;
+        if (!already) {
+            if (worldPass) {
+                loggedFirstWorldDraw = true;
+            } else {
+                loggedFirstDraw = true;
             }
+            long indexTotal = 0;
+            for (DrawEntry entry : drawable) {
+                indexTotal += entry.bone().indexCount;
+            }
+            LOGGER.info("[TacZMeshLoader] GPU mesh pass drew {} bones ({} indices) in {} {} flush:"
+                            + " lit={}, colorView={}, depthView={}, vertexFormat={}",
+                    drawable.size(), indexTotal, irisFlush ? "Iris" : "vanilla",
+                    worldPass ? "world" : "hand", lit,
+                    System.identityHashCode(colorView), System.identityHashCode(depthView),
+                    passFormat);
         }
     }
+
+    /** 已记录过解析失败的纹理：同一条每帧 ERROR 刷屏没有增量信息（log-once）。 */
+    private static final java.util.Set<Identifier> LOGGED_TEXTURE_FAILURES = new java.util.HashSet<>();
 
     private static GpuTextureView resolveTextureView(Identifier texture) {
         try {
             return Minecraft.getInstance().getTextureManager().getTexture(texture).getTextureView();
         } catch (Exception e) {
-            LOGGER.error("[TacZMeshLoader] Failed to resolve texture view for {}", texture, e);
+            // 调用约定：本方法必须在 render pass 之外调用（见 drawList 中段的懒加载说明）。
+            if (LOGGED_TEXTURE_FAILURES.add(texture)) {
+                LOGGER.error("[TacZMeshLoader] Failed to resolve texture view for {};"
+                        + " the group falls back to the missing texture until this succeeds.", texture, e);
+            }
             return null;
         }
     }
