@@ -62,6 +62,8 @@ public class PolyMesh {
                 continue;
             }
             float faceNx = 0, faceNy = 0, faceNz = 0;
+            // 退化面（零面积：三点共线或重合）的叉积是 (0,0,0)。见下面写顶点时的处置。
+            boolean faceDegenerate = true;
             if (FORCE_FLAT_SHADING) {
                 float[] v0 = positions[poly[0][0]], v1 = positions[poly[1][0]], v2 = positions[poly[2][0]];
                 float ux = v1[0] - v0[0], uy = v1[1] - v0[1], uz = v1[2] - v0[2];
@@ -74,6 +76,7 @@ public class PolyMesh {
                     faceNx /= len;
                     faceNy /= len;
                     faceNz /= len;
+                    faceDegenerate = false;
                 }
             }
             int drawCount = (poly.length == 3) ? 4 : poly.length;
@@ -86,9 +89,29 @@ public class PolyMesh {
                 bakedY[vIdx] = (FLIP_MODEL_Y ? -(pos[1] - pivotY) : (pos[1] - pivotY)) / 16.0f;
                 bakedZ[vIdx] = (pos[2] - pivotZ) / 16.0f;
                 if (FORCE_FLAT_SHADING) {
-                    bakedNX[vIdx] = FLIP_MODEL_X ? -faceNx : faceNx;
-                    bakedNY[vIdx] = FLIP_MODEL_Y ? -faceNy : faceNy;
-                    bakedNZ[vIdx] = faceNz;
+                    // 【退化面不写零法线 · 姊妹审查 A10 里唯一无争议的一条】
+                    // 零面积面叉积为零向量，写进顶点后 normalize(0) = NaN，
+                    // 光影下表现为随机高光/黑点（vanilla 无光影不看这条法线，
+                    // 所以不装光影包时看不出来）。退化面回退到枪包自带法线，
+                    // 再不行取一个确定向量 —— 任何情况下都不写 (0,0,0)。
+                    float nx = faceNx, ny = faceNy, nz = faceNz;
+                    if (faceDegenerate) {
+                        float[] packNormal = (normals != null && vi[1] >= 0 && vi[1] < normals.length
+                                && normals[vi[1]] != null && normals[vi[1]].length >= 3)
+                                ? normals[vi[1]] : null;
+                        if (packNormal != null) {
+                            nx = packNormal[0];
+                            ny = packNormal[1];
+                            nz = packNormal[2];
+                        } else {
+                            nx = 0f;
+                            ny = 1f;
+                            nz = 0f;
+                        }
+                    }
+                    bakedNX[vIdx] = FLIP_MODEL_X ? -nx : nx;
+                    bakedNY[vIdx] = FLIP_MODEL_Y ? -ny : ny;
+                    bakedNZ[vIdx] = nz;
                 } else {
                     float[] n = normals[vi[1]];
                     bakedNX[vIdx] = FLIP_MODEL_X ? -n[0] : n[0];

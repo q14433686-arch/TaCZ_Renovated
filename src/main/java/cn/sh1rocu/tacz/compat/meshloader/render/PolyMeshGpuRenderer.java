@@ -156,6 +156,11 @@ public final class PolyMeshGpuRenderer {
      */
     private static int bakeGeneration = 0;
     private static boolean lastShaderPackState = false;
+    /**
+     * 上一帧 {@code DefaultVertexFormat.ENTITY} 的字节数（格式哨兵，见
+     * {@link #beginFrame}）。-1 = 首帧还没采到基线。
+     */
+    private static int lastEntityStride = -1;
 
     private PolyMeshGpuRenderer() {
     }
@@ -233,7 +238,8 @@ public final class PolyMeshGpuRenderer {
             GpuBuffer vertexBuffer = RenderSystem.getDevice().createBuffer(
                     () -> "tacz_mesh_bone", GpuBuffer.USAGE_VERTEX, meshData.vertexBuffer());
             return new BakedBone(vertexBuffer, meshData.drawState().indexCount());
-        } catch (Exception e) {
+        } catch (Exception | LinkageError e) {
+            // LinkageError 同 A3：设备/驱动接口签名变动抛的是 Error。
             LOGGER.error("[TacZMeshLoader] Failed to bake bone geometry", e);
             return null;
         } finally {
@@ -256,6 +262,18 @@ public final class PolyMeshGpuRenderer {
             bakeGeneration++;
             LOGGER.info("[TacZMeshLoader] Shader pack state changed (active={}); mesh bake generation -> {}",
                     shaders, bakeGeneration);
+        }
+        // 【第二道格式哨兵 · 姊妹审查 A5】世代号原来只认光影开关翻转；若有别的 mod
+        // 也改写 ENTITY 顶点格式（stride 变化），旧 VBO 会被按新 stride 解读
+        // （= 模型拉伸）。逐帧比对格式字节数，变了立刻整代失效。
+        int stride = DefaultVertexFormat.ENTITY.getVertexSize();
+        if (stride != lastEntityStride) {
+            if (lastEntityStride != -1) {
+                bakeGeneration++;
+                LOGGER.info("[TacZMeshLoader] ENTITY vertex format stride changed ({} -> {}); "
+                        + "mesh bake generation -> {}", lastEntityStride, stride, bakeGeneration);
+            }
+            lastEntityStride = stride;
         }
         HAND_DRAWS.clear();
         drawnThisFrame = false;
@@ -291,6 +309,15 @@ public final class PolyMeshGpuRenderer {
         if (HAND_DRAWS.isEmpty()) {
             return;
         }
+        if (RenderSystem.outputColorTextureOverride != null) {
+            // 【渲染目标覆盖防御 · 姊妹审查 A1】26.2 字节码：override 只在
+            // addAlwaysOnTopPass 的 lambda 里设置（世界帧图，且随后复位），
+            // vanilla 手部 renderAllFeatures 收尾处不应有 override —— 但别的
+            // mod 可以在任何时刻设置它。带着 override 画 = 枪画进未知离屏
+            // target。跳过并清表（下一帧手部 pass 会重新 submit）。
+            HAND_DRAWS.clear();
+            return;
+        }
         if (drawnThisFrame) {
             // Iris 第二次手部 pass（renderTranslucent）的重复 submit：跳过。
             HAND_DRAWS.clear();
@@ -303,10 +330,14 @@ public final class PolyMeshGpuRenderer {
                 drawList(HAND_DRAWS);
             }
             drawnThisFrame = true;
-        } catch (Exception e) {
+        } catch (Exception | LinkageError e) {
+            // LinkageError 也要接（姊妹审查 A3）：渲染路径上最常见的失败恰是
+            // 链接类 —— Iris/Sodium 升级后签名变了抛 NoSuchMethodError，
+            // 那是 Error 不是 Exception，漏接 = 崩游戏而不是回退 collector。
+            // 只置内存标志、不回写配置（A2）：渲染线程写配置文件既不安全，
+            // 也会把一次瞬时故障固化成用户看不懂的持久设置。
             LOGGER.error("[TacZMeshLoader] GPU mesh pass failed; falling back to collector path for this session.", e);
             gpuDisabledThisSession = true;
-            MeshyConfig.GPU_BAKING.set(false);
         } finally {
             HAND_DRAWS.clear();
         }
@@ -352,19 +383,36 @@ public final class PolyMeshGpuRenderer {
             for (DrawEntry entry : group.getValue()) {
                 // MV = MV_hand(栈顶) × pose_bone。压栈让 prepare() 自己取，
                 // 弹栈还原 —— 不污染后续 executeTranslucent 的矩阵状态。
+                // 【弹栈必须在 drawFromBuffer 之后 —— 法线病灶，姊妹 83daf16 实测复现】
+                // 首版在 prepare() 后立即弹栈，位置对但光照/反光全错。根因（Iris 26.2
+                // ExtendedShader.iris$setupState 源码实读）：
+                //   if (normalMat > -1) {
+                //       tempF = RenderSystem.getModelViewMatrixCopy()
+                //           .invert(tempMatrix4f).transpose3x3(normalMatrix).get(tempF);
+                //       IrisRenderSystem.uniformMatrix3fv(normalMat, false, tempF);
+                //   }
+                // 光影包的 gl_NormalMatrix（被 Iris 改名 iris_NormalMat）不来自
+                // prepare() 快照的 DynamicTransforms，而是【绘制执行那一刻】的
+                // RenderSystem MV 栈顶的逆转置。我们的顶点法线是骨骼本地系
+                // （writeRaw 裸写），指望这个矩阵补上全部旋转 —— 弹早了，
+                // setupState 读到的栈顶只剩 MV_draw，pose_bone 的旋转层丢失
+                // ⇒ 法线仍朝骨骼本地方向 ⇒ 光影的平行光/反射按错误法线算
+                // ⇒「反光的光源关系不对」。
+                // 位置不受影响：ModelViewMat 走的是 prepare() 快照，早已正确。
+                // vanilla 无光影路径不受此病影响：核心 entity shader 的
+                // NO_CARDINAL_LIGHTING 分支根本不用法线。
                 mvStack.pushMatrix();
                 mvStack.mul(entry.model());
-                PreparedRenderType prepared;
                 try {
-                    prepared = renderType.prepare();
+                    PreparedRenderType prepared = renderType.prepare();
+                    RenderSystem.AutoStorageIndexBuffer indices =
+                            RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
+                    GpuBuffer indexBuffer = indices.getBuffer(entry.bone().indexCount);
+                    prepared.drawFromBuffer(entry.bone().vertexBuffer, indexBuffer, indices.type(),
+                            0, 0, entry.bone().indexCount);
                 } finally {
                     mvStack.popMatrix();
                 }
-                RenderSystem.AutoStorageIndexBuffer indices =
-                        RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
-                GpuBuffer indexBuffer = indices.getBuffer(entry.bone().indexCount);
-                prepared.drawFromBuffer(entry.bone().vertexBuffer, indexBuffer, indices.type(),
-                        0, 0, entry.bone().indexCount);
                 totalIndices += entry.bone().indexCount;
             }
         }
@@ -398,7 +446,7 @@ public final class PolyMeshGpuRenderer {
         // 但朝向恒北、俯仰为平（相机旋转全在丢的那层里），实测症状完全吻合。
         // 本方法跑在手部 renderAllFeatures 的 executeSolid 之后、同一调用内，
         // MV 与 prepareFrame 时一致，取一次全体通用。
-        Matrix4f handModelView = RenderSystem.getModelViewMatrixCopy();
+        Matrix4f drawModelView = RenderSystem.getModelViewMatrixCopy();
 
         Map<Identifier, List<DrawEntry>> byTexture = new HashMap<>();
         for (DrawEntry entry : draws) {
@@ -436,7 +484,7 @@ public final class PolyMeshGpuRenderer {
                 for (DrawEntry entry : group.getValue()) {
                     // ModelViewMat = MV_draw * pose_submit（乘序同 vanilla：顶点先套
                     // pose 再进相机系）。scratch 每骨骼重算，不污染 entry.model()。
-                    Matrix4f mv = new Matrix4f(handModelView).mul(entry.model());
+                    Matrix4f mv = new Matrix4f(drawModelView).mul(entry.model());
                     pass.setUniform("DynamicTransforms",
                             RenderSystem.getDynamicUniforms().writeTransform(mv, WHITE));
                     pass.setVertexBuffer(0, entry.bone().vertexBuffer.slice());
