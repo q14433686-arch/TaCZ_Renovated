@@ -58,7 +58,7 @@
 
 ## F. 可选 Mod
 
-逐项按 [`../COMPATIBILITY.md`](../COMPATIBILITY.md) 更新为用户结果；未测试可保持“未实测”，
+逐项按 [`../COMPATIBILITY.md`](../../COMPATIBILITY.md) 更新为用户结果；未测试可保持“未实测”，
 但不得写 PASS：
 
 - [ ] Cloth Config
