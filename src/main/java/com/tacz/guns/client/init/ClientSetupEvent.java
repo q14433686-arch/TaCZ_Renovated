@@ -125,6 +125,8 @@ public class ClientSetupEvent {
     public static void onClientResourceReload(AddClientReloadListenersEvent event) {
         PlayerAnimatorCompat.init();
         PlayerAnimatorCompat.registerReloadListener(event::addListener);
+        // 内置 TacZ Mesh Loader：poly_mesh 解析缓存随资源重载失效（材质/F3+T 后重新解析）。
+        com.tacz.guns.compat.meshloader.TaczMeshyIntegration.registerReloadListener(event::addListener);
         ClientAssetsManager.INSTANCE.reloadAndRegister(event);
     }
 

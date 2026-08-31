@@ -32,6 +32,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -82,6 +83,21 @@ public final class ClientGameEvents {
                 && RenderCrosshairEvent.shouldHideVanillaCrosshair()) {
             event.setCanceled(true);
         }
+    }
+
+    /**
+     * mesh GPU 的 GUI 提取窗口（NeoForge 26.1.x 的 {@code ScreenEvent.Render.Pre/Post} 回调参数为
+     * {@code GuiGraphicsExtractor}，等价 Fabric fabric-screen-api 的 beforeExtract/afterExtract）。
+     * 只有真正在 Screen 提取阶段内部才置位，避免「菜单开着」误伤世界内 mesh 枪。
+     */
+    @SubscribeEvent
+    public static void onScreenExtractPre(ScreenEvent.Render.Pre event) {
+        com.tacz.guns.compat.meshloader.render.ScreenRenderTracker.onScreenRenderPre();
+    }
+
+    @SubscribeEvent
+    public static void onScreenExtractPost(ScreenEvent.Render.Post event) {
+        com.tacz.guns.compat.meshloader.render.ScreenRenderTracker.onScreenRenderPost();
     }
 
     @SubscribeEvent

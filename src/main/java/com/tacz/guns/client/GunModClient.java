@@ -18,6 +18,12 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 public class GunModClient {
     public GunModClient(ModContainer container) {
         ScopeRenderTypes.init();
+        // Iris 反射桥的版本感知初始化（isRenderShadow 的 1.7.0 分界；必须在任何
+        // PolyRenderPolicy / mesh GPU 查询阴影遍之前完成，与 ShaderCompat 注册同相位）。
+        com.tacz.guns.compat.iris.IrisCompat.initCompat();
+        // 内置 TacZ Mesh Loader：mesh 枪模构造器 + 状态追踪基建（GUI 提取窗口 / 光影翻转检测）。
+        // 必须在客户端资源加载前注册（各 GunModelType 构造器只在 setup 期生效）。
+        com.tacz.guns.compat.meshloader.TaczMeshyIntegration.onClientSetup();
         // TACZ classic Cloth Config screen (MUKSC idiom): cloth present -> cloth UI,
         // absent -> download-hint screen. Registration mirrors MUKSC's CompatRegistry.
         if (net.neoforged.fml.ModList.get().isLoaded(com.tacz.guns.init.CompatRegistry.CLOTH_CONFIG)) {
