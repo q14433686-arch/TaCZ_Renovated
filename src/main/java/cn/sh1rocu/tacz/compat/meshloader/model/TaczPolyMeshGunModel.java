@@ -376,11 +376,15 @@ public class TaczPolyMeshGunModel extends BedrockGunModel {
             if (polyMeshModel.isTranslucentBone(boneName)) {
                 continue;
             }
-            // 光影下发光骨骼 sky 列走环境真值（IlluminatedRealSky，两层同一开关）。
-            // resolve 依赖 lightKey 的 sky 列 —— 烘焙缓存本就按 lightKey 分档，
-            // 每档各烘各的，缓存正确性不受影响。
+            // 发光骨骼恒满亮（block=15, sky=15）。
+            //
+            // 【有意不同步】姊妹侧这里调 IlluminatedLights.resolve(lightKey)：
+            // 她的 IlluminatedRealSky 开关让光影下 sky 列走环境真值（默认 false）。
+            // 本仓不搬那个旋钮 —— 默认关、无默认行为差异，且她的 A/B 把
+            // 「发光件继承日月亮度」症状追到了别的根因、开关没起效。
+            // 因此这里保持上游 TML 的硬编码满亮。等真有人复现「开了就好」再议。
             int boneLight = polyMeshModel.isIlluminatedBone(boneName)
-                    ? com.tacz.guns.util.IlluminatedLights.resolve(lightKey) : lightKey;
+                    ? PolyMeshGpuRenderer.FULL_BRIGHT : lightKey;
             PolyMeshGpuRenderer.BakedBone baked = PolyMeshGpuRenderer.bakeBone(entry.getValue(), boneLight);
             if (baked == null) {
                 allOk = false;
@@ -450,11 +454,15 @@ public class TaczPolyMeshGunModel extends BedrockGunModel {
             if (polyMeshModel.isTranslucentBone(boneName)) {
                 continue;
             }
-            // 光影下发光骨骼 sky 列走环境真值（IlluminatedRealSky，两层同一开关）。
-            // resolve 依赖 lightKey 的 sky 列 —— 烘焙缓存本就按 lightKey 分档，
-            // 每档各烘各的，缓存正确性不受影响。
+            // 发光骨骼恒满亮（block=15, sky=15）。
+            //
+            // 【有意不同步】姊妹侧这里调 IlluminatedLights.resolve(lightKey)：
+            // 她的 IlluminatedRealSky 开关让光影下 sky 列走环境真值（默认 false）。
+            // 本仓不搬那个旋钮 —— 默认关、无默认行为差异，且她的 A/B 把
+            // 「发光件继承日月亮度」症状追到了别的根因、开关没起效。
+            // 因此这里保持上游 TML 的硬编码满亮。等真有人复现「开了就好」再议。
             int boneLight = polyMeshModel.isIlluminatedBone(boneName)
-                    ? com.tacz.guns.util.IlluminatedLights.resolve(lightKey) : lightKey;
+                    ? PolyMeshGpuRenderer.FULL_BRIGHT : lightKey;
             PolyMeshGpuRenderer.BakedBone baked = PolyMeshGpuRenderer.bakeBone(entry.getValue(), boneLight);
             if (baked == null) {
                 allOk = false;
