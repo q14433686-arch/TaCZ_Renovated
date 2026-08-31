@@ -3,7 +3,11 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
-## Unreleased — 1.1.8+neoforge.26.2.R1-hotfix
+## Unreleased
+
+（R2 定名之后的增量写在里；发布时并入下一版条目。）
+
+## 1.1.8+neoforge.26.2.R2 — 2026-09-01（待发布命令）
 
 ### 目标环境
 
@@ -31,6 +35,23 @@
   `AnimationStateMachine#trigger` 的转移前快照，豁免「本次 trigger 刚启动的后继
   动画」—— 否则检视中换弹的换弹动画会被 exit 的 stop 当场误杀。
   三文件基线已与姊妹侧逐字比对确认为其修复前状态。**源码级同步，未实机。**
+
+- 修复枪包内联占位符被 `String.format` 解析成 `Format error: …`（`c1b687b`）：
+  display json 的 `text_show` 走 `PapiManager#getTextShow`。上游 1.20.1 是
+  `I18n.language.getOrDefault(textKey)` —— 纯查表，查不到原样返回键。26.2 的
+  `I18n.language` 字段没了，移植时误换成 `I18n.get(textKey)`，而它**不等价**
+  （26.2 `I18n` 字节码实读）：查表之后还要 `String.format`，抛
+  `IllegalFormatException` 时返回 `"Format error: " + s`。对「把显示串直接内联进
+  `text_key`」的枪包是致命的（MK5HD 的 `"%ammo_count%"` 不是语言键）：查表落空
+  原样返回 → `%a...` 被当格式说明符 → 抛异常 → 垃圾串在前，而下面 PAPI 的占位符
+  循环照常把 `%ammo_count%` 换成弹药数，真数字缀在最后。改回纯查表语义：
+  `Language.getInstance().getOrDefault(textKey)`。**未实机。**
+
+- 修复三处 26.2 编译错误：`PapiManager` 的 `Language` 类名（26.2 是
+  `net.minecraft.locale.Language`，不是 `net.minecraft.client.resources.language.Language`）
+  与 `GameRendererMixin` 漏 import（`bf2a16f`）；`ScopeFinalRingOverlay` 的方法名
+  （26.2 是 `getModelViewMatrixCopy`，`ce24ef8`）；`Ordered` 与 `SubmitNodeCollector`
+  在 26.2 是**平级类型**、`instanceof` 恒假（`30966ea`，修 `475ea40` 的编译错误）。
 
 - 修复开光影后镜内裁切整体失效（含低倍镜准星溢出目镜）—— **draw 时的 uniform /
   采样器状态被覆盖**。Iris 的 `MixinGlCommandEncoder` 也在 `GlCommandEncoder#trySetup`
@@ -177,6 +198,87 @@
 - 已知边界：第三方 ttf / unihex 灰度字体走回退路径（不裁但也不裂）。
 - **源码级同步，未经本仓实机验证。**
 
+### 新增：内置 TacZ Mesh Loader（TML，`model_type=mesh` 枪包）
+
+来源：VellEagle/TacZMeshLoader `1.21.1_fabric` v0.1.7（GPL-3.0，已登记
+`LICENSES.md`），经姊妹分支 `arena/01a04e96` 的 `8c6ad27` 落地，按她的
+`SYNC_GUIDE_RENOV_262` §3 二段式推进。维护者确认本仓用户确有 `model_type=mesh`
+枪包后，由「暂不移植」翻为立项。
+
+- **第 0 步（安全子集）**：纯 collector 路径、无 GPU 烘焙。四个模型
+  （枪 / 配件 / 弹药 / 方块）+ 四个装载 mixin（`GunDisplayInstance` /
+  `ClientAttachmentIndex` / `ClientAmmoIndex` / `ClientBlockIndex` —— 目标全是本仓
+  自有类，不是第三方表面，故 mixin 配置沿用 `required=true` + `defaultRequire=1`：
+  装载点改名就 fail-fast，而不是静默丢功能）+ 独立 mixin 配置
+  `tacz.mesh.mixins.json`。枪的弹匣走双通道：主遍历 exclude
+  `additional_magazine` 子树，立方体弹匣交给本仓 26.2 原生的 `IMirrorGeometry`，
+  poly 弹匣按该节点变换补画。
+- **近距全模豁免**（`2ee701d`）：无 LOD 低模的高模（36 万顶点级）在玩家眼前的
+  第三人称 / 掉落物 / 展示台会被世界顶点预算整层拦掉、只剩立方体。改为在
+  `MeshWorldFullDetailDistance`（默认 16 格）内免顶点预算，预算只保护远处与密集
+  场景。FIXED / HEAD 是双面语境（既在枪匠桌 GUI 预览、又在世界展示台雕像 / 展示框
+  / 背枪），只有非 GUI 那一侧允许豁免，否则 36 万顶点会被全量画进图标。
+- **第 1 步：第一人称手部 GPU 静态烘焙**（`728ca3c` —— 取姊妹四笔的**最终形态**，
+  不逐笔照搬，因为后三笔全是对第一笔的修正）：骨骼本地顶点一次烘进常驻 VBO
+  （ENTITY 格式、light 烘进 UV2），每帧只写 O(骨骼) 次 `DynamicTransforms` ——
+  成本从 O(顶点) 降到 O(骨骼)。关掉的四个上游 PR（#33 / #69 / #70 / #71-72）的
+  教训逐条落地：HAND 表只收 `ScopeMaskRenderer.isInHandPass()` 期间的提交
+  （不是 `transformType.firstPerson()`，世界 / GUI / 掉落物才不会漏进世界 pass）；
+  绘制挂在 `executeSolid` 之后（不在任何 render pass 内，此时立方体深度已就绪）；
+  换弹 `additional_magazine` 恒走 collector（`mirrorRoot` 矩阵语义不同）；
+  translucent 骨骼留在 collector 走排序混合；任何异常即本会话停用并回退 collector。
+  光影下默认走 vanilla `RenderType.prepare()` + `PreparedRenderType.drawFromBuffer`
+  + `ENTITY_CUTOUT`，让 Iris 按 HAND 程序接管 —— 裸 GPU pass 会绕过光影拦截；
+  `MeshGpuUnderShaders` 是诊断用强开。绘制时自乘 `getModelViewMatrixCopy()`
+  （collector 路径是 MV_draw × pose_submit 两层，GPU 路径原先只写了后者，
+  表现为「朝向恒北」）；光影开关翻转立即失效重烘（旧 VBO 在新布局下属性错位会
+  拉伸，一帧都不能再画）。
+- **手部路径六连修**（`2a408c7`，同步她 08-31）。**第 1 条是本仓已带病发船的真
+  bug**：法线弹栈时序 —— `drawListViaRenderType` 在 `prepare()` 之后、
+  `drawFromBuffer` 之前就弹了 MV 栈，而光影包的 `gl_NormalMatrix` 是 Iris 在
+  **绘制执行那一刻**从 RenderSystem MV 栈顶取的逆转置（Iris 26.2
+  `ExtendedShader.iris$setupState` 源码实读），**不走 `prepare()` 快照**；弹早了
+  ⇒ 栈顶只剩 MV_draw，`pose_bone` 旋转层丢失 ⇒ 顶点法线（骨骼本地系）转到错误
+  方向 ⇒ 光影下反光的光源关系错乱。位置不受影响（`ModelViewMat` 走 `prepare()`
+  快照），所以肉眼容易漏。弹栈移到 `drawFromBuffer` 之后。另五条：两处 catch 补接
+  `LinkageError`（Iris / Sodium 升级后签名变了抛的是 `NoSuchMethodError`，
+  Error 不是 Exception，漏接 = 崩游戏而不是回退 collector）；GPU 失败不再回写
+  `MeshyConfig`（渲染线程写配置文件既不安全，也会把一次瞬时故障固化成用户看不懂的
+  持久设置，只置会话标志）；逐帧比对 `ENTITY.getVertexSize()`，stride 变即整代失效
+  （原来只认光影开关翻转，可别的 mod 改顶点格式同样会让旧 VBO 被按新 stride 解读）；
+  手部消费点带 `RenderSystem.outputColorTextureOverride` 时跳过并清表；
+  `PolyMesh` 退化面（零面积）不再写。
+- **第 2 步：世界语境 GPU 烘焙**（`ba59ff5` + 修正 `f5fa1a1`，`MeshGpuWorld`
+  **默认开**）：第三人称（别人手里的枪）/ 掉落物 / 展示框 / 展示台共用同一套常驻
+  骨骼 VBO，每把枪每帧往 `WORLD_DRAWS` 登记 O(骨骼) 个矩阵，在世界帧图的
+  `PreparedFrame.executeSolid` RETURN 处统一绘制。
+  * 消费点不是 `renderAllFeatures`：26.2 的世界实体 pass 根本不经过它
+    （`LevelRenderer.render` 的帧图 lambda **直调** `executeSolid`，偏移 177）；
+    而 `renderLevel` 偏移 560 那次 `renderAllFeatures` 在 MV 栈 pop 之后 ——
+    在那里画 = 丢掉相机旋转整层 = 枪固定在视角空间（她实测复现；与第 1 步当年
+    丢 MV_draw 层是同一个病，这次是丢在栈已空的地方）。
+  * NeoForge 表皮差异只此一处：她的 `ScreenRenderTracker` 用 Fabric 的
+    `ScreenEvents.beforeExtract/afterExtract` 精确框住 Screen 提取窗口（不能用
+    「有菜单开着」或时间戳窗口 —— 那会一开背包全场景跌回 collector，上游 TML
+    记载过同款事故）。NeoForge 没有等价事件，改挂 vanilla 的
+    `Screen#extractRenderState`（挂点存在性由本仓 `GunRefitScreen extends Screen`
+    覆写该方法并调 `super` 编译通过**自证**），并用**深度计数**而不是布尔 ——
+    子类覆写里调 `super` 时，super 那次的 RETURN 会把布尔清掉。
+  * 光照档 LRU（`MeshGpuLightCacheSize` 默认 4，逐出的 VBO 延迟一帧释放，本帧
+    绘制表可能还引用它）与每帧烘焙额度（`MeshGpuBakeBudgetPerFrame` 默认 4，
+    病理场景回退 collector 而不是逐帧「逐出—重烘」打摆；额度与缓存容量解耦：
+    缓存是显存开销、额度是每帧 CPU / 上传开销）；世界 GPU 失败不再拖垮已实测过的
+    手部路径，两者各有独立会话标志。
+- 适配（仅三处，其余逐字相同）：去掉 Fabric 的 `@Environment(EnvType.CLIENT)`；
+  `ForgeConfigSpec` → `ModConfigSpec`；缓存失效监听器从 Fabric 的
+  `ResourceManagerHelper` 改为 NeoForge 的 `AddClientReloadListenersEvent`
+  （与 `PlayerAnimatorCompat` 同一范式）。配置面按维护者硬性惯例**同时接 TOML 与
+  Cloth**（比姊妹侧多一整个 mesh 分区与中英文文案）。
+- 验证：第 1 步由维护者 2026-08-31 实机复测 `docs/MESH_LOADER.md` §5.2 第 8–12 条
+  全通过；第 2 步由维护者 2026-09-01 报告**实机 PASS**。
+- 仍未量化：GPU 烘焙的**帧率收益数字一个都没有**，只有「成本从 O(顶点) 降到
+  O(骨骼)」这个机制性结论。多人满屏高模枪的 fps 对比是最该出数字的地方。
+
 ### 变更
 
 - 从包含多人修复与 LRTactical 的完整 NeoForge 26.1.2 R1 稳定基线前滚到 26.2；不是重写。
@@ -198,6 +300,18 @@
   `gh api contents` 读回 —— 配方随姊妹分支 `arena/01a04e96` 同步（她的 v3，
   v2 的 commit 回推曾因 push 竞争多次失败）。只在本仓 `arena/**` 分支触发，
   `paths-ignore: build-reports/**` 防死循环；`.gitignore` 把该目录排除在提交之外。
+- 编译验证配方已从 `docs/ci/` 暂存区**落进 `.github/workflows/compile-check.yml`
+  并生效**：编译在 GitHub Actions 上跑，日志经 Contents API 写回分支的
+  `build-reports/compile-java.log`，供网络受限的环境用 `gh api contents` 读回。
+  只在本仓 `arena/**` 分支触发，`paths-ignore: build-reports/**` 防死循环。
+- 新增**收尾用 changelog 流程**（`scripts/generate_changelog.sh` +
+  `.github/workflows/changelog.yml`，手工触发）：按 conventional-commit 前缀
+  从 `git log` 生成条目草稿（自动剔除 `ci-log` 回推提交），可下载为 artifact
+  或回推到 `docs/records/`。**本版条目是人工对照 40 笔提交写的**，脚本从下一版起
+  作为收尾骨架使用。
+- 版本号一致性门禁（`consistency.yml`）已含**全仓 markdown 相对链接核验**，
+  文档搬移不会再留下断链。
+
 - 记录姊妹分支 `arena/01a04e96` 的同步取舍：内置 Mesh Loader（`8c6ad27`，第三方
   `VellEagle/TacZMeshLoader` 的 poly_mesh 渲染，GPL-3.0）**已由维护者确认需求后立项**——
   本仓用户确用 `model_type=mesh` 枪包，此前「暂不移植」的裁定作废。按姊妹
@@ -268,6 +382,13 @@
 - NeoForge Vulkan 需在 `config/fml.toml` 设置 `earlyWindowControl=false` 绕过仍开放的
   NeoForge#3230 ELS 问题；关闭后用户报告 Vulkan 启动 PASS。
 - 当前 LR-integrated R1 只完成源码/API 静态前滚，尚无 JDK 25 生产构建或实机 PASS。
+- 内置 Mesh Loader 第 1 步（第一人称手部 GPU 烘焙）：维护者 2026-08-31 实机复测
+  `docs/MESH_LOADER.md` §5.2 第 8–12 条**全部通过**。
+- 内置 Mesh Loader 第 2 步（世界语境 GPU 烘焙）：维护者 2026-09-01 报告**实机
+  PASS**（未逐条回报 §5.4 九项矩阵 —— 若要作为发版依据需补齐逐条结果）。
+- 镜内画中画（Scope PIP）**全条线仍只有源码级同步 + CI 编译，无实机结论**（默认
+  关闭，关闭时运行路径与合入前逐位等价）；镜内裁手 / 镜内文字在姊妹侧已 PASS，
+  本仓仍未实机。
 - 官方 0.4.3 调查、留给下一轮（本轮不做）：
   - TACZ 第三人称枪口锁定：官方 LR 自己的 player_animator 旋转层会给所有玩家手臂加 pitch；
     本仓没有这套层。TACZ PAL 的 `PalRotationAdjustment` 已对 `is3rdFixedHand` 跳过手臂，
@@ -284,5 +405,11 @@
 - OpenGL / Iris / Vulkan 完整 GPU scope-mask 矩阵；
 - 可选 Mod 逐项用户结果；
 - metadata、license、source tag 与 source archive 最终一致性检查。
+- 内置 Mesh Loader 第 2 步的 §5.4 九项矩阵逐条回报（`MeshGpuWorld` 默认开，
+  这一项是 R2 唯一默认生效的新 GPU 面）。
+- 内置 Mesh Loader：GPU 烘焙的帧率收益数字（至少一组「多人满屏高模枪」开/关对比）。
+- Scope PIP / 镜内裁手 / 镜内文字的实机矩阵（当前默认关或仅在姊妹侧 PASS）。
 
-本条目必须保持 **Unreleased**，直到检查清单关闭并收到项目发起人的明确发布命令。
+R2 条目在收到项目发起人明确发布命令前**不视为已发布**；发布时把上方日期改为
+实际发布日期，并把 `## Unreleased` 里的增量并入下一版条目。
+未收到明确命令时：**不 merge、不打 tag、不创建 Release、不上传 jar。**
