@@ -135,6 +135,29 @@ poly 部分：`TaczPolyMeshGunModel#submit` 里
    旧 VBO 在新管线下属性错位就是模型拉伸，一帧都不能再画。
    模型重载走 `loadPolyMesh` 开头的 `releaseBaked()`。
 
+### 2.6 手部路径的六条后续修复（2026-08-31，同步她 08-31）
+
+第 1 步实机 PASS 之后，她那边又修了几条落在**同一条手部路径**上的问题，本仓已同步
+（提交 `2a408c7`）。其中第 1 条是**已经带病发船的真 bug**：
+
+1. **光影下反光的光源关系错乱（法线弹栈时序）**：`prepare()` 之后、`drawFromBuffer()` 之前就弹了 MV 栈。光影包的 `gl_NormalMatrix` 是 Iris 在
+   **绘制执行那一刻**从 `RenderSystem` MV 栈顶取的逆转置（Iris 26.2
+   `ExtendedShader.iris$setupState` 源码实读），不走 `prepare()` 快照 —— 弹早了
+   ⇒ 栈顶只剩 MV_draw ⇒ 顶点法线（骨骼本地系）丢了 `pose_bone` 的旋转层。
+   **位置一直是对的**（ModelViewMat 走 `prepare()` 快照），所以肉眼容易漏，
+   症状只表现为「反光/光照的方向不对」。弹栈移到 `drawFromBuffer()` 之后。
+2. `LinkageError` 也要接：Iris/Sodium 升级后签名变了抛的是 `NoSuchMethodError`
+   （Error 不是 Exception），漏接 = 崩游戏而不是回退 collector。
+3. GPU 失败**不再回写配置**（原来会把 `MeshGpuBaking` 翻成 false 写回去）：
+   渲染线程写配置文件既不安全，也会把一次瞬时故障固化成持久设置。只置会话标志。
+4. 逐帧比对 `ENTITY.getVertexSize()`：stride 一变就整代失效（原来只认光影开关翻转）。
+5. 手部消费点带 `RenderSystem.outputColorTextureOverride` 时跳过并清表（防别的 mod）。
+6. **退化面不写零法线**：零面积面的叉积是 (0,0,0)，写进顶点后 `normalize(0)` = NaN
+   ⇒ 光影下随机高光/黑点；退化为枪包自带法线，再不行取 (0,1,0)。
+
+> 复测重点（装光影包）：**反光方向是否与立方体部件一致**——第 1 条修的就是这个，
+> 之前位置正确所以看不出来。
+
 ## 3. 枪包怎么用
 
 display JSON：
