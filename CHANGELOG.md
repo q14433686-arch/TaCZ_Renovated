@@ -3,7 +3,12 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## Unreleased
+## 1.1.8+neoforge.26.1.2.R2 — 2026-09-02
+
+> R2 = R1-hotfix 之后回传的 26.2 修复 + 姊妹渲染线（v1–v5：TML Mesh 加载器 / PIP 二次渲染 /
+> 镜内裁切与低倍率豁免 / tacz:nbt 材料 / 开镜距离补偿）。**其中 TML/PIP/镜内裁切尚未实机
+> 验证**，见 [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md) 与
+> [`docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md`](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md)。
 
 ### 新增
 
