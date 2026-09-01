@@ -1,4 +1,4 @@
-commit: dff23bc20251672a281931fcf93fd3ac8b6423f4
+commit: 0be13adbabf277f11f4293683f1b3b677c9d39af
 Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
 ............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
 
@@ -23,60 +23,48 @@ Loaded 127 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/
 [1m*** Started working on [4mdownloadJson[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
   ↓ https://piston-meta.mojang.com/v1/packages/6b6c2d7f875539647774da3e334b27d0a67331a4/1.21.11.json
- [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.45s
-[1m*** Started working on [4mdownloadServer[0m[0m
+ [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.83s
 [1m*** Started working on [4mdownloadClientMappings[0m[0m
 [1m*** Started working on [4mdownloadClient[0m[0m
+[1m*** Started working on [4mdownloadServer[0m[0m
+  ↓ https://piston-data.mojang.com/v1/objects/031a68bebf55d824f66d6573d8c752f0e1bf232a/client.txt
   ↓ https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar
   ↓ https://piston-data.mojang.com/v1/objects/ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd/client.jar
-  ↓ https://piston-data.mojang.com/v1/objects/031a68bebf55d824f66d6573d8c752f0e1bf232a/client.txt
- [1m[92m✓[0m Completed [4mdownloadClientMappings[0m in 0.44s
+ [1m[92m✓[0m Completed [4mdownloadClientMappings[0m in 0.97s
 [1m*** Started working on [4mmergeMappings[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.7:fatjar
- [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.83s
- [1m[92m✓[0m Completed [4mdownloadServer[0m in 1.32s
+ [1m[92m✓[0m Completed [4mdownloadClient[0m in 1.24s
+ [1m[92m✓[0m Completed [4mdownloadServer[0m in 1.40s
 [1m*** Started working on [4mextractServer[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.7:fatjar
- [1m[92m✓[0m Completed [4mextractServer[0m in 0.63s
- [1m[92m✓[0m Completed [4mmergeMappings[0m in 2.71s
+ [1m[92m✓[0m Completed [4mextractServer[0m in 0.50s
+ [1m[92m✓[0m Completed [4mmergeMappings[0m in 2.14s
 [1m*** Started working on [4mstripClient[0m[0m
 [1m*** Started working on [4mstripServer[0m[0m
- [1m[92m✓[0m Completed [4mstripServer[0m in 2.97s
- [1m[92m✓[0m Completed [4mstripClient[0m in 3.94s
+ [1m[92m✓[0m Completed [4mstripServer[0m in 2.18s
+ [1m[92m✓[0m Completed [4mstripClient[0m in 2.95s
 [1m*** Started working on [4mmerge[0m[0m
  ↳ Running external tool net.neoforged:mergetool:2.0.7:fatjar
- [1m[92m✓[0m Completed [4mmerge[0m in 3.39s
+ [1m[92m✓[0m Completed [4mmerge[0m in 2.64s
 [1m*** Started working on [4mrename[0m[0m
  ↳ Running external tool net.neoforged:AutoRenamingTool:2.0.17:all
- [1m[92m✓[0m Completed [4mrename[0m in 7.18s
+ [1m[92m✓[0m Completed [4mrename[0m in 5.32s
 [1m*** Started working on [4mbinaryPatch[0m[0m
   [33mWARNING: [0mnet.neoforged.installertools:binarypatcher:4.0.6:fatjar is not present in the artifact manifest
   ↓ https://maven.neoforged.net/releases/net/neoforged/installertools/binarypatcher/4.0.6/binarypatcher-4.0.6-fatjar.jar
  ↳ Running external tool net.neoforged.installertools:binarypatcher:4.0.6:fatjar
- [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.09s
+ [1m[92m✓[0m Completed [4mbinaryPatch[0m in 2.69s
 [1m*** Started working on [4mcopyUnpatchedClasses[0m[0m
- [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 2.48s
+ [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 1.79s
 [1m*** Started working on [4mapplyDevTransforms[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.12:fatjar
- [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 2.66s
+ [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 1.95s
 [1m*** Started working on [4mbinaryWithNeoForge[0m[0m
- [1m[92m✓[0m Completed [4mbinaryWithNeoForge[0m in 5.09s
-Total runtime: 32.55s
+ [1m[92m✓[0m Completed [4mbinaryWithNeoForge[0m in 4.63s
+Total runtime: 26.76s
 
 
 > Task :compileJava
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/core/PolyMesh.java:10: error: package net.minecraftforge.common does not exist
-import net.minecraftforge.common.ForgeConfigSpec;
-                                ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/core/PolyMesh.java:256: error: package ForgeConfigSpec does not exist
-    private static boolean flag(ForgeConfigSpec.BooleanValue value, boolean fallback) {
-                                               ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/TaczMeshyIntegration.java:51: error: <anonymous cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration$1> is not abstract and does not override abstract method reload(SharedState,Executor,PreparationBarrier,Executor) in PreparableReloadListener
-        return new PreparableReloadListener() {
-                                              ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/TaczMeshyIntegration.java:52: error: method does not override or implement a method from a supertype
-            @Override
-            ^
 /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/inventory/GunSmithTableMenu.java:129: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
         net.neoforged.neoforge.items.IItemHandler handler = new net.neoforged.neoforge.items.wrapper.InvWrapper(player.getInventory());
                                     ^
@@ -104,11 +92,15 @@ import net.minecraftforge.common.ForgeConfigSpec;
 /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:231: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
     public int findAndExtractInventoryAmmo(IItemHandler itemHandler, ItemStack gunItem, int needAmmoCount) {
                                            ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: cannot find symbol
-        event.registerReloadListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: method addListener in class SortedReloadListenerEvent cannot be applied to given types;
+        event.addListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
              ^
-  symbol:   method registerReloadListener(PreparableReloadListener)
-  location: variable event of type AddClientReloadListenersEvent
+  required: Identifier,PreparableReloadListener
+  found:    PreparableReloadListener
+  reason: actual and formal argument lists differ in length
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: incompatible types: PreparableReloadListener cannot be converted to Identifier
+        event.addListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
+                                                                                               ^
 /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/ammo/AmmoSourceRegistry.java:29: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
     private static IItemHandler handler(LivingEntity shooter) {
                    ^
@@ -143,11 +135,12 @@ Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
-5 errors
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+2 errors
 19 warnings
 
 > Task :compileJava FAILED
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1788291659411.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1788291826024.json
 
 [Incubating] Problems report is available at: file:///home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/reports/problems/problems-report.html
 
@@ -156,15 +149,18 @@ FAILURE: Build failed with an exception.
 * What went wrong:
 Execution failed for task ':compileJava'.
 > Compilation failed; see the compiler output below.
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: method addListener in class SortedReloadListenerEvent cannot be applied to given types;
+          event.addListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
+               ^
+    required: Identifier,PreparableReloadListener
+    found:    PreparableReloadListener
+    reason: actual and formal argument lists differ in length
   Note: Recompile with -Xlint:deprecation for details.
-  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/TaczMeshyIntegration.java:51: error: <anonymous cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration$1> is not abstract and does not override abstract method reload(SharedState,Executor,PreparationBarrier,Executor) in PreparableReloadListener
-          return new PreparableReloadListener() {
-                                                ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: incompatible types: PreparableReloadListener cannot be converted to Identifier
+          event.addListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
+                                                                                                 ^
   Note: Recompile with -Xlint:unchecked for details.
   Note: Some input files use or override a deprecated API.
-  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/TaczMeshyIntegration.java:52: error: method does not override or implement a method from a supertype
-              @Override
-              ^
   /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/inventory/GunSmithTableMenu.java:129: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
           net.neoforged.neoforge.items.IItemHandler handler = new net.neoforged.neoforge.items.wrapper.InvWrapper(player.getInventory());
                                       ^
@@ -222,19 +218,9 @@ Execution failed for task ':compileJava'.
   /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/ammo/AmmoSourceRegistry.java:73: warning: [removal] extractItem(int,int,boolean) in IItemHandler has been deprecated and marked for removal
                   ItemStack extracted = itemHandler.extractItem(i, remaining, false);
                                                    ^
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
   Note: Some input files use unchecked or unsafe operations.
-  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: cannot find symbol
-          event.registerReloadListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
-               ^
-    symbol:   method registerReloadListener(PreparableReloadListener)
-    location: variable event of type AddClientReloadListenersEvent
-  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/core/PolyMesh.java:10: error: package net.minecraftforge.common does not exist
-  import net.minecraftforge.common.ForgeConfigSpec;
-                                  ^
-  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/core/PolyMesh.java:256: error: package ForgeConfigSpec does not exist
-      private static boolean flag(ForgeConfigSpec.BooleanValue value, boolean fallback) {
-                                                 ^
-  5 errors
+  2 errors
   19 warnings
 
 * Try:
@@ -277,15 +263,18 @@ org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':compile
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
 Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler output below.
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: method addListener in class SortedReloadListenerEvent cannot be applied to given types;
+        event.addListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
+             ^
+  required: Identifier,PreparableReloadListener
+  found:    PreparableReloadListener
+  reason: actual and formal argument lists differ in length
 Note: Recompile with -Xlint:deprecation for details.
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/TaczMeshyIntegration.java:51: error: <anonymous cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration$1> is not abstract and does not override abstract method reload(SharedState,Executor,PreparationBarrier,Executor) in PreparableReloadListener
-        return new PreparableReloadListener() {
-                                              ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: incompatible types: PreparableReloadListener cannot be converted to Identifier
+        event.addListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
+                                                                                               ^
 Note: Recompile with -Xlint:unchecked for details.
 Note: Some input files use or override a deprecated API.
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/TaczMeshyIntegration.java:52: error: method does not override or implement a method from a supertype
-            @Override
-            ^
 /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/inventory/GunSmithTableMenu.java:129: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
         net.neoforged.neoforge.items.IItemHandler handler = new net.neoforged.neoforge.items.wrapper.InvWrapper(player.getInventory());
                                     ^
@@ -343,19 +332,9 @@ Note: Some input files use or override a deprecated API.
 /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/ammo/AmmoSourceRegistry.java:73: warning: [removal] extractItem(int,int,boolean) in IItemHandler has been deprecated and marked for removal
                 ItemStack extracted = itemHandler.extractItem(i, remaining, false);
                                                  ^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
 Note: Some input files use unchecked or unsafe operations.
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/init/ClientSetupEvent.java:131: error: cannot find symbol
-        event.registerReloadListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
-             ^
-  symbol:   method registerReloadListener(PreparableReloadListener)
-  location: variable event of type AddClientReloadListenersEvent
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/core/PolyMesh.java:10: error: package net.minecraftforge.common does not exist
-import net.minecraftforge.common.ForgeConfigSpec;
-                                ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/cn/sh1rocu/tacz/compat/meshloader/core/PolyMesh.java:256: error: package ForgeConfigSpec does not exist
-    private static boolean flag(ForgeConfigSpec.BooleanValue value, boolean fallback) {
-                                               ^
-5 errors
+2 errors
 19 warnings
 	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:89)
 	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:50)
@@ -491,7 +470,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD FAILED in 1m 36s
+BUILD FAILED in 1m 20s
 2 actionable tasks: 2 executed
 Configuration cache entry stored.
 
