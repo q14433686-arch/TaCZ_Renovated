@@ -7,6 +7,25 @@
 
 （R2 定名之后的增量写在里；发布时并入下一版条目。）
 
+### 修复：二次渲染（Iris）镜内误画视模 —— 「高模枪枪身仅二次渲染时被高倍镜裁切」（2026-09-02）
+
+- **症状**：高模枪的枪身在仅开 `ScopePipRerender` 时被「高倍镜」裁出孔径
+  形状的孔；重投影形态无；1.21.11 / 26.1.2 线无（没有二次渲染 PIP）。
+- **根因**：Iris 把手部渲染搬进 `LevelRenderer#render` 内部（实机日志调用
+  栈 + Iris 1.11.2 源码双证）⇒ 二次渲染的镜内那一遍（又一次
+  `levelRenderer.render`）**自带一趟手部 pass**：视模立方体按窄投影画进
+  镜内画面，并被同一遍刚画的窄投影孔径掩码裁孔；合成把它贴进镜片。
+  旧防线（`renderAfterSolid` 的镜内闸）只挡了 mesh 表、漏了立方体。
+- **修法**：新 `IrisHandRendererMixin` 在 `HandRenderer.renderSolid` /
+  `renderTranslucent` HEAD 取消镜内那一遍的手部 pass（镜内画面按定义
+  只有放大后的世界）；首次跳过打一行 log 兼作注入匹配证据。另加
+  `maskReadyForViewmodel` 一次性 gate 诊断（每种「判定 × 帧形态」组合
+  一行，封顶 8 行）供无光影形态的复测取证。
+- 完整排查（含「裁剪链本身模式无关」的穷举结论与未决项）见
+  `docs/records/BUG_MESHGUNBODY_SCOPE_CLIP_RERENDER_20260902.md`；
+  实机判据见 `docs/MESH_LOADER.md` §5.2 第 18 条。
+  **证据级别：静态闭环 + Iris 源码/实机日志核对；CI 与实机未跑，不宣称已修。**
+
 ### 同步 Fabric 26.2 线 `arena/01a05e3e`（tip `dee2578d`，2026-09-02 对账，R5）
 
 > 游戏语义权威线（AGENTS §0）自 R4 取货点 `bf5bc5a` 又前进 6 笔实质提交

@@ -395,6 +395,18 @@ CI 闭环：push 触发 → Actions 跑 `./gradlew compileJava` →
     视距 / F3+A，主画面远景不错乱、无 `Tried to use destroyed RenderTargets`
     类崩溃；日志若打印 `Suppressed a full renderer reload … prewarm build`
     属预期。
+18. **二次渲染 × 光影：镜内不得出现枪件**（2026-09-02 修复，
+    `IrisHandRendererMixin`）：Iris + `ScopePipRerender=true` 开高倍镜，
+    镜片里只该有放大的世界——**不该**看到一把按窄投影放大的枪身/镜筒
+    （修复前视模立方体被画进镜内画面、并被窄投影下的孔径掩码裁出孔，
+    即用户报的「枪身被高倍镜裁切」）；日志应出现一次
+    `Iris hand pass (solid phase) skipped inside the scope PIP re-render
+    pass`（这行同时是注入匹配成功的证据——没有此行而镜内仍见枪件 =
+    Iris 升级改了签名，注入脱靶）。无光影形态下镜内本就无手部 pass，
+    本条不适用。另：开镜后首帧日志会摊出最多 8 行
+    `[diag] viewmodel clip gate -> CLIP/NO-CLIP | gates: …`（每种
+    「判定 × 帧形态」组合一行），用于核对裁剪 gate 在各 PIP 形态下
+    的生效情况。
 
 ### 5.3 已知边界（如实）
 
