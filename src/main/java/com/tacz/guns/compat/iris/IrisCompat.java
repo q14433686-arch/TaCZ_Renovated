@@ -28,13 +28,17 @@ public final class IrisCompat {
      * @return whether Iris is currently rendering its shadow pass.
      *
      * <p><b>不是可选项——它是 mesh 世界 GPU 路径在光影下的生死闸。</b>本线移植时此方法
-     * 是 {@code return false} 空壳（谱系缺陷，26.1.2 分支同源），造成：阴影 pass 的
+     * 是 {@code return false} 空壳，造成：阴影 pass 的
      * {@code renderAllFeatures} 调用点会消费世界 GPU 表（Iris 1.10.x 的阴影 pass 经
      * {@code MixinGlCommandEncoder} 拦截 {@code glBindFramebuffer} 切 FBO，不经过
      * {@code outputColorTextureOverride}，故 drawList 的 override 闸挡不住它），
      * {@code worldConsumedFrame} 被提前标记 ⇒ 主画面那遍跳过 ⇒ 光影下第三人称/掉落物/
      * 展示台的高模枪只画进了阴影贴图，主画面不可见。姊妹 1.21.11 线的 legacy/newly
      * 双桥均反射本方法，语义权威。</p>
+     *
+     * <p>注：本仓 26.1.2 分支的同名方法也是空壳，但该线实机 PASS、无此症状
+     * （维护者 2026-09-02 实测结论）——空壳致命是本线 1.21.11「世界表消费点挂在
+     * {@code renderAllFeatures} RETURN」拓扑特有的，故 26.1.2 分支不随本轮改动。</p>
      *
      * <p>证据：Iris 上游 `1.21.11-unobf` 分支 common 模块（NeoForge 构建同源）确有
      * {@code net.irisshaders.iris.shadows.ShadowRenderingState#areShadowsCurrentlyBeingRendered()}

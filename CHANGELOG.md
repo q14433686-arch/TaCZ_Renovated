@@ -55,12 +55,14 @@
 
 - 用户报告：开光影且 `MeshGpuWorldUnderShaders` 默认开后，第三人称 / 掉落物 / 展示台的
   高模 mesh 枪**不显示**。
-- 根因：本线 `IrisCompat#isRenderShadow` 是 `return false` 空壳（谱系缺陷，本仓 26.1.2
-  分支同源；姊妹 1.21.11 线的 legacy/newly 双桥均反射
+- 根因：本线 `IrisCompat#isRenderShadow` 是 `return false` 空壳（姊妹 1.21.11 线的
+  legacy/newly 双桥均反射
   `ShadowRenderingState.areShadowsCurrentlyBeingRendered()`）。Iris 1.10.x 的阴影 pass
   经 `MixinGlCommandEncoder` 拦截 `glBindFramebuffer` 切 FBO（不走
   `outputColorTextureOverride`），于是阴影 pass 的 `renderAllFeatures` 调用点把世界 GPU
   表消费进阴影贴图并标记 `worldConsumedFrame` ⇒ 主画面那遍跳过 ⇒ 主画面不可见。
+  （注：本仓 26.1.2 分支同名方法也是空壳，但该线实机 PASS、无此症状——维护者
+  2026-09-02 实测——空壳致命是本线 1.21.11 消费拓扑特有的，26.1.2 不随本轮改动。）
 - 修法：`isRenderShadow()` 按姊妹线同款反射实现（证据：Iris 上游 `1.21.11-unobf` 分支
   common 模块直读源码）。同步受益：`PolyRenderPolicy` 的阴影提交闸、`ShellRender` /
   `MuzzleFlashRender` 的阴影闸一并恢复真实信号。
