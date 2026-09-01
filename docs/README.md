@@ -13,7 +13,8 @@
 | [`../COMPATIBILITY.md`](../COMPATIBILITY.md) | 可选 Mod 与图形后端的逐项状态 |
 | [`GUNPACKS.md`](GUNPACKS.md) | 枪包双端安装、重载、版本谓词与故障判读 |
 | [`DEDICATED_SERVER_TEST.md`](DEDICATED_SERVER_TEST.md) | 专服搭建和 L0-L4 多人验收 |
-| [`../LICENSES.md`](../LICENSES.md) | 代码、资源与依赖许可 |
+| [`MESH_LOADER.md`](MESH_LOADER.md) | 内置 TML：机制、配置、枪包用法、验证清单 |
+| [`../LICENSES.md`](../LICENSES.md) | 代码、资源与依赖许可（含 TML 来源与声明） |
 
 ## 开发与发布
 
@@ -48,6 +49,11 @@
 
 - `REFAB_SYNC_01A04E96_20260830.md` / `_R2_20260830.md` / `_R3_20260831.md` /
   `_R4_20260831.md` —— 一轮一份，含「搬了什么 / 不搬什么 + 理由 / 回单」；
+- `REFAB_SYNC_0105E3E_R5_20260902.md` —— 对 Fabric 26.2 线 tip `dee2578d` 的第五轮
+  同步（mesh 枪身开镜裁剪、PIP 镜内世界表、开镜距离补偿、纹理预解析等）；
+- `SYNC_SIBLING_0105E43_20260901.md` —— 对 1.21.11 姊妹线的等价移植对照；
+- `BUG_MESHGUNBODY_SCOPE_CLIP_RERENDER_20260902.md` —— 「高模枪身开镜不被孔径裁切」
+  的根因时序、误判与回滚、帧快照修法全记录；
 - `REFAB_SCOPE_PIP_SYNC_20260830.md`、`REFAB_SCOPE_PIP_FPS_DECAY_20260829.md`
   —— PIP 同步取舍与帧率衰减调查；
 - `SCOPE_MASK_HULL_SLOPESPACE_20260827.md`、`SCOPE_IRIS_VIEWLAG_AUDIT_20260826.md`、
