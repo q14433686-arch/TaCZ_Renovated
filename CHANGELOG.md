@@ -66,8 +66,9 @@
 - 修法：`isRenderShadow()` 按姊妹线同款反射实现（证据：Iris 上游 `1.21.11-unobf` 分支
   common 模块直读源码）。同步受益：`PolyRenderPolicy` 的阴影提交闸、`ShellRender` /
   `MuzzleFlashRender` 的阴影闸一并恢复真实信号。
-- 证据级别：静态（读码 + gh api 直读 Iris 源码）；实机未复测，待实机清单见
-  `docs/MESH_LOADER.md` §7。
+- 证据级别：静态（读码 + gh api 直读 Iris 源码）+ **维护者实机 PASS**（2026-09-02：
+  开光影 + 默认开关下第三人称 / 掉落物 / 展示台高模枪恢复显示）。次要项（阴影贴图
+  枪影形状、shell/muzzle 光影下表现）未回报，仍在待实机清单 `docs/MESH_LOADER.md` §7。
 
 #### 本轮的核对结论（其余项）
 
