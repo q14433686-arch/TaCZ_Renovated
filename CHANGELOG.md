@@ -3,6 +3,71 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-09-02 姊妹线渲染线全量移植（版本号未变）
+
+> 应项目要求把姊妹线 `arena/01a05db2` 的<b>全部实质性改动</b>等价移植到本线（NeoForge 1.21.11）：
+> ScopePip 全族、meshloader/TML/GPU 全族、镜内裁手、掩码周期帧戳、Iris 时域隔离、
+> Sodium/Voxy 通道。只排除本线不需要的 FCAP 配置落盘（本线原生 ModConfigSpec + Cloth
+> savingRunnable 已闭环）。对照与适配记录：`docs/records/SYNC_SIBLING_0105DB2_20260901.md`。
+> **证据级别：静态移植 + 姊妹线 javap/实机旁证 + 本线 CI 编译门绿（compile-check success）；实机未跑。**
+
+### Scope PIP（镜内画中画 / 二次渲染）
+
+- 新增 `ScopePipRenderState`（屏幕空间重投影合成、双深度掩码、显示阈 `0.35`、重投影倍率渐变、
+  `captureSceneFromMain`、按参数缓存的合成管线）与 `ScopePipDepthDebug`（品红透镜诊断）；
+- 新增 `ScopePipRerender`（窄 FOV 二次渲染、隔帧 `ScopePipRerenderInterval`、画布代次守卫、
+  `worldZoomForcedToOne` 只在本帧窄遍真会跑时压 1×、预热/空闲释放按 20 帧节流）;
+- `CameraSetupEvent` 的 PIP FOV 让位分支（`WorldZoomShare` 拆分、同 partial-tick 判据）；
+- `BedrockAttachmentModel` 的 `pipDefersReticle` 延迟闸；`ScopeFinalOverlayState.discardPendingOverlays`
+  + 裸镜框捕获 + `hasPendingOverlay`；`IrisFinalScopeOverlayMixin` 窄遍守卫 +
+  `captureSceneAfterIrisFinal/compositeAfterIrisFinal`；
+- `GameRendererMixin`：`renderItemInHand` HEAD/RETURN 的 capture/composite/overlay flush、
+  `renderLevel` Redirect 注入二次渲染窄遍、`render` HEAD 帧戳+预热；
+- 光影时域隔离：`IrisScopePipelineCompat`（按维度管线 + 阴影降采样 + 预热/空闲释放，
+  全程反射）+ `IrisScopeDimensionMixin`/`IrisShadowResolutionMixin`；
+- Sodium 通道：`SodiumCompat` 反射同步其地形投影快照与区块 uniform 每帧一闸；
+  Voxy 通道：`VoxyCompat`/`VoxyScopePipelineCompat`（纯反射）+ 3 个 `@Pseudo` mixin +
+  `VoxyCompatMixinPlugin`（NeoForge 无 Voxy 发行，插件拒载 = 通道惰性无害，语义保留）；
+- 配置：`RenderConfig` 14 个 `ScopePip*` 键 + Cloth 面板条目 + lang 56 键（en/zh）。
+  功能默认全部关闭/旧行为。
+
+### TacZ Mesh Loader（TML/GPU，`cn.sh1rocu.tacz.compat.meshloader`，21 文件）
+
+- poly_mesh 枪/配件/弹药/方块模型 + 解析缓存 + 顶点预算闸 + `MeshyConfig` 18 键
+  （挂 `ClientConfig`，Cloth 面板全量暴露）；
+- GPU 静态烘焙：`PolyMeshGpuRenderer` 常驻 VBO 手部/世界两表，绘制点分别为
+  `ItemInHandRendererMixin`（`renderHandsWithItems` RETURN，flush 之后）与
+  `FeatureRenderDispatcherMixin`（`renderAllFeatures` RETURN）；`GameRendererMixin` 圈定
+  in-hand-pass / level-render 语境；法线矩阵读取时刻修复、pass 体内无纹理懒加载、
+  首帧判据日志移出 pass 体、EMISSIVE 永久降级修复、光影两键默认关、绕序默认关——
+  后续修复全量携带；
+- 镜内 mesh 枪身目镜裁剪：`mesh_entity_scope_clip.fsh` + LIT 管线；
+- 开镜 mesh 距离闸门角尺寸补偿：`ScopePipRenderState.currentDetailZoom` ×
+  `PolyRenderPolicy` 两道闸；
+- 4 个 self-mixin（`tacz.mesh.mixins.json`，`remap=false`）目标方法与本线签名逐一核对一致；
+- `TaczMeshyIntegration` 挂 `GunModClient` enqueueWork（注册 `model_type=mesh` 构造器）+ 缓存
+  失效监听器挂 `AddClientReloadListenersEvent#addListener`（1.21.11 双参形）；
+  `ScreenRenderTracker`/`ShaderStateTracker` 分别改挂 `ScreenEvent.Render.Pre/Post` 与
+  `RenderFrameEvent.Pre`。
+
+### 掩码周期帧戳与镜内裁手
+
+- `ScopeDepthCopyState`：`onClientFrameStart`/`hasMaskCycleThisFrame`/`beginExternalMaskOutsideDraw`/
+  `DepthHandle`（`worldDepthTarget`/`apertureDepthTarget`）；BACKUP 世界拷贝闸并入
+  `ScopePipRenderState.needsIrisWorldDepthCopy`；
+- 镜内裁手：`ScopeRenderTypes.shouldClipViewmodel`（`ScopePipMinMagnification` 低倍门禁）+
+  `armClipped` 掩码手臂类型 + `RenderHelper` collector 代理（identity 替换
+  `entityTranslucent(skin)`）；`MuzzleFlashRender` 同闸。
+
+### 明确不搬（本线不需要）
+
+- FCAP 配置落盘整族（`ConfigPersist`/`ForgeConfigSpecAccessor`/ModMenu 入口）：本线原生
+  NeoForge `ModConfigSpec`（`save()` = `loadedConfig.save()`），Cloth 面板早已接
+  `setSavingRunnable`；`/tacz overwrite` 落盘上一轮已补。
+- `fabric.mod.json` 的注册面由 `neoforge.mods.toml` [[mixins]] 等价承接；
+  `TaczNbtIngredient` 的 Fabric `CustomIngredient` 注册以 `RecipeCompat` 改写等价承接（上轮）。
+- 版本号**未动**（仍 `1.1.8+neoforge.1.21.11.R1-hotfix`）⇒ README 无需跟改。
+
 ## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-09-01 姊妹线同步（版本号未变）
 
 > 姊妹项目 `TaCZ_Refabricated_Unofficial` 的 `arena/01a05db2` 分支 2026-08-30 ~ 09-01 的新增内容，
