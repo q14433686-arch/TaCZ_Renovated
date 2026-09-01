@@ -501,5 +501,7 @@
   "tacz.configuration.ServerShootCooldownCheck.tooltip": "服务端射击冷却检查",
   "tacz.configuration.HoldToAim.tooltip": "长按瞄准",
   "tacz.configuration.HoldToCrawl.tooltip": "长按爬行",
-  "tacz.configuration.AutoReload.tooltip": "自动换弹"
+  "tacz.configuration.AutoReload.tooltip": "自动换弹",
+  "attribute.name.tacz.bullet_resistance": "子弹抗性",
+  "commands.tacz.arguments.enum.invalid": "无效值 %2$s。有效选项：%1$s"
 }

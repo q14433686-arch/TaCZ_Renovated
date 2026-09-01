@@ -25,6 +25,11 @@ public class OverwriteCommand {
     private static int setOverwrite(CommandContext<CommandSourceStack> context) {
         boolean enable = BoolArgumentType.getBool(context, ENABLE);
         PreLoadConfig.override.set(!enable);
+        // 这条命令绕过了 Cloth 面板的 savingRunnable，而 DefaultPackDebug 是 tacz-pre.toml
+        // 里的键：不显式落盘的话，命令行改完重启就回默认（姊妹 1.21.11 线 2026-09-01 的
+        // cd14a2a 修了同一个病根的另一条入口；本线原生 NeoForge ModConfigSpec#save 即
+        // loadedConfig.save()，无需那边自建的 ConfigPersist 那套）。
+        PreLoadConfig.spec.save();
         if (context.getSource().getEntity() instanceof ServerPlayer serverPlayer) {
             if (PreLoadConfig.override.get()) {
                 serverPlayer.sendSystemMessage(Component.translatable("commands.tacz.reload.overwrite_off"));

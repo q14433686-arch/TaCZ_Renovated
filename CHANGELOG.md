@@ -7,6 +7,42 @@
 
 （R2 定名之后的增量写在里；发布时并入下一版条目。）
 
+### 同步姊妹 1.21.11 线 `arena/01a05e43`（tip `5fa0963`，2026-09-01 对账）
+
+> 姊妹线 `41319d7`（其自 Fabric 线 `01a05db2` 的同步）逐 commit 核对本线现状后等价移植；
+> 完整对照与「不搬清单」见 `docs/records/SYNC_SIBLING_0105E43_20260901.md`。
+> **证据级别：源码级静态闭环（含动画三文件逐字节比对）；本线 CI 编译门与实机均未跑，不宣称已修。**
+
+- **tooltip 纯查表**（姊妹 `c9b8ba1`，对齐本线 `ec51f556`）：
+  `ClientAttachmentItemTooltip` / `ClientBlockItemTooltip` 不再走 `I18n.get`
+  （「查表 + `String.format`」的格式化接口，枪包把 `tooltipKey` 写成含 `%` 的内联串时
+  返回 `"Format error: ..."`），改用 `Language.getInstance().getOrDefault(...)` 纯查表。
+  `PapiManager` 本线早已同修（`ec51f556`），与姊妹 tip 逐字等价，未动。
+- **`tacz:nbt` 跨包材料**（Fabric 线 `e1aad10` 第 1 件，经姊妹线等价改写）：
+  枪包升级工具产出的 `tacz:nbt`（`items` 常为单字符串、`partial` 布尔）本线此前不认、
+  整条配方解析失败。`RecipeCompat.normalizeCustomIngredient` 现在把 `tacz:nbt` 改写为
+  已注册的 `neoforge:ingredient_type=tacz:partial_nbt`（`strict = !partial`，缺省 strict，
+  与本线 `PartialNbtIngredient.CODEC` 的 `optionalFieldOf("strict", false)` 吻合），
+  `items` 字符串→数组；旧的无 type `{item+nbt}` 写法不再**静默丢弃 nbt**，
+  改写为 partial 宽松子集语义并 INFO 记一笔；`GunSmithTableIngredient` 解析失败的 WARN
+  带上规范化形态 + 原文，catch 面加 `LinkageError`。（改写逻辑 13 组 JSON 用例独立模拟
+  全 PASS，Java 编译待 CI。）
+- **`/tacz overwrite` 落盘**（等价姊妹 `cd14a2a` 第 4 项）：命令行开关绕过了 Cloth 面板
+  的 savingRunnable，改完重启回默认；现在 `PreLoadConfig.spec.save()` 显式落盘
+  （本线原生 NeoForge `ModConfigSpec#save` = `loadedConfig.save()`，无需 FCAP 那套
+  ConfigPersist）。
+- **lang 补 2 键**（en/zh，取值与姊妹线逐字一致）：`attribute.name.tacz.bullet_resistance`
+  （被 `ModAttributes` 实际引用，此前属性名显示原始键）与 `commands.tacz.arguments.enum.invalid`
+  （本线暂无 Java 引用，按三线键表对齐防缺键）。
+
+**明确不搬**（对照姊妹 `41319d7`，理由见 records 文档）：P0-a functionalTasks 手动 flush
+（本线 `super.submit` → `BedrockModel#submit` 自带无条件 `submitFunctionalTasks`，
+姊妹线系其自回放架构特有病）、P1 镜内文字掩码裁剪全套（本线已有更完整独立实现：
+`ScopeTextSubmitter`/`ScopeTextRenderTypes`/`scope_text_final.fsh`/`ScopeFinalRingOverlay`
+延迟路径 + Iris 桥）、动画两修（本线三文件与姊妹 tip 逐字节相同，无差异可搬）、
+LR「幽灵使用」/耳鸣资源（姊妹 `81dfb50`/PR #24 的全部内容本线已逐件在位，无差异可搬）、
+姊妹 CI workflow `.yml`（按仓库所有者流程由人手动跟进）。版本号**未动**（仍 `1.1.8+neoforge.26.2.R2`）⇒ README 无需跟改。
+
 ## 1.1.8+neoforge.26.2.R2 — 2026-09-01（待发布命令）
 
 ### 目标环境
