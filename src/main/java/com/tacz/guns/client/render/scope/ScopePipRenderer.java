@@ -358,19 +358,6 @@ public final class ScopePipRenderer {
     }
 
     /**
-     * 供「视模裁剪 gate」首帧诊断拼日志用的一行 PIP 状态快照。
-     *
-     * <p>只拼<b>帧内稳定</b>的位（rerender 开关 / 本帧是否抓到场景 / 此刻是否在
-     * 镜内那一遍）——不含随帧变化的计数器，这样同一 PIP 形态下的多次判定才会
-     * 命中同一条 log-once 签名，而不是每帧都算「新组合」。</p>
-     */
-    public static String pipDiagnosticState() {
-        return "rerender=" + rerenderMode()
-                + ", sceneCaptured=" + sceneCaptured
-                + ", inScopePass=" + isInsideScopeLevelRender();
-    }
-
-    /**
      * 是否给镜内那一遍配独立的 Iris 管线。
      *
      * <p>不隔离的话，Iris 那一整族「上一帧」uniform 会被一帧推进两次，

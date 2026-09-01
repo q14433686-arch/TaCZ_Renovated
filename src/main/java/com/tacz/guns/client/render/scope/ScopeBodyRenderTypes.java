@@ -455,12 +455,6 @@ public final class ScopeBodyRenderTypes {
      * {@link ScopeMaskGeometry#isViewmodelClipEnabled()} 才能换 outside-mask 类型。</p>
      */
     public static boolean maskReadyForViewmodel(boolean appliesToFirstPersonViewmodel) {
-        boolean result = maskReadyForViewmodelInternal(appliesToFirstPersonViewmodel);
-        logClipGateDiagnosticOnce(result);
-        return result;
-    }
-
-    private static boolean maskReadyForViewmodelInternal(boolean appliesToFirstPersonViewmodel) {
         if (!appliesToFirstPersonViewmodel) {
             return false;
         }
@@ -475,41 +469,6 @@ public final class ScopeBodyRenderTypes {
             return false;
         }
         return ScopeMaskTextureHandle.syncToMaskTarget();
-    }
-
-    /**
-     * 【实机诊断 · 2026-09-02 案「枪身只在二次渲染时被高倍镜裁切」】
-     *
-     * <p>每种「判定结果 × 帧形态」组合<b>只打一行</b>（封顶 8 行）：哪些位被
-     * gate 拦下、当时 PIP 处于哪种形态，全部摊在一行里。下一次实机 A/B
-     * （重投影 vs 二次渲染，各开一次镜）之后，日志就能直接回答「每种形态下
-     * 裁剪 gate 是否生效」，不用再靠画面反推。签名只用帧内稳定的位（见
-     * {@link ScopePipRenderer#pipDiagnosticState()} 的注释），封顶后连字符串
-     * 都不再拼 —— 热路径零残留开销。</p>
-     */
-    private static final java.util.Set<String> LOGGED_CLIP_GATE_DIAGNOSTICS =
-            java.util.concurrent.ConcurrentHashMap.newKeySet();
-
-    private static void logClipGateDiagnosticOnce(boolean result) {
-        if (LOGGED_CLIP_GATE_DIAGNOSTICS.size() >= 8) {
-            return;
-        }
-        String signature = result
-                + "|hand=" + ScopeMaskRenderer.isInHandPass()
-                + "|" + ScopePipRenderer.pipDiagnosticState();
-        if (!LOGGED_CLIP_GATE_DIAGNOSTICS.add(signature)) {
-            return;
-        }
-        GunMod.LOGGER.info("[TACZ Scope][diag] viewmodel clip gate -> {} | gates: scopeMaskEnable={}, "
-                        + "irisMaskSafe={}, ocularGeometry={}, viewmodelClipAllowed={}, inHandPass={}, pip={}",
-                result ? "CLIP" : "NO-CLIP",
-                com.tacz.guns.config.client.RenderConfig.SCOPE_MASK_ENABLE.get(),
-                !IrisCompat.shouldDisableScopeMaskUnderShaderPack(),
-                com.tacz.guns.client.render.scope.ScopeMaskGeometry.isEmpty()
-                        ? "empty" : com.tacz.guns.client.render.scope.ScopeMaskGeometry.entries().size(),
-                com.tacz.guns.client.render.scope.ScopeMaskGeometry.isViewmodelClipEnabled(),
-                ScopeMaskRenderer.isInHandPass(),
-                ScopePipRenderer.pipDiagnosticState());
     }
 
     private static RenderType create(String name, RenderPipeline pipeline, Identifier tex, boolean bindMask) {

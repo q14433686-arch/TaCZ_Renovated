@@ -523,12 +523,6 @@ public final class PolyMeshGpuRenderer {
         // 会重新 submit 一份并正常绘制。镜内内容不受损：合成只取镜片孔径内
         // 的像素，孔径里本来就该是干净的世界画面，不该有枪件。
         //
-        // 【2026-09-02 起本闸是第二道防线】那道「不该有枪件」的原则此前只
-        // 落到了 mesh 表上，镜内那趟手部 pass 的<b>立方体</b>（executeSolid）
-        // 仍会按窄投影画进镜内画面 —— 用户实机看到的「枪身被高倍镜裁切」
-        // 即其症状。现由 IrisHandRendererMixin 在 HEAD 取消整趟镜内手部 pass，
-        // 本闸在注入脱靶（Iris 升级改签名）时兜底，保留不删。
-        //
         if (com.tacz.guns.client.render.scope.ScopePipRenderer.isInsideScopeLevelRender()) {
             HAND_DRAWS.clear();
             return;
