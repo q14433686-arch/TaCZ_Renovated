@@ -94,25 +94,39 @@
 
 ## 已核验（只列实际执行并有记录的结果）
 
+- **维护者实机（多轮）**：2026-08-31 – 2026-09-01 在实机环境（Windows / AMD Radeon
+  RX 7800 XT；Sodium + Iris 1.11.x + ComplementaryUnbound r5.8.1；高模枪包
+  duyupack kar98un）完成「发现 → 反馈 → 修复 → 再实测」闭环，下列运行期问题即由
+  实机发现并修复：
+  - v2 纹理视图：全 GPU 高模枪贴图错误 + “Close the existing render pass…” 刷屏
+    （维护者实机，`bdc6044` / 姊妹 `2ae4c29`）；
+  - v3 Sodium 投影：rerender-only / 全部实体 / 固定偏移下镜内实体与世界错位
+    （实机定位 `a598149` / 姊妹 `3d8432fa`，Sodium 安装）；
+  - v4 光影 PIP：二次渲染「首帧正确后冻结 + 遮光罩逐帧累积」（2026-09-01 实机首测，
+    ComplementaryUnbound r5.8.1）→ 反馈回路修复；同一实测链上再发现「帧率比 26.2
+    掉得更狠」与 **ESC 崩溃**（`IllegalStateException: Tried to use destroyed
+    RenderTargets`，`RawOutput.log` 实证）并修复；
+  - v4/v5 目镜路径：光影下二次渲染失效、镜内枪前端残影、目镜初始/退出「透视面」、
+    一帧「截图」贴屏、帧内手部坐过窄遍 —— 均为 2026-09-01 当日实机反馈后修复；
+  - v5 世界 mesh：PIP 二次渲染中镜内高模枪打成立方体（用户实机回报，`db360639`）；
+  - tacz:nbt：旧配方 NBT 静默丢弃的实机日志形态（“Not a json array”，`f8f5ed9c`）。
 - CI `compile-check` / `consistency`：各轮 **success**（本线首次 v5 编译失败
   `206d8e0` 已由 `89db8081` 修复，失败/成功均留档）。
 - 本地脚本：`check_lang_keys`（320 键）、`check_mesh_config_parity`（19 项齐平）、
   `check_mixin_registration`（44 注册/42 类）、`check_release_consistency.sh --strict` 全过。
-- **运行期行为全部未实机** —— 本仓无实机环境，以下一律按「待实机」对待，
-  本文不写任何 PASS（下节列完整清单）。
 
-## 已知边界
+## 已知边界（未逐项留档 / 代码级未核验）
 
-- **TML 运行行为未实机**（collector/GPU 手部/GPU 世界/光影组合全在
-  `docs/MESH_LOADER.md` §5 复测矩阵）；`MeshGpuUnderShaders`/`MeshGpuWorldUnderShaders`
-  的光影照明等价性未实机（R3 默认开是已知取舍）。
-- **PIP 全部模式未实机**：重投影 / 二次渲染 / 光影下（Iris 独立管线 / 终局合成 /
-  final overlay / Voxy 反射桥）。Iris 1.11.x 门（`supportsFinalScopeOverlay`）只做了
-  源码级核对。
-- **镜内裁手未实机**；关键前置「`RenderTypes.entityTranslucent` 按贴图 memoize」是
-  26.2 侧字节码实读结论，本仓未 javap 复核 —— 若未 memoize，效果等于没做且不报错
-  （日志仍会打 `engaged`），复测第 1 条专门盯这个。
-- **低倍率豁免 / 开镜距离补偿 / tacz:nbt 实机配方解析**：未实机。
+- **TML 复测矩阵未逐条留档**：主体已实机（高模包 + Sodium + ComplementaryUnbound），
+  但 `docs/MESH_LOADER.md` §5 的分项尚未逐条记录结论（已验的写已验、没验的写待实机）；
+  `MeshGpuUnderShaders` / `MeshGpuWorldUnderShaders` 的默认值分歧（26.2 R3 与本线
+  默认开、1.21.11 实机 A/B 后默认关）未在带光影的同场景关账。
+- **Voxy 第二渲染栈**：NeoForge 侧是否生效未核实（若为 Fabric-only 则按设计静默降级：
+  镜内无 LOD 远景、主画面不受影响）。
+- **`RenderTypes.entityTranslucent` 按贴图 memoize**：26.2 侧字节码实读结论，本线未
+  javap 复核——若未 memoize，镜内裁手等于没做且不报错（日志仍会打 `engaged`），
+  判据见 `SCOPE_ARM_CLIP` §5 第 1 条；Iris 门 `supportsFinalScopeOverlay` 同属源码级
+  核对（实机首测中行为正常）。
 - 半透明部件与弹匣永远走 collector；GUI/预览/阴影在提交侧拒收世界表（设计边界）。
 - 明确依赖 TacZ:Arcana 的内容不受支持；LRTactical 是部分兼容框架，不含 `flash_shield`
   或原作完整美术资源。
@@ -170,11 +184,21 @@
   pass; fix: Sodium chunk uniforms reset per pass.
 
 ### Verification status
-- CI compile-check and consistency: success. **No runtime test has been performed yet.**
-  TML behavior, all PIP modes, arm clipping, the low-power exemption, ADS distance
-  compensation and tacz:nbt parsing are NOT TESTED in-game; see docs/MESH_LOADER.md §5
-  and docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md §4 for the in-game checklist.
-- Iris shader-pack combos remain untested (same status as the sibling line).
+- CI compile-check and consistency: success. Runtime behavior has been verified on
+  a real machine by the maintainer (2026-08-31 – 2026-09-01; Windows / AMD Radeon
+  RX 7800 XT, Sodium + Iris 1.11.x + ComplementaryUnbound r5.8.1, high-poly pack
+  duyupack kar98un): every runtime issue listed above was found in-game and then
+  fixed through the feedback loop — broken texture / "Close the existing render
+  pass" spam (v2), Sodium terrain-projection offset (v3), PIP re-render freeze and
+  shadow-mask accumulation (2026-09-01 first test), ESC crash ("Tried to use
+  destroyed RenderTargets", RawOutput.log), in-lens residuals and the one-frame
+  screenshot flash, the un-baked in-mirror high-poly gun, and the "Not a json
+  array" legacy NBT ingredient log form.
+- Items without an individual runtime record: the per-item checklist in
+  docs/MESH_LOADER.md §5; Voxy on NeoForge (possibly Fabric-only, silent
+  downgrade); bytecode re-verification of the entityTranslucent memoize premise
+  (see docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md §5). No claim is made for items
+  the maintainer has not individually logged.
 
 ### Known boundaries
 - Files for other Minecraft releases are not interchangeable; back up worlds and gun

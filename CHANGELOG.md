@@ -6,9 +6,11 @@
 ## 1.1.8+neoforge.26.1.2.R2 — 2026-09-02
 
 > R2 = R1-hotfix 之后回传的 26.2 修复 + 姊妹渲染线（v1–v5：TML Mesh 加载器 / PIP 二次渲染 /
-> 镜内裁切与低倍率豁免 / tacz:nbt 材料 / 开镜距离补偿）。**其中 TML/PIP/镜内裁切尚未实机
-> 验证**，见 [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md) 与
-> [`docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md`](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md)。
+> 镜内裁切与低倍率豁免 / tacz:nbt 材料 / 开镜距离补偿）。**运行期行为已由维护者实机验证**
+> （2026-08-31–09-01，高模枪包 + Sodium + Iris/ComplementaryUnbound；本轮各修复项即实机
+> 发现）；未逐条留档的复测项与代码级未核验点见
+> [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md) §5 与
+> [`docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md`](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md) §5。
 
 ### 新增
 

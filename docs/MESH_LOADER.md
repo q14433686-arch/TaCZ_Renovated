@@ -12,8 +12,14 @@
 > - **编译级完成**：CI `compile-check` 在 `89db8081` 上 BUILD SUCCESSFUL。
 > - **齐平自查通过**：`python3 docs/check_mesh_config_parity.py` → 19 TOML ↔ 19 Cloth ↔
 >   38 语言键，键/字段绑定/默认值/区间/en·zh 全对齐。
-> - **运行期行为全部未验证**：本仓没有实机环境，§5 每一条都按「待实机」对待；
->   本文不写任何 PASS。
+> - **实机已验证（维护者本机）**：2026-08-31 – 09-01 多轮实机——高模枪包
+>   duyupack kar98un 的贴图错误 / “Close the existing render pass…” 刷屏（v2 修复）、
+>   Sodium 下 PIP rerender 投影错位（v3 修复）、2026-09-01 光影首测（ComplementaryUnbound
+>   r5.8.1）的 PIP 冻结 / 遮光罩累积 / ESC 崩溃（RawOutput.log）/ 镜内残影、PIP 二次渲染
+>   中镜内高模枪打成立方体（v5 修复）等，均由实机发现并修复；取证出处见
+>   `docs/publish/RELEASE_NOTES_26_1_2_R2.md` §已核验 与各移植记录。
+> - **§5 分项未逐条留档**：主体已实机，但下面矩阵的每一项结论仍需逐条补记
+>   （没验的写「待实机」，本文不写 PASS）。
 >
 > 姊妹线（Fabric 26.1.2）对应文档为
 > [`docs/MESH_LOADER.md`](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/blob/01a05db3/docs/MESH_LOADER.md)
@@ -137,7 +143,7 @@
 - 本仓决定：**维持与上游一致、只记录不修**（`MeshPolyMirrorReverseWinding` 默认关，
   与 1211 实机否证一致）。
 
-## 5. 待实机复测矩阵（全部未验证；按步走，逐步勾）
+## 5. 实机复测矩阵（主体已实机；分项按步走，逐条补记结论）
 
 ### 5.1 第 0 步（collector 安全子集）
 - [ ] mesh 枪包在背包 / 手持 / 掉落物 / 展示框都画得出来；
@@ -174,7 +180,9 @@
       （无破洞）、无 `engaged` 日志；组合镜低倍档同、切高倍档恢复裁切；
 - [ ] **烘焙额度**：`MeshGpuBakeBudgetPerFrame=1` 且同屏 >1 把世界枪 → 日志出现一次
       `World bake budget (1 per frame) exhausted; ...`，余枪回 collector 且不崩；
-- [ ] Iris 光影下整族：本仓未实机（沿用姊妹未实机标注）。
+- [ ] Iris 光影下整族：2026-09-01 实机首测（ComplementaryUnbound r5.8.1）覆盖
+      PIP 冻结 / 遮光罩累积 / ESC 崩溃 / 镜内残影等并已修复；mesh GPU 光影下
+      的天体亮度继承、换包 / F3+T 回 collector 等分项仍待逐条补记。
 
 ### 5.5 收尾
 - [ ] 本文件状态块改写成实机结论（没验的写「待实机」）；

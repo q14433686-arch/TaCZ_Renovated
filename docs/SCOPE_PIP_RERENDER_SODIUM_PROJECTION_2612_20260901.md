@@ -66,7 +66,7 @@ finally：还原 `cameraState.projectionMatrix` → `restoreProjection()` →
 | Sodium 改名/换实现 | 反射失败 log-once warn，镜内地形回到 1×（=修复前的已知症状），不崩 |
 | `sodium$getProjectionMatrix` 返回不可变实现 | 同上，直接放弃不硬来 |
 
-## 5. 验收（运行期未验证，待实机）
+## 5. 验收（症状源自实机；修复后的分项按实机补记，未测的写待实机）
 
 - [ ] `ScopePipRerender=true` + Sodium：镜内地形与实体**同一套比例**（地形跟随倍率放大），
       实体相对镜内世界不再错位；

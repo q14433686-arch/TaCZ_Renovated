@@ -69,7 +69,9 @@ Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
 与其 §8「枪包怎么用」。配置位于 `tacz-client.toml` 的 `[mesh_loader]` 段（19 项，
 全部接进局内「渲染」页）；把 `MeshEnable` 关掉即回退到纯立方体外观，行为等价于未装。
 **光影下两条 GPU 开关默认开**（R3 定稿的已知取舍，见 MESH_LOADER.md §3）；运行期行为
-在 26.1.2 上**尚未实机验证**，问题请按 MESH_LOADER.md §5 的复测矩阵反馈。
+已由维护者实机验证（2026-08-31 – 09-01：高模枪包 duyupack kar98un、Sodium、Iris 1.11.x +
+ComplementaryUnbound r5.8.1；贴图错误 / 投影错位 / PIP 冻结 / ESC 崩溃等本轮修复项均由
+实机发现；分项复测与未留档项见 MESH_LOADER.md §5 与发布公告「已知边界」）。
 
 **镜内画中画（PIP）与镜内裁切**（v4/v5）：除经典整屏变焦外，还提供重投影 PIP 与
 「二次渲染」PIP 两种瞄具模式，以及镜内文字 / 手臂 / 火光 / 枪身的孔径裁剪与
@@ -179,11 +181,15 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
   实际合成走 mod 内部管线。
 - 可选 mod 的逐项状态（含**明确不适配**的 Just Zoom、无 NeoForge 版的 Zoomify 等）
   见 [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md)。
-- **TML / PIP / 镜内裁切全部未实机**：本仓没有运行环境，v5 之前的渲染线亦然。
-  已知取舍与复测清单见
+- **TML / PIP / 镜内裁切已实机验证（维护者本机）**：本轮各运行期修复项均由实机发现并
+  修复（高模枪包 duyupack kar98un 贴图错误、Sodium 投影错位、PIP 二次渲染冻结、
+  ESC 崩溃 RawOutput.log、镜内残影、未烘焙立方体、NBT 配方日志等；见发布公告
+  与各移植记录）。未逐条留档的复测项与代码级未核验点见
   [docs/MESH_LOADER.md](docs/MESH_LOADER.md) §3/§5 与
-  [docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md) §4。
-- **Iris 光影下是同一未实机状态**：姊妹线多处标注未实机，本仓承接同一状态，不写 PASS。
+  [docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md) §5。
+- **Iris 光影下主体已实机**（2026-09-01，ComplementaryUnbound r5.8.1）：
+  管线隔离 / 阴影缩放 / 终局合成经实机首测反馈闭环；Voxy 在 NeoForge 侧是否生效
+  与 `supportsFinalScopeOverlay` 门属未核实/源码级核对项，不写 PASS。
 - **目录层级 `recipe/` 与 `recipes/`**：26.x 数据包布局（vanilla registry 读 `recipe/`）；
   旧枪包的 `recipes/` 由 PackMapping 重映射、`recipes→recipe` 兼容，详见
   [docs/PORT_01a05170_TO_NEOFORGE_26_1_2_20260901.md](docs/PORT_01a05170_TO_NEOFORGE_26_1_2_20260901.md)（v1-v5）。
