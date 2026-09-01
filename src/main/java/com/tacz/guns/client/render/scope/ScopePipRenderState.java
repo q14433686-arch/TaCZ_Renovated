@@ -249,6 +249,37 @@ public final class ScopePipRenderState {
         return zoom > 1.0f ? zoom : 1.0f;
     }
 
+    /**
+     * 供 meshloader 的距离闸门用：当前画面把远处放大了多少倍（裸眼 = 1）。
+     *
+     * <p>同步自姊妹线 {@code f8f5ed9c}（26.2 线 {@code 0886909} 的同形移植；本仓没有
+     * {@code ScopePipRenderer}—— 镜内合成走 {@code ScopePipRerender}，倍率与开镜进度都从
+     * 本类取，公式一致）。</p>
+     *
+     * <h3>为什么距离闸门需要它</h3>
+     * poly 层的提交发生在 extract 阶段、每帧一次，{@code MeshMaxRenderDistance} 与
+     * {@code MeshWorldFullDetailDistance} 都按<b>主相机裸眼距离</b>判定；而镜内那一遍复用
+     * 同一批提交节点，不会重新过闸门。于是 4x 镜下 48 格的 poly 上限观感只剩 12 格、
+     * 16 格全模豁免观感只剩 4 格 —— 举镜看到的掉落物/第三人称 mesh 枪几乎必然是立方体。
+     *
+     * <p>「多远该有细节」本质是<b>角尺寸</b>判定：把阈值乘上当前放大倍数即恢复语义一致。
+     * 取值随开镜进度渐变（与整屏变焦的 {@code 1+(zoom-1)·progress} 同式），收镜自动回 1，
+     * 经典整屏变焦与 PIP 两种模式同样适用（两者都放大了世界观感）。</p>
+     *
+     * <p><b>证据级别</b>：机制与公式 = 26.2 线实机回报 + 其实现；本仓这一份 = 同形移植，
+     * <b>实机未验</b>。</p>
+     */
+    public static float currentDetailZoom() {
+        Minecraft mc = Minecraft.getInstance();
+        float progress = currentAimingProgress(mc,
+                mc.getDeltaTracker() == null ? 0.0f : mc.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+        if (progress <= 0.0f) {
+            return 1.0f;
+        }
+        float magnification = Math.max(1.0f, currentZoom());
+        return 1.0f + (magnification - 1.0f) * progress;
+    }
+
     // ------------------------------------------------------------------
     // 游戏内配置读取（配置可能尚未加载，带 null 兜底）
     // ------------------------------------------------------------------
@@ -259,8 +290,15 @@ public final class ScopePipRenderState {
                 : RenderConfig.SCOPE_PIP_MIN_AIMING_PROGRESS.get().floatValue();
     }
 
-    /** 低于该倍率的瞄具不走 PIP，回落到旧整屏变焦。 */
-    private static float minMagnification() {
+    /**
+     * 低于该倍率的瞄具不走 PIP，回落到旧整屏变焦。
+     *
+     * <p>这里<b>刻意开放</b>：镜内裁手/裁火光/枪身/配件也用同一条线 —— 低倍镜（配置注释
+     * 举的 2×/3×）没有「镜内画面」可让位，把手臂/火光/枪身挖个洞露出未放大的背景只会像
+     * 破图，见
+     * {@link com.tacz.guns.client.render.scope.ScopeRenderTypes#viewmodelFxClipApplies()}。</p>
+     */
+    public static float minMagnification() {
         return RenderConfig.SCOPE_PIP_MIN_MAGNIFICATION == null
                 ? 4.0f
                 : RenderConfig.SCOPE_PIP_MIN_MAGNIFICATION.get().floatValue();

@@ -139,6 +139,47 @@ public final class ScopeRenderTypes {
     }
 
     /**
+     * 【低倍镜不裁】手臂 / 枪口火光 / 枪身 / 配件那一类「镜内 discard」的闸门。
+     *
+     * <h2>为什么跟枪身不是同一个闸门</h2>
+     * 枪身、配件用 {@link #hasScheduledViewmodelAperture()}（见 {@link #clipForViewmodel}）：
+     * 那一刀的作用是把<b>镜片本身挖透</b>（模型里那块镜片几何是不透明的），跟倍率无关，
+     * 低倍镜也要挖，否则红点/全息就是一块黑片。
+     * 而手臂、火光是在「给镜内画面让位」—— 高倍镜时镜内画的是放大后的世界，
+     * 手臂压在目镜上就必须让；<b>低倍镜没有镜内画面可让</b>（阈值以下连 PIP 都不跑），
+     * 挖出来的洞里是没放大的背景，观感就是手上/火光上破了个洞。
+     * 枪身、配件的目镜孔径裁切经 {@code f086f36d} 线更正后与它们<b>同性质</b>：
+     * {@code AIM_CLIP_START} 之后镜片本体已从可见 body 移到 depth writer，那一刀同样是
+     * 「给镜内画面让位」而非「挖透镜片」，所以低倍镜一样不裁。
+     *
+     * <h2>阈值取谁的</h2>
+     * 复用 {@code ScopePipMinMagnification}（{@link ScopePipRenderState#minMagnification()}，
+     * 默认 4×）：它已经是本线对「低倍镜 vs 高倍镜」的唯一成文分界，配置注释里就写着
+     * 「低倍镜（2×/3×）…组合镜按<b>当前档位</b>判定」。倍率取
+     * {@link ScopePipRenderState#currentZoom()}（{@code IGun#getAimingZoom}），
+     * 与 PIP 判定同一个值 ⇒ 组合镜切到低倍档自动不裁、切回高倍档自动裁。
+     *
+     * <p>失败哲学照旧：任一条件不满足即不裁，回到「手臂/火光正常画」的行为。</p>
+     */
+    public static boolean viewmodelFxClipApplies() {
+        return apertureScheduledForViewmodel && magnificationSupportsLensClip();
+    }
+
+    /**
+     * 【低倍镜不裁】倍率下限：当前倍率是否够到「镜内有放大画面」那条线。
+     *
+     * <p>取 {@link ScopePipRenderState#currentZoom()}（{@code IGun#getAimingZoom}，组合镜按
+     * <b>当前档位</b>）与 {@link ScopePipRenderState#minMagnification()}（{@code
+     * ScopePipMinMagnification}，默认 4×）比较 —— 本线对「低倍镜 vs 高倍镜」的成文分界。</p>
+     *
+     * <p>单独拆出来是因为 mesh GPU 的枪身批次不经过 {@code apertureScheduledForViewmodel}
+     * （它看 {@link ScopeDepthCopyState#hasMaskCycleThisFrame()}），但要守同一条倍率线。</p>
+     */
+    public static boolean magnificationSupportsLensClip() {
+        return ScopePipRenderState.currentZoom() >= ScopePipRenderState.minMagnification();
+    }
+
+    /**
      * Wraps the plain scope-body type so its draw boundary first copies the aperture depth
      * (world depth plus only the ocular differences) into the mask texture, then draws the body.
      */
@@ -232,11 +273,18 @@ public final class ScopeRenderTypes {
     }
 
     /**
-     * Replaces an ordinary first-person gun/attachment cutout type only after an ocular was queued.
-     * All other contexts and failed aperture cycles retain the caller's original behavior.
+     * Replaces an ordinary first-person gun/attachment cutout type only after an ocular was queued
+     * <b>and</b> the scope is at/above {@code ScopePipMinMagnification}.
+     *
+     * <p>与手臂 / 火光同一条倍率线（{@link #viewmodelFxClipApplies()}）：枪身、配件这一刀
+     * 与它们<b>同性质</b> —— 都是「给镜内画面让位」，不是「把镜片挖透」。镜片本体在
+     * {@code AIM_CLIP_START} 之后就已经从可见 body 移到 invisible depth writer 了
+     * （{@code BedrockAttachmentModel#currentAimingProgress} 的注释），与倍率无关。
+     * 所以低倍镜（含组合镜低倍档）一样不该裁：没有放大画面可让位，裁掉的是枪身自己，
+     * 观感就是枪身上破了个洞。All other contexts retain the caller's original behavior.</p>
      */
     public static RenderType clipForViewmodel(RenderType original, Identifier texture, boolean applies) {
-        if (!applies || !apertureScheduledForViewmodel) {
+        if (!applies || !viewmodelFxClipApplies()) {
             return original;
         }
         // Gun displays may opt into entityTranslucent; retain that blend/sort recipe rather than

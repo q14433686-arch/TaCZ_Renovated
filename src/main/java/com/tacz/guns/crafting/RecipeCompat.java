@@ -58,12 +58,14 @@ public final class RecipeCompat {
      * {@code {"item":"minecraft:flint"}} → {@code "minecraft:flint"}.
      */
     private static final Set<String> SUPPORTED_FORGE_INGREDIENTS =
-            Set.of("forge:partial_nbt", "forge:nbt");
+            Set.of("forge:partial_nbt", "forge:nbt", "tacz:nbt");
 
     /**
-     * The Forge-era gun packs in the wild use {@code forge:partial_nbt} and {@code forge:nbt}.
-     * NeoForge 26.1 has an equivalent native custom ingredient, registered as
-     * {@code tacz:partial_nbt}; convert only these two known types and leave every unknown
+     * The Forge-era gun packs in the wild use {@code forge:partial_nbt} and {@code forge:nbt};
+     * {@code tacz:nbt} is the shape {@code TaCZPackUpgrader} emits for pack-embedded NBT
+     * materials (no {@code strict} field = partial/subset semantics).
+     * NeoForge 26.1 has one native equivalent custom ingredient, registered as
+     * {@code tacz:partial_nbt}; convert only these known types and leave every unknown
      * custom type untouched rather than guessing its semantics.
      */
     private static JsonElement normalizeCustomIngredient(JsonObject source) {
@@ -74,10 +76,14 @@ public final class RecipeCompat {
             return source;
         }
 
-        JsonElement itemsElement = source.get("items");
+        // The codec declares items as a list; the Upgrader's tacz:nbt form writes a single
+        // string ("Not a json array" was the real-world symptom of skipping this wrap).
         JsonArray items = new JsonArray();
+        JsonElement itemsElement = source.get("items");
         if (itemsElement != null && itemsElement.isJsonArray()) {
             itemsElement.getAsJsonArray().forEach(items::add);
+        } else if (itemsElement != null && itemsElement.isJsonPrimitive()) {
+            items.add(itemsElement);
         } else if (source.has("item") && source.get("item").isJsonPrimitive()) {
             items.add(source.get("item"));
         } else {
@@ -111,6 +117,23 @@ public final class RecipeCompat {
             }
             JsonElement item = obj.get("item");
             if (item != null && item.isJsonPrimitive() && item.getAsJsonPrimitive().isString()) {
+                // 【隐式 NBT 材料】old packs may write {"item": ..., "nbt": {...}} without a
+                // "type". Previously the nbt was silently dropped: the slot showed a bare gun
+                // and matching degenerated to "any gun of that item". Rewrite to partial_nbt
+                // semantics (subset match - gun items always carry extra fields such as ammo
+                // count, so strict could never match a used gun; partial is the only usable
+                // semantics, same conclusion as the sister line).
+                if (obj.has("nbt") && obj.get("nbt").isJsonObject()) {
+                    JsonObject out = new JsonObject();
+                    out.addProperty("neoforge:ingredient_type", "tacz:partial_nbt");
+                    JsonArray items = new JsonArray(1);
+                    items.add(item);
+                    out.add("items", items);
+                    out.add("nbt", obj.get("nbt"));
+                    GunMod.LOGGER.info("Rewrote a legacy no-type NBT ingredient (item={} + nbt) to tacz:partial_nbt "
+                            + "semantics; previously the nbt was silently dropped.", item.getAsString());
+                    return out;
+                }
                 return item;
             }
             return raw;

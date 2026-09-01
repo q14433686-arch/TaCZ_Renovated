@@ -93,6 +93,22 @@ public final class ScopeTextSubmitter {
     private static final Map<Identifier, PageHandle> PAGE_HANDLES = new HashMap<>();
     private static int nextPageOrdinal = 0;
 
+    /** 「镜内文字已走掩码裁剪」这条判据日志只打一次（同步自姊妹 091dd5ec / 1.21.11 线 SYNC_CHECKLIST §2 第 1 条）。 */
+    private static volatile boolean LOGGED_CLIPPED = false;
+
+    /**
+     * 字体页缓存遇到资源重载时的隐患（<b>已知未修，本轮只登记</b> —— 1.21.11 线
+     * SYNC_CHECKLIST §2 第 2 条点名）。
+     *
+     * <p>两个缓存都是<b>按 id / 按 view</b> 的常驻映射：资源重载后 {@code FontTexture} 会换掉页
+     * view，而 {@code PAGE_HANDLES} 里的壳仍指向旧对象。清空入口需要接在一个客户端资源重载
+     * 监听上（本仓现成的入口是 {@code ClientSetupEvent.onClientResourceReload} 的
+     * {@code AddClientReloadListenersEvent}，{@code TaczMeshyIntegration.registerReloadListener}
+     * 同款模式），本轮<b>没有接线</b>：接线点要挑、又只能靠实机验证，不做一个没验过的运行期
+     * 改动去换一个还没人踩到的隐患。现状的失败半径：旧壳只是借指向，重载后第一次取用的
+     * 可能是已释放的 view。</p>
+     */
+
     private static Identifier pageId(GpuTextureView view) {
         Identifier id = PAGE_IDS.get(view);
         if (id == null) {
@@ -174,6 +190,14 @@ public final class ScopeTextSubmitter {
             collector.submitCustomGeometry(identity, ScopeRenderTypes.maskedText(page),
                     (entryPose, consumer) ->
                             renderables.forEach(r -> r.render(pose, consumer, packedLight, false)));
+        }
+        // 【log-once 判据 —— 1.21.11 线 SYNC_CHECKLIST §2 第 1 条】没有它，
+        // 「走了掩码」与「isMaskCycleValid() 为假 ⇒ 回退 vanilla」在屏幕上长得一模一样，
+        // 验收矩阵无法区分这两种状态。提交成功时说一句，只说一次。
+        if (!LOGGED_CLIPPED) {
+            LOGGED_CLIPPED = true;
+            GunMod.LOGGER.info("[TACZ Scope] In-scope text is now clipped to the ocular aperture mask "
+                    + "({} font page group(s)).", byPage.size());
         }
         return true;
     }
