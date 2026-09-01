@@ -15,9 +15,11 @@
     "client.AbstractButtonMixin",
     "client.CameraMixin",
     "client.GameRendererMixin",
+    "client.FeatureRenderDispatcherMixin",
     "client.GlCommandEncoderScopeDepthCopyMixin",
     "client.ItemInHandLayerMixin",
     "client.ItemInHandRendererMixin",
+    "client.LevelRendererAccessor",
     "client.LanguageMixin",
     "client.LocalPlayerMixin",
     "client.MinecraftUseRestartMixin",
@@ -25,7 +27,8 @@
     "client.PlayerModelMixin",
     "client.ScreenAccessor",
     "client.SoundManagerPreparationsMixin",
-    "client.StairBlockAccessor"
+    "client.StairBlockAccessor",
+    "client.LevelRendererAllChangedScopePassMixin"
   ],
   "injectors": {
     "defaultRequire": 1

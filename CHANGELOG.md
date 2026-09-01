@@ -3,7 +3,35 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## Unreleased
+## 1.1.8+neoforge.26.1.2.R2 — 2026-09-02
+
+> R2 = R1-hotfix 之后回传的 26.2 修复 + 姊妹渲染线（v1–v5：TML Mesh 加载器 / PIP 二次渲染 /
+> 镜内裁切与低倍率豁免 / tacz:nbt 材料 / 开镜距离补偿）。**运行期行为已由维护者实机验证**
+> （2026-08-31–09-01，高模枪包 + Sodium + Iris/ComplementaryUnbound；本轮各修复项即实机
+> 发现）；未逐条留档的复测项与代码级未核验点见
+> [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md) §5 与
+> [`docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md`](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md) §5。
+
+### 新增
+
+- **内置 Mesh 加载器（TML）**：枪包可在 geo.json 骨骼上携带 `poly_mesh` 网格
+  （`"model_type": "mesh"`），由本 mod 直接解析渲染；带第一人称 / 世界语境的 GPU
+  静态烘焙、按光照档 LRU 缓存 + 每帧烘焙额度、目镜孔径裁剪与低倍镜豁免。移植自
+  VellEagle/TacZMeshLoader（GPL-3.0，经姊妹项目中转）；配置见 `tacz-client.toml`
+  `[mesh_loader]`（19 项，Cloth「渲染」页同步），说明与复测矩阵见
+  [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md)。**运行期未验证**，实机前请按其中 §5 逐条测。
+- **镜内画中画（PIP）与镜内裁切**：除经典整屏变焦外，新增 PIP 重投影与 PIP 二次渲染
+  两种瞄具模式（`RenderConfig` 的 `ScopePip*` 键，默认关）；镜内文字 / 手臂 / 火光 /
+  枪身 / 配件的孔径裁剪，以及低于 `ScopePipMinMagnification`（默认 4×）时不裁的
+  低倍镜豁免。机制与验收见
+  [`docs/SCOPE_PIP_RERENDER_IRIS_PORT_2612_20260901.md`](docs/SCOPE_PIP_RERENDER_IRIS_PORT_2612_20260901.md)、
+  [`docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md`](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md)
+  与 [`docs/MESH_OCULAR_CLIP_IRIS_ROUTE_20260901.md`](docs/MESH_OCULAR_CLIP_IRIS_ROUTE_20260901.md)。
+  **同上，运行期未验证**。
+- **tacz:nbt 配方材料**：工作台配方支持 `type: "tacz:nbt"`（`TaCZPackUpgrader` 形态）
+  以及无 `type` 的 `{item + nbt}` 隐式写法，统一按本仓 NeoForge 原生
+  `tacz:partial_nbt` 自定义材料解析（宽松子集匹配；旧的静默丢弃 nbt 行为已修，
+  材料格不再显示裸枪）。
 
 ### 修复
 
@@ -50,6 +78,13 @@
   1663324）、原始项目、直接上游、源码、Release、Issues 与许可文件补齐跳转链接。
 - `docs/publish/RELEASE.md` 改为覆盖 26.2、26.1.2、1.21.11 的内部更新规范，明确
   活文档 → Release notes → 平台 Changelog 的同步顺序及“测试结论不得跨分支继承”。
+- 新增 [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md)（TML 主文档：来源/许可、19 项
+  配置、26.1.2 消费点与 v5 修正、复测矩阵、设计不变量、枪包作者 §8）与
+  [`docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md`](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md)
+  （镜内裁手 + 低倍镜豁免 + 验收清单）；`PORT_..._20260901.md` 追加 v5 补丁段。
+- README §2/§3/§6/§7 与 [`LICENSES.md`](LICENSES.md) 同步：项目范围补 TML/PIP，
+  §3 由「不是 PIP」改写为「三类模式」，§6 补未实机边界，§7 补 TML 的
+  VellEagle/GPL-3.0 来源与“不构成授权背书、上游问题回 TML 仓库”声明。
 
 ## 1.1.8+neoforge.26.1.2.R1-hotfix — 2026-08-27
 

@@ -25,6 +25,10 @@ public class OverwriteCommand {
     private static int setOverwrite(CommandContext<CommandSourceStack> context) {
         boolean enable = BoolArgumentType.getBool(context, ENABLE);
         PreLoadConfig.override.set(!enable);
+        // 这条命令绕过了 Cloth 面板的 savingRunnable，而 DefaultPackDebug 是 pre 配置里的键：
+        // 不显式落盘的话，命令行改完重启就回默认（姊妹线同一病根，1.21.11 线 cd14a2ac；
+        // 本仓没有 Fabric 版 ConfigPersist.saveAll，等价物就是 ModConfigSpec 自带的 save()）。
+        PreLoadConfig.spec.save();
         if (context.getSource().getEntity() instanceof ServerPlayer serverPlayer) {
             if (PreLoadConfig.override.get()) {
                 serverPlayer.sendSystemMessage(Component.translatable("commands.tacz.reload.overwrite_off"));

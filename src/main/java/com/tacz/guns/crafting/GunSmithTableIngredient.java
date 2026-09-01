@@ -66,10 +66,14 @@ public class GunSmithTableIngredient {
                     RegistryOps.create(JsonOps.INSTANCE, registryAccess), normalized
             ).getOrThrow();
             rawIngredient = null;
-        } catch (RuntimeException exception) {
+        } catch (RuntimeException | LinkageError exception) {
             if (!loggedFailure) {
                 loggedFailure = true;
-                GunMod.LOGGER.warn("Failed to resolve gun smith table ingredient {}", raw, exception);
+                // ERROR + 原文 + 规范化形态 + 完整异常：跨包合成排查的第一现场。
+                // （LinkageError 也要接 —— 自定义材料 serializer 缺失在某些环境以
+                // NoClassDefFoundError 形态抛出，只接 RuntimeException 会让它消失得无声无息。）
+                GunMod.LOGGER.error("Failed to resolve gun smith table ingredient {} "
+                        + "(normalized form: {})", raw, RecipeCompat.normalizeLegacyIngredient(raw), exception);
             }
         }
         return ingredient;
