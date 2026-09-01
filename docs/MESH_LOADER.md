@@ -395,6 +395,16 @@ CI 闭环：push 触发 → Actions 跑 `./gradlew compileJava` →
     视距 / F3+A，主画面远景不错乱、无 `Tried to use destroyed RenderTargets`
     类崩溃；日志若打印 `Suppressed a full renderer reload … prewarm build`
     属预期。
+18. **开镜 mesh 枪身裁剪真正生效**（2026-09-02 修复，判据时序）：R5 移植
+    的裁剪判据在绘制时查活几何，而那时阶段边界已把目镜几何清空 ⇒
+    判定恒 false、裁剪从未生效（用户实机：枪身仅二次渲染时「看起来裁了」——
+    实为其余形态枪管穿进镜片画面）。改看「本帧画过允许裁视模的掩码」
+    帧快照后：高倍镜开镜，mesh 枪身/配件与 cube 枪身一样被孔径裁掉
+    （**重投影与二次渲染都裁**，PIP 关的经典整屏变焦同样）；镜内画面
+    干净；收镜枪身完整；低倍 sight 的 reticle-only 掩码不啃枪身；
+    光影（Iris RenderType 路）同行为；日志出现**一次**
+    `GPU hand mesh pass: ocular clip ACTIVE`（出现即证明判据不再恒
+    false；没有这行而枪身仍穿镜 = 需回看本节）。
 
 ### 5.3 已知边界（如实）
 

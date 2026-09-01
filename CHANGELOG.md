@@ -7,6 +7,27 @@
 
 （R2 定名之后的增量写在里；发布时并入下一版条目。）
 
+### 修复：开镜 mesh 枪身裁剪判据时序 —— 高模枪身/配件从未被孔径裁掉（2026-09-02）
+
+- **症状**（用户实机，26.2 两线独有）：高模枪枪身（配件未知）仅开启二次
+  渲染时「看起来」被高倍镜裁切。方向经用户澄清：**裁切是正确行为**（与
+  cube 枪身、26.1.2 基线一致），不裁切才是 bug。
+- **根因**：R5 移植的 mesh 裁剪判据（`maskReadyForViewmodel`）在
+  executeSolid **之后**的手部绘制点查活几何，而阶段边界的掩码绘制
+  （executeSolid 之前）finally 已把 `ScopeMaskGeometry` 清空 ⇒ 判定
+  **恒 false** ⇒ 裁剪从未生效；二次渲染的镜内画面恰好是不含视模的整幅
+  世界渲染，才「看起来裁了」。cube 枪身在 submit 时判定（几何在场）
+  一直正常，故只有 mesh 缺裁。
+- **修法**：`ScopeMaskRenderer` 加「本帧画过允许裁视模的掩码」帧快照
+  （画掩码时、清空前记下）；`ScopeBodyRenderTypes` 加绘制时变体
+  `maskReadyForViewmodelAtDraw` / `clipForViewmodelAtDraw`（与 cube 同开
+  同关）；`PolyMeshGpuRenderer` 两处绘制时判据（自定义 pass + Iris
+  RenderType 路）换用之；裁剪首次生效打一行 log-once。
+- 排查全记录（含第一轮误判与回滚）见
+  `docs/records/BUG_MESHGUNBODY_SCOPE_CLIP_RERENDER_20260902.md`；
+  实机判据见 `docs/MESH_LOADER.md` §5.2 第 18 条。
+  **证据级别：静态闭环（时序穷举 + 逐 gate 对照）；CI 与实机未跑，不宣称已修。**
+
 ### 同步 Fabric 26.2 线 `arena/01a05e3e`（tip `dee2578d`，2026-09-02 对账，R5）
 
 > 游戏语义权威线（AGENTS §0）自 R4 取货点 `bf5bc5a` 又前进 6 笔实质提交

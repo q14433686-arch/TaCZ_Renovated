@@ -471,6 +471,54 @@ public final class ScopeBodyRenderTypes {
         return ScopeMaskTextureHandle.syncToMaskTarget();
     }
 
+    /**
+     * 视模裁剪判定的<b>绘制时</b>变体（供 executeSolid 之后才绘制的消费者：
+     * GPU mesh 手部表，自定义 pass 与 Iris RenderType 两路）。
+     *
+     * <h2>为什么必须与 {@link #maskReadyForViewmodel} 分开（2026-09-02 实机案）</h2>
+     * mesh 手部表的绘制点在 {@code renderAllFeatures} 的 executeSolid <b>之后</b>，
+     * 而阶段边界的掩码绘制（executeSolid 之前）已在 finally 里把
+     * {@code ScopeMaskGeometry} 消费清空 —— 绘制时若仍查活几何，
+     * {@code isEmpty()} 恒真 ⇒ 判定恒 false ⇒ <b>mesh 枪身从未被裁</b>：
+     * 主画面上枪管一直穿进镜片画面；只有二次渲染的镜内画面恰好是
+     * 不含视模的整幅世界渲染，才「看起来裁了」。用户实机看到的
+     * 「枪身仅二次渲染时被高倍镜裁切」即此症状（裁切本身是正确行为，
+     * 缺的是其他形态下的裁切）。
+     *
+     * <p>绘制时改看<b>帧快照</b>：本帧阶段边界是否成功画过允许裁视模的
+     * 掩码（{@code ScopeMaskRenderer#hasViewmodelClipMaskThisFrame}，
+     * 在画掩码时、清空之前记下）—— 与 submit 时查活几何语义等价，
+     * 与 cube 的 {@code clipForViewmodel} 同开同关。其余 gate 逐字一致。
+     * EMISSIVE 回退档不裁的事由在调用方（lightmap 取不到已降级，宁简勿繁）。</p>
+     */
+    public static boolean maskReadyForViewmodelAtDraw() {
+        if (!com.tacz.guns.config.client.RenderConfig.SCOPE_MASK_ENABLE.get()) {
+            return false;
+        }
+        if (IrisCompat.shouldDisableScopeMaskUnderShaderPack()) {
+            return false;
+        }
+        if (!ScopeMaskRenderer.hasViewmodelClipMaskThisFrame()) {
+            return false;
+        }
+        return ScopeMaskTextureHandle.syncToMaskTarget();
+    }
+
+    /**
+     * {@link #clipForViewmodel} 的绘制时变体（GPU mesh 手部表的 Iris RenderType 路）。
+     * 判据换成 {@link #maskReadyForViewmodelAtDraw()}，其余逐字一致。
+     */
+    public static RenderType clipForViewmodelAtDraw(RenderType original,
+                                                    @javax.annotation.Nullable Identifier texture) {
+        if (texture == null) {
+            return original;
+        }
+        if (!maskReadyForViewmodelAtDraw()) {
+            return original;
+        }
+        return clipped(texture);
+    }
+
     private static RenderType create(String name, RenderPipeline pipeline, Identifier tex, boolean bindMask) {
         var builder = RenderSetup.builder(pipeline)
                 // Sampler0 = 瞄具自身贴图。r52 教训：管线声明的每个 sampler
