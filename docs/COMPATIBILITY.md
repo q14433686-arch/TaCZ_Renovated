@@ -1,6 +1,6 @@
 # 兼容性
 
-适用版本：Minecraft 26.1.2 + NeoForge 26.1.2.x。本 mod **无必装前置**。
+适用版本：Minecraft 1.21.11 + NeoForge 21.11.x。本 mod **无必装前置**。
 
 ## 枪包
 
@@ -24,10 +24,10 @@
 | Carry On | ✅ 可用 | — | 搬运枪械工作台等方块 |
 | FirstPerson Model | ✅ 可用 | — | 第一人称身体模型共存 |
 | Punchy! | ✅ 可用 | 2.7d | 可选 mixin 让出；持枪/近战/手雷时 Punchy 独立手臂与位移让出给 TACZ |
-| ImmediatelyFast | ✅ 无需适配 | — | 26.x 渲染架构下无需集成，装了也不冲突 |
+| ImmediatelyFast | ✅ 无需适配 | — | 本线兼容层为 no-op，装了也不冲突 |
 | Just Zoom | ❌ 不适配 | — | 无上游先例，项目决定不做原创适配 |
-| Zoomify | — | — | 26.1 线无 NeoForge 版，无从适配 |
-| Accelerated Rendering | — | — | 无 26.1.2 Feature Rendering 版，兼容层禁用 |
+| Zoomify | ❓ 未验证 | — | 本线兼容层为 no-op（历史结论基于 26.1 线）；1.21.11 是否存在 NeoForge 版未核实，待实机 |
+| Accelerated Rendering | ❓ 未验证 | — | 兼容层禁用；1.21.11 线是否可用未核实，待实机 |
 
 「✅ 可用」= 在真实客户端环境通过用户实测（PASS），或为无 GUI 依赖的纯逻辑层。
 

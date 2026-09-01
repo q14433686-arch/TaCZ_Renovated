@@ -32,6 +32,11 @@ public class GunModClient {
     static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             com.tacz.guns.client.init.ClientSetupEvent.onClientSetup();
+            // 内置 TacZ Mesh Loader：注册 model_type=mesh 枪模构造器与状态追踪基建。
+            // 必须在任何枪 display 资源加载（ClientAssetsManager 的 reload listener 触发）之前
+            // 把 model_type=mesh 构造器注册进 GunModelTypeManager，否则 checkTextureAndModel
+            // 会落到默认 BedrockGunModel 构造器，mesh 枪退回纯立方体。
+            cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.onClientSetup();
             com.tacz.guns.client.init.ClientSetupEvent.registerItemRenderers();
             // WP-LR2：LR 物品渲染器登记——必须在 enqueueWork 内（r29：构造期字段未填充会静默跳过）。
             me.xjqsh.lrtactical.client.init.ModEntitiesRender.registerItemRenderers();

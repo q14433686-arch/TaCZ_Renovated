@@ -6,9 +6,9 @@
 
 ## 环境与构建
 
-- **JDK 25**（Minecraft 26.1.2 / NeoForge 官方要求）
+- **JDK 21**（Minecraft 1.21.11：Mojang 随游戏分发 Java 21；`build.gradle` 的 toolchain 同此）
 - Gradle Wrapper 9.2.1（仓库自带，勿升级）
-- **不要配置 mappings / parchment / Yarn**——26.1+ 游戏本体未混淆，直接读源码。
+- **不要配置 mappings / parchment / Yarn**——1.21.11 是混淆版本，官方 Mojang 映射已由 ModDevGradle 自动接好（`gradle.properties` 注释）；不要再叠加任何映射层。
 
 ```bash
 ./gradlew build        # 产物在 build/libs/
@@ -39,7 +39,7 @@
 1. **洁净室**：禁止以任何形式接触 CurseForge `tacz-port`（guilhermez1989）的 jar。
 2. **API 必须有证据**：任何非平凡 API 调用要能指认 `类#方法(签名)` + 来源
    （层级见宪章第 3 节），并记入对应的 records 文档。
-3. **参考边界**：游戏语义抄 Fabric 26.1.2 分支，加载器习语抄 MUKSC 1.21.1，
+3. **参考边界**：游戏语义抄 Fabric **1.21.11** 分支（姊妹仓库 `arena/01a05db2*` 线），加载器习语抄 MUKSC 1.21.1，
    **MUKSC 的渲染代码一行不抄**（宪章第 2 节的表格是完整版）。
 
 ## 进度与记录约定
@@ -69,7 +69,7 @@ MCModderAnchor/TACZ  (1.20.1 Forge, 官方源头)
                             ▼
                 ┌─────────────────────────────────┐
                 │  本仓库  TaCZ: Renovated         │
-                │  (NeoForge 26.1.2，modId=tacz)  │
+                │  (NeoForge 1.21.11，modId=tacz) │
                 └─────────────────────────────────┘
                             ▲
                             │  加载器习语参考（辅；渲染代码零采用）

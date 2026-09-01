@@ -20,10 +20,40 @@ public final class IrisCompat {
     }
 
     public static void initCompat() {
+        // 无版本分派：1.21.11 线的 NeoForge Iris 只有 1.10.x 一代，
+        // 无需姊妹线（Fabric）的 legacy/newly 双桥。
     }
 
+    /**
+     * @return whether Iris is currently rendering its shadow pass.
+     *
+     * <p><b>不是可选项——它是 mesh 世界 GPU 路径在光影下的生死闸。</b>本线移植时此方法
+     * 是 {@code return false} 空壳，造成：阴影 pass 的
+     * {@code renderAllFeatures} 调用点会消费世界 GPU 表（Iris 1.10.x 的阴影 pass 经
+     * {@code MixinGlCommandEncoder} 拦截 {@code glBindFramebuffer} 切 FBO，不经过
+     * {@code outputColorTextureOverride}，故 drawList 的 override 闸挡不住它），
+     * {@code worldConsumedFrame} 被提前标记 ⇒ 主画面那遍跳过 ⇒ 光影下第三人称/掉落物/
+     * 展示台的高模枪只画进了阴影贴图，主画面不可见。姊妹 1.21.11 线的 legacy/newly
+     * 双桥均反射本方法，语义权威。</p>
+     *
+     * <p>注：本仓 26.1.2 分支的同名方法也是空壳，但该线实机 PASS、无此症状
+     * （维护者 2026-09-02 实测结论）——空壳致命是本线 1.21.11「世界表消费点挂在
+     * {@code renderAllFeatures} RETURN」拓扑特有的，故 26.1.2 分支不随本轮改动。</p>
+     *
+     * <p>证据：Iris 上游 `1.21.11-unobf` 分支 common 模块（NeoForge 构建同源）确有
+     * {@code net.irisshaders.iris.shadows.ShadowRenderingState#areShadowsCurrentlyBeingRendered()}
+     * （gh api 直读源码，2026-09-02）。反射失败安全回退 false。</p>
+     */
     public static boolean isRenderShadow() {
-        return false;
+        if (!ModList.get().isLoaded(CompatRegistry.IRIS)) {
+            return false;
+        }
+        try {
+            Class<?> clazz = Class.forName("net.irisshaders.iris.shadows.ShadowRenderingState");
+            return (Boolean) clazz.getMethod("areShadowsCurrentlyBeingRendered").invoke(null);
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     public static boolean isUsingRenderPack() {
@@ -72,47 +102,91 @@ public final class IrisCompat {
     public static synchronized boolean assignPipelineToIris(RenderPipeline pipeline,
                                                             String irisProgramName,
                                                             String debugName) {
+        return assignPipelineToIrisAny(pipeline, new String[]{irisProgramName}, debugName);
+    }
+
+    private static boolean assignPipelineToIrisAny(RenderPipeline pipeline, String[] irisProgramNames, String debugName) {
         if (!ModList.get().isLoaded(CompatRegistry.IRIS)) {
             return false;
         }
         if (ASSIGNED_SCOPE_PIPELINES.contains(pipeline)) {
             return true;
         }
-        try {
-            Class<?> apiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
-            Class<?> programClass = Class.forName("net.irisshaders.iris.api.v0.IrisProgram");
-            Object api = apiClass.getMethod("getInstance").invoke(null);
-            @SuppressWarnings({"unchecked", "rawtypes"})
-            Object irisProgram = Enum.valueOf((Class<? extends Enum>) programClass.asSubclass(Enum.class), irisProgramName);
-            apiClass.getMethod("assignPipeline", RenderPipeline.class, programClass).invoke(api, pipeline, irisProgram);
-            ASSIGNED_SCOPE_PIPELINES.add(pipeline);
-            GunMod.LOGGER.info("[TACZ Iris] Assigned {} to the Iris {} program.", debugName, irisProgramName);
-            return true;
-        } catch (Throwable t) {
-            // Iris 1.11.3+mc26.1.2 起会对常见 entity 管线做自动分类（日志
-            // "Found fine program match ..."），此时重复 assign 会抛
-            // IllegalStateException("Shader already assigned")。Iris 已分类 = 目的已达成，
-            // 视为成功，不再告警（2026-08-21 LAN 实测日志，records/SERVER_TEST_20260821_LAN.md）。
-            Throwable cause = t;
-            while (cause != null) {
-                if (cause instanceof IllegalStateException
-                        && cause.getMessage() != null
-                        && cause.getMessage().startsWith("Shader already assigned")) {
-                    ASSIGNED_SCOPE_PIPELINES.add(pipeline);
-                    GunMod.LOGGER.info("[TACZ Iris] {} already classified by Iris ({}); keeping Iris assignment.",
-                            debugName, cause.getMessage());
-                    return true;
+        for (String irisProgramName : irisProgramNames) {
+            try {
+                Class<?> apiClass = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+                Class<?> programClass = Class.forName("net.irisshaders.iris.api.v0.IrisProgram");
+                Object api = apiClass.getMethod("getInstance").invoke(null);
+                @SuppressWarnings({"unchecked", "rawtypes"})
+                Object irisProgram = Enum.valueOf((Class<? extends Enum>) programClass.asSubclass(Enum.class), irisProgramName);
+                apiClass.getMethod("assignPipeline", RenderPipeline.class, programClass).invoke(api, pipeline, irisProgram);
+                ASSIGNED_SCOPE_PIPELINES.add(pipeline);
+                GunMod.LOGGER.info("[TACZ Iris] Assigned {} to the Iris {} program.", debugName, irisProgramName);
+                return true;
+            } catch (Throwable t) {
+                // Iris 1.11.3+mc26.1.2 起会对常见 entity 管线做自动分类（日志
+                // "Found fine program match ..."），此时重复 assign 会抛
+                // IllegalStateException("Shader already assigned")。Iris 已分类 = 目的已达成，
+                // 视为成功，不再告警（2026-08-21 LAN 实测日志，records/SERVER_TEST_20260821_LAN.md）。
+                Throwable cause = t;
+                while (cause != null) {
+                    if (cause instanceof IllegalStateException
+                            && cause.getMessage() != null
+                            && cause.getMessage().startsWith("Shader already assigned")) {
+                        ASSIGNED_SCOPE_PIPELINES.add(pipeline);
+                        GunMod.LOGGER.info("[TACZ Iris] {} already classified by Iris ({}); keeping Iris assignment.",
+                                debugName, cause.getMessage());
+                        return true;
+                    }
+                    cause = cause.getCause();
                 }
-                cause = cause.getCause();
+                if (!loggedScopePipelineFailure) {
+                    loggedScopePipelineFailure = true;
+                    GunMod.LOGGER.warn("[TACZ Iris] Iris cannot classify render pipeline {} as {}; vanilla pipeline used.",
+                            debugName, String.join("/", irisProgramNames), t);
+                }
             }
-            if (!loggedScopePipelineFailure) {
-                loggedScopePipelineFailure = true;
-                GunMod.LOGGER.warn("[TACZ Iris] Iris cannot classify render pipeline {}; vanilla pipeline used.",
-                        debugName, t);
-            }
-            return false;
         }
+        return false;
     }
+
+    /**
+     * Whether the active Iris line exposes the hand-flush timing the mesh GPU path relies on.
+     *
+     * <p>The mesh GPU pass under a shader pack is drawn from {@code ItemInHandRenderer#renderHandsWithItems}
+     * immediately after the flush that Iris replaces there ({@code HandRenderer#endRender()} calls
+     * {@code FeatureRenderDispatcher#renderAllFeatures()} + {@code BufferSource#endBatch()}). That
+     * replacement pair is what was audited for Iris 1.10.x on 1.21.11; other Iris lines keep the
+     * mesh guns on the collector path. A stale assumption here would only cost a frame (the
+     * submit-side liveness proof in {@code PolyMeshGpuRenderer} falls back to the collector), but
+     * an audited version gate is the cheaper guarantee.</p>
+     */
+    public static boolean supportsHandFlushHook() {
+        return ModList.get().getModContainerById(CompatRegistry.IRIS)
+                .map(container -> container.getModInfo().getVersion().toString().startsWith("1.10."))
+                .orElse(false);
+    }
+
+    /**
+     * Classify the mesh renderer's own pipeline as Iris' hand program so the resident-VBO pass,
+     * which never goes through a vanilla {@code RenderType}, still receives shader-pack lighting.
+     * Failures are swallowed the same way as the scope pipelines: without the assignment the gun
+     * still draws, just with vanilla lighting.
+     */
+    public static boolean assignMeshPipelineToHand(RenderPipeline pipeline) {
+        return assignPipelineToIrisAny(pipeline, new String[]{"HAND"}, "mesh_entity_hand");
+    }
+
+    /**
+     * Same classification for the <b>world</b> mesh pass: the resident-VBO pipeline should be lit
+     * by the pack's entity program instead of falling back to the vanilla one.
+     * {@code IrisProgram.ENTITIES} exists on the audited 1.10.7 line; the assignment is
+     * best-effort and quietly skipped on unknown programs.
+     */
+    public static boolean assignMeshPipelineToEntity(RenderPipeline pipeline) {
+        return assignPipelineToIrisAny(pipeline, new String[]{"ENTITIES"}, "mesh_entity_world");
+    }
+
 
     public static synchronized void assignCommonEntityPipelinesToHandIfNeeded() {
         if (!ModList.get().isLoaded(CompatRegistry.IRIS)) {
