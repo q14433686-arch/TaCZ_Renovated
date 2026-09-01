@@ -7,7 +7,6 @@ import cn.sh1rocu.tacz.compat.meshloader.render.ShaderStateTracker;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.PreparableReloadListener.PreparationBarrier;
-import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -24,7 +23,7 @@ import java.util.concurrent.Executor;
  * 1.21.11 NeoForge 线把 Fabric 的 {@code ResourceManagerHelper} /
  * {@code IdentifiableResourceReloadListener} 换成原生
  * {@link PreparableReloadListener}（由本线 {@code ClientSetupEvent} 的
- * {@code AddClientReloadListenersEvent} 登记），语义不变。</p>
+ * {@code AddClientReloadListenersEvent#addListener} 登记），语义不变。</p>
  */
 public final class TaczMeshyIntegration {
 
@@ -44,17 +43,19 @@ public final class TaczMeshyIntegration {
 
     /**
      * geo 解析缓存失效监听器（原 Fabric 版 {@code registerReloadListener} 的内容）。
-     * 由本线 {@code ClientSetupEvent#onClientResourceReload} 经
-     * {@code AddClientReloadListenersEvent#registerReloadListener} 登记。
+     * 1.21.11 的 {@code PreparableReloadListener#reload} 仍是
+     * {@code (SharedState, Executor, PreparationBarrier, Executor)} 四参旧形
+     * （CI 编译门实证，与姊妹线 Fabric 版所用签名一致）。
      */
     public static PreparableReloadListener reloadListener() {
         return new PreparableReloadListener() {
             @Override
-            public CompletableFuture<Void> reload(PreparationBarrier barrier,
-                                                  ResourceManager manager,
+            @SuppressWarnings("removal")
+            public CompletableFuture<Void> reload(PreparableReloadListener.SharedState state,
                                                   Executor backgroundExecutor,
+                                                  PreparationBarrier barrier,
                                                   Executor gameExecutor) {
-                return barrier.wait(null).thenRunAsync(PolyMeshSupport::invalidateParseCache, gameExecutor);
+                return barrier.wait(state).thenRunAsync(PolyMeshSupport::invalidateParseCache, gameExecutor);
             }
         };
     }

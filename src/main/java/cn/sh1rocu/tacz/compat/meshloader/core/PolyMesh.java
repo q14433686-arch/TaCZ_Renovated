@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
@@ -253,7 +253,7 @@ public class PolyMesh {
     }
 
     /** 配置项可能还没被赋值（见构造函数里那段注释）—— 取不到就按声明的默认值。 */
-    private static boolean flag(ForgeConfigSpec.BooleanValue value, boolean fallback) {
+    private static boolean flag(ModConfigSpec.BooleanValue value, boolean fallback) {
         return value == null ? fallback : value.get();
     }
 

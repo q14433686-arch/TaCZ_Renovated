@@ -128,7 +128,7 @@ public class ClientSetupEvent {
         ClientAssetsManager.INSTANCE.reloadAndRegister(event);
         // TacZ Mesh Loader：geo 解析缓存失效监听器（Fabric 版挂在 ResourceManagerHelper 上，
         // 本线等价挂到原生客户端 reload 监听器列表）。
-        event.registerReloadListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
+        event.addListener(cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration.reloadListener());
     }
 
     @SubscribeEvent
