@@ -1,14 +1,13 @@
 # TaCZ: Renovated 26.2 兼容矩阵
 
-适用构建：`1.1.8+neoforge.26.2.R1-hotfix`（**R1 期快照**；R2 的内置块——
-LRTactical / TML / PIP——不在本矩阵内，见根 README §2 与
+适用构建：`1.1.8+neoforge.26.2.R2`（**R2 期快照**；TML / PIP 的专项说明见根 README §2 与
 [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md)）
 
 游戏 / 加载器：Minecraft 26.2 / NeoForge 26.2.0.64  
 核验日期：2026-08-22（2026-09-02 补：Iris 行实机反馈）
 
 > **状态纪律**：下表的“API 已核”表示发布文件、坐标与源码签名已核对，**不等于游戏内
-> PASS**。旧 L0-L3 回执覆盖 LR 合入前的 26.2 核心候选；当前 LR-integrated R1 必须
+> PASS**。旧 L0-L3 回执覆盖 LR 合入前的 26.2 核心候选；当前 R2 候选必须
 > 重跑构建、专服与多人。26.1.2 的 LR 单机/专服 PASS 也不自动继承到 26.2。
 
 ## 内置 LRTactical

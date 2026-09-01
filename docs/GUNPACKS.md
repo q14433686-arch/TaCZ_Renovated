@@ -1,6 +1,6 @@
 # 26.2 枪包安装与兼容指南
 
-适用版本：`1.1.8+neoforge.26.2.R1-hotfix`。
+适用版本：`1.1.8+neoforge.26.2.R2`。
 
 ## 双端职责
 
@@ -23,7 +23,7 @@
 - **只装服务端**：逻辑数据可同步，但客户端缺模型/语言时可能显示紫黑资源或原始翻译键；
   底线是不崩溃、不踢出。
 
-这些是 26.1.2 R1 的已知基线；26.2 R1 仍须按 L2.5 单独确认。
+这些是 26.1.2 R1 的已知基线；26.2 R2 仍须按 L2.5 单独确认。
 
 ## 版本谓词
 
@@ -37,13 +37,13 @@
 }
 ```
 
-本 Mod 的 `1.1.8+neoforge.26.2.R1-hotfix` 中，`+` 后是 build metadata，不影响
+本 Mod 的 `1.1.8+neoforge.26.2.R2` 中，`+` 后是 build metadata，不影响
 `>=1.1.8`。不要把依赖写成只接受某个开发分支名，也不要假设 `-neoforge` 与 `+neoforge`
 排序相同。
 
 ## LRTactical 边界
 
-当前 R1 候选已内置 LRTactical 的 throwable、melee、detonator、consumable 四类承载物品，
+当前 R2 候选已内置 LRTactical 的 throwable、melee、detonator、consumable 四类承载物品，
 以及 explode、sticky、smoke、stun、effect-cloud 行为、索引/配方/Lua 与联机同步。
 
 - LR 内容包仍须双端安装：服务端需要 index/data/recipe/scripts，客户端需要 display、模型、

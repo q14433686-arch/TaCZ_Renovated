@@ -8,8 +8,8 @@
 执行者：项目发起人的 JDK 25 / GPU 环境；结果必须记录当前 commit 与完整版本矩阵。
 
 > 当前执行状态（2026-08-22）：用户报告的 **L0-L3 PASS** 对应 LR 合入前核心候选，冻结
-> 记录为 `docs/records/SERVER_TEST_20260821_262_R1.md`。当前 R1 已前滚 LRTactical 的
-> 代码、资源、AT、mixin 与 payload，必须从 L0 起重跑，并增加下述 LR 专项；26.1.2 的
+> 记录为 `docs/records/SERVER_TEST_20260821_262_R1.md`。当前 R2 候选已前滚 LRTactical 与
+> TML / PIP 的代码、资源、AT、mixin 与 payload，必须从 L0 起重跑，并增加下述 LR 专项；26.1.2 的
 > LR 单机/专服 PASS 只作为源基线。
 
 ---
@@ -18,7 +18,7 @@
 
 ```bash
 ./gradlew build
-JAR=build/libs/tacz-1.1.8+neoforge.26.2.R1-hotfix.jar   # 以实际文件名为准
+JAR=build/libs/tacz-1.1.8+neoforge.26.2.R2.jar   # 以实际文件名为准
 unzip -l "$JAR" | grep -E "META-INF/jarjar/|luaj|commons-math3"
 unzip -l "$JAR" | grep -E "tacz.*mixins.json|lrtactical.mixins.json|accesstransformer.cfg"
 unzip -l "$JAR" | grep -E "me/xjqsh/lrtactical/|assets/lrtactical/|data/lrtactical/"
@@ -42,9 +42,9 @@ unzip -p "$JAR" META-INF/neoforge.mods.toml | grep -E "version=|modId="
 
 判据（对照 `docs/records/` 各期冒烟口径）：
 
-- [ ] Mod List 出现 `Timeless and Classics Zero 1.1.8+neoforge.26.2.R1-hotfix (tacz)`；
+- [ ] Mod List 出现 `Timeless and Classics Zero 1.1.8+neoforge.26.2.R2 (tacz)`；
 - [ ] 日志有 TaCZ 与 LR payload 注册行、枪包装载行及
-      `LRTactical built-in layer (NeoForge 26.2 R1 candidate) registered`；
+      `LRTactical built-in layer (NeoForge 26.2 R2 candidate) registered`；
 - [ ] LR throwable/melee/consumable 三类 index reload 完成，登入同步不报未知 payload；
 - [ ] 到 `Done`，`stop` 干净退出；
 - [ ] 全程无 `NoClassDefFoundError`（dedicated classpath 没有
@@ -117,7 +117,7 @@ R1 证据：`docs/records/SERVER_TEST_20260821_GUNPACK.md`。
 
 ### D. 版本谓词
 
-包内 `gunpack.meta.json` 声明 `tacz >= 1.1.8` 的，26.2 R1（`+` build metadata）
+包内 `gunpack.meta.json` 声明 `tacz >= 1.1.8` 的，26.2 R2（`+` build metadata）
 应照常通过；遇到写了奇怪谓词的包，记录其完整谓词再下结论。
 
 ### E. LRTactical 内容包
