@@ -3,7 +3,21 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-09-02 第二轮修正（维护者指正；版本号未变）
+## 1.1.8+neoforge.1.21.11.R2 — 2026-09-02
+
+> R2 = R1-hotfix 之后回传姊妹 1.21.11 线（`arena/01a05db2`）08-30~09-02 的全部修复，
+> 并对照 26.1.2 / 26.2 两线的后续修复轮补齐（维护者指正轮）。范围：
+> 镜内 `text_show` 三连修（P0-a/P0-b/P1）、检视打断动画两修、`tacz:nbt` 跨包材料、
+> ScopePip 全族（镜内画中画 / 二次渲染 / 时域隔离）、内置 TacZ Mesh Loader（poly_mesh +
+> GPU 烘焙，光影两键默认开）、镜内裁手与低倍率豁免、掩码周期帧戳、Sodium/Voxy 通道。
+> **其中 TML / PIP / 镜内裁切 / 光影下 GPU 烘焙尚未实机验证**（仅 CI 编译门绿），
+> 见 [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md) 与
+> [`docs/records/SYNC_SIBLING_0105DB2_20260901.md`](docs/records/SYNC_SIBLING_0105DB2_20260901.md)。
+> 配套文档：`docs/MESH_LOADER.md`（总览 / 配置键默认值 / A10 / 待实机清单）与三篇 TML 深潜
+> （`TML_GPU_STEP2_HANDFLUSH_20260831`、`TML_GPU_FEASIBILITY_1211_20260831`、
+> `REVIEW_UPSTREAM_TML_GPU_262_20260831`）。
+
+### 2026-09-02 第二轮修正（维护者指正）
 
 > 上轮移植只对了 1.21.11 线（`arena/01a05db2`）的 tip，而该线本身落后于 26.1.2 / 26.2 线的
 > 后续修复轮次。本轮按维护者指正逐项核对三线差异后补齐（证据：26.1.2 线
@@ -11,14 +25,14 @@
 > 26.1.2 线 `091dd5ec`/`be054bc7`/`d3f0fdc2`；逐 commit 读 diff 核实）。
 > 对照表：`docs/records/SYNC_SIBLING_0105DB2_20260901.md` §6。
 
-### 光影下烘焙两键默认开（维护者裁定，对齐 26.2 R3 定稿与 26.1.2）
+#### 光影下烘焙两键默认开（维护者裁定，对齐 26.2 R3 定稿与 26.1.2）
 
 - `MeshGpuUnderShaders` / `MeshGpuWorldUnderShaders` 默认 `true`（原随 1.21.11 线旧 A/B 为 false）。
   理由与 26.2 R3 终态一致：常驻 VBO 在光影下的收益胜过每帧 CPU 重变换；
   「高模枪遮挡太阳/月亮处继承天体亮度」是已知、可观测、可整键关闭的取舍。
   MeshyConfig 注释与中英语言描述同步更新。
 
-### 法线修复（下游审查 A10 —— 绕序×法线自洽，此前 1.21.11 线以默认关回避、未真修）
+#### 法线修复（下游审查 A10 —— 绕序×法线自洽，此前 1.21.11 线以默认关回避、未真修）
 
 - `PolyMesh` 换用 26.2 线 `bb6fcb61` 采纳后的现代烘焙形态：镜像（奇数次轴翻转）时
   **反转发射绕序**（`MeshPolyMirrorReverseWinding` 默认 **true**），使变换后绕序叉积与
@@ -30,14 +44,14 @@
   四个 poly 模型（枪/配件/弹药/方块）的 collector 提交改走 `entityCutoutNoCull`；
   GPU 路径管线本就 `withCull(false)`。两条路径都不再因反转吞面。
 
-### 烘焙额度与 LRU 容量解耦（下游审查 A6）
+#### 烘焙额度与 LRU 容量解耦（下游审查 A6）
 
 - 新增 `MeshGpuBakeBudgetPerFrame`（默认 4，1-64）：每帧烘焙额度独立于
   `MeshGpuLightCacheSize`（显存语义），不再 `Math.max(4, 容量)` 一个旋钮当两个用；
   额度耗尽时 log-once INFO（`[TacZMeshLoader] World bake budget ...`），溢出枪当帧回 collector。
   Cloth 面板条目 + en/zh 语言键同步。
 
-### 本轮的核对结论（其余项）
+#### 本轮的核对结论（其余项）
 
 - 法线矩阵读取时刻修复（MV 栈 per-draw 压/弹）：1.21.11 线 `014f4b0` 已带、26.1.2 线
   `SYNC_REPLY_TO_1211` §4 明确判定两线形状一致且正确 —— **已在，无需再动**。
@@ -49,7 +63,7 @@
   FeatureRenderDispatcher 构造器参数等），语义无缺；`captureSceneAfterIrisFinal` 补了
   26.1.2 的 `getDeltaTracker()==null` 防御守卫。
 
-## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-09-02 姊妹线渲染线全量移植（版本号未变）
+### 2026-09-02 姊妹线渲染线全量移植
 
 > 应项目要求把姊妹线 `arena/01a05db2` 的<b>全部实质性改动</b>等价移植到本线（NeoForge 1.21.11）：
 > ScopePip 全族、meshloader/TML/GPU 全族、镜内裁手、掩码周期帧戳、Iris 时域隔离、
@@ -57,7 +71,7 @@
 > savingRunnable 已闭环）。对照与适配记录：`docs/records/SYNC_SIBLING_0105DB2_20260901.md`。
 > **证据级别：静态移植 + 姊妹线 javap/实机旁证 + 本线 CI 编译门绿（compile-check success）；实机未跑。**
 
-### Scope PIP（镜内画中画 / 二次渲染）
+#### Scope PIP（镜内画中画 / 二次渲染）
 
 - 新增 `ScopePipRenderState`（屏幕空间重投影合成、双深度掩码、显示阈 `0.35`、重投影倍率渐变、
   `captureSceneFromMain`、按参数缓存的合成管线）与 `ScopePipDepthDebug`（品红透镜诊断）；
@@ -77,7 +91,7 @@
 - 配置：`RenderConfig` 14 个 `ScopePip*` 键 + Cloth 面板条目 + lang 56 键（en/zh）。
   功能默认全部关闭/旧行为。
 
-### TacZ Mesh Loader（TML/GPU，`cn.sh1rocu.tacz.compat.meshloader`，21 文件）
+#### TacZ Mesh Loader（TML/GPU，`cn.sh1rocu.tacz.compat.meshloader`，21 文件）
 
 - poly_mesh 枪/配件/弹药/方块模型 + 解析缓存 + 顶点预算闸 + `MeshyConfig` 18 键
   （挂 `ClientConfig`，Cloth 面板全量暴露）；
@@ -96,7 +110,7 @@
   `ScreenRenderTracker`/`ShaderStateTracker` 分别改挂 `ScreenEvent.Render.Pre/Post` 与
   `RenderFrameEvent.Pre`。
 
-### 掩码周期帧戳与镜内裁手
+#### 掩码周期帧戳与镜内裁手
 
 - `ScopeDepthCopyState`：`onClientFrameStart`/`hasMaskCycleThisFrame`/`beginExternalMaskOutsideDraw`/
   `DepthHandle`（`worldDepthTarget`/`apertureDepthTarget`）；BACKUP 世界拷贝闸并入
@@ -105,16 +119,16 @@
   `armClipped` 掩码手臂类型 + `RenderHelper` collector 代理（identity 替换
   `entityTranslucent(skin)`）；`MuzzleFlashRender` 同闸。
 
-### 明确不搬（本线不需要）
+#### 明确不搬（本线不需要）
 
 - FCAP 配置落盘整族（`ConfigPersist`/`ForgeConfigSpecAccessor`/ModMenu 入口）：本线原生
   NeoForge `ModConfigSpec`（`save()` = `loadedConfig.save()`），Cloth 面板早已接
   `setSavingRunnable`；`/tacz overwrite` 落盘上一轮已补。
 - `fabric.mod.json` 的注册面由 `neoforge.mods.toml` [[mixins]] 等价承接；
   `TaczNbtIngredient` 的 Fabric `CustomIngredient` 注册以 `RecipeCompat` 改写等价承接（上轮）。
-- 版本号**未动**（仍 `1.1.8+neoforge.1.21.11.R1-hotfix`）⇒ README 无需跟改。
+- 本条目提交时版本号未动（仍 `R1-hotfix`）；随 `1.1.8+neoforge.1.21.11.R2` 一并发布。
 
-## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-09-01 姊妹线同步（版本号未变）
+### 2026-09-01 姊妹线同步
 
 > 姊妹项目 `TaCZ_Refabricated_Unofficial` 的 `arena/01a05db2` 分支 2026-08-30 ~ 09-01 的新增内容，
 > 逐 commit 核对后按本线（NeoForge 21.11.45 / 原生 ModConfigSpec / 无 PIP / 无 meshloader）等价移植。
@@ -123,7 +137,7 @@
 > 姊妹线给本线的同步清单 `SYNC_CHECKLIST_1211_NEOFORGE_SISTER_20260901.md` 的 §2（P0-a）、§3（P0-b）、
 > §4（P1）三条已全部落地。
 
-### 镜内 `text_show` 文本（MK5/MK5HD 弹药计数）三连修（P0-a / P0-b / P1）
+#### 镜内 `text_show` 文本（MK5/MK5HD 弹药计数）三连修（P0-a / P0-b / P1）
 
 - **P0-a 补回被绕开的 functionalTasks flush**（姊妹线 `1cfa42b` + `cb39564`）：
   `BedrockAttachmentModel#submit` 的孔径路径自己重放几何、没走 `super.submit(...)`，
@@ -149,7 +163,7 @@
   （三参重载保留，枪包注册面不变）；瞄具侧传 `true`、枪身侧显式 `false`。
   失败语义：掩码不可用 ⇒ 回退 vanilla `submitText`，不丢字、不画错，最差回到「贴边溢出」。
 
-### 同步的其余实质改动
+#### 同步的其余实质改动
 
 - **检视打断动画两修**（姊妹线 `1c765c6`，逐字移植 26.2 `4aa8d7b` + `12d6f3c`；本线三份动画文件
   与姊妹线改前基线逐字节相同，移植为零差异）：`stopAnimation(track)` 连坐停在 `transitionTo` 上的
@@ -169,7 +183,7 @@
 - **lang 补齐**（对应姊妹线「恢复完整 lang」）：补 `attribute.name.tacz.bullet_resistance` 与
   `commands.tacz.arguments.enum.invalid` 两条（前者被 `ModAttributes` 实际引用，此前属性名显示原始键）。
 
-### 明确不搬（对照姊妹线，理由见 records 文档）
+#### 明确不搬（对照姊妹线，理由见 records 文档）
 
 - 全部 `ScopePip*`（PIP 二次渲染/重渲染/时域隔离/显示阈/倍率渐变/窄遍守卫等）：本线 1.21.11 无 PIP；
 - 全部 meshloader / TML GPU / poly_mesh 项（含法线矩阵读取时刻、纹理懒加载、EMISSIVE 降级等）；
@@ -179,8 +193,6 @@
 - 掩码周期帧戳（`8d28e57` 的 `onClientFrameStart`/`hasMaskCycleThisFrame`）：其消费者是 mesh 手部
   裁剪闸与 PIP 合成闸，本线均无；镜内文字按姊妹线口径保留跨帧 `isMaskCycleValid` 语义；
 - Iris 二次渲染的 Sodium/Voxy 通道（Fabric 专属 mod）；姊妹线 `.github/workflows` 与 CI 探针（TEMP）。
-- 版本号**未动**（仍 `1.1.8+neoforge.1.21.11.R1-hotfix`）⇒ README 无需跟改。
-
 ## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-08-27
 
 ### 长按右键的「幽灵使用」与耳鸣资源（同步姊妹项目 2026-08-27 跟进）

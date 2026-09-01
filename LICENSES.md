@@ -6,9 +6,10 @@
 
 | 组件 | 许可 |
 |---|---|
-| 本仓库代码（NeoForge 26.1.2 移植） | GPL-3.0-only |
+| 本仓库代码（NeoForge 1.21.11 移植，`1.21.11` 分支） | GPL-3.0-only |
 | 上游代码谱系 MCModderAnchor/TACZ、Sh1roCu/TACZ-Refabricated、q14433686-arch/TaCZ_Refabricated_Unofficial、MUKSC/TACZ-1.21.1 | GPL-3.0 |
 | `me/xjqsh/lrtactical` 内置层（109 个源文件；仅代码，不打包原作美术/音频） | GPL-3.0 ← [`LesRaisins-Studios/LesRaisins-Tactical-Equipements`](https://github.com/LesRaisins-Studios/LesRaisins-Tactical-Equipements)（Programmer: xjqsh，Artist: LeComte） |
+| `cn/sh1rocu/tacz/compat/meshloader` 内置 TacZ Mesh Loader 子集（poly_mesh 解析 / collector 渲染 / GPU 烘焙，20 个源文件（另有挂接 mixin 与配置接线散落在 com.tacz 包）；仅代码，不打包原作美术/音频） | GPL-3.0 ← [`VellEagle/TacZMeshLoader`](https://github.com/VellEagle/TacZMeshLoader) `1.21.1_fabric` v0.1.7（**不是**官方 TaCZ 附属项目） |
 | `com/maydaymemory/mae`（`Pose` / `DummyPose`） | Mayday Animation Engine（`com.maydaymemory:mae`，SimpleBedrockModel 的编译期依赖）的**编译期桩**：一个空接口 + 一个 dummy 实现，不含 MAE 任何代码；仅在缺少 MAE 的编译环境中替代其 `Pose` 类型 |
 | 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0（**非商业**、禁止演绎；随 jar 分发的默认枪包受此约束，故本 mod jar 整体按非商业再分发处理，与原版 TaCZ 同一约束） |
 | 本仓库品牌图标 `icon.png` / `logo.png` | 本项目原创（`scripts/generate_branding.py`），**不是**官方 TaCZ 美术的衍生品 |
@@ -17,10 +18,10 @@
 
 | 组件 | 用途 | 许可 / 来源 |
 |---|---|---|
-| NeoForge `26.1.2.97` | 模组加载器 | LGPL-2.1（NeoForged） |
-| Minecraft 26.1.2 | 游戏本体（开发依赖，不 redistributable） | Mojang EULA |
+| NeoForge `21.11.45` | 模组加载器 | LGPL-2.1（NeoForged） |
+| Minecraft 1.21.11 | 游戏本体（开发依赖，不 redistributable） | Mojang EULA |
 | `net.neoforged.moddev` 2.0.144（ModDevGradle） | 构建插件 | NeoForged |
-| MDK-26.1.2-ModDevGradle | 构建脚本模板 | NeoForge MDK template license |
+| MDK-1.21.11-ModDevGradle | 构建脚本模板 | NeoForge MDK template license |
 | Gradle 9.2.1 Wrapper | 构建 | Apache-2.0 |
 
 ## 运行时 Jar-in-Jar（必须打进发布 jar）
