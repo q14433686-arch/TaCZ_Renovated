@@ -20,10 +20,36 @@ public final class IrisCompat {
     }
 
     public static void initCompat() {
+        // 无版本分派：1.21.11 线的 NeoForge Iris 只有 1.10.x 一代，
+        // 无需姊妹线（Fabric）的 legacy/newly 双桥。
     }
 
+    /**
+     * @return whether Iris is currently rendering its shadow pass.
+     *
+     * <p><b>不是可选项——它是 mesh 世界 GPU 路径在光影下的生死闸。</b>本线移植时此方法
+     * 是 {@code return false} 空壳（谱系缺陷，26.1.2 分支同源），造成：阴影 pass 的
+     * {@code renderAllFeatures} 调用点会消费世界 GPU 表（Iris 1.10.x 的阴影 pass 经
+     * {@code MixinGlCommandEncoder} 拦截 {@code glBindFramebuffer} 切 FBO，不经过
+     * {@code outputColorTextureOverride}，故 drawList 的 override 闸挡不住它），
+     * {@code worldConsumedFrame} 被提前标记 ⇒ 主画面那遍跳过 ⇒ 光影下第三人称/掉落物/
+     * 展示台的高模枪只画进了阴影贴图，主画面不可见。姊妹 1.21.11 线的 legacy/newly
+     * 双桥均反射本方法，语义权威。</p>
+     *
+     * <p>证据：Iris 上游 `1.21.11-unobf` 分支 common 模块（NeoForge 构建同源）确有
+     * {@code net.irisshaders.iris.shadows.ShadowRenderingState#areShadowsCurrentlyBeingRendered()}
+     * （gh api 直读源码，2026-09-02）。反射失败安全回退 false。</p>
+     */
     public static boolean isRenderShadow() {
-        return false;
+        if (!ModList.get().isLoaded(CompatRegistry.IRIS)) {
+            return false;
+        }
+        try {
+            Class<?> clazz = Class.forName("net.irisshaders.iris.shadows.ShadowRenderingState");
+            return (Boolean) clazz.getMethod("areShadowsCurrentlyBeingRendered").invoke(null);
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     public static boolean isUsingRenderPack() {

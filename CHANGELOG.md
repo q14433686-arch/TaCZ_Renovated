@@ -51,6 +51,22 @@
   额度耗尽时 log-once INFO（`[TacZMeshLoader] World bake budget ...`），溢出枪当帧回 collector。
   Cloth 面板条目 + en/zh 语言键同步。
 
+### 2026-09-02 第三轮修正（用户报告：光影下 VBO 世界路径枪体不可见）
+
+- 用户报告：开光影且 `MeshGpuWorldUnderShaders` 默认开后，第三人称 / 掉落物 / 展示台的
+  高模 mesh 枪**不显示**。
+- 根因：本线 `IrisCompat#isRenderShadow` 是 `return false` 空壳（谱系缺陷，本仓 26.1.2
+  分支同源；姊妹 1.21.11 线的 legacy/newly 双桥均反射
+  `ShadowRenderingState.areShadowsCurrentlyBeingRendered()`）。Iris 1.10.x 的阴影 pass
+  经 `MixinGlCommandEncoder` 拦截 `glBindFramebuffer` 切 FBO（不走
+  `outputColorTextureOverride`），于是阴影 pass 的 `renderAllFeatures` 调用点把世界 GPU
+  表消费进阴影贴图并标记 `worldConsumedFrame` ⇒ 主画面那遍跳过 ⇒ 主画面不可见。
+- 修法：`isRenderShadow()` 按姊妹线同款反射实现（证据：Iris 上游 `1.21.11-unobf` 分支
+  common 模块直读源码）。同步受益：`PolyRenderPolicy` 的阴影提交闸、`ShellRender` /
+  `MuzzleFlashRender` 的阴影闸一并恢复真实信号。
+- 证据级别：静态（读码 + gh api 直读 Iris 源码）；实机未复测，待实机清单见
+  `docs/MESH_LOADER.md` §7。
+
 #### 本轮的核对结论（其余项）
 
 - 法线矩阵读取时刻修复（MV 栈 per-draw 压/弹）：1.21.11 线 `014f4b0` 已带、26.1.2 线
