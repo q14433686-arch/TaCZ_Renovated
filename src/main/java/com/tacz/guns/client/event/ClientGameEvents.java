@@ -74,6 +74,9 @@ public final class ClientGameEvents {
         RefitTransform.tickInterpolation(event);
         TickAnimationEvent.tickAnimation(event);
         RenderCrosshairEvent.onRenderTick(event);
+        // TacZ Mesh Loader：光影开关翻转检测 + 配置层 shadersActive 缓存（Fabric 版挂在
+        // RenderTickEvent START 上，本线等价挂在 NeoForge RenderFrameEvent.Pre）。
+        cn.sh1rocu.tacz.compat.meshloader.render.ShaderStateTracker.onClientFrameStart();
     }
 
     @SubscribeEvent

@@ -14,11 +14,13 @@
   "client": [
     "client.AbstractButtonMixin",
     "client.CameraMixin",
+    "client.FeatureRenderDispatcherMixin",
     "client.GameRendererMixin",
     "client.GlCommandEncoderScopeDepthCopyMixin",
     "client.ItemInHandLayerMixin",
     "client.ItemInHandRendererMixin",
     "client.LanguageMixin",
+    "client.LevelRendererAllChangedScopePassMixin",
     "client.LocalPlayerMixin",
     "client.MinecraftUseRestartMixin",
     "client.MouseHandlerMixin",

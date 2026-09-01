@@ -7,6 +7,7 @@ import com.tacz.guns.client.model.bedrock.BedrockPart;
 import com.tacz.guns.client.model.bedrock.ModelRendererWrapper;
 import com.tacz.guns.client.model.functional.BeamRenderer;
 import com.tacz.guns.client.render.scope.IReticleRenderer;
+import com.tacz.guns.client.render.scope.ScopePipRenderState;
 import com.tacz.guns.client.render.scope.ReticleRendererRegistry;
 import com.tacz.guns.client.render.scope.ScopeFinalOverlayState;
 import com.tacz.guns.client.render.scope.ScopeLateReticleState;
@@ -625,9 +626,15 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
                 && texture != null
                 && !ocularSnapshots.isEmpty()
                 && !bodySnapshot.isEmpty();
+        // Step 3 (real PIP lens) must sit below the reticle and physical ocular shade, otherwise the
+        // lens picture overwrites both. When the PIP composite is active this frame we therefore run
+        // the reticle/rim through the post-composite overlay even without Iris; normal vanilla stays
+        // in its established immediate solid-pass order.
+        boolean pipDefersReticle = ScopePipRenderState.shouldDeferReticleOverlay();
         boolean deferReticleToIrisFinalOverlay = orderedScopeSequence
-                && IrisCompat.isRenderingSolidHandPass()
-                && IrisCompat.supportsFinalScopeOverlay();
+                && ((IrisCompat.isRenderingSolidHandPass()
+                        && IrisCompat.supportsFinalScopeOverlay())
+                        || pipDefersReticle);
         // Keep the R8/R9 hand-translucent path as a fallback for Iris versions whose final hook
         // was not bytecode-audited. The verified 1.10.7 path goes past final composite instead.
         boolean deferReticleToIrisTranslucent = orderedScopeSequence

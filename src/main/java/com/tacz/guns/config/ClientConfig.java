@@ -13,6 +13,7 @@ public class ClientConfig {
         ResourceConfig.init(builder);
         SoundConfig.init(builder);
         ZoomConfig.init(builder);
+        cn.sh1rocu.tacz.compat.meshloader.config.MeshyConfig.init(builder);
         return builder.build();
     }
 }
