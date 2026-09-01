@@ -1,12 +1,13 @@
 # TaCZ: Renovated 26.2 兼容矩阵
 
-适用构建：`1.1.8+neoforge.26.2.R1-hotfix`
+适用构建：`1.1.8+neoforge.26.2.R2`（**R2 期快照**；TML / PIP 的专项说明见根 README §2 与
+[`docs/MESH_LOADER.md`](docs/MESH_LOADER.md)）
 
 游戏 / 加载器：Minecraft 26.2 / NeoForge 26.2.0.64  
-核验日期：2026-08-22
+核验日期：2026-08-22（2026-09-02 补：Iris 行实机反馈）
 
 > **状态纪律**：下表的“API 已核”表示发布文件、坐标与源码签名已核对，**不等于游戏内
-> PASS**。旧 L0-L3 回执覆盖 LR 合入前的 26.2 核心候选；当前 LR-integrated R1 必须
+> PASS**。旧 L0-L3 回执覆盖 LR 合入前的 26.2 核心候选；当前 R2 候选必须
 > 重跑构建、专服与多人。26.1.2 的 LR 单机/专服 PASS 也不自动继承到 26.2。
 
 ## 内置 LRTactical
@@ -32,7 +33,7 @@
 | JEI | `30.24.0.176`，`mezz.jei:jei-26.2-neoforge:30.24.0.176` | 工作台、配件/弹药查询、subtype | 30.24 source/API 已核；未实机 |
 | REI | `26.2.820` NeoForge，Curse file `8271756` | 工作台、配件/弹药查询、subtype、同步后 reload | source/API 已核；未实机 |
 | Architectury API | `21.0.2` NeoForge | REI 26.2.820 的编译/运行依赖 | 按 REI 26.2 source 原始 pin |
-| Iris | `1.11.2` NeoForge 26.2 | 反射 API、HAND/HAND_TRANSLUCENT、shadow、linked-fragment mask bridge | OpenGL source/API 已核；未实机 |
+| Iris | `1.11.2` NeoForge 26.2 | 反射 API、HAND/HAND_TRANSLUCENT、shadow、linked-fragment mask bridge | OpenGL source/API 已核；实机反馈 2026-09-02（用户，Iris 1.11.2 + ComplementaryUnbound r5.8.1）：PIP 二次渲染与目镜掩码孔径裁切行为确认（两项均非逐条矩阵 PASS） |
 | Carry On | `2.11.0` NeoForge 26.2 | 多格工作台 root/companion、放置预检、携带模型 BlockId | 2.11.0 descriptor 已核；未实机 |
 | First-person Model | **无 NeoForge 26.2 文件**；2.7.2 只有 Fabric 26.2，NeoForge 止于 26.1.2 | 反射 ActivationHandler 已按 2.7.2 API 预留 | 当前不列为可安装兼容；桥保持 dormant |
 | Not Enough Animations | **无 NeoForge 26.2 文件**；1.12.4 的 NeoForge 文件止于 26.1.2 | 直接手臂提交 guard 已按 1.12.4 API 预留 | 当前不列为可安装兼容；桥保持 dormant |
@@ -93,7 +94,9 @@
 | 后端 | 状态 |
 |---|---|
 | OpenGL（无 Iris） | 阶段边界离屏 ocular mask 已接入；GPU 未实测 |
-| OpenGL + Iris 1.11.2 | HAND pipeline 分类、linked-fragment dormant branch 与逐 draw mask uniform bridge 已接入；GPU 未实测。本轮两处改动：① mask uniform/采样器改为 `trySetup` RETURN + `iris$setupState` RETURN 双写入点，不再依赖与 Iris 的 mixin 应用顺序；② 凸包孔径填充改为斜率空间、不再读投影 UBO（旧实现开光影后必抛 `Buffer is not readable` 而每帧回退描摹）。**两项均待复测** |
+| OpenGL + Iris 1.11.2 | HAND pipeline 分类、linked-fragment dormant branch 与逐 draw mask uniform bridge 已接入；GPU 未实测。本轮两处改动：① mask uniform/采样器改为 `trySetup` RETURN + `iris$setupState` RETURN 双写入点，不再依赖与 Iris 的 mixin 应用顺序；② 凸包孔径填充改为斜率空间、不再读投影 UBO（旧实现开光影后必抛 `Buffer is not readable` 而每帧回退描摹）。**复测**：2026-09-02
+用户实机（Iris 1.11.2 + ComplementaryUnbound r5.8.1）开镜与 PIP 二次渲染行为确认；
+逐条矩阵未跑 |
 | Vulkan | `earlyWindowControl=false` 后用户启动 PASS；低倍准星 containment 报告 FAIL，已拆分 reticle-only/full-viewmodel mask 修复，当前 HEAD 待复测 |
 | 其他 shader replacement / Aperture | 没有已核 bridge 时走普通未掩码回退；未作为硬依赖接入 |
 

@@ -9,7 +9,9 @@ import com.tacz.guns.client.model.functional.BeamRenderer;
 import com.tacz.guns.client.render.scope.IReticleRenderer;
 import com.tacz.guns.client.render.scope.ReticleRendererRegistry;
 import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
+import com.tacz.guns.client.render.scope.ScopeFinalRingOverlay;
 import com.tacz.guns.client.render.scope.ScopeMaskGeometry;
+import com.tacz.guns.client.render.scope.ScopePipRenderer;
 import com.tacz.guns.client.render.scope.ScopeMaskTextureHandle;
 import com.tacz.guns.compat.iris.IrisCompat;
 import com.tacz.guns.client.render.scope.ScopeNodeSet;
@@ -481,11 +483,12 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
     public void setTextShowList(Map<String, TextShow> textShowList) {
         textShowList.forEach((name, textShow) -> this.setFunctionalRenderer(name,
                 bedrockPart -> {
-                    // 未开镜（或刚开始开镜）时不提交，避免文字溢出到镜孔之外。
+                    // 未开镜（或刚开始开镜）时不提交，见 javadoc「门禁为什么还留着」。
                     if (currentAimingProgress() <= TEXT_SHOW_AIM_START) {
                         return null;
                     }
-                    return new TextShowRender(this, textShow, currentGunItem);
+                    // 第四个参数 = 走目镜掩码裁剪管线（镜内文字）。
+                    return new TextShowRender(this, textShow, currentGunItem, true);
                 }));
     }
 
@@ -670,7 +673,7 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
         // 重画物理目镜框（先于下面的准星提交，等价于邻链 ring=order 1 / reticle=order 2 的语义；
         // 本架构按提交顺序消费，且目镜框是 opaque cutout，深度测试下顺序本来就不敏感）。
         if (detachOcularRing) {
-            submitOcularRingPlain(poseStack, collector, renderType, transformType, light, overlay);
+            submitOcularRingPlain(poseStack, collector, renderType, texture, transformType, light, overlay);
         }
 
         if (transformType != null && transformType.firstPerson() && !reticleNodes.isEmpty()) {
@@ -720,8 +723,8 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
      *                   的裁剪分支），即该配件的正常材质——上游 stencilFunc(ALWAYS) 的等价物。
      */
     private void submitOcularRingPlain(PoseStack poseStack, SubmitNodeCollector collector,
-                                       RenderType renderType, ItemDisplayContext transformType,
-                                       int light, int overlay) {
+                                       RenderType renderType, @Nullable Identifier texture,
+                                       ItemDisplayContext transformType, int light, int overlay) {
         if (ocularRingPart == null) {
             return;
         }
@@ -740,8 +743,17 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
                 com.tacz.guns.client.renderer.snapshot.BedrockRenderSnapshot.captureSubtree(
                         ocularRingPart, ringPose, transformType, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
         if (!ringSnapshot.isEmpty()) {
-            collector.submitCustomGeometry(new PoseStack(), renderType,
-                    (entryPose, consumer) -> ringSnapshot.write(consumer));
+            // 【遮光环最终覆盖】光影下这条分支会被镜内画中画的合成整片盖掉 ——
+            // 合成跑在 LevelRenderer#render 之后（Iris 把整个手部 pass 搬进了那里），
+            // 也就是画在手持之后；无光影时合成在阶段边界、画在手持之前，所以只有
+            // 光影路径需要排队。判定用 wantsIrisComposite()（纯查询，不看本帧合成
+            // 有没有真的跑）：它为真 ⇒ 合成一定在手持之后 ⇒ 必须延后。
+            if (ScopePipRenderer.wantsIrisComposite()) {
+                ScopeFinalRingOverlay.queue(ringSnapshot, texture);
+            } else {
+                collector.submitCustomGeometry(new PoseStack(), renderType,
+                        (entryPose, consumer) -> ringSnapshot.write(consumer));
+            }
         }
     }
 

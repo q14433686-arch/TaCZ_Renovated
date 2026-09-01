@@ -154,11 +154,53 @@ public final class ScopeMaskRenderer {
      * 凸包只要吃进一个这样的点就会撑满整个屏幕，掩码于是「全屏为真」，
      * 视模整块消失 —— 姊妹仓 26.2 在 NDC 空间用 {@code NDC_SANITY_LIMIT = 2.0} 挡的就是这个。
      *
-     * <p>本仓改在斜率空间做凸包（见 {@link #writeHullFill}），所以阈值也换到斜率空间。
-     * 合法目镜投影的斜率上界 ≈ {@code aspect * tan(fov/2)}（最宽 FOV + 最宽屏也就 ~3），
-     * 而近平面伪影是 100 以上，取 16 两边都留足余量。</p>
+     * <p>本仓改在斜率空间做凸包（见 {@link #writeHullFill}），所以阈值也换到斜率空间，
+     * 而<b>换的时候换算错了量级</b>，这正是「MARK5 开镜渐开超过目镜」的根因：</p>
+     *
+     * <pre>
+     * NDC.x = P00 * slopeX        P00 = (1 / tan(fovY / 2)) / aspect
+     * NDC.y = P11 * slopeY        P11 =  1 / tan(fovY / 2)
+     * </pre>
+     *
+     * <p>70° 默认 FOV、16:9 下 {@code P00 ≈ 0.80}、{@code P11 ≈ 1.43}。于是
+     * 「屏幕上刚好在视口边缘」的斜率只有 {@code |slope| ≈ 0.7（y）～ 1.25（x）}；
+     * 阈值 16 等价于 {@code |NDC| ≈ 13（x）～ 23（y）}，也就是<b>十几块屏幕之外</b>
+     * 的点照样被收进凸包，而姊妹仓 26.2 的 {@code NDC_SANITY_LIMIT = 2.0} 只允许
+     * 一块屏幕多一点 —— 两边差 <b>6～11 倍</b>，开镜倍率越高差得越多（变焦会放大 P）。
+     * 这一段「NDC 2.0 之外、斜率 16 之内」的点是本仓独有的，凸包被它们撑大，
+     * 掩码于是大于真实通光孔径，开镜渐开时长满的那一下就越过了目镜。</p>
+     *
+     * <p>取 <b>3.0</b>：对应 70° FOV 下约 2.4 倍视口高度，量级与她的 2.0 NDC 相当，
+     * 同时给「目镜被推到眼前、投影本就很大」的开镜过渡留出余量。
+     * 近平面伪影（斜率 100 以上）依然被这一层直接挡掉。
+     * 变焦（P 变大）时这一层会相对变松，由 {@link #applyOutlierTrim} 那层自适应兜住。</p>
      */
-    private static final float SLOPE_SANITY_LIMIT = 16.0f;
+    private static final float SLOPE_SANITY_LIMIT = 3.0f;
+
+    /**
+     * 【自适应离群剔除 · 半径】丢弃离稳健中心超过 {@code 中位数半径 × 本系数} 的点。
+     *
+     * <p>为什么还需要这一层：绝对阈值那一层是<b>投影相关</b>的 —— 开镜变焦会把 P 放大
+     * 数倍，同一个 {@code SLOPE_SANITY_LIMIT} 换算到 NDC 就松了同样的倍数。而「离群」
+     * 本质是<b>相对</b>概念：目镜玻璃自己占着绝大多数点，中位数半径就代表孔径本身，
+     * 真正不属于孔径的零件（筒壁、压圈、挂到目镜节点下的其它几何）必然落在数倍之外。
+     * 这一层不依赖投影，因此在任何 FOV / 任何倍率下尺度一致。</p>
+     *
+     * <p>系数取 5.0 是刻意保守：目镜玻璃自身的外缘最多也就是中位数半径的 ~1.5 倍，
+     * 5 倍留了三倍以上的余量，宁可漏剔（退化为旧行为）也不能把孔径本身削掉。
+     * 剔除到不足 3 点时 {@code writeHullFill} 返回 false，回退逐立方体描摹 —— 那是
+     * 已经验证过的形态，不会画错，只是板条目镜会留缝。</p>
+     */
+    private static final float RADIUS_OUTLIER_FACTOR = 5.0f;
+
+    /**
+     * 【自适应离群剔除 · 深度】丢弃视深度小于 {@code 中位数深度 × 本系数} 的点。
+     *
+     * <p>近平面伪影的判据不是「斜率大」而是「深度趋零」：同一个目镜上，玻璃片在
+     * 0.2 格处，某个擦过近平面的顶点在 0.002 格处 —— 后者的斜率会被放大上百倍。
+     * 按深度中位数做相对判据可以直接点名这一类，且同样与投影无关。</p>
+     */
+    private static final float DEPTH_OUTLIER_FRACTION = 0.25f;
 
     /**
      * 凸包扇面写入时使用的视深度下限。
@@ -190,7 +232,100 @@ public final class ScopeMaskRenderer {
      */
     private static boolean inHandPass = false;
 
+    // ------------------------------------------------------------------
+    // 帧状态：镜内画中画（ScopePipRenderer）要读的四样东西
+    // ------------------------------------------------------------------
+
+    /** 本帧掩码是否已成功画进 target（合成阶段跑在掩码之后，看这个）。 */
+    private static boolean maskDrawnThisFrame = false;
+    /**
+     * 上一帧的 {@link #maskDrawnThisFrame} 快照。
+     *
+     * <p>为什么需要它：掩码画在手部渲染里，而两个消费者跑在那之前 ——
+     * FOV 事件在 {@code extract} 阶段、镜内画面的抓取在 {@code renderLevel} 里。
+     * 它们要问的是「上一帧有没有掩码」，读当帧的值只会恒得 false。</p>
+     */
+    private static boolean maskDrawnLastFrame = false;
+    /**
+     * 「镜内画面本帧已经合成过」的一次性闸门。
+     *
+     * <p>Iris 的 {@code HandRenderer} 一帧调用两次 {@code renderAllFeatures}
+     * （solid 与 translucent），合成若两次都跑，第二次会把 solid 阶段已经画进
+     * 孔径的东西（蚀刻准星等）整片覆盖掉。只允许本帧第一次手部 pass 合成。</p>
+     */
+    private static boolean compositedThisFrame = false;
+    /**
+     * 【绘制时快照 · 2026-09-02】本帧掩码绘制时「允许裁视模」是否为真。
+     *
+     * <p>给<b>executeSolid 之后</b>才绘制的消费者（GPU mesh 手部表）用：那时
+     * 阶段边界已经把 {@code ScopeMaskGeometry} 消费清空（见
+     * {@link #renderAtPhaseBoundary} 的 finally），活几何永远查不到 —— 读这个
+     * 在 {@code drawMask} 成功路径上、清空之前记下的快照。每帧
+     * {@link #beginFrame()} 复位。</p>
+     */
+    private static boolean viewmodelClipMaskThisFrame = false;
+
+    /**
+     * 【2026-08-30 移除】这里曾经放「目镜斜率包围盒 → 屏幕 NDC」的换算与状态，
+     * 供镜内画中画开一道硬件剪裁（scissor）。两轮实机都证明这个盒子算不对：
+     * ① 用 {@code renderItemInHand} 第三参数 ⇒ 那是视图矩阵，盒子随朝向胀缩；
+     * ② 改用 {@code CameraRenderState#projectionMatrix} ⇒ 那是世界投影，
+     *    比手持那一遍更宽，盒子恒定偏小（PIP 变成恒矩形）。
+     * 26.2 的 {@code RenderSystem} 没有 {@code getProjectionMatrix()}，
+     * 手持那一遍的投影在 CPU 侧拿不到（投影 UBO 读回在有光影时必抛），
+     * 因此这道剪裁<b>无法被正确计算</b>，整体移除。合成只剩着色器里的软掩码约束 ——
+     * 与姊妹分支一致。想把保险加回来，唯一正确的做法是在<b>着色器里</b>用
+     * 环境 Projection uniform 做斜率空间判定（不需要 CPU 侧知道投影），
+     * 见 docs/records/REFAB_SCOPE_PIP_SYNC_20260830.md §5.5。
+     */
+
     private ScopeMaskRenderer() {
+    }
+
+    /**
+     * 每帧开头调用一次，快照上一帧结果并把本帧归零。
+     *
+     * <p>接在 {@code GameRenderer#extract} 的 HEAD 上 —— 那是
+     * {@code Minecraft#runTick} 里 <b>extract → render</b> 这条顺序的最前面，
+     * 于是本帧所有消费者（FOV 事件、镜内抓取、合成）看到的都是同一份、定义明确的状态。
+     *
+     * <p>刻意<b>不</b>放在手部 pass 里：Iris 一帧有两次手部 pass，放那儿会被第二次抹掉。
+     */
+    public static void beginFrame() {
+        maskDrawnLastFrame = maskDrawnThisFrame;
+        maskDrawnThisFrame = false;
+        viewmodelClipMaskThisFrame = false;
+        compositedThisFrame = false;
+    }
+
+    /** 本帧掩码是否已成功画进 target（供合成阶段判定 —— 它跑在掩码之后）。 */
+    public static boolean hasMaskThisFrame() {
+        return maskDrawnThisFrame;
+    }
+
+    /**
+     * 「本帧成功画过<b>允许裁视模</b>的掩码」（帧快照）。
+     *
+     * <p>供 executeSolid 之后才绘制的消费者（GPU mesh 手部表）做裁剪判定：
+     * 那时 {@link ScopeMaskGeometry} 已被本帧阶段边界消费清空，活几何恒空，
+     * 只能看本快照（详见 {@link #viewmodelClipMaskThisFrame} 注释）。</p>
+     */
+    public static boolean hasViewmodelClipMaskThisFrame() {
+        return maskDrawnThisFrame && viewmodelClipMaskThisFrame;
+    }
+
+    /** 上一帧是否画出过掩码（供 FOV 让位与镜内抓取判定 —— 它们跑在掩码之前）。 */
+    public static boolean hadMaskLastFrame() {
+        return maskDrawnLastFrame;
+    }
+
+    /** @return true 表示本次调用取得了合成资格（每帧只有第一次调用会返回 true） */
+    public static boolean claimCompositeSlot() {
+        if (compositedThisFrame) {
+            return false;
+        }
+        compositedThisFrame = true;
+        return true;
     }
 
     /** Registers the off-screen mask pipeline through NeoForge's 26.2 mod-bus API. */
@@ -246,6 +381,9 @@ public final class ScopeMaskRenderer {
                 return;
             }
             drawMask(target);
+            // 【绘制时快照】在 finally 清空之前记下：executeSolid 之后才画的
+            // mesh 手部表只能靠这个快照知道「本帧画过允许裁视模的掩码」。
+            viewmodelClipMaskThisFrame = ScopeMaskGeometry.isViewmodelClipEnabled();
         } catch (Exception e) {
             failed = true;
             GunMod.LOGGER.error("[TACZ Scope] Failed to render ocular mask; mask disabled.", e);
@@ -321,6 +459,9 @@ public final class ScopeMaskRenderer {
                     // 我们的顶点/索引都是从头开始的单批，所以 firstIndex 与 baseVertex 都是 0。
                     pass.drawIndexed(draw.indexCount(), 1, 0, 0, 0);
                 }
+                // 走到这里 pass 已经关闭、绘制已提交 —— 掩码 target 里确实有东西了。
+                // 镜内画中画的合成阶段就等这一位。
+                maskDrawnThisFrame = true;
                 if (!loggedSuccess) {
                     loggedSuccess = true;
                     // 凸包 / 描摹 计数是判断「掩码到底是孔径填充还是只剩板条」的唯一线索：
@@ -475,13 +616,36 @@ public final class ScopeMaskRenderer {
                             || Math.abs(slopeX) > SLOPE_SANITY_LIMIT || Math.abs(slopeY) > SLOPE_SANITY_LIMIT) {
                         continue;
                     }
-                    pts.add(new float[]{slopeX, slopeY});
+                    // 第三位存视深度：自适应离群剔除要用（见 applyOutlierTrim）。
+                    pts.add(new float[]{slopeX, slopeY, depth});
                     depthSum += depth;
                     depthCount++;
                 }
             }
         }
         if (pts.size() < 3 || depthCount == 0) {
+            return false;
+        }
+        int beforeTrim = pts.size();
+        float[] centerAndRadii = applyOutlierTrim(pts);
+        if (centerAndRadii != null && loggedHullStats()) {
+            // 判读口径：kept 明显小于 total ⇒ 目镜节点下挂着不属于孔径的几何；
+            // maxRadius/medianRadius 接近 1 ⇒ 剔除后剩下的就是孔径本身，凸包不会外扩。
+            GunMod.LOGGER.info("[TACZ Scope] Ocular hull: kept {}/{} points, medianRadius={}, maxRadius={}, "
+                            + "medianDepth={}.",
+                    pts.size(), beforeTrim, fmt(centerAndRadii[2]), fmt(centerAndRadii[3]),
+                    fmt(centerAndRadii[4]));
+        }
+        if (pts.size() < 3) {
+            return false;
+        }
+        depthSum = 0.0f;
+        depthCount = 0;
+        for (float[] p : pts) {
+            depthSum += p[2];
+            depthCount++;
+        }
+        if (depthCount == 0) {
             return false;
         }
         // Andrew 单调链凸包（输入先按 x、再按 y 排序去重）
@@ -531,6 +695,115 @@ public final class ScopeMaskRenderer {
             emitSlopeAsQuad(builder, depth, p0, hull.get(i), hull.get(i + 1));
         }
         return true;
+    }
+
+    /**
+     * 【自适应离群剔除】按<b>相对</b>判据丢掉不属于通光孔径的点。
+     *
+     * <h2>为什么必须有这一层</h2>
+     * 绝对阈值 {@link #SLOPE_SANITY_LIMIT} 是投影<b>相关</b>的：斜率 → NDC 要乘 P，
+     * 而 P 随 FOV 与开镜倍率变化。同一个阈值在腰射与 8 倍变焦下代表的实际屏幕范围
+     * 差好几倍，不可能用一个常数同时贴住姊妹仓 {@code NDC_SANITY_LIMIT = 2.0} 的语义。
+     * 这一层改用<b>相对</b>判据（相对中位数半径、相对中位数深度），与投影无关，
+     * 因此在任何 FOV / 倍率下尺度一致 —— 它才是「孔径有多大」这件事的稳态判据。
+     *
+     * <h2>为什么中位数而不是均值</h2>
+     * 均值会被离群点自己拖走（正是要剔除的东西），中位数不会。目镜玻璃占着绝大多数
+     * 顶点，它的中位数半径就是孔径本身；不属于孔径的零件（筒壁 / 压圈 / 挂到目镜
+     * 节点下的其它几何）必然落在数倍之外。稳健统计在这里是唯一正确的选择。
+     *
+     * @param pts 斜率空间点集，第三位是视深度；<b>就地</b>剔除
+     * @return {@code {centerX, centerY, medianRadius, maxRadius, medianDepth}}；
+     *         点数不足无法统计时返回 {@code null}（调用方保持原样）
+     */
+    private static float[] applyOutlierTrim(java.util.List<float[]> pts) {
+        int n = pts.size();
+        if (n < 3) {
+            return null;
+        }
+        float[] xs = new float[n];
+        float[] ys = new float[n];
+        float[] depths = new float[n];
+        for (int i = 0; i < n; i++) {
+            xs[i] = pts.get(i)[0];
+            ys[i] = pts.get(i)[1];
+            depths[i] = pts.get(i)[2];
+        }
+        float cx = median(xs.clone());
+        float cy = median(ys.clone());
+        float medianDepth = median(depths.clone());
+        float[] radii = new float[n];
+        for (int i = 0; i < n; i++) {
+            float dx = xs[i] - cx;
+            float dy = ys[i] - cy;
+            radii[i] = (float) Math.sqrt((double) dx * dx + (double) dy * dy);
+        }
+        float medianRadius = median(radii.clone());
+
+        float depthFloor = DEPTH_OUTLIER_FRACTION * medianDepth;
+        float radiusCeil = RADIUS_OUTLIER_FACTOR * medianRadius;
+        // 退化保护：所有点几乎重合时中位数半径≈0，此时任何相对判据都会把点剔光。
+        // 这种情况直接不按半径剔，交给凸包自己的「不足 3 点返回 false」兜底。
+        boolean trimByRadius = medianRadius > 1.0e-6f;
+        java.util.Iterator<float[]> it = pts.iterator();
+        while (it.hasNext()) {
+            float[] p = it.next();
+            if (p[2] < depthFloor) {
+                it.remove();
+                continue;
+            }
+            if (trimByRadius) {
+                float dx = p[0] - cx;
+                float dy = p[1] - cy;
+                if (Math.sqrt((double) dx * dx + (double) dy * dy) > radiusCeil) {
+                    it.remove();
+                }
+            }
+        }
+        float maxRadius = 0.0f;
+        for (float[] p : pts) {
+            float dx = p[0] - cx;
+            float dy = p[1] - cy;
+            float r = (float) Math.sqrt((double) dx * dx + (double) dy * dy);
+            maxRadius = Math.max(maxRadius, r);
+        }
+        return new float[]{cx, cy, medianRadius, maxRadius, medianDepth};
+    }
+
+    /** 中位数（会就地排序入参的副本，调用方负责 clone）。 */
+    private static float median(float[] values) {
+        if (values.length == 0) {
+            return 0.0f;
+        }
+        java.util.Arrays.sort(values);
+        int mid = values.length / 2;
+        return values.length % 2 == 1
+                ? values[mid]
+                : (values[mid - 1] + values[mid]) * 0.5f;
+    }
+
+    /**
+     * 是否该打这一帧的凸包统计。
+     *
+     * <p>只在 {@code ScopeMaskDebug} 打开时打，且<b>每局只打一次</b> —— 这行日志是给
+     * 「掩码到底比孔径大多少」这个问题留的唯一线索（开镜每帧都打会淹掉日志）。</p>
+     */
+    private static boolean loggedHullStats;
+
+    private static boolean loggedHullStats() {
+        if (loggedHullStats) {
+            return false;
+        }
+        if (com.tacz.guns.config.client.RenderConfig.SCOPE_MASK_DEBUG == null
+                || !com.tacz.guns.config.client.RenderConfig.SCOPE_MASK_DEBUG.get()) {
+            return false;
+        }
+        loggedHullStats = true;
+        return true;
+    }
+
+    private static String fmt(float v) {
+        return String.format(java.util.Locale.ROOT, "%.4f", v);
     }
 
     /** 单调链叉积：(b−a)×(c−a) 的 z 分量。 */

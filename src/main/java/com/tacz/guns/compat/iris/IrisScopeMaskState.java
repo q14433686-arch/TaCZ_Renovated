@@ -16,9 +16,18 @@ import java.util.Map;
  * Runtime bridge for the Iris HAND shader scope-mask integration.
  *
  * <p>This class manages the per-draw uniform state for patched Iris shaders so that
- * custom scope clipping runs accurately when scope body or reticle passes are submitted,
- * while all standard passes (gun body, attachments, player hands, entities) are explicitly
- * set to {@code mode = 0} on every draw call to prevent uniform leakage and random clipping.</p>
+ * custom scope clipping runs accurately when scope body (mode 1) or reticle / in-scope text
+ * (mode 2) passes are submitted, while all standard passes (gun body, attachments, player
+ * hands, entities) are explicitly set to {@code mode = 0} on every draw call to prevent
+ * uniform leakage and random clipping.</p>
+ *
+ * <h2>新增管线必须来这里登记</h2>
+ * <p>光影下裁剪的执行者<b>不是</b>我们自己的片元着色器 —— {@code assignPipeline} 把
+ * 自定义管线归入 Iris 的 HAND 程序后，光影包的手部着色器会整条替换掉我们的 fsh。
+ * 真正干活的是 {@code IrisShaderCreatorMixin} 注入进光影着色器的
+ * {@code tacz_ScopeMaskMode} 分支，而它的开关值由本类<b>按管线 location 查表</b>给出。
+ * 于是每新增一条需要裁剪的自定义管线，都必须在本类的 {@code resolveMode} 里登一行 ——
+ * 漏登 = mode 恒 0 = 分支休眠 = 光影下该管线完全不裁，且没有任何报错。</p>
  */
 public final class IrisScopeMaskState {
     private static final String BODY_PIPELINE = "pipeline/scope_body_clipped";
@@ -26,6 +35,16 @@ public final class IrisScopeMaskState {
     private static final String FLASH_SWIRL_PIPELINE = "pipeline/scope_flash_swirl_clipped";
     private static final String RETICLE_PIPELINE = "pipeline/scope_reticle_clipped";
     private static final String RETICLE_EMISSIVE_PIPELINE = "pipeline/scope_reticle_emissive_clipped";
+    /**
+     * 【镜内文字】与准星同侧（mode 2 = discard 镜外），把文字约束在目镜圆孔内。
+     *
+     * <p>这条是后补的：{@code pipeline/scope_text_clipped} 随镜内文字一案
+     * （本仓 {@code 9d03659} 的移植）新增，当时没进这张表 —— 那时注释还写着
+     * 「光影下掩码整体禁用、走不到这里」，而那是 Iris 桥落地<b>之前</b>的旧政策。
+     * 桥落地后掩码在光影下是活的，漏登这一行的后果就是：光影下文字<b>完全不裁</b>
+     * （mode 恒 0 ⇒ 注入段的分支休眠），表现即「镜内文字穿出目镜」。
+     */
+    private static final String TEXT_PIPELINE = "pipeline/scope_text_clipped";
     private static final String MASK_SAMPLER = "ScopeMaskSampler";
     private static final String UNIFORM_MODE = "tacz_ScopeMaskMode";
     private static final String UNIFORM_SAMPLER = "tacz_ScopeMaskSampler";
@@ -113,8 +132,10 @@ public final class IrisScopeMaskState {
 
     /**
      * Updates the active Iris shader program uniforms for the current GlRenderPass draw call.
-     * If the draw call is {@code scope_body_clipped}, mode is set to 1.
-     * If the draw call is {@code scope_reticle_clipped}, mode is set to 2.
+     * If the draw call is {@code scope_body_clipped}, mode is set to 1 (discard inside the ocular).
+     * If the draw call is {@code scope_reticle_clipped} or {@code scope_text_clipped},
+     * mode is set to 2 (discard outside the ocular — reticle and in-scope text are both
+     * constrained to the aperture).
      * Otherwise (gun body, attachments, hands, entities, particles), mode is set to 0.
      */
     public static void applyToGlRenderPass(Object glRenderPass) {
@@ -216,7 +237,10 @@ public final class IrisScopeMaskState {
                     || FLASH_SWIRL_PIPELINE.equals(normalized)) {
                 return 1;
             }
-            if (RETICLE_PIPELINE.equals(normalized) || RETICLE_EMISSIVE_PIPELINE.equals(normalized)) {
+            // mode 2 = 只保留镜内（discard 镜外）。准星与镜内文字同侧：
+            // 两者都是「浮在镜内画面之上、必须被约束在圆孔内」的一族。
+            if (RETICLE_PIPELINE.equals(normalized) || RETICLE_EMISSIVE_PIPELINE.equals(normalized)
+                    || TEXT_PIPELINE.equals(normalized)) {
                 return 2;
             }
         } catch (Throwable t) {

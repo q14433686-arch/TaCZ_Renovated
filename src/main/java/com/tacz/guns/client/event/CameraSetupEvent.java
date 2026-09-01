@@ -15,6 +15,7 @@ import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.api.item.nbt.AttachmentItemDataAccessor;
 import com.tacz.guns.api.modifier.ParameterizedCachePair;
 import com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer;
+import com.tacz.guns.client.render.scope.ScopePipRenderer;
 import com.tacz.guns.client.resource.GunDisplayInstance;
 import com.tacz.guns.client.resource.index.ClientGunIndex;
 import com.tacz.guns.config.client.RenderConfig;
@@ -112,6 +113,25 @@ public class CameraSetupEvent {
             ItemStack stack = KeepingItemRenderer.getRenderer().getCurrentItem();
             if (!(stack.getItem() instanceof IGun iGun)) {
                 float fov = WORLD_FOV_DYNAMICS.update((float) event.getFOV());
+                event.setFOV(fov);
+                return;
+            }
+            // 【镜内画中画】开着 PIP 时，倍镜的放大由镜内那一遍负责，
+            // 世界 FOV 必须原样不动 —— 否则镜外也跟着被拉近，两处放大叠在一起。
+            //
+            // 判据刻意【不看开镜进度】：抬镜途中若判据翻转，世界 FOV 会毫无理由地跳一下。
+            //
+            // 每帧重新问一次、不缓存：PIP 若在运行期出错自我停用，
+            // 下一帧整屏变焦就自动接管，不会留下「既没 PIP 也没放大」的死角。
+            if (ScopePipRenderer.suppressesWorldFovZoom()) {
+                // 【倍率拆分】默认 ScopePipWorldZoomShare=0.0 时 worldZoom 恒为 1，
+                // magnificationToFov(1, fov) == fov，于是这里与「完全不动世界 FOV」
+                // 逐位等价 —— 老行为一点没变。玩家把它调大，就是在用「镜外放大一点」
+                // 换「镜内清晰一点」；合成那一侧会把 W 除掉，两边相乘恒等于总倍率。
+                float worldZoom = ScopePipRenderer.currentWorldZoom();
+                float fov = WORLD_FOV_DYNAMICS.update(worldZoom > 1.0f
+                        ? (float) MathUtil.magnificationToFov(worldZoom, event.getFOV())
+                        : (float) event.getFOV());
                 event.setFOV(fov);
                 return;
             }

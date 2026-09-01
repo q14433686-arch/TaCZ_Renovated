@@ -94,7 +94,7 @@ public final class EquipmentMod {
         NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) ->
                 event.getRelevantPlayers().forEach(LrNetworkHandler::syncToPlayer));
 
-        LOGGER.info("LRTactical built-in layer (NeoForge 26.2 R1 candidate) registered");
+        LOGGER.info("LRTactical built-in layer (NeoForge 26.2 R2 candidate) registered");
     }
 
     public static Identifier id(String path) {

@@ -33,4 +33,4 @@
 
 **本工作树是未发布 R1 候选，不是可发布成品。** 未收到明确命令时不 merge、不打 tag、
 不创建 Release、不上传 jar，也不把 CHANGELOG 的 Unreleased 改成日期版本。剩余步骤统一由
-`docs/RELEASE_CHECKLIST.md` 管理。
+`docs/records/RELEASE_CHECKLIST_26_2_R1.md` 管理。

@@ -1,0 +1,1678 @@
+diff --git a/src/main/java/com/tacz/guns/client/model/BedrockAttachmentModel.java b/src/main/java/com/tacz/guns/client/model/BedrockAttachmentModel.java
+index 904f24f..bf03a0f 100644
+--- a/src/main/java/com/tacz/guns/client/model/BedrockAttachmentModel.java
++++ b/src/main/java/com/tacz/guns/client/model/BedrockAttachmentModel.java
+@@ -7,9 +7,12 @@ import com.tacz.guns.client.model.bedrock.ModelRendererWrapper;
+ import com.tacz.guns.client.model.functional.BeamRenderer;
+ import com.tacz.guns.client.render.scope.IReticleRenderer;
+ import com.tacz.guns.client.render.scope.ReticleRendererRegistry;
++import com.tacz.guns.client.render.scope.ScopeFinalOverlayState;
++import com.tacz.guns.client.render.scope.ScopeLateReticleState;
+ import com.tacz.guns.client.render.scope.ScopeNodeSet;
+ import com.tacz.guns.client.render.scope.ScopeRenderTypes;
+ import com.tacz.guns.client.renderer.snapshot.BedrockRenderSnapshot;
++import com.tacz.guns.compat.iris.IrisCompat;
+ import com.tacz.guns.client.model.functional.TextShowRender;
+ import com.tacz.guns.client.resource.pojo.display.gun.TextShow;
+ import com.tacz.guns.client.resource.pojo.model.BedrockModelPOJO;
+@@ -60,9 +63,23 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
+     private static final int SCOPE_APERTURE_ORDER = -3;
+     private static final int SCOPE_BODY_ORDER = -2;
+     private static final int SCOPE_DEPTH_CLEANUP_ORDER = -1;
+-    /** Physical ocular rim: draw after depth cleanup so the aperture cannot punch holes in it. */
+-    private static final int SCOPE_OCULAR_RING_ORDER = 1;
+-    private static final int SCOPE_RETICLE_ORDER = 2;
++    private static final int SCOPE_RETICLE_ORDER = 1;
++    /**
++     * Physical ocular rim: after depth cleanup so the aperture cannot punch holes in it, and
++     * <b>after the reticle</b> so the opaque rim covers any reticle fragment that spills past
++     * the ocular edge.
++     * <p>
++     * 【准星溢出镜框的修复 / 2026-08-13 实机反馈】原先 rim=1、reticle=2，准星画在镜框【之后】。
++     * 准星的镜内判据用的是 {@code APERTURE_TARGET}，而它是在 order -2（body 绘制边界）就
++     * 快照好的 —— 那时 rim 根本还没画，掩码里没有镜框的任何信息，于是压在镜框上的准星像素
++     * 通过了判据，表现为准星"漏"出目镜、贴到镜框上（有无光影都会出现，因为这与深度测试
++     * 函数、与 Iris 都无关，纯粹是绘制顺序问题）。
++     * <p>
++     * 上游 1.21.1 的顺序本来就是「先准星、后 ocular_ring」，用不透明的镜框盖住溢出部分；
++     * 移植时把两者调换了。这里改回上游顺序即可，无需调整掩码 epsilon
++     * （盲目放大 epsilon 会连镜内准星一起裁掉，是更糟的做法）。
++     */
++    private static final int SCOPE_OCULAR_RING_ORDER = 2;
+ 
+     /**
+      * 发光准星节点。凡是名字以 {@code _illuminated} 结尾的，
+@@ -595,14 +612,28 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
+             }
+         }
+ 
+-        // Submit ordered aperture/body/reticle batches. The aperture uses an ordinary RenderPipeline depth
+-        // state, so it remains inside vanilla/Iris scheduling and does not alter framebuffer attachments.
+-        if (apertureActive && texture != null && !ocularSnapshots.isEmpty() && !bodySnapshot.isEmpty()) {
++        // Submit the aperture/body/cleanup sequence in HAND_SOLID. Under an active Iris shader
++        // pack, only reticle color and its physical ocular rim move to the later HAND_TRANSLUCENT
++        // boundary; all 3D snapshots below retain the original ADS/recoil/view-bob transform.
++        boolean orderedScopeSequence = apertureActive
++                && texture != null
++                && !ocularSnapshots.isEmpty()
++                && !bodySnapshot.isEmpty();
++        boolean deferReticleToIrisFinalOverlay = orderedScopeSequence
++                && IrisCompat.isRenderingSolidHandPass()
++                && IrisCompat.supportsFinalScopeOverlay();
++        // Keep the R8/R9 hand-translucent path as a fallback for Iris versions whose final hook
++        // was not bytecode-audited. The verified 1.10.7 path goes past final composite instead.
++        boolean deferReticleToIrisTranslucent = orderedScopeSequence
++                && IrisCompat.isRenderingSolidHandPass()
++                && !deferReticleToIrisFinalOverlay;
++
++        if (orderedScopeSequence) {
+             PoseStack identity = new PoseStack();
+             RenderType apertureWriter = ScopeRenderTypes.depthAperture(texture);
+             OrderedSubmitNodeCollector apertureCollector = collector.order(SCOPE_APERTURE_ORDER);
+             apertureCollector.submitCustomGeometry(identity, apertureWriter, (entryPose, consumer) -> {
+-                for (com.tacz.guns.client.renderer.snapshot.BedrockRenderSnapshot ocularSnap : ocularSnapshots) {
++                for (BedrockRenderSnapshot ocularSnap : ocularSnapshots) {
+                     ocularSnap.write(consumer);
+                 }
+             });
+@@ -626,10 +657,11 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
+                         }
+                     });
+ 
+-            // Upstream 1.21.1 renders ocular_ring with stencil disabled. In the depth fallback it
+-            // must be redrawn after cleanup: drawing it in the body batch lets the invisible ocular
+-            // kill its inner pixels, while drawing it before cleanup would lose its depth again.
+-            if (ocularRingSnapshot != null && !ocularRingSnapshot.isEmpty()) {
++            // Without Iris deferral, keep the established order: reticle(1) then opaque rim(2).
++            // With deferral, hold the rim until we know a reticle snapshot was actually queued;
++            // it will then follow that snapshot in HAND_TRANSLUCENT and still cover edge spill.
++            if (!deferReticleToIrisTranslucent && !deferReticleToIrisFinalOverlay
++                    && ocularRingSnapshot != null && !ocularRingSnapshot.isEmpty()) {
+                 collector.order(SCOPE_OCULAR_RING_ORDER).submitCustomGeometry(identity, renderType,
+                         (entryPose, consumer) -> ocularRingSnapshot.write(consumer));
+             }
+@@ -639,28 +671,68 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
+                     (entryPose, consumer) -> bodySnapshot.write(consumer));
+         }
+ 
+-        // Render Reticle
++        // Render Reticle. Iris HAND_SOLID freezes only immutable snapshots here. Iris 1.10.7's
++        // verified final-overlay path submits them after all shader-pack composites; older Iris
++        // versions retain the R8/R9 HAND_TRANSLUCENT fallback. Vanilla remains immediate.
++        int lateReticlesBefore = ScopeLateReticleState.pendingReticleCount();
++        int finalReticlesBefore = ScopeFinalOverlayState.pendingReticleCount();
+         if (transformType != null && transformType.firstPerson() && !reticleNodes.isEmpty()) {
+             ScopeNodeSet active = filterReticleByActiveView(reticleNodes);
+             IReticleRenderer reticle = ReticleRendererRegistry.select(active);
+             if (reticle != null && !active.isEmpty()) {
+                 boolean etchedOnly = active.hasEtched() && !active.hasIlluminated() && texture != null;
+-                RenderType baseReticleType = etchedOnly
+-                        ? ScopeRenderTypes.etchedReticle(texture)
+-                        : renderType;
+-                RenderType baseIlluminatedType = texture == null
+-                        ? renderType
+-                        : ScopeRenderTypes.visibleReticle(texture);
++                RenderType baseReticleType;
++                if (etchedOnly) {
++                    if (deferReticleToIrisFinalOverlay) {
++                        baseReticleType = ScopeRenderTypes.finalEtchedReticle(texture);
++                    } else if (deferReticleToIrisTranslucent) {
++                        baseReticleType = ScopeRenderTypes.lateEtchedReticle(texture);
++                    } else {
++                        baseReticleType = ScopeRenderTypes.etchedReticle(texture);
++                    }
++                } else {
++                    baseReticleType = renderType;
++                }
++                RenderType baseIlluminatedType;
++                if (texture == null) {
++                    baseIlluminatedType = renderType;
++                } else if (deferReticleToIrisFinalOverlay) {
++                    baseIlluminatedType = ScopeRenderTypes.finalVisibleReticle(texture);
++                } else if (deferReticleToIrisTranslucent) {
++                    baseIlluminatedType = ScopeRenderTypes.lateVisibleReticle(texture);
++                } else {
++                    baseIlluminatedType = ScopeRenderTypes.visibleReticle(texture);
++                }
+ 
+                 // Pure etched trees are CPU-filtered to retain thin marks and discard large blackout panels.
+-                // Both etched and illuminated reticles render after the exact world-depth restore, sample the
+-                // world-depth backup and the ocular aperture copy per pixel, and only keep fragments where
+-                // ocularDepth < worldDepth - epsilon — the true screen-space ocular mask. Surviving pixels
+-                // still write near hand depth so later water/fog/particle passes cannot cover them.
++                // Both renderers sample world/aperture depth per pixel and only retain the ocular interior.
+                 reticle.submitReticle(new IReticleRenderer.Context(
+                         poseStack, collector.order(SCOPE_RETICLE_ORDER),
+                         transformType, baseReticleType, baseIlluminatedType,
+-                        light, overlay, currentAimingProgress(), etchedOnly), active);
++                        light, overlay, currentAimingProgress(), etchedOnly,
++                        deferReticleToIrisTranslucent, deferReticleToIrisFinalOverlay), active);
++            }
++        }
++
++        if ((deferReticleToIrisTranslucent || deferReticleToIrisFinalOverlay)
++                && ocularRingSnapshot != null && !ocularRingSnapshot.isEmpty()) {
++            boolean queuedFinal = deferReticleToIrisFinalOverlay
++                    && ScopeFinalOverlayState.pendingReticleCount() > finalReticlesBefore;
++            boolean queuedLate = deferReticleToIrisTranslucent
++                    && ScopeLateReticleState.pendingReticleCount() > lateReticlesBefore;
++            if (queuedFinal) {
++                // The final rim is deliberately after final reticle geometry, preserving physical
++                // lens-edge occlusion without giving Complementary another fog/composite pass.
++                ScopeFinalOverlayState.queueOcularRing(
++                        ocularRingSnapshot, ScopeRenderTypes.finalOcularRing(texture));
++            } else if (queuedLate) {
++                ScopeLateReticleState.queueOcularRing(
++                        ocularRingSnapshot, ScopeRenderTypes.lateOcularRing(texture));
++            } else {
++                // No visible reticle this frame (for example during fade-in): preserve the normal
++                // solid-pass rim rather than forcing an otherwise unnecessary deferred pass.
++                collector.order(SCOPE_OCULAR_RING_ORDER).submitCustomGeometry(new PoseStack(), renderType,
++                        (entryPose, consumer) -> ocularRingSnapshot.write(consumer));
+             }
+         }
+ 
+diff --git a/src/main/java/com/tacz/guns/client/render/scope/EtchedReticleRenderer.java b/src/main/java/com/tacz/guns/client/render/scope/EtchedReticleRenderer.java
+index 86e9ebf..a1b5e2d 100644
+--- a/src/main/java/com/tacz/guns/client/render/scope/EtchedReticleRenderer.java
++++ b/src/main/java/com/tacz/guns/client/render/scope/EtchedReticleRenderer.java
+@@ -119,15 +119,8 @@ public final class EtchedReticleRenderer implements IReticleRenderer {
+             }
+         }
+ 
+-        if (!snapshot.isEmpty()) {
+-            // 快照矩阵已含完整入参 pose，必须从单位矩阵提交，否则根变换叠加两次。
+-            PoseStack identity = new PoseStack();
+-            ctx.collector().submitCustomGeometry(
+-                    identity, ctx.baseRenderType(),
+-                    // 遮光板剔除的规则与阈值见 ReticleMarkFilter —— 与发光准星共用同一把尺，
+-                    // 避免任何一条路径在 mask 降级时把大面外露。
+-                    (entryPose, consumer) -> snapshot.writeFiltered(
+-                            consumer, ReticleMarkFilter::isThinMark));
+-        }
++        // 快照矩阵已含完整入参 pose，必须从单位矩阵提交，否则根变换叠加两次。
++        // Iris HAND_SOLID 下则只冻结该快照，稍后在 HAND_TRANSLUCENT 写入同一份几何。
++        ScopeLateReticleState.submitReticle(ctx, snapshot, ctx.baseRenderType());
+     }
+ }
+diff --git a/src/main/java/com/tacz/guns/client/render/scope/IReticleRenderer.java b/src/main/java/com/tacz/guns/client/render/scope/IReticleRenderer.java
+index e67a1c3..2bd00d0 100644
+--- a/src/main/java/com/tacz/guns/client/render/scope/IReticleRenderer.java
++++ b/src/main/java/com/tacz/guns/client/render/scope/IReticleRenderer.java
+@@ -65,14 +65,18 @@ public interface IReticleRenderer {
+      * @param light          继承的光照
+      * @param overlay        overlay 坐标
+      * @param aimingProgress 开镜进度 0~1，可用于淡入淡出
+-     */
+-    /**
+      * @param baseRenderType 准星应当使用的 RenderType。掩码生效时它是「反向裁剪」版
+      *                       （只在目镜投影内绘制）；否则是普通的 entityCutout。
+      * @param maskActive     本帧目镜掩码是否真的生效。
+      *                       <p>{@link EtchedReticleRenderer} 必须看这个标志：
+      *                       {@code division} 里混着大块遮光板，只有在掩码把它们裁掉时
+      *                       才能安全绘制，否则会糊住屏幕（第 9 轮的教训）。</p>
++     * @param deferToIrisTranslucent true 时只冻结快照，交由
++     *                                {@link ScopeLateReticleState} 在 Iris 的较晚
++     *                                {@code HAND_TRANSLUCENT} pass 提交。
++     * @param deferToIrisFinalOverlay true 时保留同一份 3D 快照，交由
++     *                                {@link ScopeFinalOverlayState} 在 Iris final composite
++     *                                之后提交，以避开不可覆盖的屏幕空间雾。
+      */
+     record Context(PoseStack poseStack,
+                    OrderedSubmitNodeCollector collector,
+@@ -82,6 +86,8 @@ public interface IReticleRenderer {
+                    int light,
+                    int overlay,
+                    float aimingProgress,
+-                   boolean maskActive) {
++                   boolean maskActive,
++                   boolean deferToIrisTranslucent,
++                   boolean deferToIrisFinalOverlay) {
+     }
+ }
+diff --git a/src/main/java/com/tacz/guns/client/render/scope/IlluminatedReticleRenderer.java b/src/main/java/com/tacz/guns/client/render/scope/IlluminatedReticleRenderer.java
+index 827a11a..eae8449 100644
+--- a/src/main/java/com/tacz/guns/client/render/scope/IlluminatedReticleRenderer.java
++++ b/src/main/java/com/tacz/guns/client/render/scope/IlluminatedReticleRenderer.java
+@@ -138,16 +138,9 @@ public final class IlluminatedReticleRenderer implements IReticleRenderer {
+             }
+         }
+ 
+-        // 与 BedrockModel#submit 保持同一套提交惯例：
+-        // 快照里的矩阵已含完整入参 pose，因此必须从【单位矩阵】提交，否则根变换会被叠加两次。
+-        if (!snapshot.isEmpty()) {
+-            PoseStack identity = new PoseStack();
+-            ctx.collector().submitCustomGeometry(
+-                    identity, ctx.illuminatedRenderType(),
+-                    // 发光子树照样可能藏遮光板（scope_vudu 的 division_illuminated 实测含
+-                    // 100x250 整版），与蚀刻路径共用 ReticleMarkFilter 逐 cube 剔除。
+-                    (entryPose, consumer) -> snapshot.writeFiltered(
+-                            consumer, ReticleMarkFilter::isThinMark));
+-        }
++        // 与 BedrockModel#submit 保持同一套提交惯例：快照里的矩阵已含完整入参 pose，
++        // 因此必须从【单位矩阵】提交，否则根变换会被叠加两次。Iris solid pass 下仅
++        // 冻结它，ScopeLateReticleState 会在较晚的 HAND_TRANSLUCENT pass 提交。
++        ScopeLateReticleState.submitReticle(ctx, snapshot, ctx.illuminatedRenderType());
+     }
+ }
+diff --git a/src/main/java/com/tacz/guns/client/render/scope/ScopeDepthCopyState.java b/src/main/java/com/tacz/guns/client/render/scope/ScopeDepthCopyState.java
+index 777882c..66e9504 100644
+--- a/src/main/java/com/tacz/guns/client/render/scope/ScopeDepthCopyState.java
++++ b/src/main/java/com/tacz/guns/client/render/scope/ScopeDepthCopyState.java
+@@ -50,6 +50,8 @@ public final class ScopeDepthCopyState {
+ 
+     /** Enables the reticle screen-space mask branch. 0 keeps every ordinary shader dormant. */
+     public static final String MASK_MODE_UNIFORM = "tacz_ScopeMaskMode";
++    /** Marks the no-fog post-composite shader, which must use our private world-depth copy. */
++    public static final String FINAL_OVERLAY_UNIFORM = "tacz_ScopeFinalOverlay";
+     /** Vanilla mask shaders read the pre-ocular world-depth backup from this sampler. */
+     public static final String MASK_WORLD_SAMPLER_UNIFORM = "tacz_WorldDepthSampler";
+     /** All mask implementations read the post-ocular aperture depth from this sampler. */
+@@ -98,6 +100,7 @@ public final class ScopeDepthCopyState {
+     private static boolean loggedSelectiveRestoreActive;
+     private static boolean loggedMaskActiveIris;
+     private static boolean loggedMaskActiveVanilla;
++    private static boolean loggedMaskActiveFinal;
+ 
+     private static final List<OverriddenUnit> OVERRIDDEN_UNITS = new ArrayList<>(3);
+     private static boolean loggedActive;
+@@ -139,6 +142,17 @@ public final class ScopeDepthCopyState {
+                     useIrisPreHandDepth = true;
+                     backupValid = true;
+                     maskWorldValid = true;
++                    // R11 final-overlay shaders intentionally run after Iris has stopped binding
++                    // depthtex2. When a frozen final reticle exists, take one private copy now;
++                    // it is the same pre-ocular world depth but remains sampleable after final
++                    // composite. Ordinary Iris paths keep using depthtex2 without this blit.
++                    if (ScopeFinalOverlayState.hasPendingReticles()) {
++                        boolean copied = copyCurrentDepth(WORLD_TARGET, "final-overlay world depth");
++                        worldDepthIdentity = copied ? captureDepthIdentity() : null;
++                        if (!copied) {
++                            maskWorldValid = false;
++                        }
++                    }
+                     if (!loggedIrisPreHandDepth) {
+                         loggedIrisPreHandDepth = true;
+                         GunMod.LOGGER.info("[TACZ Scope] Using Iris depthtex2 as exact pre-hand depth backup.");
+@@ -184,6 +198,7 @@ public final class ScopeDepthCopyState {
+         }
+         zeroUniform(program, MODE_UNIFORM);
+         zeroUniform(program, MASK_MODE_UNIFORM);
++        zeroUniform(program, FINAL_OVERLAY_UNIFORM);
+     }
+ 
+     private static void zeroUniform(int program, String name) {
+@@ -365,25 +380,36 @@ public final class ScopeDepthCopyState {
+             // The active program has no mask branch (not a reticle shader); draw it untouched.
+             return true;
+         }
++        int finalOverlayLocation = GL20.glGetUniformLocation(program, FINAL_OVERLAY_UNIFORM);
++        boolean finalOverlay = finalOverlayLocation >= 0;
+         // The mask and restore branches share Iris' HAND shader; never let the restore flag bleed
+         // into the reticle draw.
+         zeroUniform(program, MODE_UNIFORM);
+         if (!maskValid) {
+             GL20.glUniform1i(maskLocation, 0);
++            if (finalOverlay) {
++                GL20.glUniform1i(finalOverlayLocation, 0);
++            }
+             return true;
+         }
+ 
+-        DepthInfo destination = inspectDepthAttachment();
+-        DepthIdentity currentDepth = captureDepthIdentity();
+-        if (destination == null
+-                || destination.width() != APERTURE_TARGET.width()
+-                || destination.height() != APERTURE_TARGET.height()
+-                || destination.internalFormat() != APERTURE_TARGET.internalFormat()
+-                || apertureDepthIdentity == null || !apertureDepthIdentity.equals(currentDepth)) {
+-            GL20.glUniform1i(maskLocation, 0);
+-            logFailure("scope mask target does not match the aperture copy surface (depth "
+-                    + currentDepth + " vs copied " + apertureDepthIdentity + ")");
+-            return true;
++        // Final-overlay geometry samples only the two immutable private depth copies. It does not
++        // use or write the destination depth attachment, which may be a post-composite main target
++        // rather than Iris' original hand FBO. Ordinary MASK draws retain the strict identity
++        // guard that prevents stale copies from leaking into unrelated render targets.
++        if (!finalOverlay) {
++            DepthInfo destination = inspectDepthAttachment();
++            DepthIdentity currentDepth = captureDepthIdentity();
++            if (destination == null
++                    || destination.width() != APERTURE_TARGET.width()
++                    || destination.height() != APERTURE_TARGET.height()
++                    || destination.internalFormat() != APERTURE_TARGET.internalFormat()
++                    || apertureDepthIdentity == null || !apertureDepthIdentity.equals(currentDepth)) {
++                GL20.glUniform1i(maskLocation, 0);
++                logFailure("scope mask target does not match the aperture copy surface (depth "
++                        + currentDepth + " vs copied " + apertureDepthIdentity + ")");
++                return true;
++            }
+         }
+ 
+         int apertureLocation = GL20.glGetUniformLocation(program, APERTURE_SAMPLER_UNIFORM);
+@@ -395,9 +421,9 @@ public final class ScopeDepthCopyState {
+             logFailure("reticle shader has no ocular aperture sampler");
+             return true;
+         }
+-        boolean irisWorld = useIrisPreHandDepth && irisWorldLocation >= 0;
+-        // The vanilla branch may only bind a world-depth sampler when this cycle actually blitted
+-        // the backup; otherwise texture 0 would discard every reticle pixel.
++        boolean irisWorld = !finalOverlay && useIrisPreHandDepth && irisWorldLocation >= 0;
++        // The vanilla branch and final overlay may only bind a world-depth sampler when this cycle
++        // actually owns a private copy; otherwise texture 0 would discard every reticle pixel.
+         if (!irisWorld && (worldLocation < 0 || WORLD_TARGET.texture() == 0)) {
+             GL20.glUniform1i(maskLocation, 0);
+             logFailure("reticle shader has no usable world-depth source for the ocular mask");
+@@ -414,9 +440,17 @@ public final class ScopeDepthCopyState {
+         }
+         // 1 keeps the ocular interior (reticles); 2 discards it (muzzle flash/viewmodel FX).
+         GL20.glUniform1i(maskLocation, maskMode);
++        if (finalOverlay) {
++            GL20.glUniform1i(finalOverlayLocation, 1);
++        }
+         // Log each mask flavour once: toggling a shader pack switches between them mid-session,
+-        // and a single boolean would hide the Iris path ever becoming active.
+-        if (irisWorld ? !loggedMaskActiveIris : !loggedMaskActiveVanilla) {
++        // and a single boolean would hide the Iris/final path ever becoming active.
++        if (finalOverlay) {
++            if (!loggedMaskActiveFinal) {
++                loggedMaskActiveFinal = true;
++                GunMod.LOGGER.info("[TACZ Scope] Final overlay masked by private world/aperture depth copies.");
++            }
++        } else if (irisWorld ? !loggedMaskActiveIris : !loggedMaskActiveVanilla) {
+             if (irisWorld) {
+                 loggedMaskActiveIris = true;
+             } else {
+diff --git a/src/main/java/com/tacz/guns/client/render/scope/ScopeFinalOverlayState.java b/src/main/java/com/tacz/guns/client/render/scope/ScopeFinalOverlayState.java
+new file mode 100644
+index 0000000..f5e7fce
+--- /dev/null
++++ b/src/main/java/com/tacz/guns/client/render/scope/ScopeFinalOverlayState.java
+@@ -0,0 +1,205 @@
++package com.tacz.guns.client.render.scope;
++
++import com.mojang.blaze3d.ProjectionType;
++import com.mojang.blaze3d.buffers.GpuBufferSlice;
++import com.mojang.blaze3d.systems.RenderSystem;
++import com.mojang.blaze3d.vertex.PoseStack;
++import com.tacz.guns.GunMod;
++import com.tacz.guns.client.renderer.snapshot.BedrockRenderSnapshot;
++import net.minecraft.client.Minecraft;
++import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
++import net.minecraft.client.renderer.RenderBuffers;
++import net.minecraft.client.renderer.SubmitNodeStorage;
++import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
++import net.minecraft.client.renderer.rendertype.RenderType;
++import org.joml.Matrix4f;
++import org.joml.Matrix4fStack;
++
++import javax.annotation.Nullable;
++import java.util.ArrayList;
++import java.util.List;
++
++/**
++ * Draws frozen scope reticle/rim geometry after Iris has completed every composite and final pass.
++ *
++ * <p>Some shader packs, including Complementary Reimagined, apply a screen-space fog pass after
++ * {@code HAND_TRANSLUCENT} and sample a pre-hand or otherwise immutable world depth snapshot. A
++ * late hand depth write cannot affect that input. This state therefore keeps the original 3D
++ * snapshots and the exact hand projection/model-view transform, but delays their actual vanilla
++ * pipeline draw until {@code IrisRenderingPipeline#finalizeLevelRendering()} has returned.</p>
++ *
++ * <p>This is not a HUD crosshair: vertices remain the original Bedrock model geometry with ADS,
++ * recoil and view-bob already frozen into their snapshots. Only the final color submission moves
++ * past shader-pack post-processing.</p>
++ */
++public final class ScopeFinalOverlayState {
++    private static final int FINAL_RETICLE_ORDER = 20_000;
++    private static final int FINAL_OCULAR_RING_ORDER = 20_001;
++
++    private static final List<ReticleDraw> PENDING_RETICLES = new ArrayList<>();
++    private static final List<RingDraw> PENDING_RINGS = new ArrayList<>();
++    private static @Nullable HandTransform handTransform;
++    private static @Nullable RenderBuffers renderBuffers;
++    private static @Nullable SubmitNodeStorage submitNodes;
++    private static @Nullable FeatureRenderDispatcher featureDispatcher;
++    private static boolean loggedQueued;
++    private static boolean loggedRendered;
++    private static boolean loggedFailure;
++
++    private ScopeFinalOverlayState() {
++    }
++
++    /** Clears a deferred frame that could not reach Iris' finalization hook. */
++    public static void beginSolidSubmission() {
++        PENDING_RETICLES.clear();
++        PENDING_RINGS.clear();
++        handTransform = null;
++    }
++
++    public static int pendingReticleCount() {
++        return PENDING_RETICLES.size();
++    }
++
++    public static boolean hasPendingReticles() {
++        return !PENDING_RETICLES.isEmpty();
++    }
++
++    static void queueReticle(BedrockRenderSnapshot snapshot, RenderType renderType) {
++        if (snapshot.isEmpty()) {
++            return;
++        }
++        captureHandTransform();
++        if (handTransform == null) {
++            return;
++        }
++        PENDING_RETICLES.add(new ReticleDraw(snapshot, renderType));
++        if (!loggedQueued) {
++            loggedQueued = true;
++            GunMod.LOGGER.info("[TACZ Scope] Queued reticle for Iris post-composite overlay.");
++        }
++    }
++
++    public static void queueOcularRing(BedrockRenderSnapshot snapshot, RenderType renderType) {
++        if (!snapshot.isEmpty()) {
++            PENDING_RINGS.add(new RingDraw(snapshot, renderType));
++        }
++    }
++
++    /** Called by the Iris-only final-pipeline mixin after shader-pack final compositing. */
++    public static void renderAfterFinalComposite() {
++        if (PENDING_RETICLES.isEmpty() || handTransform == null) {
++            return;
++        }
++        RenderSystem.assertOnRenderThread();
++        Minecraft minecraft = Minecraft.getInstance();
++        if (!ensureDispatcher(minecraft)) {
++            return;
++        }
++
++        List<ReticleDraw> reticles = List.copyOf(PENDING_RETICLES);
++        List<RingDraw> rings = List.copyOf(PENDING_RINGS);
++        HandTransform transform = handTransform;
++        PENDING_RETICLES.clear();
++        PENDING_RINGS.clear();
++        handTransform = null;
++
++        GpuBufferSlice previousProjection = RenderSystem.getProjectionMatrixBuffer();
++        ProjectionType previousProjectionType = RenderSystem.getProjectionType();
++        Matrix4fStack modelView = RenderSystem.getModelViewStack();
++        var previousColorTarget = RenderSystem.outputColorTextureOverride;
++        var previousDepthTarget = RenderSystem.outputDepthTextureOverride;
++
++        modelView.pushMatrix();
++        modelView.set(transform.modelView());
++        RenderSystem.setProjectionMatrix(transform.projection(), transform.projectionType());
++        RenderSystem.outputColorTextureOverride = minecraft.getMainRenderTarget().getColorTextureView();
++        RenderSystem.outputDepthTextureOverride = minecraft.getMainRenderTarget().getDepthTextureView();
++        try {
++            OrderedSubmitNodeCollector reticleCollector = submitNodes.order(FINAL_RETICLE_ORDER);
++            for (ReticleDraw draw : reticles) {
++                reticleCollector.submitCustomGeometry(new PoseStack(), draw.renderType(),
++                        (entryPose, consumer) -> draw.snapshot().writeFiltered(consumer, ReticleMarkFilter::isThinMark));
++            }
++
++            OrderedSubmitNodeCollector ringCollector = submitNodes.order(FINAL_OCULAR_RING_ORDER);
++            for (RingDraw draw : rings) {
++                ringCollector.submitCustomGeometry(new PoseStack(), draw.renderType(),
++                        (entryPose, consumer) -> draw.snapshot().write(consumer));
++            }
++
++            featureDispatcher.renderAllFeatures();
++            renderBuffers.bufferSource().endBatch();
++            if (!loggedRendered) {
++                loggedRendered = true;
++                GunMod.LOGGER.info("[TACZ Scope] Rendered reticle and ocular rim after Iris final composite.");
++            }
++        } catch (RuntimeException e) {
++            // Optional Iris integration must not turn a shader-pack edge case into a client crash.
++            if (!loggedFailure) {
++                loggedFailure = true;
++                GunMod.LOGGER.warn("[TACZ Scope] Post-composite reticle overlay failed; skipping this frame.", e);
++            }
++        } finally {
++            try {
++                submitNodes.endFrame();
++            } finally {
++                RenderSystem.outputColorTextureOverride = previousColorTarget;
++                RenderSystem.outputDepthTextureOverride = previousDepthTarget;
++                modelView.popMatrix();
++                RenderSystem.setProjectionMatrix(previousProjection, previousProjectionType);
++            }
++        }
++    }
++
++    private static void captureHandTransform() {
++        if (handTransform != null) {
++            return;
++        }
++        RenderSystem.assertOnRenderThread();
++        handTransform = new HandTransform(
++                new Matrix4f(RenderSystem.getModelViewMatrix()),
++                RenderSystem.getProjectionMatrixBuffer(),
++                RenderSystem.getProjectionType()
++        );
++    }
++
++    private static boolean ensureDispatcher(Minecraft minecraft) {
++        if (renderBuffers != null && submitNodes != null && featureDispatcher != null) {
++            return true;
++        }
++        try {
++            RenderBuffers buffers = new RenderBuffers(Runtime.getRuntime().availableProcessors());
++            SubmitNodeStorage nodes = new SubmitNodeStorage();
++            FeatureRenderDispatcher dispatcher = new FeatureRenderDispatcher(
++                    nodes,
++                    minecraft.getBlockRenderer(),
++                    buffers.bufferSource(),
++                    minecraft.getAtlasManager(),
++                    buffers.outlineBufferSource(),
++                    buffers.crumblingBufferSource(),
++                    minecraft.font
++            );
++            renderBuffers = buffers;
++            submitNodes = nodes;
++            featureDispatcher = dispatcher;
++            return true;
++        } catch (RuntimeException e) {
++            GunMod.LOGGER.warn("[TACZ Scope] Cannot initialize post-composite reticle renderer; falling back next frame.", e);
++            return false;
++        }
++    }
++
++    private record HandTransform(Matrix4f modelView,
++                                 GpuBufferSlice projection,
++                                 ProjectionType projectionType) {
++        private HandTransform {
++            modelView = new Matrix4f(modelView);
++        }
++    }
++
++    private record ReticleDraw(BedrockRenderSnapshot snapshot, RenderType renderType) {
++    }
++
++    private record RingDraw(BedrockRenderSnapshot snapshot, RenderType renderType) {
++    }
++}
+diff --git a/src/main/java/com/tacz/guns/client/render/scope/ScopeLateReticleState.java b/src/main/java/com/tacz/guns/client/render/scope/ScopeLateReticleState.java
+new file mode 100644
+index 0000000..9bae9fc
+--- /dev/null
++++ b/src/main/java/com/tacz/guns/client/render/scope/ScopeLateReticleState.java
+@@ -0,0 +1,143 @@
++package com.tacz.guns.client.render.scope;
++
++import com.mojang.blaze3d.vertex.PoseStack;
++import com.tacz.guns.GunMod;
++import com.tacz.guns.client.renderer.snapshot.BedrockRenderSnapshot;
++import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
++import net.minecraft.client.renderer.SubmitNodeCollector;
++import net.minecraft.client.renderer.rendertype.RenderType;
++
++import java.util.ArrayList;
++import java.util.List;
++
++/**
++ * Per-frame immutable scope geometry deferred from Iris {@code HAND_SOLID} to
++ * {@code HAND_TRANSLUCENT}.
++ *
++ * <p>Iris 1.10.7 only invokes its translucent-hand pass when vanilla detects a translucent held
++ * block. TACZ guns are not block items, so a scope reticle submitted with the gun body can only
++ * reach {@code HAND_SOLID}; shader packs may subsequently composite water, fog and particles over
++ * it. The solid pass freezes the original reticle/ring model snapshots here. An Iris-only mixin
++ * then forces one late hand pass, submits these snapshots after world translucency, and lets the
++ * existing hand collector perform the real draw at its normal {@code endBatch()} boundary. R9 uses
++ * dedicated late pipelines there to write foreground depth only after world translucency is done.
++ * R11 routes the audited Iris 1.10.7 path onward to {@link ScopeFinalOverlayState}, because some
++ * shader packs still apply fog in a later composite that ignores mutable hand depth.</p>
++ *
++ * <p>This class never keeps mutable {@code BedrockPart}s, poses or item stacks. A queued snapshot
++ * has already captured ADS, recoil and view-bob transforms, so moving its submission does not
++ * change the reticle's 3D placement or animation.</p>
++ */
++public final class ScopeLateReticleState {
++    /** Ordinary translucent hand geometry uses the default order; reticle must be later. */
++    private static final int LATE_RETICLE_ORDER = 10_000;
++    /** The physical ocular rim must be the last local layer and hide any edge spill. */
++    private static final int LATE_OCULAR_RING_ORDER = 10_001;
++
++    private static final List<ReticleDraw> PENDING_RETICLES = new ArrayList<>();
++    private static final List<RingDraw> PENDING_RINGS = new ArrayList<>();
++    private static boolean loggedLateQueue;
++    private static boolean loggedLateSubmit;
++
++    private ScopeLateReticleState() {
++    }
++
++    /** Clears stale work before extracting the next first-person gun solid pass. */
++    public static void beginSolidSubmission() {
++        PENDING_RETICLES.clear();
++        PENDING_RINGS.clear();
++    }
++
++    /** @return whether Iris must run a translucent hand pass for this frame. */
++    public static boolean hasPendingReticles() {
++        return !PENDING_RETICLES.isEmpty();
++    }
++
++    /** @return current count, used by a caller to decide whether its ocular ring must be deferred too. */
++    public static int pendingReticleCount() {
++        return PENDING_RETICLES.size();
++    }
++
++    /** Queues an immutable, already filtered-at-write-time reticle snapshot. */
++    static void queueReticle(BedrockRenderSnapshot snapshot, RenderType renderType) {
++        if (!snapshot.isEmpty()) {
++            PENDING_RETICLES.add(new ReticleDraw(snapshot, renderType));
++            if (!loggedLateQueue) {
++                loggedLateQueue = true;
++                GunMod.LOGGER.info("[TACZ Scope] Queued reticle for Iris HAND_TRANSLUCENT.");
++            }
++        }
++    }
++
++    /** Queues the physical ocular rim after the associated reticle snapshots. */
++    public static void queueOcularRing(BedrockRenderSnapshot snapshot, RenderType renderType) {
++        if (!snapshot.isEmpty()) {
++            PENDING_RINGS.add(new RingDraw(snapshot, renderType));
++        }
++    }
++
++    /**
++     * Called while Iris has selected {@code HAND_TRANSLUCENT}, before its normal hand extraction
++     * reaches {@code endBatch()}. Submission remains delayed; the Iris collector still owns the
++     * actual GPU draw and shader/FBO setup.
++     */
++    public static void submitPending(SubmitNodeCollector collector) {
++        if (PENDING_RETICLES.isEmpty()) {
++            return;
++        }
++
++        List<ReticleDraw> reticles = List.copyOf(PENDING_RETICLES);
++        List<RingDraw> rings = List.copyOf(PENDING_RINGS);
++        PENDING_RETICLES.clear();
++        PENDING_RINGS.clear();
++
++        OrderedSubmitNodeCollector reticleCollector = collector.order(LATE_RETICLE_ORDER);
++        for (ReticleDraw draw : reticles) {
++            submitReticleGeometry(reticleCollector, draw.snapshot(), draw.renderType());
++        }
++
++        OrderedSubmitNodeCollector ringCollector = collector.order(LATE_OCULAR_RING_ORDER);
++        for (RingDraw draw : rings) {
++            ringCollector.submitCustomGeometry(new PoseStack(), draw.renderType(),
++                    (entryPose, consumer) -> draw.snapshot().write(consumer));
++        }
++
++        if (!loggedLateSubmit) {
++            loggedLateSubmit = true;
++            GunMod.LOGGER.info("[TACZ Scope] Deferred reticle and ocular rim to Iris HAND_TRANSLUCENT with late foreground depth.");
++        }
++    }
++
++    /** Emits immediately on vanilla/ordinary Iris paths, or saves it for the Iris late hand pass. */
++    static void submitReticle(IReticleRenderer.Context context,
++                              BedrockRenderSnapshot snapshot,
++                              RenderType renderType) {
++        if (snapshot.isEmpty()) {
++            return;
++        }
++        if (context.deferToIrisFinalOverlay()) {
++            ScopeFinalOverlayState.queueReticle(snapshot, renderType);
++            return;
++        }
++        if (context.deferToIrisTranslucent()) {
++            queueReticle(snapshot, renderType);
++            return;
++        }
++        submitReticleGeometry(context.collector(), snapshot, renderType);
++    }
++
++    private static void submitReticleGeometry(OrderedSubmitNodeCollector collector,
++                                              BedrockRenderSnapshot snapshot,
++                                              RenderType renderType) {
++        // Snapshot matrices already include the original solid-pass model transform. Submit from
++        // identity so neither the late hand pass nor its current PoseStack can apply it a second time.
++        collector.submitCustomGeometry(new PoseStack(), renderType,
++                (entryPose, consumer) -> snapshot.writeFiltered(consumer, ReticleMarkFilter::isThinMark));
++    }
++
++    private record ReticleDraw(BedrockRenderSnapshot snapshot, RenderType renderType) {
++    }
++
++    private record RingDraw(BedrockRenderSnapshot snapshot, RenderType renderType) {
++    }
++}
+diff --git a/src/main/java/com/tacz/guns/client/render/scope/ScopeRenderTypes.java b/src/main/java/com/tacz/guns/client/render/scope/ScopeRenderTypes.java
+index d7ecbfb..e57228f 100644
+--- a/src/main/java/com/tacz/guns/client/render/scope/ScopeRenderTypes.java
++++ b/src/main/java/com/tacz/guns/client/render/scope/ScopeRenderTypes.java
+@@ -1,26 +1,27 @@
+ package com.tacz.guns.client.render.scope;
+ 
+-import com.mojang.blaze3d.pipeline.ColorTargetState;
+-import com.mojang.blaze3d.pipeline.DepthStencilState;
++import com.mojang.blaze3d.pipeline.BlendFunction;
+ import com.mojang.blaze3d.pipeline.RenderPipeline;
+-import com.mojang.blaze3d.platform.CompareOp;
++import com.mojang.blaze3d.platform.DepthTestFunction;
+ import com.mojang.blaze3d.vertex.MeshData;
+ import com.mojang.blaze3d.vertex.VertexFormat;
+ import com.tacz.guns.GunMod;
+ import com.tacz.guns.compat.iris.IrisCompat;
+ import net.minecraft.client.renderer.RenderPipelines;
+-import net.minecraft.client.renderer.rendertype.OutputTarget;
+ import net.minecraft.client.renderer.rendertype.RenderSetup;
+ import net.minecraft.client.renderer.rendertype.RenderType;
+ import net.minecraft.client.renderer.rendertype.TextureTransform;
+ import net.minecraft.resources.Identifier;
+ 
++import javax.annotation.Nullable;
++import java.util.Collections;
+ import java.util.HashMap;
+ import java.util.IdentityHashMap;
+ import java.util.Map;
+ import java.util.Optional;
++import java.util.Set;
+ 
+-/** Render types for the depth-aperture scope fallback used on Minecraft 26.1.2. */
++/** Render types for the depth-aperture scope fallback used on Minecraft 1.21.11. */
+ public final class ScopeRenderTypes {
+     private static final RenderSetup FAKE_SETUP = RenderSetup.builder(RenderPipelines.GUI_TEXTURED)
+             .createRenderSetup();
+@@ -28,12 +29,52 @@ public final class ScopeRenderTypes {
+     private static final Map<RenderType, RenderType> APERTURE_COPY_BODIES = new IdentityHashMap<>();
+     private static final Map<Identifier, RenderType> DEPTH_APERTURES = new HashMap<>();
+     private static final Map<Identifier, RenderType> DEPTH_CLEANUPS = new HashMap<>();
++    /** Ordinary/vanilla reticles: retain restored world depth after their draw. */
+     private static final Map<Identifier, RenderType> ETCHED_RETICLES = new HashMap<>();
+     private static final Map<Identifier, RenderType> VISIBLE_RETICLES = new HashMap<>();
++    /** Iris late-pass reticles: write near depth only after all world translucency has completed. */
++    private static final Map<Identifier, RenderType> LATE_ETCHED_RETICLES = new HashMap<>();
++    private static final Map<Identifier, RenderType> LATE_VISIBLE_RETICLES = new HashMap<>();
++    private static final Map<Identifier, RenderType> LATE_OCULAR_RINGS = new HashMap<>();
++    /** Iris 1.10.7 final-overlay types: draw after every shader-pack composite/final pass. */
++    private static final Map<Identifier, RenderType> FINAL_ETCHED_RETICLES = new HashMap<>();
++    private static final Map<Identifier, RenderType> FINAL_VISIBLE_RETICLES = new HashMap<>();
++    private static final Map<Identifier, RenderType> FINAL_OCULAR_RINGS = new HashMap<>();
+     private static final Map<Identifier, RenderType> VIEWMODEL_CUTOUT_TYPES = new HashMap<>();
+     private static final Map<Identifier, RenderType> FLASH_TRANSLUCENT_TYPES = new HashMap<>();
+     private static final Map<Identifier, RenderType> FLASH_SWIRL_TYPES = new HashMap<>();
+ 
++    /**
++     * 1.21.11 的 {@code DepthTestFunction} 没有 {@code ALWAYS}。
++     * <p>
++     * depth-cleanup 需要把较远的世界深度写回较近的手部深度上方；
++     * {@code GREATER_DEPTH_TEST} 对这一个写深度操作仍是正确的等价比较。
++     * <p>
++     * 常规 reticle 管线需要无条件通过，且<b>不能</b>覆盖 cleanup 恢复的世界深度。
++     * 它们因此声明 {@code NO_DEPTH_TEST + depthWrite=false}；在真正 draw 边界由
++     * {@code GlCommandEncoderScopeDepthCopyMixin} 仅把深度测试改成
++     * {@code GL_ALWAYS}，不改变深度写入掩码。
++     * <p>
++     * Iris 的 R9 late-pass 另有独立 reticle/rim 管线：它们只在所有世界透明绘制完成后
++     * 执行，故可以安全写入近处深度，以便 shader-pack 后续的屏幕空间雾/DOF/composite
++     * 把它们识别为前景。这个例外绝不能回流到常规或 vanilla reticle 管线。
++     */
++    private static final DepthTestFunction ALWAYS_PASS_KEEPING_DEPTH_WRITES =
++            DepthTestFunction.GREATER_DEPTH_TEST;
++
++    /**
++     * 供 encoder mixin 识别的「需要强制 GL_ALWAYS」的 scope 前景管线集合。
++     * 常规 reticle 保留 {@code depthWrite=false}；R9 late reticle/rim 则由其 pipeline
++     * 显式启用 depth write。mixin 只重新开启深度测试并改比较函数，从不覆盖写入掩码。
++     */
++    private static final Set<RenderPipeline> FORCE_ALWAYS_DEPTH_PIPELINES =
++            Collections.newSetFromMap(new IdentityHashMap<>());
++
++    /** @return 该管线是否需要 mixin 把深度比较函数强制成 GL_ALWAYS。 */
++    public static boolean needsForcedAlwaysDepth(@Nullable RenderPipeline pipeline) {
++        return pipeline != null && FORCE_ALWAYS_DEPTH_PIPELINES.contains(pipeline);
++    }
++
+     /** Set during extraction when this first-person gun submission actually queued an ocular aperture. */
+     private static boolean apertureScheduledForViewmodel;
+ 
+@@ -53,11 +94,33 @@ public final class ScopeRenderTypes {
+     private static final RenderPipeline ETCHED_RETICLE_PIPELINE = createEtchedReticlePipeline();
+ 
+     /**
+-     * Small illuminated reticles use the same screen-space ocular mask and still write near hand
+-     * depth to protect their surviving pixels from later world translucency.
++     * Small illuminated reticles use the same screen-space ocular mask without replacing the
++     * world depth restored by cleanup.
+      */
+     private static final RenderPipeline VISIBLE_RETICLE_PIPELINE = createVisibleReticlePipeline();
+ 
++    /**
++     * R9 Iris-only foreground versions. They are submitted after world transparency, so their near
++     * depth is safe and prevents post-processing fog from treating reticle pixels as distant world.
++     */
++    private static final RenderPipeline LATE_ETCHED_RETICLE_PIPELINE = createLateEtchedReticlePipeline();
++    private static final RenderPipeline LATE_VISIBLE_RETICLE_PIPELINE = createLateVisibleReticlePipeline();
++
++    /**
++     * Opaque physical ocular rim submitted after a deferred Iris reticle. It keeps ordinary cutout
++     * material state but is classified as {@code HAND_TRANSLUCENT} so it reaches the late hand pass.
++     */
++    private static final RenderPipeline LATE_OCULAR_RING_PIPELINE = createLateOcularRingPipeline();
++
++    /**
++     * Final-overlay variants use no-fog vanilla fragments after Iris has stopped overriding core
++     * pipelines. They retain the same model geometry and aperture mask, but cannot be touched by
++     * shader-pack post-processing.
++     */
++    private static final RenderPipeline FINAL_ETCHED_RETICLE_PIPELINE = createFinalEtchedReticlePipeline();
++    private static final RenderPipeline FINAL_VISIBLE_RETICLE_PIPELINE = createFinalVisibleReticlePipeline();
++    private static final RenderPipeline FINAL_OCULAR_RING_PIPELINE = createFinalOcularRingPipeline();
++
+     /** Entity cutout plus an outside-aperture mask for the gun body and non-scope attachments. */
+     private static final RenderPipeline VIEWMODEL_CUTOUT_PIPELINE = createViewmodelCutoutPipeline();
+ 
+@@ -77,6 +140,11 @@ public final class ScopeRenderTypes {
+     /** Starts extraction of one first-person gun; prevents a previous frame's aperture from clipping fire. */
+     public static void beginViewmodelSubmission() {
+         apertureScheduledForViewmodel = false;
++        // A queued Iris reticle is consumed before the next solid hand submission. Clearing here
++        // also guarantees that a skipped/aborted previous hand pass cannot leak geometry into a
++        // later gun or frame.
++        ScopeLateReticleState.beginSolidSubmission();
++        ScopeFinalOverlayState.beginSolidSubmission();
+     }
+ 
+     /** @return whether this gun submission queued a valid depth-aperture sequence before its FX. */
+@@ -112,6 +180,40 @@ public final class ScopeRenderTypes {
+         return VISIBLE_RETICLES.computeIfAbsent(texture, ScopeRenderTypes::createVisibleReticleType);
+     }
+ 
++    /** Iris-only late etched reticle: writes foreground depth after world translucency. */
++    public static RenderType lateEtchedReticle(Identifier texture) {
++        return LATE_ETCHED_RETICLES.computeIfAbsent(texture, ScopeRenderTypes::createLateEtchedReticleType);
++    }
++
++    /** Iris-only late illuminated reticle: writes foreground depth after world translucency. */
++    public static RenderType lateVisibleReticle(Identifier texture) {
++        return LATE_VISIBLE_RETICLES.computeIfAbsent(texture, ScopeRenderTypes::createLateVisibleReticleType);
++    }
++
++    /**
++     * Returns the physical ocular-ring type for the late Iris reticle pass. This is deliberately
++     * separate from the normal entity-cutout type: Iris must select {@code HAND_TRANSLUCENT} even
++     * though the rim itself remains opaque cutout geometry.
++     */
++    public static RenderType lateOcularRing(Identifier texture) {
++        return LATE_OCULAR_RINGS.computeIfAbsent(texture, ScopeRenderTypes::createLateOcularRingType);
++    }
++
++    /** Final post-composite etched reticle; only selected for the verified Iris 1.10.7 path. */
++    public static RenderType finalEtchedReticle(Identifier texture) {
++        return FINAL_ETCHED_RETICLES.computeIfAbsent(texture, ScopeRenderTypes::createFinalEtchedReticleType);
++    }
++
++    /** Final post-composite illuminated reticle; only selected for the verified Iris 1.10.7 path. */
++    public static RenderType finalVisibleReticle(Identifier texture) {
++        return FINAL_VISIBLE_RETICLES.computeIfAbsent(texture, ScopeRenderTypes::createFinalVisibleReticleType);
++    }
++
++    /** Final post-composite physical rim, emitted after final reticle geometry. */
++    public static RenderType finalOcularRing(Identifier texture) {
++        return FINAL_OCULAR_RINGS.computeIfAbsent(texture, ScopeRenderTypes::createFinalOcularRingType);
++    }
++
+     /**
+      * Replaces an ordinary first-person gun/attachment cutout type only after an ocular was queued.
+      * All other contexts and failed aperture cycles retain the caller's original behavior.
+@@ -122,7 +224,7 @@ public final class ScopeRenderTypes {
+         }
+         // Gun displays may opt into entityTranslucent; retain that blend/sort recipe rather than
+         // silently forcing every body through cutout. AttachmentRender supplies cutout here.
+-        if (original.hasBlending()) {
++        if (hasBlending(original)) {
+             return FLASH_TRANSLUCENT_TYPES.computeIfAbsent(texture, ScopeRenderTypes::createFlashTranslucentType);
+         }
+         return VIEWMODEL_CUTOUT_TYPES.computeIfAbsent(texture, ScopeRenderTypes::createViewmodelCutoutType);
+@@ -216,6 +318,99 @@ public final class ScopeRenderTypes {
+         );
+     }
+ 
++    private static RenderType createLateEtchedReticleType(Identifier texture) {
++        RenderSetup setup = RenderSetup.builder(LATE_ETCHED_RETICLE_PIPELINE)
++                .withTexture("Sampler0", texture)
++                .withTexture(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM, texture)
++                .withTexture(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM, texture)
++                .useLightmap()
++                .useOverlay()
++                .createRenderSetup();
++        RenderType base = RenderType.create("tacz_scope_late_etched_reticle_base", setup);
++        return new DepthCopyRenderType(
++                "tacz_scope_late_etched_reticle",
++                base,
++                ScopeDepthCopyState.Operation.MASK
++        );
++    }
++
++    private static RenderType createLateVisibleReticleType(Identifier texture) {
++        RenderSetup setup = RenderSetup.builder(LATE_VISIBLE_RETICLE_PIPELINE)
++                .withTexture("Sampler0", texture)
++                .withTexture(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM, texture)
++                .withTexture(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM, texture)
++                .useOverlay()
++                .affectsCrumbling()
++                .sortOnUpload()
++                .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
++                .createRenderSetup();
++        RenderType base = RenderType.create("tacz_scope_late_visible_reticle_base", setup);
++        return new DepthCopyRenderType(
++                "tacz_scope_late_visible_reticle",
++                base,
++                ScopeDepthCopyState.Operation.MASK
++        );
++    }
++
++    private static RenderType createLateOcularRingType(Identifier texture) {
++        // Bytecode-equivalent to RenderTypes.entityCutout(texture, true). The pipeline differs
++        // only in Iris classification, so the opaque rim retains its vanilla material state while
++        // being submitted after the world translucent pass.
++        RenderSetup setup = RenderSetup.builder(LATE_OCULAR_RING_PIPELINE)
++                .withTexture("Sampler0", texture)
++                .useLightmap()
++                .useOverlay()
++                .affectsCrumbling()
++                .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
++                .createRenderSetup();
++        return RenderType.create("tacz_scope_late_ocular_ring", setup);
++    }
++
++    private static RenderType createFinalEtchedReticleType(Identifier texture) {
++        RenderSetup setup = RenderSetup.builder(FINAL_ETCHED_RETICLE_PIPELINE)
++                .withTexture("Sampler0", texture)
++                .withTexture(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM, texture)
++                .withTexture(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM, texture)
++                .useLightmap()
++                .useOverlay()
++                .createRenderSetup();
++        RenderType base = RenderType.create("tacz_scope_final_etched_reticle_base", setup);
++        return new DepthCopyRenderType(
++                "tacz_scope_final_etched_reticle",
++                base,
++                ScopeDepthCopyState.Operation.MASK
++        );
++    }
++
++    private static RenderType createFinalVisibleReticleType(Identifier texture) {
++        RenderSetup setup = RenderSetup.builder(FINAL_VISIBLE_RETICLE_PIPELINE)
++                .withTexture("Sampler0", texture)
++                .withTexture(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM, texture)
++                .withTexture(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM, texture)
++                .useOverlay()
++                .affectsCrumbling()
++                .sortOnUpload()
++                .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
++                .createRenderSetup();
++        RenderType base = RenderType.create("tacz_scope_final_visible_reticle_base", setup);
++        return new DepthCopyRenderType(
++                "tacz_scope_final_visible_reticle",
++                base,
++                ScopeDepthCopyState.Operation.MASK
++        );
++    }
++
++    private static RenderType createFinalOcularRingType(Identifier texture) {
++        RenderSetup setup = RenderSetup.builder(FINAL_OCULAR_RING_PIPELINE)
++                .withTexture("Sampler0", texture)
++                .useLightmap()
++                .useOverlay()
++                .affectsCrumbling()
++                .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
++                .createRenderSetup();
++        return RenderType.create("tacz_scope_final_ocular_ring", setup);
++    }
++
+     private static RenderType createViewmodelCutoutType(Identifier texture) {
+         // Bytecode-equivalent to RenderTypes.entityCutout(texture, true), plus the two depth
+         // samplers consumed by the outside-aperture branch.
+@@ -282,15 +477,14 @@ public final class ScopeRenderTypes {
+         RenderPipeline.Builder builder = clonePipeline(source,
+                 Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_depth_aperture"));
+ 
+-        ColorTargetState sourceColor = source.getColorTargetState();
+-        builder.withColorTargetState(new ColorTargetState(
+-                sourceColor.blendFunction(),
+-                ColorTargetState.WRITE_NONE
+-        ));
+-        DepthStencilState sourceDepth = source.getDepthStencilState();
+-        CompareOp depthTest = sourceDepth == null ? CompareOp.LESS_THAN_OR_EQUAL : sourceDepth.depthTest();
++        // 1.21.11 没有 ColorTargetState/DepthStencilState 这两个聚合对象，
++        // 等价状态在 Builder 上是扁平的 withColorWrite / withDepthWrite /
++        // withDepthTestFunction / withDepthBias（语义一一对应，见 clonePipeline 的注释）。
++        builder.withColorWrite(false);                              // == ColorTargetState.WRITE_NONE
++        builder.withDepthTestFunction(source.getDepthTestFunction());
++        builder.withDepthWrite(true);
+         // Pull the invisible ocular very slightly toward the camera to avoid coplanar scope-body leakage.
+-        builder.withDepthStencilState(new DepthStencilState(depthTest, true, -1.0F, -1.0F));
++        builder.withDepthBias(-1.0F, -1.0F);
+ 
+         RenderPipeline pipeline = RenderPipelines.register(builder.build());
+         IrisCompat.assignPipelineToIris(pipeline, "HAND", "scope_depth_aperture");
+@@ -307,13 +501,10 @@ public final class ScopeRenderTypes {
+         builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
+         builder.withSampler(ScopeDepthCopyState.POST_BODY_SAMPLER_UNIFORM);
+ 
+-        ColorTargetState sourceColor = source.getColorTargetState();
+-        builder.withColorTargetState(new ColorTargetState(
+-                sourceColor.blendFunction(),
+-                ColorTargetState.WRITE_NONE
+-        ));
++        builder.withColorWrite(false);
+         // Cleanup geometry rasterizes only the ocular footprint and writes exact sampled world depth.
+-        builder.withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true));
++        builder.withDepthTestFunction(ALWAYS_PASS_KEEPING_DEPTH_WRITES);
++        builder.withDepthWrite(true);
+ 
+         RenderPipeline pipeline = RenderPipelines.register(builder.build());
+         IrisCompat.assignPipelineToIris(pipeline, "HAND", "scope_depth_cleanup");
+@@ -331,10 +522,25 @@ public final class ScopeRenderTypes {
+         builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
+         // Large blackout panels are still removed on the CPU; the retained thin marks render after
+         // the exact depth restore and the mask clips them to the ocular footprint.
+-        builder.withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true));
++        //
++        // 准星必须【无条件通过】深度测试：它在手部近深度，而目镜区域刚被 depth-cleanup
++        // 写回了世界远深度，任何 near<far 的比较都会把它丢掉（实机已证实 GREATER 会让
++        // 无光影下的准星完全消失）。声明为 NO_DEPTH_TEST，再由 encoder mixin 还原成 GL_ALWAYS。
++        //
++        // 【深度写入必须关闭】depth-cleanup 已把目镜区域恢复为世界深度；准星只需显示，
++        // 不应以手部近深度覆盖该结果。depthWrite=false 保证 GL_ALWAYS 只影响本次
++        // 准星颜色绘制，不改变后续 world/composite pass 所读的深度。
++        //
++        // 这只能保证深度恢复不被破坏，不能单独保证 shader pack 的 HAND 或更晚的
++        // composite 阶段不会改变准星颜色；那是独立的绘制时序/着色问题，须实机验证。
++        builder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
++        builder.withDepthWrite(false);
+ 
+         RenderPipeline pipeline = RenderPipelines.register(builder.build());
+-        IrisCompat.assignPipelineToIris(pipeline, "HAND", "scope_etched_reticle");
++        FORCE_ALWAYS_DEPTH_PIPELINES.add(pipeline);
++        // The snapshot is deferred to Iris' late hand pass; mapping it to HandWater makes both
++        // etched and illuminated reticles use the same HAND_TRANSLUCENT boundary under shaders.
++        IrisCompat.assignPipelineToIris(pipeline, "HAND_TRANSLUCENT", "scope_etched_reticle");
+         return pipeline;
+     }
+ 
+@@ -348,13 +554,124 @@ public final class ScopeRenderTypes {
+         builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
+         builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
+         // The ocular depth writer must not hide the small dot/cross geometry placed behind the lens.
+-        builder.withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, true));
++        // 同 etched reticle：NO_DEPTH_TEST + encoder mixin 强制 GL_ALWAYS，且【不写深度】；
++        // 这样不会覆盖 depth-cleanup 恢复的世界深度。
++        builder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
++        builder.withDepthWrite(false);
+ 
+         RenderPipeline pipeline = RenderPipelines.register(builder.build());
++        FORCE_ALWAYS_DEPTH_PIPELINES.add(pipeline);
+         IrisCompat.assignPipelineToIris(pipeline, "HAND_TRANSLUCENT", "scope_visible_reticle");
+         return pipeline;
+     }
+ 
++    /**
++     * R9 late etched reticle. It differs from the ordinary reticle only in depth writes: this
++     * pipeline runs after Iris world translucency, so surviving masked pixels may safely become
++     * foreground depth for post-processing fog/composite.
++     */
++    private static RenderPipeline createLateEtchedReticlePipeline() {
++        RenderPipeline.Builder builder = clonePipeline(
++                RenderPipelines.ENTITY_CUTOUT,
++                Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_late_etched_reticle"));
++        builder.withFragmentShader(Identifier.fromNamespaceAndPath(
++                GunMod.MOD_ID, "core/scope_reticle_mask"));
++        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
++        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
++        builder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
++        builder.withDepthWrite(true);
++
++        RenderPipeline pipeline = RenderPipelines.register(builder.build());
++        FORCE_ALWAYS_DEPTH_PIPELINES.add(pipeline);
++        IrisCompat.assignPipelineToIris(pipeline, "HAND_TRANSLUCENT", "scope_late_etched_reticle");
++        return pipeline;
++    }
++
++    /** See {@link #createLateEtchedReticlePipeline()}; the source state remains emissive/translucent. */
++    private static RenderPipeline createLateVisibleReticlePipeline() {
++        RenderPipeline.Builder builder = clonePipeline(
++                RenderPipelines.ENTITY_TRANSLUCENT_EMISSIVE,
++                Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_late_visible_reticle"));
++        builder.withFragmentShader(Identifier.fromNamespaceAndPath(
++                GunMod.MOD_ID, "core/scope_reticle_mask"));
++        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
++        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
++        builder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
++        builder.withDepthWrite(true);
++
++        RenderPipeline pipeline = RenderPipelines.register(builder.build());
++        FORCE_ALWAYS_DEPTH_PIPELINES.add(pipeline);
++        IrisCompat.assignPipelineToIris(pipeline, "HAND_TRANSLUCENT", "scope_late_visible_reticle");
++        return pipeline;
++    }
++
++    private static RenderPipeline createLateOcularRingPipeline() {
++        RenderPipeline.Builder builder = clonePipeline(
++                RenderPipelines.ENTITY_CUTOUT,
++                Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_late_ocular_ring"));
++        // The rim must win over any reticle edge pixel drawn immediately before it. It is a late
++        // foreground layer, so GL_ALWAYS + depthWrite=true is safe here and also marks it near for
++        // shader-pack post-processing.
++        builder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
++        builder.withDepthWrite(true);
++
++        RenderPipeline pipeline = RenderPipelines.register(builder.build());
++        FORCE_ALWAYS_DEPTH_PIPELINES.add(pipeline);
++        IrisCompat.assignPipelineToIris(pipeline, "HAND_TRANSLUCENT", "scope_late_ocular_ring");
++        return pipeline;
++    }
++
++    /**
++     * Final overlay is drawn after {@code IrisRenderingPipeline} sets isRenderingWorld=false, so
++     * this core pipeline is intentionally not assigned to an Iris program. Its fragment omits
++     * vanilla fog while retaining the ocular screen-space mask uniforms.
++     */
++    private static RenderPipeline createFinalEtchedReticlePipeline() {
++        RenderPipeline.Builder builder = clonePipeline(
++                RenderPipelines.ENTITY_CUTOUT,
++                Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_final_etched_reticle"));
++        builder.withFragmentShader(Identifier.fromNamespaceAndPath(
++                GunMod.MOD_ID, "core/scope_reticle_final"));
++        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
++        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
++        builder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
++        builder.withDepthWrite(false);
++
++        RenderPipeline pipeline = RenderPipelines.register(builder.build());
++        FORCE_ALWAYS_DEPTH_PIPELINES.add(pipeline);
++        return pipeline;
++    }
++
++    private static RenderPipeline createFinalVisibleReticlePipeline() {
++        RenderPipeline.Builder builder = clonePipeline(
++                RenderPipelines.ENTITY_TRANSLUCENT_EMISSIVE,
++                Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_final_visible_reticle"));
++        builder.withFragmentShader(Identifier.fromNamespaceAndPath(
++                GunMod.MOD_ID, "core/scope_reticle_final"));
++        builder.withSampler(ScopeDepthCopyState.MASK_WORLD_SAMPLER_UNIFORM);
++        builder.withSampler(ScopeDepthCopyState.APERTURE_SAMPLER_UNIFORM);
++        builder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
++        builder.withDepthWrite(false);
++
++        RenderPipeline pipeline = RenderPipelines.register(builder.build());
++        FORCE_ALWAYS_DEPTH_PIPELINES.add(pipeline);
++        return pipeline;
++    }
++
++    private static RenderPipeline createFinalOcularRingPipeline() {
++        RenderPipeline.Builder builder = clonePipeline(
++                RenderPipelines.ENTITY_CUTOUT,
++                Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_final_ocular_ring"));
++        builder.withFragmentShader(Identifier.fromNamespaceAndPath(
++                GunMod.MOD_ID, "core/scope_ring_final"));
++        builder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
++        builder.withDepthWrite(false);
++
++        RenderPipeline pipeline = RenderPipelines.register(builder.build());
++        FORCE_ALWAYS_DEPTH_PIPELINES.add(pipeline);
++        return pipeline;
++    }
++
+     private static RenderPipeline createViewmodelCutoutPipeline() {
+         RenderPipeline.Builder builder = clonePipeline(
+                 RenderPipelines.ENTITY_CUTOUT,
+@@ -397,6 +714,14 @@ public final class ScopeRenderTypes {
+         return pipeline;
+     }
+ 
++    /**
++     * 1.21.11 的 {@code RenderType} 不再暴露 {@code hasBlending()}（那是 26.1 加的）。
++     * 等价信息在其 {@code RenderPipeline} 上：存在 BlendFunction 即为混合类型。
++     */
++    private static boolean hasBlending(RenderType type) {
++        return type.pipeline().getBlendFunction().isPresent();
++    }
++
+     private static RenderPipeline.Builder clonePipeline(RenderPipeline source, Identifier location) {
+         RenderPipeline.Builder builder = RenderPipeline.builder()
+                 .withLocation(location)
+@@ -416,13 +741,19 @@ public final class ScopeRenderTypes {
+                 builder.withUniform(uniform.name(), uniform.type(), uniform.textureFormat());
+             }
+         });
+-        builder.withColorTargetState(source.getColorTargetState());
+-        DepthStencilState sourceDepth = source.getDepthStencilState();
+-        if (sourceDepth == null) {
+-            builder.withDepthStencilState(Optional.empty());
++        // 26.1 把混合/颜色写入打包进 ColorTargetState，把深度测试/写入/bias 打包进
++        // DepthStencilState。1.21.11 全部是 Builder 上的独立 setter，这里逐项复制。
++        Optional<BlendFunction> blend = source.getBlendFunction();
++        if (blend.isPresent()) {
++            builder.withBlend(blend.get());
+         } else {
+-            builder.withDepthStencilState(sourceDepth);
++            builder.withoutBlend();
+         }
++        builder.withColorWrite(source.isWriteColor());
++        builder.withDepthTestFunction(source.getDepthTestFunction());
++        builder.withDepthWrite(source.isWriteDepth());
++        builder.withDepthBias(source.getDepthBiasScaleFactor(), source.getDepthBiasConstant());
++        builder.withColorLogic(source.getColorLogic());
+         return builder;
+     }
+ 
+@@ -461,15 +792,9 @@ public final class ScopeRenderTypes {
+             }
+         }
+ 
+-        @Override
+-        public boolean hasBlending() {
+-            return this.wrapped.hasBlending();
+-        }
+-
+-        @Override
+-        public OutputTarget outputTarget() {
+-            return this.wrapped.outputTarget();
+-        }
++        // 1.21.11 的 RenderType 没有 hasBlending()/outputTarget()（26.1 才加的）。
++        // 混合信息改由 pipeline().getBlendFunction() 表达，输出目标则由 RenderSetup 决定，
++        // 包装类无需再转发，删掉这两个 override。
+ 
+         @Override
+         public int bufferSize() {
+diff --git a/src/main/java/com/tacz/guns/compat/iris/IrisCompat.java b/src/main/java/com/tacz/guns/compat/iris/IrisCompat.java
+index 30b4d50..abd82b0 100644
+--- a/src/main/java/com/tacz/guns/compat/iris/IrisCompat.java
++++ b/src/main/java/com/tacz/guns/compat/iris/IrisCompat.java
+@@ -39,6 +39,36 @@ public final class IrisCompat {
+         }
+     }
+ 
++    /**
++     * @return whether the active Iris hand renderer is currently extracting its solid pass.
++     *         A scope reticle is frozen only in this pass and emitted later by the Iris-only
++     *         {@code HAND_TRANSLUCENT} bridge or the post-final-composite overlay.
++     *         (Semantic source: sibling 1.21.11 IrisCompat, reflection-only.)
++     */
++    public static boolean isRenderingSolidHandPass() {
++        if (!ModList.get().isLoaded(CompatRegistry.IRIS) || !isUsingRenderPack()) {
++            return false;
++        }
++        try {
++            Class<?> handRendererClass = Class.forName("net.irisshaders.iris.pathways.HandRenderer");
++            Object instance = handRendererClass.getField("INSTANCE").get(null);
++            return (Boolean) handRendererClass.getMethod("isActive").invoke(instance)
++                    && (Boolean) handRendererClass.getMethod("isRenderingSolid").invoke(instance);
++        } catch (Throwable ignored) {
++            return false;
++        }
++    }
++
++    /**
++     * The post-final-composite overlay hook was bytecode-audited against Iris 1.10.7 only.
++     * Other Iris versions keep the R8/R9 HAND_TRANSLUCENT fallback.
++     */
++    public static boolean supportsFinalScopeOverlay() {
++        return ModList.get().getModContainerById(CompatRegistry.IRIS)
++                .map(container -> container.getModInfo().getVersion().toString().startsWith("1.10.7"))
++                .orElse(false);
++    }
++
+     public static synchronized boolean assignPipelineToIris(RenderPipeline pipeline,
+                                                             String irisProgramName,
+                                                             String debugName) {
+diff --git a/src/main/java/com/tacz/guns/mixin/client/GlCommandEncoderScopeDepthCopyMixin.java b/src/main/java/com/tacz/guns/mixin/client/GlCommandEncoderScopeDepthCopyMixin.java
+index 2df8350..2512c08 100644
+--- a/src/main/java/com/tacz/guns/mixin/client/GlCommandEncoderScopeDepthCopyMixin.java
++++ b/src/main/java/com/tacz/guns/mixin/client/GlCommandEncoderScopeDepthCopyMixin.java
+@@ -1,8 +1,13 @@
+ package com.tacz.guns.mixin.client;
+ 
++import com.mojang.blaze3d.opengl.GlRenderPipeline;
++import com.mojang.blaze3d.opengl.GlStateManager;
+ import com.mojang.blaze3d.vertex.VertexFormat;
+ import com.tacz.guns.client.render.scope.ScopeDepthCopyState;
++import com.tacz.guns.client.render.scope.ScopeRenderTypes;
++import org.lwjgl.opengl.GL11;
+ import org.spongepowered.asm.mixin.Mixin;
++import org.spongepowered.asm.mixin.Unique;
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.Coerce;
+ import org.spongepowered.asm.mixin.injection.Inject;
+@@ -11,6 +16,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+ /**
+  * Runs the scope depth backup, ocular aperture copy, world-depth restore and reticle mask binding
+  * after vanilla/Iris bind the real destination FBO and before glDraw*.
++ *
++ * <p>1.21.11 port: {@code DepthTestFunction} has no ALWAYS, so reticle pipelines declare
++ * {@code NO_DEPTH_TEST} and this mixin re-enables the depth test with {@code GL_ALWAYS}
++ * right before the draw (semantic source: Fabric 1.21.11 sibling mixin).</p>
+  */
+ @Mixin(targets = "com.mojang.blaze3d.opengl.GlCommandEncoder")
+ public abstract class GlCommandEncoderScopeDepthCopyMixin {
+@@ -20,11 +29,37 @@ public abstract class GlCommandEncoderScopeDepthCopyMixin {
+                                      int firstIndex,
+                                      int indexCount,
+                                      VertexFormat.IndexType indexType,
+-                                     @Coerce Object glRenderPipeline,
++                                     GlRenderPipeline glRenderPipeline,
+                                      int instanceCount,
+                                      CallbackInfo ci) {
+         if (!ScopeDepthCopyState.beforeDraw()) {
+             ci.cancel();
++            return;
+         }
++        tacz$forceAlwaysDepthIfNeeded(glRenderPipeline);
++    }
++
++    /**
++     * 1.21.11 的 {@code DepthTestFunction} 没有 ALWAYS；reticle 因而先声明为
++     * {@code NO_DEPTH_TEST}，再在 vanilla 应用完管线状态后、真正 {@code glDraw*}
++     * 前改回「深度测试开启 + GL_ALWAYS」。
++     * <p>
++     * 这里只补深度<b>测试</b>状态，绝不手工调用 {@code _depthMask}。常规 reticle
++     * pipeline 刻意声明 {@code depthWrite=false}——写入掩码由 pipeline 决定，vanilla
++     * 已按各自 pipeline 设置 glDepthMask，这里绝不能一刀切覆盖它。
++     * <p>
++     * 此逻辑只对白名单中的 TACZ scope 前景管线生效
++     * （{@link ScopeRenderTypes#needsForcedAlwaysDepth}）。
++     */
++    @Unique
++    private static void tacz$forceAlwaysDepthIfNeeded(GlRenderPipeline glRenderPipeline) {
++        if (glRenderPipeline == null
++                || !ScopeRenderTypes.needsForcedAlwaysDepth(glRenderPipeline.info())) {
++            return;
++        }
++        // 顺序要紧: 先 enable 再设函数。vanilla 对 NO_DEPTH_TEST 走的是 _disableDepthTest(),
++        // 这里重新打开深度测试并把比较函数设成恒通过。
++        GlStateManager._enableDepthTest();
++        GlStateManager._depthFunc(GL11.GL_ALWAYS);
+     }
+ }
+diff --git a/src/main/java/com/tacz/guns/mixin/client/iris/IrisFinalScopeOverlayMixin.java b/src/main/java/com/tacz/guns/mixin/client/iris/IrisFinalScopeOverlayMixin.java
+new file mode 100644
+index 0000000..4d60018
+--- /dev/null
++++ b/src/main/java/com/tacz/guns/mixin/client/iris/IrisFinalScopeOverlayMixin.java
+@@ -0,0 +1,23 @@
++package com.tacz.guns.mixin.client.iris;
++
++import com.tacz.guns.client.render.scope.ScopeFinalOverlayState;
++import org.spongepowered.asm.mixin.Mixin;
++import org.spongepowered.asm.mixin.injection.At;
++import org.spongepowered.asm.mixin.injection.Inject;
++import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
++
++/**
++ * Renders frozen scope reticle/rim geometry only after Iris has run all composite and final passes.
++ *
++ * <p>{@code IrisRenderingPipeline#finalizeLevelRendering()} first sets {@code isRenderingWorld}
++ * false and then runs composite/final programs. At TAIL Iris no longer replaces core pipelines;
++ * {@link ScopeFinalOverlayState} can therefore use its no-fog vanilla fragments on the main output
++ * while retaining the hand projection captured during {@code HAND_SOLID}.</p>
++ */
++@Mixin(targets = "net.irisshaders.iris.pipeline.IrisRenderingPipeline", remap = false)
++public abstract class IrisFinalScopeOverlayMixin {
++    @Inject(method = "finalizeLevelRendering", at = @At("TAIL"), require = 1)
++    private void tacz$drawScopeAfterShaderPackFinal(CallbackInfo ci) {
++        ScopeFinalOverlayState.renderAfterFinalComposite();
++    }
++}
+diff --git a/src/main/java/com/tacz/guns/mixin/client/iris/IrisHandRendererReticlePassMixin.java b/src/main/java/com/tacz/guns/mixin/client/iris/IrisHandRendererReticlePassMixin.java
+new file mode 100644
+index 0000000..76cfa32
+--- /dev/null
++++ b/src/main/java/com/tacz/guns/mixin/client/iris/IrisHandRendererReticlePassMixin.java
+@@ -0,0 +1,53 @@
++package com.tacz.guns.mixin.client.iris;
++
++import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
++import com.tacz.guns.client.render.scope.ScopeLateReticleState;
++import net.minecraft.client.renderer.SubmitNodeStorage;
++import org.spongepowered.asm.mixin.Mixin;
++import org.spongepowered.asm.mixin.Shadow;
++import org.spongepowered.asm.mixin.injection.At;
++import org.spongepowered.asm.mixin.injection.Inject;
++import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
++
++/**
++ * Makes Iris 1.10.7 run one late hand pass for a deferred TACZ scope reticle.
++ *
++ * <p>{@code HandRenderer#renderTranslucent} normally returns early unless vanilla finds a
++ * translucent held block. A TACZ gun is not a {@code BlockItem}, so the reticle captured in
++ * {@code HAND_SOLID} would otherwise have no later collector to enter. This mixin only extends
++ * that gate while immutable reticle snapshots are pending. It then submits them after Iris has
++ * selected {@code HAND_TRANSLUCENT}, but before Iris' normal {@code endBatch()} flush; Iris still
++ * owns all FBO, shader and draw scheduling.</p>
++ */
++@Mixin(targets = "net.irisshaders.iris.pathways.HandRenderer", remap = false)
++public abstract class IrisHandRendererReticlePassMixin {
++    @Shadow private SubmitNodeStorage submitNodeCollector;
++
++    @ModifyExpressionValue(
++            method = "renderTranslucent",
++            at = @At(
++                    value = "INVOKE",
++                    target = "Lnet/irisshaders/iris/pathways/HandRenderer;isAnyHandTranslucent()Z"
++            ),
++            require = 0
++    )
++    private boolean tacz$runLateHandPassForScopeReticle(boolean hasVanillaTranslucentHand) {
++        return hasVanillaTranslucentHand || ScopeLateReticleState.hasPendingReticles();
++    }
++
++    @Inject(
++            method = "renderTranslucent",
++            at = @At(
++                    value = "INVOKE",
++                    target = "Lnet/irisshaders/iris/pipeline/WorldRenderingPipeline;setPhase(Lnet/irisshaders/iris/pipeline/WorldRenderingPhase;)V",
++                    ordinal = 0,
++                    shift = At.Shift.AFTER
++            ),
++            require = 0
++    )
++    private void tacz$submitScopeReticleAfterWorldTranslucency(CallbackInfo ci) {
++        // The collector is flushed later by Iris' own ItemInHandRenderer endBatch wrapper. Do not
++        // draw immediately here: that would bypass the currently selected HAND_TRANSLUCENT shader.
++        ScopeLateReticleState.submitPending(this.submitNodeCollector);
++    }
++}
+diff --git a/src/main/resources/assets/tacz/shaders/core/scope_reticle_final.fsh b/src/main/resources/assets/tacz/shaders/core/scope_reticle_final.fsh
+new file mode 100644
+index 0000000..67c5698
+--- /dev/null
++++ b/src/main/resources/assets/tacz/shaders/core/scope_reticle_final.fsh
+@@ -0,0 +1,98 @@
++#version 330
++
++// TACZ final reticle shader: no-fog entity clone with the
++// ocular screen-space mask branch prepended to main(). It is drawn after Iris final compositing;
++// shader defines (EMISSIVE / ALPHA_CUTOUT / NO_OVERLAY / PER_FACE_LIGHTING / DISSOLVE) and
++// uniform blocks remain compatible with the source pipeline, except fog is intentionally omitted.
++//
++// The branch is dormant (tacz_ScopeMaskMode == 0) for every ordinary draw. A reticle draw that
++// owns a fresh ocular aperture copy enables it and passes:
++//   tacz_WorldDepthSampler    the pre-ocular world-depth backup (step 1)
++//   tacz_ApertureDepthSampler the aperture depth copied before the body draw (step 3)
++// Only pixels where apertureDepth < worldDepth - epsilon keep the reticle; everything else
++// discards, clipping the reticle to the true ocular footprint without any stencil attachment.
++
++#moj_import <minecraft:dynamictransforms.glsl>
++
++uniform sampler2D Sampler0;
++
++#ifdef DISSOLVE
++uniform sampler2D DissolveMaskSampler;
++#endif
++
++uniform int tacz_ScopeMaskMode;
++// Set by ScopeDepthCopyState only for the Iris post-composite overlay path. Keeping this live
++// lets that path bypass destination-depth identity checks and sample its private world copy.
++uniform int tacz_ScopeFinalOverlay;
++uniform sampler2D tacz_WorldDepthSampler;
++uniform sampler2D tacz_ApertureDepthSampler;
++
++// Guard band for "strictly nearer": equal values mean no ocular fragment wrote that pixel.
++const float TACZ_MASK_EPSILON = 1.0e-6;
++
++in float sphericalVertexDistance;
++in float cylindricalVertexDistance;
++#ifdef PER_FACE_LIGHTING
++in vec4 vertexPerFaceColorBack;
++in vec4 vertexPerFaceColorFront;
++#else
++in vec4 vertexColor;
++#endif
++
++#ifndef EMISSIVE
++in vec4 lightMapColor;
++#endif
++
++#ifndef NO_OVERLAY
++in vec4 overlayColor;
++#endif
++
++in vec2 texCoord0;
++
++out vec4 fragColor;
++
++void main() {
++    if (tacz_ScopeFinalOverlay == 0) {
++        discard;
++    }
++    if (tacz_ScopeMaskMode != 0) {
++        vec2 taczWorldUv = gl_FragCoord.xy / max(vec2(textureSize(tacz_WorldDepthSampler, 0)), vec2(1.0));
++        vec2 taczApertureUv = gl_FragCoord.xy / max(vec2(textureSize(tacz_ApertureDepthSampler, 0)), vec2(1.0));
++        float taczWorldDepth = texture(tacz_WorldDepthSampler, taczWorldUv).r;
++        float taczApertureDepth = texture(tacz_ApertureDepthSampler, taczApertureUv).r;
++        if (!(taczApertureDepth < taczWorldDepth - TACZ_MASK_EPSILON)) {
++            discard;
++        }
++    }
++
++    vec4 color = texture(Sampler0, texCoord0);
++#ifdef ALPHA_CUTOUT
++    if (color.a < ALPHA_CUTOUT) {
++        discard;
++    }
++#endif
++
++#ifdef PER_FACE_LIGHTING
++    vec4 faceVertexColor = gl_FrontFacing ? vertexPerFaceColorFront : vertexPerFaceColorBack;
++#else
++    vec4 faceVertexColor = vertexColor;
++#endif
++
++#ifdef DISSOLVE
++    if (faceVertexColor.a < texture(DissolveMaskSampler, texCoord0).a) {
++        discard;
++    }
++    // The dissolve effect entirely replaces translucency
++    faceVertexColor.a = 1.0;
++#endif
++
++    color *= faceVertexColor * ColorModulator;
++#ifndef NO_OVERLAY
++    color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);
++#endif
++#ifndef EMISSIVE
++    color *= lightMapColor;
++#endif
++
++    fragColor = color;
++}
+diff --git a/src/main/resources/assets/tacz/shaders/core/scope_ring_final.fsh b/src/main/resources/assets/tacz/shaders/core/scope_ring_final.fsh
+new file mode 100644
+index 0000000..5a73828
+--- /dev/null
++++ b/src/main/resources/assets/tacz/shaders/core/scope_ring_final.fsh
+@@ -0,0 +1,66 @@
++#version 330
++
++// TACZ final ocular-ring shader. This is the 1.21.11 entity fragment path without
++// apply_fog(): the ring is a physical 3D foreground layer submitted after Iris has finished
++// all shader-pack composite/final passes. Its vertex data, lightmap and overlay remain normal.
++
++#moj_import <minecraft:dynamictransforms.glsl>
++
++uniform sampler2D Sampler0;
++
++#ifdef DISSOLVE
++uniform sampler2D DissolveMaskSampler;
++#endif
++
++in float sphericalVertexDistance;
++in float cylindricalVertexDistance;
++#ifdef PER_FACE_LIGHTING
++in vec4 vertexPerFaceColorBack;
++in vec4 vertexPerFaceColorFront;
++#else
++in vec4 vertexColor;
++#endif
++
++#ifndef EMISSIVE
++in vec4 lightMapColor;
++#endif
++
++#ifndef NO_OVERLAY
++in vec4 overlayColor;
++#endif
++
++in vec2 texCoord0;
++
++out vec4 fragColor;
++
++void main() {
++    vec4 color = texture(Sampler0, texCoord0);
++#ifdef ALPHA_CUTOUT
++    if (color.a < ALPHA_CUTOUT) {
++        discard;
++    }
++#endif
++
++#ifdef PER_FACE_LIGHTING
++    vec4 faceVertexColor = gl_FrontFacing ? vertexPerFaceColorFront : vertexPerFaceColorBack;
++#else
++    vec4 faceVertexColor = vertexColor;
++#endif
++
++#ifdef DISSOLVE
++    if (faceVertexColor.a < texture(DissolveMaskSampler, texCoord0).a) {
++        discard;
++    }
++    faceVertexColor.a = 1.0;
++#endif
++
++    color *= faceVertexColor * ColorModulator;
++#ifndef NO_OVERLAY
++    color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);
++#endif
++#ifndef EMISSIVE
++    color *= lightMapColor;
++#endif
++
++    fragColor = color;
++}
+diff --git a/src/main/resources/tacz.iris.mixins.json b/src/main/resources/tacz.iris.mixins.json
+index 7d0dda1..b7032c6 100644
+--- a/src/main/resources/tacz.iris.mixins.json
++++ b/src/main/resources/tacz.iris.mixins.json
+@@ -5,9 +5,12 @@
+   "compatibilityLevel": "JAVA_21",
+   "plugin": "com.tacz.guns.mixin.client.iris.IrisCompatMixinPlugin",
+   "client": [
+-    "IrisDepthRestoreShaderMixin"
++    "IrisDepthRestoreShaderMixin",
++    "IrisHandRendererReticlePassMixin",
++    "IrisFinalScopeOverlayMixin"
+   ],
+   "injectors": {
+     "defaultRequire": 0
+-  }
++  },
++  "_comment": "阶段 9/R8-R11 Iris 集成（自姊妹 1.21.11 分支平移）。ShaderCreator.link 的第 5 次 createShader(ordinal=4)是 fragment；R8 为冻结 scope reticle 强制 HAND_TRANSLUCENT，R9 写 late foreground depth；Complementary 仍使用不可覆盖的 post-composite 雾深度后，R11 仅对经审计的 Iris 1.10.7 在 IrisRenderingPipeline.finalizeLevelRendering TAIL 重画同一份 3D 快照，使用 no-fog vanilla fragments。required=false + IrisCompatMixinPlugin 的 isModLoaded 双重兜底，未装 Iris 不受影响。"
+ }

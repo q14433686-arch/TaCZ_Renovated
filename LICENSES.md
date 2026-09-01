@@ -14,6 +14,7 @@
 | LRTactical 原作美术 | **不打包**；原作 Art Assets: All Rights Reserved |
 | 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0（**非商业**、禁止演绎；随 jar 分发的默认枪包受此约束，故本 mod jar 整体按非商业再分发处理，与原版 TaCZ 同一约束） |
 | 本仓库品牌图标 `icon.png` / `logo.png` | 本项目原创（`scripts/generate_branding.py`），**不是**官方 TaCZ 美术的衍生品 |
+| TacZ Mesh Loader [TML] 代码部分（包 `cn.sh1rocu.tacz.compat.meshloader`） | GPL-3.0，移植自 [`VellEagle/TacZMeshLoader`](https://github.com/VellEagle/TacZMeshLoader)（`1.21.1_fabric` v0.1.7），作者 VellEagle。**不是**官方 TaCZ 附属；随姊妹分支 `arena/01a04e96` 的 `8c6ad27` 同步 |
 
 ## 构建骨架
 

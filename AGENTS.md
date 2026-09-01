@@ -9,7 +9,7 @@
 Minecraft **26.2** + NeoForge **26.2.0.64** + Java **25** 的非官方 GPL-3.0 移植。
 
 - modId 永远是 `tacz`；枪包依赖已绑定该 id。
-- 当前版本：`1.1.8+neoforge.26.2.R1-hotfix`，已发布（2026-08-22，GitHub Release `26.2_R1`）。
+- 当前版本：`1.1.8+neoforge.26.2.R2`（R2 候选，待发布命令；R1 / `R1-hotfix` 已发布于 2026-08-22，GitHub Release `26.2_R1`）。
 - 代码谱系基线：26.1.2 R1 分支
   `arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0`，尖端
   `6020a5cf1dd02c356f797557f6323b0d430b75e1`；该稳定基线包含多人修复与
@@ -68,7 +68,7 @@ bash scripts/check_release_consistency.sh --strict
    （26.2 的 `ItemTransform#apply` 会把中心移到 −0.5，见
    `docs/records/LR_043_FOLLOWUP_20260826.md`）；1.21.1 的约束位移在 26.2 没有对应
    基座（见 `docs/records/SCOPE_IRIS_VIEWLAG_AUDIT_20260826.md` 症状表）；mod 构造期
-   注册表在 26.1 已冻结、与 1.20.1 老 Forge 相反（见 `docs/WP07_LRTACTICAL_PLAN.md`）。
+   注册表在 26.1 已冻结、与 1.20.1 老 Forge 相反（见 `docs/investigations/WP07_LRTACTICAL_PLAN.md`）。
 
    处置口径：
    - 归类为**「不适用（上游纪元）」**，写进对应状态文档并给出上游机制的指认，
@@ -87,9 +87,12 @@ bash scripts/check_release_consistency.sh --strict
 | `docs/DEVELOPMENT.md` | 构建、运行、权威边界与开发纪律 |
 | `docs/PORTING_STATUS.md` | 当前候选状态与发布闸门 |
 | `docs/DEDICATED_SERVER_TEST.md` / `docs/GUNPACKS.md` | L0-L4 验收与枪包指南 |
-| `docs/RELEASE_CHECKLIST.md` | R1 发布前逐项门禁 |
-| `docs/WP262_*_EVIDENCE.md` | 26.2 工作包证据 |
-| `docs/records/` | 冻结审计快照及 26.1.2 R1 回流证据 |
+| `docs/RELEASE_CHECKLIST.md` | R2 发布前逐项门禁 |
+| `docs/investigations/` | 冻结的工作包证据与路线图（原 `docs/WP262_*_EVIDENCE.md` 等） |
+| `docs/records/` | 冻结审计快照、同步取证与 26.1.2 R1 回流证据 |
+| `docs/handoff/` | 写给姊妹分支维护者的回单（机制 + 证据，不贴代码） |
+| `scripts/generate_changelog.sh` | 收尾用 CHANGELOG 草稿生成器（只按前缀归类，不判断机制） |
+| `.github/workflows/` | `compile-check` 编译闭环 / `changelog` 收尾草稿 / `consistency` 版本门禁 + 链接核验 |
 | `CHARTER.md` / 本文件 | 规则 |
 
 ## 5. 会话结束前自检
@@ -101,3 +104,5 @@ bash scripts/check_release_consistency.sh --strict
 - [ ] 报为缺陷的症状已判过机制归属：能指认到 1.20.1 / 1.21.1 上游纪元机制的
       已归为「不适用（上游纪元）」，没有被当成移植遗漏去修
 - [ ] 当前分支仍是固定 Arena 分支，未切换或创建其他分支
+- [ ] 版本收尾时已生成 CHANGELOG 草稿并**人工核对**（`bash scripts/generate_changelog.sh`），
+      未把脚本的归类当成机制描述

@@ -16,12 +16,25 @@ import org.apache.commons.lang3.StringUtils;
 public class TextShowRender implements IFunctionalSubmitter {
     private final TextShow textShow;
     private final ItemStack gunStack;
+    /**
+     * 【镜内文字】true = 优先走目镜掩码裁剪管线（{@code ScopeTextSubmitter}），
+     * 把文字约束在目镜投影内；掩码不可用时自动回退 vanilla submitText。
+     *
+     * <p>只有<b>瞄具</b>模型（{@code BedrockAttachmentModel}）用 true ——
+     * 枪身上的文字（弹匣计数等）不在镜筒上，天然不该被目镜裁剪。</p>
+     */
+    private final boolean clipToScopeMask;
 
     public TextShowRender(BedrockModel bedrockModel, TextShow textShow, ItemStack gunStack) {
+        this(bedrockModel, textShow, gunStack, false);
+    }
+
+    public TextShowRender(BedrockModel bedrockModel, TextShow textShow, ItemStack gunStack, boolean clipToScopeMask) {
         // Keep BedrockModel in the constructor contract used by gun-pack model registration. Text
         // itself is emitted as an immutable collector task and needs no mutable model reference.
         this.textShow = textShow;
         this.gunStack = gunStack;
+        this.clipToScopeMask = clipToScopeMask;
     }
 
     @Override
@@ -50,10 +63,38 @@ public class TextShowRender implements IFunctionalSubmitter {
         frozenPose.mulPose(Axis.ZP.rotationDegrees(180f));
         frozenPose.scale(2 / 300f * scale, -2 / 300f * scale, -2 / 300f);
         var sequence = Component.literal(text).getVisualOrderText();
+        boolean clip = this.clipToScopeMask;
         context.add(collector -> {
             PoseStack taskPose = new PoseStack();
             taskPose.last().pose().set(frozenPose.last().pose());
             taskPose.last().normal().set(frozenPose.last().normal());
+            // 【镜内文字】瞄具文字优先走掩码裁剪管线：文字被约束在目镜投影内，
+            // 不再穿出镜筒（MK5HD 弹药计数一案）。submit 返回 false 表示本帧
+            // 掩码不可用（配置关闭/光影/target 失败），回退 vanilla 路径 ——
+            // 行为退回「开镜门禁 + 可能溢出」的已验证现状，绝不丢字。
+            // 【光影路径】光影包在用时，文字不能进 Iris 的手部 pass。
+            //
+            // 自定义管线被 assign 给 Iris 的 HAND 程序后，着色由光影包的手部着色器
+            // 接管；而文字用的是 TEXT 顶点格式（POSITION_TEX_LIGHTMAP_COLOR，
+            // 没有 Normal），光影包按实体格式取法线与 lightmap，语义对不上 ——
+            // 字形被画成一片黑块。注入分支 tacz_ScopeMaskMode 只做 discard、
+            // 不接管着色，补登记 mode 能救裁切，救不了黑块。
+            //
+            // 因此这里改为把文字排进 LevelRenderer#render 之后的最终覆盖层
+            // （与遮光环同一条路），用一条【不交给 Iris】的管线副本重画 ——
+            // 字形、alpha 裁剪、目镜裁剪全部回到我们自己的着色器手里。
+            if (clip
+                    && com.tacz.guns.compat.iris.IrisCompat.isUsingRenderPack()
+                    && com.tacz.guns.client.render.scope.ScopeFinalRingOverlay.overlayAvailable()) {
+                com.tacz.guns.client.render.scope.ScopeFinalRingOverlay.queueText(
+                        taskPose, -xOffset, -font.lineHeight / 2f, sequence, shadow, packedLight, color);
+                return;
+            }
+            if (clip && com.tacz.guns.client.render.scope.ScopeTextSubmitter.submit(
+                    collector, taskPose, -xOffset, -font.lineHeight / 2f, sequence,
+                    shadow, packedLight, color, false)) {
+                return;
+            }
             collector.submitText(taskPose, -xOffset, -font.lineHeight / 2f, sequence, shadow,
                     Font.DisplayMode.NORMAL, packedLight, color, 0, 0);
         });

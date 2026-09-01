@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "cn.sh1rocu.tacz.compat.meshloader.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "GunDisplayInstanceMixin",
+    "ClientAttachmentIndexMixin",
+    "ClientAmmoIndexMixin",
+    "ClientBlockIndexMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "_comment": "内置 TacZ Mesh Loader 的模型装载点（同步自姊妹分支 arena/01a04e96 的 8c6ad27）。四个目标全是本仓自有类（GunDisplayInstance / ClientAttachmentIndex / ClientAmmoIndex / ClientBlockIndex），不是第三方表面，所以 required=true + defaultRequire=1：装载点一旦在版本迁移中改名就fail-fast，而不是静默丢掉 poly_mesh 支持。compatibilityLevel 与本仓其余 mixin 配置一致（JAVA_21）。"
+}

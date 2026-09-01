@@ -67,6 +67,12 @@ config="tacz.punchy.mixins.json"
 [[mixins]]
 config="lrtactical.mixins.json"
 
+[[mixins]]
+config="tacz.voxy.mixins.json"
+
+[[mixins]]
+config="tacz.mesh.mixins.json"
+
 # The [[accessTransformers]] block allows you to declare where your AT file is.
 # If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg
 [[accessTransformers]]

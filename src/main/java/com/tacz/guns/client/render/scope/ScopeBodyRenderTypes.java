@@ -72,6 +72,16 @@ public final class ScopeBodyRenderTypes {
     private static final BindGroupLayout MASK_SAMPLER_LAYOUT =
             BindGroupLayout.builder().withSampler(MASK_SAMPLER).build();
 
+    /** 供 meshloader 的 GPU 裁剪管线复用（同一个 layout 实例 = 同一个 sampler 名）。 */
+    public static BindGroupLayout maskSamplerLayout() {
+        return MASK_SAMPLER_LAYOUT;
+    }
+
+    /** 掩码采样器在 bind group 里的名字，供外部 pass 手动绑定时对齐。 */
+    public static String maskSamplerName() {
+        return MASK_SAMPLER;
+    }
+
     private static RenderPipeline buildPipeline(String name, boolean mask, boolean invert, boolean emissive) {
         var builder = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
                 .withLocation(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/" + name))
@@ -205,6 +215,32 @@ public final class ScopeBodyRenderTypes {
             buildPipeline("scope_reticle_emissive", false, false, true);
 
     /**
+     * 【遮光环最终覆盖】物理目镜框的「无掩码 + 无雾」管线。
+     *
+     * <p>与 {@link #CLIPPED_PIPELINE} 的差异只有着色器：{@code core/scope_ring_final}
+     * 是 {@code core/scope_body} 去掉 SCOPE_MASK 那一段、再去掉 {@code apply_fog}
+     * 之后的形态（见该文件的头注释）。顶点着色器仍复用 {@code core/scope_body}
+     * （与 vanilla entity.vsh 逐字节相同）。</p>
+     *
+     * <h2>刻意<b>不</b>注册给 Iris 的 HAND 程序</h2>
+     * 下面 {@link #ensureIrisCompatibility} 给每条自定义管线都做了
+     * {@code assignScopePipelineToHand}，唯独这条<b>不能做</b>：本管线的全部意义就是
+     * 在 Iris 收工<b>之后</b>、用手持那一遍冻结下来的投影/模型视图直接画到主画面上。
+     * 一旦交给 Iris 接管，它就会被塞回光影管线里 —— 既拿不到无雾语义，
+     * 也会被 {@code ScopeFinalRingOverlay} 想躲开的那些后置 pass 再盖一次。
+     */
+    private static final RenderPipeline RING_FINAL_PIPELINE =
+            RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+                    .withLocation(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_ring_final"))
+                    .withVertexShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_body"))
+                    .withFragmentShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_ring_final"))
+                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+                    .withShaderDefine("PER_FACE_LIGHTING")
+                    .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
+                    .withCull(false)
+                    .build();
+
+    /**
      * 第一人称视模（枪身/非瞄具配件）的「镜内 discard」总入口。
      *
      * <h2>它补的是哪个洞（目镜内未裁切枪体、配件 一案）</h2>
@@ -270,7 +306,9 @@ public final class ScopeBodyRenderTypes {
     private static final Map<Identifier, RenderType> RETICLE_EMISSIVE_CACHE = new HashMap<>();
     private static final Map<Identifier, RenderType> EMISSIVE_CACHE = new HashMap<>();
     private static final Map<Identifier, RenderType> FLASH_TRANSLUCENT_CACHE = new HashMap<>();
+    private static final Map<Identifier, RenderType> ARM_CACHE = new HashMap<>();
     private static final Map<Identifier, RenderType> FLASH_SWIRL_CACHE = new HashMap<>();
+    private static final Map<Identifier, RenderType> RING_FINAL_CACHE = new HashMap<>();
 
     private ScopeBodyRenderTypes() {
     }
@@ -283,6 +321,7 @@ public final class ScopeBodyRenderTypes {
         event.registerPipeline(RETICLE_PIPELINE);
         event.registerPipeline(RETICLE_EMISSIVE_PIPELINE);
         event.registerPipeline(EMISSIVE_PIPELINE);
+        event.registerPipeline(RING_FINAL_PIPELINE);
     }
 
     /**
@@ -323,6 +362,18 @@ public final class ScopeBodyRenderTypes {
     }
 
     /**
+     * 【遮光环最终覆盖】物理目镜框：不裁、不过雾，画在光影收工与镜内合成之后。
+     *
+     * <p>见 {@link ScopeFinalRingOverlay} 与 {@code core/scope_ring_final.fsh} 的头注释。
+     * 这里复用 {@link #create} 的 {@code bindMask=false} 分支 —— 该管线没有声明
+     * 掩码采样器，多绑一个反而会抛 {@code Missing sampler}。</p>
+     */
+    public static RenderType ringFinal(Identifier texture) {
+        return RING_FINAL_CACHE.computeIfAbsent(texture,
+                tex -> create("tacz_scope_ring_final", RING_FINAL_PIPELINE, tex, false));
+    }
+
+    /**
      * 枪口火光（大面片层）：只在目镜<b>没盖到</b>处绘制。
      *
      * <p>调用方须先过 {@link #maskReadyForViewmodel} —— 掩码没就绪时必须
@@ -332,6 +383,44 @@ public final class ScopeBodyRenderTypes {
         ensureIrisCompatibility();
         return FLASH_TRANSLUCENT_CACHE.computeIfAbsent(texture,
                 tex -> create("tacz_scope_flash_translucent_clipped", FLASH_TRANSLUCENT_CLIPPED_PIPELINE, tex, true));
+    }
+
+    /**
+     * 第一人称手臂的「镜内 discard」版 {@code entityTranslucent}。
+     *
+     * <h2>为什么手臂要单独一个入口（镜内裁手一案）</h2>
+     * 手臂的提交发生在 {@code AvatarRenderer#renderHand} <b>内部</b>——字节码实读：
+     * <pre>collector.submitModelPart(arm, pose, RenderTypes.entityTranslucent(skin), light, NO_OVERLAY, null)</pre>
+     * RenderType 是 vanilla 自己挑的（玩家皮肤含半透明二层袖，必须 translucent），
+     * 我们无法像枪身那样在调用点直接换 —— 由 {@code RenderHelper} 用
+     * collector 代理把这次提交的 RenderType 原地替换成本方法的返回值。
+     *
+     * <p><b>管线复用</b> {@link #FLASH_TRANSLUCENT_CLIPPED_PIPELINE}：它就是
+     * vanilla {@code ENTITY_TRANSLUCENT} 管线的逐项抄本 + SCOPE_MASK 三件套，
+     * 火光与手臂在管线状态上无差别（同 blend、同 snippet、同 define）。
+     * 但 <b>RenderSetup 不能复用</b> {@code create(...)} 助手：vanilla
+     * {@code entityTranslucent} 的 setup（lambda$static$12 字节码实读）比
+     * entityCutout 多 {@code affectsCrumbling() + sortOnUpload()} 两项 ——
+     * 半透明批次不 sortOnUpload 会出现二层袖压一层臂的错序。照抄补齐。</p>
+     *
+     * <p>调用方须先过 {@link #maskReadyForViewmodel}，任一不满足退回
+     * vanilla {@code entityTranslucent} —— 与枪身/火光同一失败哲学：
+     * 特性坏掉最多回到「镜内见手臂」的现状，绝不画错模型。</p>
+     *
+     * <p>同步自姊妹分支 {@code arena/01a04e96} 的 {@code 94179d4}（她侧已 PASS）。</p>
+     */
+    public static RenderType armClipped(Identifier skinTexture) {
+        ensureIrisCompatibility();
+        return ARM_CACHE.computeIfAbsent(skinTexture,
+                tex -> RenderType.create("tacz_scope_arm_clipped",
+                        RenderSetup.builder(FLASH_TRANSLUCENT_CLIPPED_PIPELINE)
+                                .withTexture("Sampler0", tex)
+                                .withTexture(MASK_SAMPLER, ScopeMaskTextureHandle.ID)
+                                .useLightmap()
+                                .useOverlay()
+                                .affectsCrumbling()
+                                .sortOnUpload()
+                                .createRenderSetup()));
     }
 
     /**
@@ -380,6 +469,54 @@ public final class ScopeBodyRenderTypes {
             return false;
         }
         return ScopeMaskTextureHandle.syncToMaskTarget();
+    }
+
+    /**
+     * 视模裁剪判定的<b>绘制时</b>变体（供 executeSolid 之后才绘制的消费者：
+     * GPU mesh 手部表，自定义 pass 与 Iris RenderType 两路）。
+     *
+     * <h2>为什么必须与 {@link #maskReadyForViewmodel} 分开（2026-09-02 实机案）</h2>
+     * mesh 手部表的绘制点在 {@code renderAllFeatures} 的 executeSolid <b>之后</b>，
+     * 而阶段边界的掩码绘制（executeSolid 之前）已在 finally 里把
+     * {@code ScopeMaskGeometry} 消费清空 —— 绘制时若仍查活几何，
+     * {@code isEmpty()} 恒真 ⇒ 判定恒 false ⇒ <b>mesh 枪身从未被裁</b>：
+     * 主画面上枪管一直穿进镜片画面；只有二次渲染的镜内画面恰好是
+     * 不含视模的整幅世界渲染，才「看起来裁了」。用户实机看到的
+     * 「枪身仅二次渲染时被高倍镜裁切」即此症状（裁切本身是正确行为，
+     * 缺的是其他形态下的裁切）。
+     *
+     * <p>绘制时改看<b>帧快照</b>：本帧阶段边界是否成功画过允许裁视模的
+     * 掩码（{@code ScopeMaskRenderer#hasViewmodelClipMaskThisFrame}，
+     * 在画掩码时、清空之前记下）—— 与 submit 时查活几何语义等价，
+     * 与 cube 的 {@code clipForViewmodel} 同开同关。其余 gate 逐字一致。
+     * EMISSIVE 回退档不裁的事由在调用方（lightmap 取不到已降级，宁简勿繁）。</p>
+     */
+    public static boolean maskReadyForViewmodelAtDraw() {
+        if (!com.tacz.guns.config.client.RenderConfig.SCOPE_MASK_ENABLE.get()) {
+            return false;
+        }
+        if (IrisCompat.shouldDisableScopeMaskUnderShaderPack()) {
+            return false;
+        }
+        if (!ScopeMaskRenderer.hasViewmodelClipMaskThisFrame()) {
+            return false;
+        }
+        return ScopeMaskTextureHandle.syncToMaskTarget();
+    }
+
+    /**
+     * {@link #clipForViewmodel} 的绘制时变体（GPU mesh 手部表的 Iris RenderType 路）。
+     * 判据换成 {@link #maskReadyForViewmodelAtDraw()}，其余逐字一致。
+     */
+    public static RenderType clipForViewmodelAtDraw(RenderType original,
+                                                    @javax.annotation.Nullable Identifier texture) {
+        if (texture == null) {
+            return original;
+        }
+        if (!maskReadyForViewmodelAtDraw()) {
+            return original;
+        }
+        return clipped(texture);
     }
 
     private static RenderType create(String name, RenderPipeline pipeline, Identifier tex, boolean bindMask) {

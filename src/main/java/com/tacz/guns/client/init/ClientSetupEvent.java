@@ -28,8 +28,11 @@ import com.tacz.guns.client.renderer.item.BuiltinItemRendererRegistry;
 import com.tacz.guns.client.renderer.item.GunItemRendererWrapper;
 import com.tacz.guns.client.renderer.item.GunSmithTableItemRenderer;
 import com.tacz.guns.client.renderer.item.TaczDynamicItemModel;
+import cn.sh1rocu.tacz.compat.meshloader.TaczMeshyIntegration;
 import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
 import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
+import com.tacz.guns.client.render.scope.ScopePipRenderer;
+import com.tacz.guns.client.render.scope.ScopeTextRenderTypes;
 import com.tacz.guns.client.resource.ClientAssetsManager;
 import com.tacz.guns.client.tooltip.ClientAmmoBoxTooltip;
 import com.tacz.guns.client.tooltip.ClientAttachmentItemTooltip;
@@ -129,12 +132,18 @@ public class ClientSetupEvent {
     public static void onRegisterRenderPipelines(RegisterRenderPipelinesEvent event) {
         ScopeMaskRenderer.registerPipeline(event);
         ScopeBodyRenderTypes.registerPipelines(event);
+        // 镜内文字的裁剪管线（本仓所有自定义管线一律在此登记）。
+        ScopeTextRenderTypes.registerPipeline(event);
+        // 镜内画中画的合成管线。注册失败只让 PIP 自我停用，不影响进游戏。
+        ScopePipRenderer.registerPipeline(event);
     }
 
     @SubscribeEvent
     public static void onClientResourceReload(AddClientReloadListenersEvent event) {
         PlayerAnimatorCompat.init();
         PlayerAnimatorCompat.registerReloadListener(event::addListener);
+        // 内置 TacZ Mesh Loader：资源重载即失效 geo 解析缓存。
+        TaczMeshyIntegration.registerReloadListener(event::addListener);
         ClientAssetsManager.INSTANCE.reloadAndRegister(event);
     }
 
@@ -151,6 +160,8 @@ public class ClientSetupEvent {
         ARCompat.init();
         ZoomifyCompat.init();
         ImmediatelyFastCompat.init();
+        // 内置 TacZ Mesh Loader：注册 model_type=mesh。
+        TaczMeshyIntegration.onClientSetup();
     }
 
     public static void registerItemRenderers() {

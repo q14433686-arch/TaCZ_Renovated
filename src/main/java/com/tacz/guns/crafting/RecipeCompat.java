@@ -58,13 +58,14 @@ public final class RecipeCompat {
      * {@code {"item":"minecraft:flint"}} → {@code "minecraft:flint"}.
      */
     private static final Set<String> SUPPORTED_FORGE_INGREDIENTS =
-            Set.of("forge:partial_nbt", "forge:nbt");
+            Set.of("forge:partial_nbt", "forge:nbt", "tacz:nbt");
 
     /**
-     * The Forge-era gun packs in the wild use {@code forge:partial_nbt} and {@code forge:nbt}.
-     * NeoForge 26.1 has an equivalent native custom ingredient, registered as
-     * {@code tacz:partial_nbt}; convert only these two known types and leave every unknown
-     * custom type untouched rather than guessing its semantics.
+     * The Forge-era gun packs in the wild use {@code forge:partial_nbt} and {@code forge:nbt};
+     * packs upgraded for upstream 1.21.1 use {@code tacz:nbt} (items + nbt + partial). NeoForge
+     * has an equivalent native custom ingredient, registered as {@code tacz:partial_nbt} (its
+     * {@code strict} flag covers both match modes). Convert only these known types and leave
+     * every unknown custom type untouched rather than guessing its semantics.
      */
     private static JsonElement normalizeCustomIngredient(JsonObject source) {
         JsonElement typeElement = source.get("type");
@@ -73,11 +74,16 @@ public final class RecipeCompat {
                 || !SUPPORTED_FORGE_INGREDIENTS.contains(typeElement.getAsString())) {
             return source;
         }
+        String type = typeElement.getAsString();
 
         JsonElement itemsElement = source.get("items");
         JsonArray items = new JsonArray();
         if (itemsElement != null && itemsElement.isJsonArray()) {
             itemsElement.getAsJsonArray().forEach(items::add);
+        } else if (itemsElement != null && itemsElement.isJsonPrimitive()) {
+            // TaCZPackUpgrader writes tacz:nbt's items as a single string ("Not a json array"
+            // in upstream codecs); wrap it so both shapes parse.
+            items.add(itemsElement);
         } else if (source.has("item") && source.get("item").isJsonPrimitive()) {
             items.add(source.get("item"));
         } else {
@@ -93,8 +99,18 @@ public final class RecipeCompat {
         normalized.addProperty("neoforge:ingredient_type", "tacz:partial_nbt");
         normalized.add("items", items);
         normalized.add("nbt", nbt.deepCopy());
-        if ("forge:nbt".equals(typeElement.getAsString())) {
+        // forge:nbt = strict equality; tacz:nbt carries its own "partial" flag (absent = false
+        // = strict, matching the upstream codec's optionalFieldOf("partial", false)).
+        if ("forge:nbt".equals(type)) {
             normalized.addProperty("strict", true);
+        } else if ("tacz:nbt".equals(type)) {
+            JsonElement partial = source.get("partial");
+            boolean partialMatch = partial != null && partial.isJsonPrimitive()
+                    && partial.getAsJsonPrimitive().isBoolean()
+                    && partial.getAsBoolean();
+            if (!partialMatch) {
+                normalized.addProperty("strict", true);
+            }
         }
         return normalized;
     }
@@ -111,6 +127,24 @@ public final class RecipeCompat {
             }
             JsonElement item = obj.get("item");
             if (item != null && item.isJsonPrimitive() && item.getAsJsonPrimitive().isString()) {
+                // 【隐式 NBT 材料 —— 跨包合成 bug 追查轮】旧写法允许不带 "type" 直接写
+                // {"item": "tacz:modern_kinetic_gun", "nbt": {"GunId": ...}}。此前这里把 "nbt"
+                // 【静默丢弃】、只留物品 id —— 后果双重：材料格显示一把没有 GunId 的裸枪（缺省
+                // 模型/名字不对），匹配退化成「任意一把同物品枪都行」。带 nbt 的对象改写成
+                // partial_nbt 语义（宽松子集匹配 —— 枪械物品必然带着弹药数/开火模式等额外字段，
+                // strict 永远不可能命中一把用过的枪，partial 是唯一可用语义，与姊妹线 1.21.11
+                // 2026-09-01 的判定一致）。
+                if (obj.has("nbt") && obj.get("nbt").isJsonObject()) {
+                    JsonObject out = new JsonObject();
+                    out.addProperty("neoforge:ingredient_type", "tacz:partial_nbt");
+                    JsonArray items = new JsonArray(1);
+                    items.add(item);
+                    out.add("items", items);
+                    out.add("nbt", obj.get("nbt"));
+                    GunMod.LOGGER.info("Rewrote a legacy no-type NBT ingredient (item={} + nbt) to tacz:partial_nbt "
+                            + "semantics; previously the nbt was silently dropped.", item.getAsString());
+                    return out;
+                }
                 return item;
             }
             return raw;
