@@ -5,6 +5,7 @@ import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.tacz.guns.api.client.event.RenderItemInHandBobEvent;
 import com.tacz.guns.api.client.event.RenderLevelBobEvent;
+import com.tacz.guns.client.render.scope.ScopeDepthCopyState;
 import com.tacz.guns.client.render.scope.ScopeFinalOverlayState;
 import com.tacz.guns.client.render.scope.ScopePipDepthDebug;
 import com.tacz.guns.client.render.scope.ScopePipRenderState;
@@ -147,10 +148,19 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void tacz$renderTickStart(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
+        // scope pip 光影二次渲染（26.2 同名语义）：帧首安全位预热瞄具专用 Iris 管线，
+        // 并按需执行空闲释放实验（ScopePipReleaseIdlePipeline）。预热把「整套 shaderpack
+        // 编译」从第一次开镜的那一帧挪到进世界后的一次性卡顿；不预热的话那次编译会落在
+        // 镜内那遍中途，preparePipeline 的全局帧计数/计时器 reset 会把时域效果当场打乱。
+        ScopePipRerender.prewarmShaderPipelineIfNeeded();
         // poly_mesh GPU：帧首归零绘制表 + 检测光影开关翻转（烘焙世代号）+ 释放延迟释放池。
         // 先于 ShaderStateTracker：它的帧首检测依赖 PolyRenderPolicy 缓存的当帧光影状态
         // （与姊妹分支 RenderTickEvent START 相位同序）。
         PolyMeshGpuRenderer.beginFrame();
+        // 目镜掩码周期的帧戳推进（ScopeDepthCopyState#onClientFrameStart）：帧计数 +1，
+        // 「本帧/上一帧有无掩码周期」的时效查询以此为基准。不清 maskValid —— 终局叠加
+        // 在本帧手部阶段之前还要用它。
+        ScopeDepthCopyState.onClientFrameStart();
         ShaderStateTracker.onRenderFrame();
     }
 

@@ -86,8 +86,9 @@ public class RenderConfig {
      * 二次渲染用窄 FOV 真画一遍，镜内是<b>原生分辨率</b>，代价是每帧多跑一遍世界渲染。
      * 与 26.2 的 {@code ScopePipRerender} 同名同义。</p>
      *
-     * <p><b>注意</b>：本分支当前只实现无光影（vanilla）路径；Iris 光影下仍走现有
-     * 屏幕空间成品帧合成，此开关暂不生效（见配置 tooltip）。默认关闭。</p>
+     * <p>无光影可直接用；光影（Iris）下需同时开启 {@link #SCOPE_PIP_ALLOW_SHADER_PACKS}
+     * 才会接管（{@link #SCOPE_PIP_ISOLATE_PIPELINE} 开启时镜内那一遍使用独立 Iris 管线；
+     * 首次开镜可能因编译着色器卡顿一次）。默认关闭。</p>
      */
     public static ModConfigSpec.BooleanValue SCOPE_PIP_RERENDER;
     /**
@@ -102,6 +103,32 @@ public class RenderConfig {
      * （离屏画布代数守卫，见 {@code ScopePipRenderState} 的 generation）。</p>
      */
     public static ModConfigSpec.IntValue SCOPE_PIP_RERENDER_INTERVAL;
+    /**
+     * 光影下二次渲染时，是否给镜内那一遍配<b>独立的 Iris 管线</b>（时域隔离）。
+     *
+     * <p>Iris 的所有「上一帧」值（previous 矩阵、previous 相机位置）都是<b>读一次推进一次</b>，
+     * 一帧跑两遍世界渲染会让主画面拿到镜内那遍的矩阵做时域重投影——实测三症状同源：
+     * 整屏拖影、体积云噪点闪烁、开镜时镜外整屏发糙。隔离=借 Iris 按维度缓存管线的机制
+     * 给镜内一遍单独一套 colortex/程序/previous 族（26.2 {@code ScopePipIsolatePipeline}
+     * 同名同默认）。代价：多一套光影缓冲（高分辨率下数百 MB 显存）+ 首次开镜一次性着色器编译。</p>
+     */
+    public static ModConfigSpec.BooleanValue SCOPE_PIP_ISOLATE_PIPELINE;
+    /**
+     * 镜内那一遍的阴影贴图分辨率比例（1.0 = 与光影包自身一致）。开销按面积走：
+     * 0.5 = 镜内那遍的阴影只花 1/4 的代价，画质损失只落在镜内。
+     * 仅当 {@link #SCOPE_PIP_RERENDER}+{@link #SCOPE_PIP_ISOLATE_PIPELINE}+光影齐备时生效；
+     * 阴影分辨率在瞄具管线构造时一次定死，改动后由预热逻辑销毁重建热生效。
+     */
+    public static ModConfigSpec.DoubleValue SCOPE_PIP_SHADOW_SCALE;
+    /**
+     * 【实验】不开镜连续 {@link #SCOPE_PIP_IDLE_RELEASE_DELAY_FRAMES} 帧后销毁瞄具专用
+     * Iris 管线释放其全部 GPU 资源，下次开镜由预热重建（带一次着色器编译成本）。
+     * 26.2 的 FPS 衰减调查线：光影下「开镜帧率自首次 ADS 起持续衰减、重进存档重置」
+     * 强烈指向瞄具管线保留 GPU 状态里的逐 pass 累积，空闲销毁即清零。
+     */
+    public static ModConfigSpec.BooleanValue SCOPE_PIP_RELEASE_IDLE_PIPELINE;
+    /** 空闲释放前需连续空闲的帧数（默认 120 ≈ 60fps 下 2 秒，避免进出镜抖动式重建）。 */
+    public static ModConfigSpec.IntValue SCOPE_PIP_IDLE_RELEASE_DELAY_FRAMES;
     /**
      * 二次渲染模式下，镜内那遍的渲染分辨率（1.0 = 原生分辨率）。
      *
@@ -217,8 +244,10 @@ public class RenderConfig {
                         "Draw the scope image by rendering the world a SECOND time with a narrow FOV, "
                                 + "instead of reprojecting the already-rendered frame. The lens then has native "
                                 + "resolution (the reprojection path is capped at screen resolution / zoom). "
-                                + "Costs a full extra world render every frame. Experimental; default off. "
-                                + "This port currently implements only the vanilla (no-shader-pack) path.")
+                                + "Costs a full extra world render every frame. Experimental. "
+                                + "Works without a shader pack, and under an Iris pack once "
+                                + "ScopePipAllowShaderPacks is on (the scope pass then runs on its own "
+                                + "Iris pipeline when ScopePipIsolatePipeline is on).")
                 .define("ScopePipRerender", false);
         SCOPE_PIP_RERENDER_INTERVAL = builder.comment(
                         "Rerender mode: truly render the narrow-FOV scope world only every N frames; ",
@@ -226,6 +255,37 @@ public class RenderConfig {
                         "cost of the second world render; the lens CONTENT lags N-1 frames while the ",
                         "main view stays full-rate. Default 1 = render every frame (no reuse).")
                 .defineInRange("ScopePipRerenderInterval", 1, 1, 4);
+        SCOPE_PIP_ISOLATE_PIPELINE = builder.comment(
+                        "Rerender mode under a shader pack: give the scope pass its own Iris pipeline, ",
+                        "so its temporal state cannot corrupt the main view. Iris advances every 'previous ",
+                        "frame' value when it is READ, so rendering the world twice would otherwise leave ",
+                        "the main view reprojecting against the scope pass's matrices (ghosting, ",
+                        "shimmering clouds, grainy screen outside the scope while aiming).",
+                        "",
+                        "Costs an extra set of shader buffers (up to a few hundred MB of VRAM at high ",
+                        "resolutions) and a one-time shader compile the first time you aim. Turn this ",
+                        "off if VRAM is tight, and the artifacts above come back.")
+                .define("ScopePipIsolatePipeline", true);
+        SCOPE_PIP_SHADOW_SCALE = builder.comment(
+                        "Shadow map resolution for the scope pass, as a fraction of the pack's own.",
+                        "Only used with ScopePipRerender + ScopePipIsolatePipeline + a shader pack.",
+                        "",
+                        "Iris renders shadows once per world render, so rendering the world twice",
+                        "doubles that cost; it scales with area, so 0.5 cuts the scope pass' shadow",
+                        "work to about 25%. Only the lens is affected. Takes effect when the scope",
+                        "pipeline is (re)built; the pipeline is rebuilt automatically on change.")
+                .defineInRange("ScopePipShadowScale", 0.5d, 0.25d, 1.0d);
+        SCOPE_PIP_RELEASE_IDLE_PIPELINE = builder.comment(
+                        "[EXPERIMENT] Destroy the scope pass' isolated Iris pipeline while not aiming, to",
+                        "release its full GPU resources; it is rebuilt (with a shaderpack compile cost) on",
+                        "the next aim. Tests whether the shader-pack aiming FPS decay that accumulates",
+                        "since the first ADS and resets on world rejoin lives in the scope pipeline's",
+                        "retained GPU state.")
+                .define("ScopePipReleaseIdlePipeline", false);
+        SCOPE_PIP_IDLE_RELEASE_DELAY_FRAMES = builder.comment(
+                        "[EXPERIMENT] Consecutive idle frames before the idle scope pipeline is released",
+                        "(default 120 ~ 2s at 60fps; keeps aim transitions from thrashing the pipeline).")
+                .defineInRange("ScopePipIdleReleaseDelayFrames", 120, 1, Integer.MAX_VALUE);
         SCOPE_PIP_RESOLUTION_SCALE = builder.comment(
                         "Render resolution scale for the scope pass in rerender mode (1.0 = native). "
                                 + "Lower values reduce the GPU cost of the second world render at the price "

@@ -6,7 +6,10 @@ import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.compat.iris.IrisCompat;
+import com.tacz.guns.compat.iris.IrisScopePipelineCompat;
 import com.tacz.guns.compat.sodium.SodiumCompat;
+import com.tacz.guns.compat.voxy.VoxyCompat;
+import com.tacz.guns.compat.voxy.VoxyScopePipelineCompat;
 import com.tacz.guns.config.client.RenderConfig;
 import com.tacz.guns.util.math.MathUtil;
 import net.minecraft.client.DeltaTracker;
@@ -89,6 +92,16 @@ public final class ScopePipRerender {
     private static boolean sceneCaptured = false;
     /** 镜内那一遍是否正在执行（防重入）。 */
     private static boolean scopePassActive = false;
+    /**
+     * 本帧镜内那遍是否正在使用<b>独立的 Iris 管线</b>（时域隔离）。
+     * {@code IrisScopeDimensionMixin} 据此在 {@code Iris.getCurrentDimension()} 改答瞄具
+     * 专用维度 id；只在窄遍的前后置位，切世界时早已清零，不会触发「维度变了重建主管线」。
+     */
+    private static boolean scopePassIsolated = false;
+    /** 本帧镜内那遍正在使用的 Voxy 渲染系统（换绑期间持有，finally 换回）。 */
+    private static Object voxySystemThisPass;
+    /** 本帧是否已把 Voxy 换绑到瞄具那套（与 {@link #voxySystemThisPass} 配对）。 */
+    private static boolean voxySwapped = false;
 
     /** 隔帧渲染的帧计次：每次「闸门全过的渲染尝试」+1（闸门失败不计，失败后强制真渲一次）。 */
     private static int scopeFrameCounter;
@@ -137,6 +150,22 @@ public final class ScopePipRerender {
         return scopePassActive;
     }
 
+    /** 本帧镜内那遍是否正跑在瞄具专用的 Iris 管线上（{@code IrisScopeDimensionMixin} 的门）。 */
+    public static boolean isScopePassIsolated() {
+        return scopePassIsolated;
+    }
+
+    /**
+     * 镜内那一遍是否应当让 Voxy <b>坐过</b>这一遍不画：隔离开了、但第二套 Voxy 渲染栈
+     * 没换上去（没建好/建失败/已失效）。Voxy 的渲染栈逐管线绑定且终生只有一个，
+     * 在第二套 Iris 管线下强画必然用错绘制目标——某一侧远景永久错乱；
+     * 坐过只是镜内没 LOD，主画面永远正确。要镜内有 LOD 而不要时域伪影，
+     * 等 Voxy 栈建好（预热逻辑会在主管线就绪后自动建）。
+     */
+    public static boolean shouldSuppressVoxyDraw() {
+        return scopePassIsolated && !voxySwapped;
+    }
+
     /** 本帧是否有可用的镜内画面（供合成阶段与 FOV 让位查询）。 */
     public static boolean hasScene() {
         return sceneCaptured && !failed;
@@ -145,6 +174,41 @@ public final class ScopePipRerender {
     /** 合成倍率：镜内画面已是窄 FOV 真画，屏幕坐标与主画面一一对应，恒为 1。 */
     public static float compositeZoom() {
         return 1.0f;
+    }
+
+    /** 空闲释放的连续空闲帧计数（{@code ScopePipReleaseIdlePipeline}）。 */
+    private static int idleReleaseFrames = 0;
+
+    /**
+     * 帧首调用（{@code GameRendererMixin} 的 render HEAD）：预热瞄具专用 Iris 管线，
+     * 并在开启 {@code ScopePipReleaseIdlePipeline} 时按连续空闲帧数释放它。
+     *
+     * <p>判据与镜内那一遍一致（二次渲染 + 光影 opt-in + 隔离），但<b>不看开镜进度</b> ——
+     * 预热的全部意义就是赶在第一次开镜之前把 shaderpack 编译做完。空闲期间不预热：
+     * 预热会立刻重建刚释放的管线，等于白释放；玩家重新开镜的那一帧走到预热分支重建。</p>
+     */
+    public static void prewarmShaderPipelineIfNeeded() {
+        if (failed || !rerenderMode() || !IrisScopePipelineCompat.isolatePipelineEnabled()) {
+            return;
+        }
+        if (!ScopePipRenderState.shaderRerenderAllowed()) {
+            return;
+        }
+        if (RenderConfig.SCOPE_PIP_RELEASE_IDLE_PIPELINE != null
+                && RenderConfig.SCOPE_PIP_RELEASE_IDLE_PIPELINE.get()) {
+            int delay = RenderConfig.SCOPE_PIP_IDLE_RELEASE_DELAY_FRAMES == null
+                    ? 120 : RenderConfig.SCOPE_PIP_IDLE_RELEASE_DELAY_FRAMES.get();
+            float partialTicks = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+            if (!ScopePipRenderState.suppressesWorldFovZoom(partialTicks)) {
+                if (++idleReleaseFrames >= delay) {
+                    IrisScopePipelineCompat.releaseScopePipelineIfPresent();
+                }
+                // 空闲期间不预热：预热会立刻重建刚释放的管线。
+                return;
+            }
+            idleReleaseFrames = 0;
+        }
+        IrisScopePipelineCompat.prewarmIfNeeded();
     }
 
     /**
@@ -174,9 +238,18 @@ public final class ScopePipRerender {
             sceneCaptured = false;
             return false;
         }
-        // B1 只支持无光影路径：光影下整条世界渲染走 Iris 自己的 colortex，
-        // 主目标里没有窄 FOV 的成品可拷，这条路留到后续阶段。
-        if (IrisCompat.isUsingRenderPack()) {
+        // 光影分支（26.2 母版移植，2026-09-01 用户裁定立项）：Iris 的成品是在 renderLevel
+        // 内部的 finalizeLevelRendering() 合成到主帧缓冲的 —— 仍发生在本调用返回之前，
+        // 所以「窄遍返回后拷主目标」的时机对光影同样成立（旧注释「主目标里没有成品可拷」
+        // 作废）。前提三条，缺一退回旧行为（整条让路、经典整屏变焦）：
+        // ①玩家显式 opt-in（ScopePipAllowShaderPacks，默认 false 的雷区不绕）；
+        // ②Iris 26.1 支持 final-overlay 钩子（supportsFinalScopeOverlay = Iris 1.11 门）；
+        // ③时域隔离可用（IrisScopeDimensionMixin + IrisScopePipelineCompat 预热；Iris 的
+        //   「上一帧」族 uniform 读一次推进一次，一帧两遍会把主画面的 TAA/体积云/SSGI
+        //   全部打上镜内那遍的矩阵 —— 整屏拖影/云噪点闪烁/镜外发糙，26.2 实测三症状同源；
+        //   隔离开关被用户关掉时属于「知情降级」，伪影自负）。
+        boolean iris = IrisCompat.isUsingRenderPack();
+        if (iris && !ScopePipRenderState.shaderRerenderAllowed()) {
             sceneCaptured = false;
             return false;
         }
@@ -251,6 +324,22 @@ public final class ScopePipRerender {
             // 镜内地形留在宽 FOV、原版实体走窄槽位 —— 两套比例糊在一起，实机表现即
             // 「镜内实体相对镜内世界错位/独立于视界」。26.2 同名 compat 的移植。
             sodiumPatched = SodiumCompat.overrideProjection(NARROW_MATRIX);
+            // 时域隔离（仅光影）：置位后 IrisScopeDimensionMixin 会在 Iris 查询当前维度时
+            // 改答瞄具专用 id，让 Iris 为这一遍建/取独立管线。置位失败（id 反射不出来）=
+            // 与主画面共用管线，时域伪影回归但不崩 —— 与 26.2 的 isolatePipeline() 同语义。
+            if (iris && IrisScopePipelineCompat.isolatePipelineEnabled()
+                    && IrisScopePipelineCompat.scopeDimensionId() != null) {
+                scopePassIsolated = true;
+            }
+            // 【Voxy 第二套栈】只换，绝不在这里建（建栈必须发生在预热的构造窗口里，
+            // 那时瞄具管线才是「当前管线」；在这里建过一次的代价是整局崩 ——
+            // "Pipeline data already bound" 会被 Voxy 捕获并顺手 disableIrisShaders()，
+            // 主画面下一次 Voxy 绘制就 NPE，教训写在 VoxyScopePipelineCompat 里）。
+            // 切不过去（没装 Voxy／没建好）就由 shouldSuppressVoxyDraw 让它这一遍坐过，
+            // 至少不会画错。
+            voxySystemThisPass = scopePassIsolated ? VoxyCompat.renderSystem() : null;
+            voxySwapped = voxySystemThisPass != null
+                    && VoxyScopePipelineCompat.swapIn(voxySystemThisPass);
             // 26.1.2 的 renderLevel 没有投影参数：着色器走 RenderSystem 投影槽（上一行），
             // 其余消费点读 cameraState.projectionMatrix —— 临时改写成窄矩阵，等价于 1.21.11
             // 把窄矩阵当第 6 参传入 renderLevel。
@@ -300,6 +389,15 @@ public final class ScopePipRerender {
                     + "falling back to screen-space reprojection / whole-screen FOV zoom.", e);
             return false;
         } finally {
+            // 必须先换回 Voxy、再清隔离标志：swapOut 里读的是「这一遍用的那个 system」，
+            // 而清标志会让其它兼容层立刻恢复常态，两者之间不该有交叉窗口（26.2 同序）。
+            if (voxySwapped) {
+                VoxyScopePipelineCompat.swapOut(voxySystemThisPass);
+                voxySwapped = false;
+            }
+            voxySystemThisPass = null;
+            // 必须最先清（26.2 同序）：从这里往后任何再问「当前维度」的代码都必须拿到真实值。
+            scopePassIsolated = false;
             scopePassActive = false;
             // 必须还原：留窄投影会让 vanilla 那遍的整个世界被放大 —— 正好是反过来的病。
             cameraState.projectionMatrix.set(SAVED_CAMERA_PROJECTION);

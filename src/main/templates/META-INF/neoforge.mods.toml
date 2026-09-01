@@ -39,6 +39,9 @@ config="tacz.mesh.mixins.json"
 config="tacz.iris.mixins.json"
 
 [[mixins]]
+config="tacz.voxy.mixins.json"
+
+[[mixins]]
 config="tacz.carryon.mixins.json"
 
 [[mixins]]

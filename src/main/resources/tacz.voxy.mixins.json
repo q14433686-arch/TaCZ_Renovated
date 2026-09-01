@@ -1,0 +1,16 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "com.tacz.guns.mixin.client.voxy",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "com.tacz.guns.mixin.client.voxy.VoxyCompatMixinPlugin",
+  "client": [
+    "VoxyScopeViewportMixin",
+    "VoxyRenderSystemMixin",
+    "VoxyNodeTickMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  },
+  "_comment": "Voxy scope-pass 集成（3d8432fa 之后，26.2 同名移植）。VoxyScopeViewportMixin 在 ViewportSelector.getViewport HEAD 为镜内那一遍改答独立视口（extraViewports 新 key，同 Iris 阴影通道先例；门=ScopePipRerender.isInsideScopeLevelRender）。VoxyRenderSystemMixin 在 VoxyRenderSystem.renderOpaque HEAD 让隔离模式下镜内那一遍坐过（门=ScopePipRerender.shouldSuppressVoxyDraw；错误做法是让 getViewport 返回 null —— VoxyUniforms.getProjection 不判空会 NPE）。VoxyNodeTickMixin 在 AsyncNodeManager/NodeCleaner.tick HEAD 把流式加载/淘汰的全局推进限制为每帧一次（门=ScopePipRerender.isInsideScopeLevelRender）。required=false + VoxyCompatMixinPlugin 的 mod 存在性检查双重兜底，未装 Voxy 不受影响。"
+}
