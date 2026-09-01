@@ -38,6 +38,16 @@ compatibility maintenance, not adding new firearms.
 - Modern gun-pack loading and conversion for supported legacy layouts.
 - A **partial LRTactical compatibility framework** covering melee items,
   consumables, detonators and several throwable behaviours.
+- A **built-in TacZ Mesh Loader (TML)** for `poly_mesh` gun models (guns,
+  attachments, ammo and blocks), with first-person and world-context GPU static
+  baking, aperture-aware scope clipping and an in-game config page. Ported from
+  [VellEagle/TacZMeshLoader](https://github.com/VellEagle/TacZMeshLoader)
+  (GPL-3.0) via the Fabric sister project; see
+  [docs/MESH_LOADER.md](https://github.com/q14433686-arch/TaCZ_Renovated/blob/26.1.2/docs/MESH_LOADER.md).
+- **Scope picture-in-picture** (reprojection and second-world-render modes, off
+  by default; classic whole-screen zoom remains the default) with in-scope arm /
+  flash / body / text clipping and a low-power exemption below
+  `ScopePipMinMagnification` (default 4x).
 - Built-in JEI/REI ammo queries and workbench categories where available;
   optional integrations vary by release.
 
@@ -106,6 +116,7 @@ LRTactical authors.
 - [Original project — MCModderAnchor/TACZ](https://github.com/MCModderAnchor/TACZ)
 - [Direct upstream — Sh1roCu/TACZ-Refabricated](https://github.com/Sh1roCu/TACZ-Refabricated)
 - [NeoForge port skeleton reference (GPL-3.0, auxiliary — rendering code not adopted) — MUKSC/TACZ-1.21.1](https://github.com/MUKSC/TACZ-1.21.1)
+- [Built-in TML upstream — VellEagle/TacZMeshLoader (GPL-3.0)](https://github.com/VellEagle/TacZMeshLoader)
 - [LRTactical original — LesRaisins Tactical Equipements](https://github.com/LesRaisins-Studios/LesRaisins-Tactical-Equipements)
 - [Fabric sister project — TaCZ Refabricated Unofficial](https://www.curseforge.com/minecraft/mc-mods/unofficial-tacz-refabricated)
 - [Fabric sister project source](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
@@ -113,7 +124,8 @@ LRTactical authors.
 - [Downloads and release notes](https://github.com/q14433686-arch/TaCZ_Renovated/releases)
 - [Issue tracker](https://github.com/q14433686-arch/TaCZ_Renovated/issues)
 
-TaCZ, this port and the incorporated LRTactical code use GPL-3.0. Default gun-pack
+TaCZ, this port and the incorporated LRTactical code use GPL-3.0; the built-in TML
+(built-in TML port) is GPL-3.0 from VellEagle/TacZMeshLoader. Default gun-pack
 assets declare CC BY-NC-ND 4.0. LuaJ uses MIT; Commons Math uses Apache-2.0. Other code and assets keep their own licenses. Code licenses
 do not automatically cover models, textures, animations or sounds; see
 [LICENSE](https://github.com/q14433686-arch/TaCZ_Renovated/blob/26.1.2/LICENSE) and

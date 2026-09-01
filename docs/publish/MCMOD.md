@@ -1,7 +1,9 @@
 # MC 百科发布文案（TaCZ: Renovated）
 
 > 供 MC 百科词条编辑使用。正文采用 MC 百科 BBCode；版本范围与功能边界已按仓库
-> `README.md`、`CHANGELOG.md`、各版本分支及 GitHub Releases 于 2026-08-22 同步。
+> `README.md`、`CHANGELOG.md`、各版本分支及 GitHub Releases 于 2026-09-02 同步
+> （26.1.2 线新增内置 TML 与瞄具 PIP 两类长期功能。版本级修复列表不堆进正文，
+> 以对应文件更新日志 / GitHub Release 为准）。
 > 后续更新时按本文末尾的维护清单核对，不要把单个文件的更新日志堆进词条正文。
 
 ## 词条名称
@@ -31,9 +33,11 @@ TaCZ: Renovated 是《永恒枪械工坊：零》（Timeless & Classics Guns: Ze
 
 • 保留 TaCZ 的枪械、配件、瞄具、弹药、改装台和数据驱动枪包体系，并附带上游默认枪包。
 
-• 针对各版本改写 NeoForge 注册、事件、网络、资源加载、GUI 与渲染接线；不同版本采用各自的瞄具渲染实现。
+• 针对各版本改写 NeoForge 注册、事件、网络、资源加载、GUI 与渲染接线；不同版本采用各自的瞄具渲染实现，26.1.2 线另含内置画面内画中画（PIP，重投影 / 二次渲染两种模式，默认关闭）与镜内文字/手臂/火光/枪身的孔径裁剪、低倍镜豁免。
 
 • 支持现代枪包直接加载，并提供旧布局枪包转换功能。
+
+• 内置 Mesh 加载器（TML）：枪包可在 geo.json 骨骼上携带 poly_mesh 网格（枪本体 model_type: "mesh"，配件/弹药/方块按同名 geo 替换），由本 mod 直接解析渲染，带第一人称与世界语境的 GPU 静态烘焙、按光照档 LRU 缓存与每帧烘焙额度，19 项配置已接入局内渲染页。TML 移植自 [url=https://github.com/VellEagle/TacZMeshLoader]VellEagle / TacZMeshLoader[/url]（GPL-3.0），经姊妹项目中转；详见 [url=https://github.com/q14433686-arch/TaCZ_Renovated/blob/26.1.2/docs/MESH_LOADER.md]MESH_LOADER.md[/url]。
 
 • 内置部分 LRTactical 兼容框架，覆盖近战、消耗品、引爆器及多类投掷物的基础数据与运行路径。
 
@@ -111,6 +115,8 @@ zip 可以直接放入，无需解压；也支持解压后的文件夹。无论�
 
 • [url=https://github.com/MUKSC/TACZ-1.21.1]NeoForge 移植骨架参考（GPL-3.0，辅，未采用其渲染代码）：MUKSC / TACZ-1.21.1[/url]
 
+• [url=https://github.com/VellEagle/TacZMeshLoader]内置 TML（Mesh 加载器）上游源码（GPL-3.0）：VellEagle / TacZMeshLoader[/url]
+
 • [url=https://github.com/LesRaisins-Studios/LesRaisins-Tactical-Equipements]LRTactical 原项目源码[/url]
 
 • [url=https://github.com/q14433686-arch/TaCZ_Renovated]本移植源码[/url]
@@ -121,7 +127,7 @@ zip 可以直接放入，无需解压；也支持解压后的文件夹。无论�
 
 为兼容既有枪包依赖和存档数据，本移植继续使用 mod ID“tacz”。这不代表其为官方版本。
 
-本仓库不同部分可能采用不同许可：TaCZ、本移植及移入的 LRTactical 代码部分使用 GPL-3.0；默认枪包资源依其 gunpack_info.json 使用 CC BY-NC-ND 4.0；随包使用的 LuaJ 为 MIT；Commons Math 为 Apache-2.0；其他第三方代码、资源和内容包以各自许可为准。代码许可不会自动覆盖模型、贴图、动画、音效等资源，完整信息请查看仓库中的 [url=https://github.com/q14433686-arch/TaCZ_Renovated/blob/26.1.2/LICENSE]LICENSE[/url] 与 [url=https://github.com/q14433686-arch/TaCZ_Renovated/blob/26.1.2/LICENSES.md]LICENSES.md[/url]。
+本仓库不同部分可能采用不同许可：TaCZ、本移植、移入的 LRTactical 代码与内置 TML（Mesh 加载器）部分均使用 GPL-3.0（TML 上游为 VellEagle/TacZMeshLoader，其许可允许纳入本 GPL 项目并再分发，但不构成对 TML 作者的背书；上游问题请回 TML 仓库）；默认枪包资源依其 gunpack_info.json 使用 CC BY-NC-ND 4.0；随包使用的 LuaJ 为 MIT；Commons Math 为 Apache-2.0；其他第三方代码、资源和内容包以各自许可为准。代码许可不会自动覆盖模型、贴图、动画、音效等资源，完整信息请查看仓库中的 [url=https://github.com/q14433686-arch/TaCZ_Renovated/blob/26.1.2/LICENSE]LICENSE[/url] 与 [url=https://github.com/q14433686-arch/TaCZ_Renovated/blob/26.1.2/LICENSES.md]LICENSES.md[/url]。
 
 本移植产生的问题请反馈至本项目，不要提交给 TaCZ、TaCZ Refabricated 或 LRTactical 原作者。
 ```
@@ -148,4 +154,4 @@ zip 可以直接放入，无需解压；也支持解压后的文件夹。无论�
 2. Java、NeoForge 或必需前置变化时，以各分支 `gradle.properties` 和 Release 为准。
 3. 功能状态变化时先更新对应分支 README / CHANGELOG / 兼容矩阵，再改本页概括；未实测内容不得写成“支持”。
 4. 每个构建的修复列表只写在文件更新日志或 GitHub Release，不累积进百科正文。
-5. 链接变更时同时核对姊妹项目、原始项目、直接上游、NeoForge 骨架参考（MUKSC）、源码、下载、Issues、LICENSE 与 LICENSES。
+5. 链接变更时同时核对姊妹项目、原始项目、直接上游、NeoForge 骨架参考（MUKSC）、内置 TML 上游（VellEagle/TacZMeshLoader）、源码、下载、Issues、LICENSE 与 LICENSES。
