@@ -251,7 +251,96 @@ poly_mesh geo）。`model_type: "mesh"` 只对枪本身必需；配件/弹药/�
 两个 GPU 键都有真实消费点（`PolyMeshGpuRenderer#shouldSubmitGpu`），
 TOML + Cloth + 中英语言三处齐备，不是「没人读的配置」。
 
-## 5. 验证清单
+## 2.8 2026-09-02 轮：Fabric 26.2 线（`arena/01a05e3e`，tip `dee2578d`）实质改动同步
+
+上轮取货点 `bf5bc5a`（R4，2026-08-31）。本轮逐 commit 核对她 `bf5bc5a..tip` 的
+6 笔实质提交（+ 探针/文档），移植 5 项、判 4 项不适用。完整对照与回执见
+`docs/records/REFAB_SYNC_0105E3E_R5_20260902.md`。
+
+1. **纹理必须在 render pass 之外解析**（她 `99b15b28` 第 1 件，26.1.2 线
+   `2ae4c29` 实机踩坑）：`TextureManager.getTexture` 对未加载纹理是懒加载
+   （`CommandEncoder.writeToTexture`），pass 开着时上传被拒 ⇒ 全 GPU 提交的枪
+   每个可见部件都没 collector 兄弟先请求贴图，我们的 pass 就是第一请求者 ⇒
+   贴图永远加载不上 + 每帧报错 + 枪面紫黑（26.1.2 duyupack kar98un 复现）。
+   `drawList` 现在在 `createRenderPass` 之前预解析 `viewsByTexture`；
+   解析失败按纹理去重打日志（全 GPU 枪失败时逐帧重试，不去重会刷屏）。
+   本仓 `resolveTextureView` 与她基线**逐字相同**，同病同修。
+2. **预热窗口同样挡 `allChanged`**（她 `99b15b28` 第 2 件之保险带一，
+   26.1.2 线 `d3f0fdc` 实机 ESC 崩溃链）：`LevelExtractorScopePassMixin` 的
+   取消闸从「仅镜内那一遍」扩到「镜内那一遍 **或** `isBuildingScopePipeline()`
+   预热构建窗口」。窗口极窄（一次 `preparePipeline` 调用），误伤一次真实重载
+   的概率可忽略，cancel 本身无害（它刷新的全局方块 id 状态主管线早已设好）；
+   取消的 reload 从未执行，Voxy 不会收到通知，无需补偿。
+   **保险带二不移植**（`releaseScopePipelineIfPresent` 的拒释放熔断 +
+   `VoxyScopePipelineCompat.isForeignVoxyBoundTo`）：本仓**从未引入**姊妹线那套
+   「空闲释放瞄具管线」实验入口（见 `IrisScopePipelineCompat` 头注释移植说明
+   第 2 条，R4 前已裁定「探针不是修复」），没有可熔断的对象。
+3. **开镜 mesh 枪身目镜裁剪**（她 `7227ff99` 捎带的 5.2-bis 第 9 项，26.1.2
+   线 `ee77059` 点名的同款缺口）：collector 提交的枪身经
+   `ScopeBodyRenderTypes.clipForViewmodel` 换成 SCOPE_MASK 管线，GPU 手部表
+   画的 mesh 枪身却走自己的管线、从不经过那次替换 ⇒ mesh 枪管穿进镜内画面。
+   修法按**本仓掩码语义**（非 26.1.2 深度孔径架构）：
+   - 无光影裸 pass：新 `LIT_CLIPPED_PIPELINE`（`core/scope_body` + SCOPE_MASK，
+     pass 内直接绑掩码，NEAREST 采样同 `ScopeMaskTextureHandle` 的理由）；
+   - 光影 RenderType 路线：手部表的 `entityCutout` 过一遍
+     `clipForViewmodel`（与 collector 枪身**同一份**替换；scope_body_clipped
+     的 Iris 链路已被立方体枪身实证）；
+   - 两路共用 `maskReadyForViewmodel(true)` 判据 ⇒ 与立方体裁剪同开同关，
+     不出现「立方体裁了 mesh 没裁」的分叉；世界表不裁（世界枪本就该出现在
+     镜内画面里）。
+   配套：`ScopeBodyRenderTypes` 加 `maskSamplerLayout()`/`maskSamplerName()`
+   两个只读出口（同一 layout 实例 = 同一 sampler 名）。
+4. **开镜距离补偿**（她 `08869095`）：两道距离闸门（`MeshMaxRenderDistance`
+   48 / `MeshWorldFullDetailDistance` 16）按裸眼距离调参，但提交每帧只在
+   extract 阶段过一次、镜内那遍复用同一批节点 ⇒ 4x 镜下 48 格上限观感只剩
+   12 格 ⇒ 举镜看到的掉落物/第三人称 mesh 枪几乎必然是立方体（实机回报
+   「二次渲染镜头里还是未烘焙」）。「多远该有细节」本质是角尺寸判定：
+   现闸门阈值乘以 `ScopePipRenderer.currentDetailZoom()`
+   （`1+(zoom-1)·progress`，随开镜进度渐变、收镜回 1，经典变焦与 PIP 皆适用），
+   带 `Throwable` 守卫（scope 线故障绝不连坐 mesh 闸门）。
+5. **PIP 二次渲染：镜内那遍世界表「各自登记、各自画、画完即清」**
+   （她 `3151adcd` → `dc24a2b7`，先「可观测」后按实机改判移植姊妹线修法；
+   与 1.21.11 `237dc153` / 26.1.2 `db360639` 同因同修）：
+   - **错判记录（不要重蹈）**：`3151adcd` 先裁定「26.2 的世界提交只发生在
+     extract 阶段一次、镜内那遍只是重画同一批节点」并加了哨兵日志；用户实机
+     latest.log 把哨兵行打了出来 ⇒ **镜内那遍确实在重新提交**。错在把
+     「extract 产出**提交节点**（每帧一次）」误读成「extract 完成**模型
+     提交**」——把节点画出来的那一步（枪模 `submit`，即
+     `shouldSubmitGpuWorld` 的调用点）在**每一遍** `LevelRenderer#render`
+     各跑一次。
+   - 修法：`shouldSubmitGpuWorld` 删除镜内拒收（原位留说明 + log-once 播报）；
+     `renderWorldAfterSolid` 镜内那遍**画完即清表**（镜内有自己的表；不清则
+     主遍把镜内登记的条目再叠画一遍——白付一倍顶点、半透明骨骼叠加加倍），
+     `worldDrawnThisFrame` 仍只在主遍置位；首画日志改报真实表名
+     （hand/world），世界表在自定义 pass 上的首画单独记一次。
+
+**判为不适用（本线架构差异，全部读码核实）**：
+
+- **FCAP 保存断桥桥接**（她 `7227ff99` 的 `ConfigPersist` +
+  `LoadingConfigEvent.track` + Cloth `savingRunnable` 改 `ConfigPersist::saveAll`）：
+  那是 **Fabric Config API（FCAP）26.x** 的断桥（FCAP 的 `ConfigValue.set` 只写
+  内存、FCAP 兼容层 `ForgeConfigSpec.save()` 恒 no-op，必须显式调
+  `LoadedConfig.save()`）。本线是**原生 NeoForge `ModConfigSpec`**：
+  `save()` = `checkNotNull(loadedConfig) → loadedConfig.save()`（night-config
+  落盘，已核 NeoForge 源码 + 本线 `MenuIntegration` 的
+  `setSavingRunnable` 早已对 `CommonConfig`/`ClientConfig` 同款调用且经 R2
+  实机），`/tacz overwrite` 那条绕过面板的入口上一轮已补显式
+  `spec.save()`。无 FCAP ⇒ 无此病。
+- **`tacz:nbt` 注册一等 ingredient**（她 `61345c58` 新增
+  `TaczNbtIngredient`，Fabric `CustomIngredient`）：本线（与 1.21.11 姊妹线
+  同判定）不注册新类型，`RecipeCompat` 把 `tacz:nbt` 改写为已注册的
+  `tacz:partial_nbt`（`strict = !partial`，`items` 字符串→数组），
+  `PartialNbtIngredient` 的 strict/partial 双语义 + 带 NBT 的
+  `display()` 与她的 `TaczNbtIngredient` **逐语义等价**（已对读两实现）。
+  她在提交信息里称「NeoForge 家族继承上游 tacz:nbt 注册」——与本线不符
+  （本线 `ModRecipe` 只注册 `partial_nbt`），但改写路径已全覆盖；若将来野包
+  出现 `neoforge:ingredient_type: tacz:nbt` 原生写法，再补注册别名（记录在案）。
+- **空闲释放的拒释放熔断**（保险带二，见上第 2 条）。
+- **日志级别差异**：她 `7227ff99` 把 `GunSmithTableIngredient` 解析失败记
+  `LOGGER.error`，本线（随 1.21.11 姊妹线）为 `LOGGER.warn`——同一修复的
+  级别取舍，两条 NeoForge 线一致，保留 `warn`，不跟 Fabric 线改。
+
+### 5. 验证清单
 
 ### 5.1 编译（CI 闭环）
 
@@ -287,6 +376,25 @@ CI 闭环：push 触发 → Actions 跑 `./gradlew compileJava` →
     进入 / 退出光影包时模型**不得拉伸错位**，且开关瞬间日志应重新出现一次
     `GPU-baked`（世代号不匹配立即重烘）。
 12. **降级通道**：`MeshGpuBaking=false` 时，画面必须与第 1 步合并前完全一致。
+13. **全 GPU 枪的贴图**（§2.8 第 1 件）：每个可见部件都走 GPU 表的枪
+    （duyupack kar98un 级）贴图正常、不紫黑，latest.log 不逐帧刷
+    `Failed to resolve texture view`（失败按纹理只记一次）。
+14. **开镜 mesh 枪身裁剪**（§2.8 第 3 件）：开镜时 mesh 枪管不穿进镜内画面
+    （与立方体枪身同开同关：`MeshGpuBaking=false` 时行为不变）；松开右键
+    枪身完整；低倍 sight 的 reticle-only 掩码不啃枪身；光影下同一行为。
+15. **开镜距离补偿**（§2.8 第 4 件）：4x/8x 开镜看 30-100 格外的掉落
+    mesh 枪 → 应为高模（补偿前同距离同镜头是立方体）；收镜后远处枪恢复原
+    距离行为；帧率无异常（只是让更多枪走已烘焙路径，O(骨骼)）。
+16. **PIP 镜内世界高模**（§2.8 第 5 件）：`ScopePipRerender=true` + 4x 以上
+    开镜，视野里放一把超 `MeshWorldMaxVertices` 的 mesh 枪 → 镜内那遍也是
+    高模（不再是立方体），主画面不出现双影/叠画（镜内表画完即清）；日志各
+    出现一次 `GPU world mesh pass active inside the scope PIP re-render pass`
+    与 `World mesh submits are produced inside the scope PIP re-render pass
+    on 26.2 too`。
+17. **预热窗口重载闸**（§2.8 第 2 件）：首次开镜（预热刚跑完）附近改区块
+    视距 / F3+A，主画面远景不错乱、无 `Tried to use destroyed RenderTargets`
+    类崩溃；日志若打印 `Suppressed a full renderer reload … prewarm build`
+    属预期。
 
 ### 5.3 已知边界（如实）
 
@@ -322,7 +430,8 @@ CI 闭环：push 触发 → Actions 跑 `./gradlew compileJava` →
    （不逐帧重烘）；
 6. 光影：世界 mesh 枪照明与立方体一致（gbuffers_entities 接管）—— **风险最高**，
    异常时 `MeshGpuWorld=false` 回退并回报；
-7. 开镜（PIP）：镜内那遍世界枪仍在（不消失、不双影）；
+7. 开镜（PIP）：镜内那遍世界枪仍在（不消失、不双影），**且镜内也是高模**
+   （超 `MeshWorldMaxVertices` 的枪在镜内不应退化成立方体 —— §2.8 第 5 件）；
 8. **多人满屏高模枪的 fps 对比**（`MeshGpuWorld` 开/关）—— 第 2 步最该出数字的一条，
    至今无人跑过；
 9. 光影开关翻转：世界枪不拉伸（世代号失效链路与第 1 步共用）。

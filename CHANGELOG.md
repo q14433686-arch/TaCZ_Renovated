@@ -7,6 +7,52 @@
 
 （R2 定名之后的增量写在里；发布时并入下一版条目。）
 
+### 同步 Fabric 26.2 线 `arena/01a05e3e`（tip `dee2578d`，2026-09-02 对账，R5）
+
+> 游戏语义权威线（AGENTS §0）自 R4 取货点 `bf5bc5a` 又前进 6 笔实质提交
+> （+ 探针/文档），逐 commit 核对本线基线后等价移植 5 件、判 4 项不适用；
+> 完整对照与回执见 `docs/records/REFAB_SYNC_0105E3E_R5_20260902.md`，
+> 验证判据见 `docs/MESH_LOADER.md` §2.8 / §5.2 第 13-17 条 / §5.4 第 7 条。
+> **证据级别：静态闭环 + 逐字节基线比对 + NeoForge 源码联网核对；本线 CI 编译门
+> 与实机均未跑，不宣称已修。**
+
+- **mesh 枪身开镜目镜裁剪**（她 `7227ff99`，26.1.2 线 `ee77059` 同款缺口）：
+  collector 枪身走 `clipForViewmodel` 的 SCOPE_MASK 管线，GPU 手部表画的 mesh
+  枪身却从不经过那次替换 ⇒ 枪管穿进镜内画面。新 `LIT_CLIPPED_PIPELINE`
+  （无光影裸 pass）+ 光影侧手部表过 `clipForViewmodel`（与立方体枪身同一份
+  替换），两路共用 `maskReadyForViewmodel(true)` 判据、与立方体裁剪同开同关；
+  世界表不裁。
+- **PIP 二次渲染：镜内那遍世界表「各自登记、各自画、画完即清」**（她
+  `3151adcd`→`dc24a2b7`，与 1.21.11 `237dc153` / 26.1.2 `db360639` 同因同修）：
+  26.2 每遍 `LevelRenderer#render` 都会把本帧提交节点重画一次 ⇒ 镜内那遍
+  **确实重新提交**世界 mesh 枪（她自己的哨兵日志被用户实机 latest.log 推翻
+  了第一轮的「不适用」裁定）。删 `shouldSubmitGpuWorld` 的镜内拒收、
+  `renderWorldAfterSolid` 镜内画完即清表，修掉「二次渲染镜头里高模枪退化成
+  立方体、退镜/关二次渲染就正常」；两条 log-once 常驻供回报对表。
+- **开镜距离补偿**（她 `08869095`）：两道 poly 距离闸门（48 / 16 格）原按裸眼
+  距离判定，4x 镜下观感只剩 12 / 4 格 ⇒ 举镜看到的掉落物/第三人称 mesh 枪
+  几乎必然是立方体。闸门阈值乘 `ScopePipRenderer.currentDetailZoom()`
+  （`1+(zoom-1)·progress`，收镜回 1），`Throwable` 守卫不连坐。
+- **纹理 render pass 外预解析**（她 `99b15b28`，26.1.2 线 `2ae4c29` 踩坑）：
+  懒加载的贴图在 pass 内上传被拒 ⇒ 全 GPU 提交的枪贴图永远加载不上、每帧报错
+  + 紫黑。`drawList` 改在 `createRenderPass` 之前预解析 `viewsByTexture`，
+  失败按纹理去重打日志。
+- **预热窗口挡 `allChanged`**（她 `99b15b28`，26.1.2 线 `d3f0fdc` 实机崩溃链）：
+  `LevelExtractorScopePassMixin` 的取消闸扩到 `isBuildingScopePipeline()`
+  预热构建窗口，防 Voxy 主栈改绑瞄具管线 ⇒ 主画面远景永久错乱。
+- 交叉印证（上轮已搬，本轮补证）：跨包合成 `tacz:nbt` 的肇事材料样本
+  （`{"type":"tacz:nbt",…,"items":"tacz:attachment"}`）与上轮 `RecipeCompat`
+  改写覆盖的形状逐字吻合；`PartialNbtIngredient` 与她的 `TaczNbtIngredient`
+  已逐语义对读等价。
+
+**明确不搬**（理由见 records 文档 §2）：FCAP 保存断桥桥接（本线原生
+NeoForge `ModConfigSpec.save()` 落盘链路已接好并经 R2 实机，FCAP 断层不存在；
+已联网核 NeoForge 源码）、`tacz:nbt` 注册一等 ingredient（改写路径全覆盖，
+`PartialNbtIngredient` 语义等价）、空闲释放拒释放熔断（本线从未引入空闲释放
+实验入口）、日志级别（保留与 1.21.11 姊妹线一致的 `warn`）。**遗留另案**：
+世界语境贴图与第一人称不同源（少 `/uv/` ⇒ missing-texture 兜底，她侧同样
+未修）。版本号**未动**（仍 `1.1.8+neoforge.26.2.R2`）⇒ README 无需跟改。
+
 ### 同步姊妹 1.21.11 线 `arena/01a05e43`（tip `5fa0963`，2026-09-01 对账）
 
 > 姊妹线 `41319d7`（其自 Fabric 线 `01a05db2` 的同步）逐 commit 核对本线现状后等价移植；

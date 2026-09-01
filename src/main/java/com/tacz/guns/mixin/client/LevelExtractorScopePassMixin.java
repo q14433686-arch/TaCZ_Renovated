@@ -34,17 +34,29 @@ public abstract class LevelExtractorScopePassMixin {
 
     @Inject(method = "allChanged", at = @At("HEAD"), cancellable = true)
     private void tacz$noFullReloadDuringScopePass(CallbackInfo ci) {
-        if (!ScopePipRenderer.isScopePassActive()) {
+        // 【预热窗口同样要挡 —— 05170(26.1.2) 实机 ESC 崩溃 d3f0fdc 的保险带】
+        // 实机链条（26.1.2 线 RawOutput.log 钉死）：prewarm 的 preparePipeline 期间
+        // 瞄具管线是 Iris 的«当前管线»，一次漏网的 allChanged 让 Voxy 全量重建、
+        // 把主渲染栈绑到瞄具管线上，主画面远景此后永久错乱（本仓若有空闲释放
+        // 机制还会在销毁时连带崩 "Tried to use destroyed RenderTargets"）。
+        // 26.2 侧已核实的触发点是«管线首次渲染»（本类头注释那条链，已被
+        // isScopePassActive 挡住）；构建期是否也会触发未在 26.2 复现 ——
+        // 本闸是防御带：窗口极窄（一次 preparePipeline 调用），误伤一次真实
+        // 重载的概率可忽略，且 cancel 本身无害（它刷新的全局状态主管线早已设好）。
+        // 取消的 reload 从未执行，Voxy 不会收到通知，无需补偿。
+        if (!ScopePipRenderer.isScopePassActive()
+                && !IrisScopePipelineCompat.isBuildingScopePipeline()) {
             IrisScopePipelineCompat.onLevelRendererReload();
             return;
         }
         if (!tacz$logged) {
             tacz$logged = true;
             GunMod.LOGGER.info("[TACZ Scope] Suppressed a full renderer reload requested during the "
-                    + "scope pass. Iris asks for it once when a pipeline first renders, and it would "
-                    + "make Voxy rebind itself to the scope pipeline for the rest of the session, "
-                    + "permanently corrupting distant terrain in the main view. The block-id state it "
-                    + "refreshes is global and already set by the main pipeline.");
+                    + "scope pass (or the scope-pipeline prewarm build). Iris asks for it once when a "
+                    + "pipeline first renders, and it would make Voxy rebind itself to the scope "
+                    + "pipeline for the rest of the session, permanently corrupting distant terrain "
+                    + "in the main view. The block-id state it refreshes is global and already set by "
+                    + "the main pipeline.");
         }
         ci.cancel();
     }
