@@ -1,6 +1,7 @@
 package com.tacz.guns.client.model;
 
 import com.mojang.blaze3d.vertex.*;
+import com.tacz.guns.GunMod;
 import com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator;
 import com.tacz.guns.client.model.bedrock.BedrockPart;
 import com.tacz.guns.client.model.bedrock.ModelRendererWrapper;
@@ -455,11 +456,13 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
      * 与准星保持一致：<b>只在开镜时显示</b>。
      * 复用 {@link IlluminatedReticleRenderer} 那条 {@code FADE_IN_START = 0.35}
      * 的判据 —— 未开镜时本就看不到镜内，文字自然也不该出现；
-     * 开镜后视线对准光轴，文字落在圆孔内，不会溢出。
+     * 开镜后镜内画面本来就只画圆孔内的部分。
      *
-     * <p>这是<b>保守做法</b>：不碰字体管线、不碰掩码链路，
-     * 只在提交前加一道门禁。代价是腰射时看不到瞄具上的弹药计数 ——
-     * 但那本来也是「凑到镜前才看得清」的信息，符合直觉。
+     * <p><b>2026-09-01 更新：这道门禁不再是唯一的防线。</b>本方法构造 {@link TextShowRender} 时传
+     * {@code clipToScopeMask = true}，于是瞄具文字在 flush 时走 {@code ScopeTextSubmitter} 的孔径深度
+     * 掩码管线（双深度拷贝 + {@code tacz_ScopeMaskMode} 分支），溢出圆孔的像素被丢弃；掩码周期未就绪时
+     * 自动回退 vanilla {@code submitText}。门禁本身<b>保留</b>，理由与裁剪无关：腰射时镜内画面并不存在，
+     * 把弹药计数画在枪身外侧并不是我们想要的观感（准星也用同一条 0.35 判据）。
      *
      * <p>注意只对<b>瞄具</b>生效：{@code BedrockGunModel} 里同名方法不加此门禁，
      * 枪身上的文字（如弹匣计数）本就该常显。
@@ -467,11 +470,14 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
     public void setTextShowList(Map<String, TextShow> textShowList) {
         textShowList.forEach((name, textShow) -> this.setFunctionalRenderer(name,
                 bedrockPart -> {
-                    // 未开镜（或刚开始开镜）时不提交，避免文字溢出到镜孔之外。
+                    // 未开镜（或刚开始开镜）时不提交：那时镜内画面不存在（裁剪后文字会整条被丢弃，
+                    // 反而像「文字消失」）；与准星共用同一条 0.35 判据。
                     if (currentAimingProgress() <= TEXT_SHOW_AIM_START) {
                         return null;
                     }
-                    return new TextShowRender(this, textShow, currentGunItem);
+                    // 瞄具上的文字需要裁进目镜掩码：flush 时优先走 ScopeTextSubmitter 的孔径深度掩码管线；
+                    // 掩码周期未就绪时自动回退 vanilla submitText（不丢字、不画错）。
+                    return new TextShowRender(this, textShow, currentGunItem, true);
                 }));
     }
 
@@ -657,6 +663,37 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
                         }
                     });
 
+            // 【镜内文字（MK5/MK5HD 的弹药计数等）】bodySnapshot 的 capture 已经把 text_show
+            // 节点的字体提交冻结进 functionalTasks（见 BedrockRenderSnapshot.Builder#capturePart 与
+            // TextShowRender#extract），但上面的重放只提交几何。任务不显式 flush 就整个丢掉，
+            // 这正是镜内从不显示弹药文本的根因（26.2 的瞄具 body 走 super.submit(...)，那条路径
+            // 自带 snapshot.submitFunctionalTasks，所以那边一直有；本线把 body 改成自己按序重放之后，
+            // 这一句被绕开了）。
+            //
+            // 非延迟情形用 collector 的默认 order(0)：落在 depthCleanup(-1) 之后、准星
+            // (SCOPE_RETICLE_ORDER=1) 之前，保证「镜内画面 → 文字 → 准星 → 镜框」的物理层序。
+            // 【注意】文字走 vanilla 字体管线，不吃 scope body 写入的孔径深度，所以这里只保证
+            // 层序正确、不保证裁剪；裁剪由 ScopeTextSubmitter + ScopeRenderTypes.maskedText 负责
+            // （瞄具文字构造时带 clipToScopeMask=true，任务执行时若本帧掩码周期有效就走掩码管线、
+            // 溢出圆孔的像素被丢弃；否则回退 vanilla submitText）。也不要「顺手」给字体开 GL_ALWAYS：
+            // GlCommandEncoderScopeDepthCopyMixin 的白名单只覆盖 TACZ 自己的 scope RenderType，
+            // 给 vanilla 文本开只会把溢出问题变成穿透问题。
+            //
+            // 延迟覆盖层激活时（已审计过 final-overlay 的 Iris）与准星、镜框同族推迟，否则会被
+            // 光影包后处理盖掉；R8/R9 的 HAND_TRANSLUCENT 回退路径保持立即提交（那条路径本就服务于
+            // 未审计的 Iris 版本）。
+            //
+            // ocularSnapshots / ocularRingSnapshot 一并兜底：第三方镜的 text_show 节点可能挂在
+            // ocular 或镜框子树下 —— 那时 bodySnapshot 因为对应部件被临时隐藏而拿不到它。每份快照
+            // 的任务只在这里 flush 一次，不会因为 aperture/cleanup 两次几何重放而重复提交。
+            submitScopeText(bodySnapshot, collector, deferReticleToIrisFinalOverlay, scopeMaskEnabled);
+            for (BedrockRenderSnapshot ocularSnap : ocularSnapshots) {
+                submitScopeText(ocularSnap, collector, deferReticleToIrisFinalOverlay, scopeMaskEnabled);
+            }
+            if (ocularRingSnapshot != null) {
+                submitScopeText(ocularRingSnapshot, collector, deferReticleToIrisFinalOverlay, scopeMaskEnabled);
+            }
+
             // Without Iris deferral, keep the established order: reticle(1) then opaque rim(2).
             // With deferral, hold the rim until we know a reticle snapshot was actually queued;
             // it will then follow that snapshot in HAND_TRANSLUCENT and still cover edge spill.
@@ -665,10 +702,20 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
                 collector.order(SCOPE_OCULAR_RING_ORDER).submitCustomGeometry(identity, renderType,
                         (entryPose, consumer) -> ocularRingSnapshot.write(consumer));
             }
-        } else if (!bodySnapshot.isEmpty()) {
-            PoseStack identity = new PoseStack();
-            collector.submitCustomGeometry(identity, renderType,
-                    (entryPose, consumer) -> bodySnapshot.write(consumer));
+        } else {
+            if (!bodySnapshot.isEmpty()) {
+                PoseStack identity = new PoseStack();
+                collector.submitCustomGeometry(identity, renderType,
+                        (entryPose, consumer) -> bodySnapshot.write(consumer));
+            }
+            // 非镜内序列（腰射 / 非第一人称 / 没给孔径贴图）同样不能丢任务：文字工厂在未开镜时
+            // 返回 null（见 setTextShowList 的 TEXT_SHOW_AIM_START 门禁），所以这里通常是空的；
+            // 带文字但没有 ocular 骨骼的第三方瞄具靠这一句兜住。
+            //
+            // isEmpty() 只看 drawCommands，所以「只有 text_show、没有本体几何」的快照必须写在
+            // 这个门【外面】才 flush 得掉 —— 这也是与 26.1.2 那版补丁的差别（他们把 flush 放在
+            // if (!bodySnapshot.isEmpty()) 里面，那种快照在他们那边仍会被丢掉）。
+            submitScopeText(bodySnapshot, collector, false, scopeMaskEnabled);
         }
 
         // Render Reticle. Iris HAND_SOLID freezes only immutable snapshots here. Iris 1.10.7's
@@ -740,6 +787,42 @@ public class BedrockAttachmentModel extends BedrockAnimatedModel {
             for (var entry : laserBeamPaths) {
                 BeamRenderer.renderLaserBeam(attachmentItem, poseStack, transformType, entry, collector);
             }
+        }
+    }
+
+    /** 一次性确认「补回来的 flush 真的跑到了」，配合四格实机剧本（掩码开/关 × 光影开/关）用日志判定。 */
+    private static boolean loggedScopeTextImmediateFlush;
+
+    /**
+     * 把一份快照里冻结的 functional 任务（实际就是镜内文字的字体提交）交出去。
+     *
+     * @param deferToFinalOverlay 与准星/镜框同族推迟到 post-composite 覆盖层；否则立刻按
+     *                            collector 默认 order 提交
+     * @param scopeMaskEnabled    仅用于日志：让四格剧本（掩码开/关 × 光影开/关）能靠日志判定，
+     *                            不依赖肉眼看出「这次是不是走了孔径那条路」
+     */
+    private static void submitScopeText(BedrockRenderSnapshot snapshot,
+                                        SubmitNodeCollector collector,
+                                        boolean deferToFinalOverlay,
+                                        boolean scopeMaskEnabled) {
+        List<IFunctionalSubmitter.SubmitTask> tasks = snapshot.functionalTasks();
+        if (tasks.isEmpty()) {
+            return;
+        }
+        for (IFunctionalSubmitter.SubmitTask task : tasks) {
+            if (deferToFinalOverlay) {
+                ScopeFinalOverlayState.queueFunctionalTask(task);
+            } else {
+                task.submit(collector);
+            }
+        }
+        // 延迟那一格由 ScopeFinalOverlayState 自己报数（含 texts 计数），这里只报立即提交那一格；
+        // 每局一次，避免刷屏。看到这条日志就说明任务没再被丢掉，与「镜内到底有没有字」解耦。
+        if (!deferToFinalOverlay && !loggedScopeTextImmediateFlush) {
+            loggedScopeTextImmediateFlush = true;
+            GunMod.LOGGER.info(
+                    "[TACZ Scope] Flushed {} in-lens text task(s) in the solid hand pass (scopeMask={}).",
+                    tasks.size(), scopeMaskEnabled);
         }
     }
 

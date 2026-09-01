@@ -3,6 +3,73 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-09-01 姊妹线同步（版本号未变）
+
+> 姊妹项目 `TaCZ_Refabricated_Unofficial` 的 `arena/01a05db2` 分支 2026-08-30 ~ 09-01 的新增内容，
+> 逐 commit 核对后按本线（NeoForge 21.11.45 / 原生 ModConfigSpec / 无 PIP / 无 meshloader）等价移植。
+> 完整对照与「不搬清单」见 `docs/records/SYNC_SIBLING_0105DB2_20260901.md`。
+> **证据级别：源码级静态闭环 + 姊妹线 CI/javap 旁证；本线 CI 编译门与实机均未跑，按 AGENTS §2 不宣称已修。**
+> 姊妹线给本线的同步清单 `SYNC_CHECKLIST_1211_NEOFORGE_SISTER_20260901.md` 的 §2（P0-a）、§3（P0-b）、
+> §4（P1）三条已全部落地。
+
+### 镜内 `text_show` 文本（MK5/MK5HD 弹药计数）三连修（P0-a / P0-b / P1）
+
+- **P0-a 补回被绕开的 functionalTasks flush**（姊妹线 `1cfa42b` + `cb39564`）：
+  `BedrockAttachmentModel#submit` 的孔径路径自己重放几何、没走 `super.submit(...)`，
+  于是快照里冻结的 `submitText` 任务无人 flush，镜内文字一帧都不画。
+  `BedrockRenderSnapshot` 加只读 `functionalTasks()`；瞄具序列在 depth-cleanup 之后对
+  `bodySnapshot`、每个 `ocularSnapshots`、`ocularRingSnapshot` 各 flush 一次（非延迟走
+  collector 默认 order(0)，落在 cleanup(-1) 与准星(1) 之间）；`deferReticleToIrisFinalOverlay`
+  时经 `ScopeFinalOverlayState.queueFunctionalTask` 与准星/镜框同族推迟、在 reticle 之前用
+  `task.submit(submitNodes)` 提交（`OrderedSubmitNodeCollector` 不是 `SubmitNodeCollector`）。
+  非镜内序列的 flush 放在 `!bodySnapshot.isEmpty()` 门**外**（`isEmpty()` 只看几何），
+  `ocularRingSnapshot` 的任务也一并兜底 —— 这两处是姊妹线相对 26.1.2 那版补丁的差别，照收。
+  另加每局一次的日志判据（`Flushed N in-lens text task(s) ... scopeMask=...`）。
+- **P0-b 纯查表**（姊妹线 `c9b8ba1`，对齐 26.2 `ec51f556`）：
+  `PapiManager#getTextShow` 与 `ClientAttachmentItemTooltip` / `ClientBlockItemTooltip` 不再走
+  `I18n.get`（那是「查表 + `String.format`」的格式化接口，枪包把 `textKey` 写成含 `%` 的内联串时
+  返回 `"Format error: ..."`），改用 `Language.getInstance().getOrDefault(...)` 纯查表。
+- **P1 镜内文字按目镜孔径掩码裁剪**（姊妹线 `d076cf5`，等价 26.1.2 `e1c550ee`）：
+  新增 `ScopeTextSubmitter`（`Font#prepareText → PreparedText#visit` 按 `TextRenderable#textureView()`
+  分组，每组一次 `submitCustomGeometry` 用新的 `ScopeRenderTypes.maskedText(pageId)`，字体页用
+  `AbstractTexture` 壳纹理 + 每帧刷新指向）+ 新着色器 `shaders/core/scope_text_final.fsh`
+  （本代 `rendertype_text.fsh` 克隆 + `tacz_ScopeMaskMode` 孔径比较，故意不含 fog）。
+  `ScopeDepthCopyState` 只加 `isMaskCycleValid()`；`TextShowRender` 加 `clipToScopeMask` 旗与四参构造
+  （三参重载保留，枪包注册面不变）；瞄具侧传 `true`、枪身侧显式 `false`。
+  失败语义：掩码不可用 ⇒ 回退 vanilla `submitText`，不丢字、不画错，最差回到「贴边溢出」。
+
+### 同步的其余实质改动
+
+- **检视打断动画两修**（姊妹线 `1c765c6`，逐字移植 26.2 `4aa8d7b` + `12d6f3c`；本线三份动画文件
+  与姊妹线改前基线逐字节相同，移植为零差异）：`stopAnimation(track)` 连坐停在 `transitionTo` 上的
+  runner（修「开镜检视不可打断」）；`AnimationStateMachine#trigger` 用全局出生序号快照豁免
+  「本次 trigger 刚启动的后继动画」（修第一修引入的「检视中换弹被误杀」回归）。
+- **`tacz:nbt` 跨包材料**（姊妹线 `e1aad10` 第 1 件，按本线原生 NeoForge Ingredient API 等价改写）：
+  枪包升级工具把旧配方批量转成上游 1.21.1 的 `tacz:nbt`（`items` 常写成单个字符串、`partial` 布尔），
+  本线此前不认该类型、整条配方解析失败。`RecipeCompat.normalizeCustomIngredient` 现在把 `tacz:nbt`
+  改写为已注册的 `neoforge:ingredient_type=tacz:partial_nbt`（`strict = !partial`，缺省 strict），
+  `items` 字符串→数组；旧的无 type `{item+nbt}` 写法不再**静默丢弃 nbt**，改写为 partial 语义；
+  解析失败的 WARN 现在带上规范化形态 + 原文，并catch `LinkageError`。
+  （姊妹线第 2 件「开镜 mesh 距离闸门按角尺寸补偿」依赖其 meshloader/PIP，本线无此项，不搬。）
+- **`/tacz overwrite` 落盘**（等价姊妹线 `cd14a2a` 第 4 项）：命令行开关绕过了 Cloth 面板的
+  savingRunnable，改完重启回默认；现在 `PreLoadConfig.spec.save()` 显式落盘
+  （本线原生 NeoForge `ModConfigSpec#save` = `loadedConfig.save()`，姊妹线自建的 ConfigPersist
+  原子合并写那套是 FCAP 专用，本线不需要）。
+- **lang 补齐**（对应姊妹线「恢复完整 lang」）：补 `attribute.name.tacz.bullet_resistance` 与
+  `commands.tacz.arguments.enum.invalid` 两条（前者被 `ModAttributes` 实际引用，此前属性名显示原始键）。
+
+### 明确不搬（对照姊妹线，理由见 records 文档）
+
+- 全部 `ScopePip*`（PIP 二次渲染/重渲染/时域隔离/显示阈/倍率渐变/窄遍守卫等）：本线 1.21.11 无 PIP；
+- 全部 meshloader / TML GPU / poly_mesh 项（含法线矩阵读取时刻、纹理懒加载、EMISSIVE 降级等）；
+- 镜内裁手（`8ddde34`/`3918049`）：依赖 PIP 镜内区域与 `ScopePipMinMagnification`；
+- FCAP 配置落盘整族（`7f3cfd5`/`cd14a2a` 的 1-3 项/`630b0a0` 的 ModMenu 出口）：本线无 FCAP/ModMenu，
+  且 Cloth 面板早已接 `setSavingRunnable`；
+- 掩码周期帧戳（`8d28e57` 的 `onClientFrameStart`/`hasMaskCycleThisFrame`）：其消费者是 mesh 手部
+  裁剪闸与 PIP 合成闸，本线均无；镜内文字按姊妹线口径保留跨帧 `isMaskCycleValid` 语义；
+- Iris 二次渲染的 Sodium/Voxy 通道（Fabric 专属 mod）；姊妹线 `.github/workflows` 与 CI 探针（TEMP）。
+- 版本号**未动**（仍 `1.1.8+neoforge.1.21.11.R1-hotfix`）⇒ README 无需跟改。
+
 ## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-08-27
 
 ### 长按右键的「幽灵使用」与耳鸣资源（同步姊妹项目 2026-08-27 跟进）

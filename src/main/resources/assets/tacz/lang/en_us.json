@@ -453,5 +453,7 @@
   "tacz.configuration.ServerShootCooldownCheck.tooltip": "Server Shoot Cooldown Check",
   "tacz.configuration.HoldToAim.tooltip": "Hold To Aim",
   "tacz.configuration.HoldToCrawl.tooltip": "Hold To Crawl",
-  "tacz.configuration.AutoReload.tooltip": "Auto Reload"
+  "tacz.configuration.AutoReload.tooltip": "Auto Reload",
+  "attribute.name.tacz.bullet_resistance": "Bullet Resistance",
+  "commands.tacz.arguments.enum.invalid": "Invalid value %2$s. Valid options: %1$s"
 }
