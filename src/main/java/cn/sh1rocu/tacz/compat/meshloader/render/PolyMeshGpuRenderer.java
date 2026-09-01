@@ -113,6 +113,51 @@ public final class PolyMeshGpuRenderer {
             .withColorTargetState(ColorTargetState.DEFAULT)
             .build();
 
+    /**
+     * 【开镜 mesh 枪身裁剪 · 5.2-bis 第 9 项】LIT_PIPELINE 的目镜掩码变体。
+     *
+     * <p>缺口（26.1.2 分支 ee77059 点名的同款）：collector 提交的枪身经
+     * {@code ScopeBodyRenderTypes.clipForViewmodel} 换成 SCOPE_MASK 管线，
+     * 开镜时孔径内的枪身像素被 discard；GPU 手部表画的 mesh 枪身走本类自己的
+     * 管线，从不经过那次替换 —— mesh 枪管会穿进镜内画面。</p>
+     *
+     * <p>修法按<b>本仓自己的掩码语义</b>（不是 26.1.2 的深度孔径架构）：
+     * {@code core/scope_body} 着色器 = vanilla entity 逐字拷贝 + SCOPE_MASK
+     * discard 段，且各 define 分支齐全 —— 给它 NO_OVERLAY + NO_CARDINAL_LIGHTING
+     * 就得到与 LIT_PIPELINE 语义一致、只多一步「孔径内 discard」的管线。
+     * 掩码纹理在 pass 内直接绑定，与镜身/火光同一张、同一帧语义。</p>
+     *
+     * <p>启用判据与 collector 枪身裁剪<b>同开同关</b>，但用的是<b>绘制时变体</b>
+     * {@code ScopeBodyRenderTypes.maskReadyForViewmodelAtDraw()}：同义前置
+     * （掩码开关/光影回退/低倍 sight 的 reticle-only 掩码不许裁枪身/掩码
+     * target 就绪），差别只在「掩码就绪」怎么证 —— 手部表画在 executeSolid
+     * 之后，那时阶段边界已把目镜几何消费清空，查活几何恒空（R5 移植的
+     * 原写法 {@code maskReadyForViewmodel(true)} 因此<b>判定恒 false</b>，
+     * 裁剪被静默禁用，2026-09-02 实机案）；变体改看「本帧画过允许裁视模
+     * 的掩码」帧快照（{@code ScopeMaskRenderer#hasViewmodelClipMaskThisFrame}），
+     * 与 submit 时查活几何语义等价，两条路径的裁剪行为永远同时开关。</p>
+     *
+     * <p>光影下不走本管线（useRenderTypeRoute 走 RenderType 路线），那一侧由
+     * clipForViewmodelAtDraw 替换 renderType 覆盖（见 drawViaRenderTypeCore）。</p>
+     */
+    private static final RenderPipeline LIT_CLIPPED_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/mesh_entity_scope_clipped"))
+            .withVertexShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_body"))
+            .withFragmentShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_body"))
+            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+            .withShaderDefine("NO_OVERLAY")
+            .withShaderDefine("NO_CARDINAL_LIGHTING")
+            .withShaderDefine("SCOPE_MASK")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER2)
+            .withBindGroupLayout(com.tacz.guns.client.render.scope.ScopeBodyRenderTypes.maskSamplerLayout())
+            .withCull(false)
+            .withVertexBinding(0, DefaultVertexFormat.ENTITY)
+            .withPrimitiveTopology(PrimitiveTopology.QUADS)
+            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .withColorTargetState(ColorTargetState.DEFAULT)
+            .build();
+
     /** 一根骨骼烘出的常驻 VBO。顶点是骨骼本地坐标，light 已按量化档烘进 UV2。 */
     public static final class BakedBone {
         public final GpuBuffer vertexBuffer;
@@ -138,11 +183,18 @@ public final class PolyMeshGpuRenderer {
      * 世界语境（第三人称/掉落物/展示框/展示台）的登记表。
      *
      * <p>与关 PR 的全局 WORLD_DRAWS 表不同名同义但<b>约束完全不同</b>——泄漏靠
-     * 提交侧闸门（{@link #shouldSubmitGpuWorld}）从源头掐死：GUI 语境、GUI 预览
-     * 窗口（{@code RenderDistance.isGuiRender()}）、镜内那一遍、阴影 pass 的提交
-     * 一概进不来。消费侧只认「主世界那一次 renderAllFeatures」（非手部、非镜内、
-     * 非阴影），并且 {@link #beginFrame} 每帧清空 —— 任何一帧内没被消费的残留
+     * 提交侧闸门（{@link #shouldSubmitGpuWorld}）从源头掐死：GUI 语境、Screen
+     * 提取窗口、手部 pass、阴影 pass 的提交一概进不来。消费侧只认世界帧图那一次
+     * {@code executeSolid}（非手部、非阴影、在 {@code LevelRenderer#render}
+     * 括号内），并且 {@link #beginFrame} 每帧清空 —— 任何一帧内没被消费的残留
      * 都活不过下一帧。</p>
+     *
+     * <p><b>镜内那一遍（PIP 二次渲染）也在这张表上，各遍各自一份</b>：26.2 的
+     * extract 阶段产出的是<b>提交节点</b>，而「把节点画出来」那一步在每一遍
+     * {@code LevelRenderer#render} 里各跑一次（枪模的 submit 就在那一步里，
+     * 2026-09-02 用户实机日志证实）—— 所以镜内那遍与主画面那遍<b>各自登记、
+     * 各自画、画完即清</b>。见 {@link #shouldSubmitGpuWorld} 与
+     * {@link #renderWorldAfterSolid}。</p>
      */
     private static final List<DrawEntry> WORLD_DRAWS = new ArrayList<>();
 
@@ -159,7 +211,34 @@ public final class PolyMeshGpuRenderer {
     private static final List<BakedBone> DEFERRED_RELEASE = new ArrayList<>();
 
     private static boolean loggedFirstDraw = false;
+    /** 世界表在<b>自定义 pass</b>（无光影/强制自定义）上的首画；与手部的首画各记一次。 */
+    private static boolean loggedFirstWorldDrawCustomPass = false;
     private static boolean loggedFirstWorldDraw = false;
+    /**
+     * 手部表<b>目镜裁剪真正生效</b>的首帧证据（2026-09-02 实机案配套）。
+     *
+     * <p>R5 移植的裁剪判据被时序静默禁用（绘制时查活几何恒空），用户只能靠
+     * 画面反推、上一轮据此误判方向。这一行把「裁剪生效了」变成日志里的
+     * 直接事实：开了高倍镜、mesh 枪在手，这行应恰好出现一次。</p>
+     */
+    private static boolean loggedHandClipActive = false;
+    /**
+     * 镜内那一遍（PIP 二次渲染）首次「提交 + 绘制」世界表时记一条 info。
+     *
+     * <p>用途是把「镜内到底有没有走 GPU 烘焙」从<b>靠帧率反推</b>变成日志里的
+     * 一条事实（用户 2026-09-01 的回报只能靠帧率变化倒推）。1.21.11 的
+     * {@code 237dc153} 与 26.1.2 的 {@code db360639} 有同名日志，本行是它的
+     * 26.2 版。</p>
+     */
+    private static boolean loggedScopeWorldDraw = false;
+    /**
+     * 首次发现「世界 mesh 提交也发生在镜内那一遍」时记一条 info。
+     *
+     * <p>这行是 2026-09-02 推翻旧结论（「世界提交只在 extract 阶段发生一次」）的
+     * 那条实机证据的常驻版本：它证明 26.2 的每一遍 {@code LevelRenderer#render}
+     * 都会把本帧提交节点重画一次，因此镜内那遍必须自己登记、自己画、画完即清。</p>
+     */
+    private static boolean loggedScopeWorldSubmitInsideScopePass = false;
     private static boolean loggedBakeBudget = false;
     private static boolean loggedFirstIrisDraw = false;
     /**
@@ -230,11 +309,23 @@ public final class PolyMeshGpuRenderer {
      *       {@code RenderDistance.isGuiRender()}：那是个 100ms 时间戳窗口，
      *       开着菜单时世界提取阶段也会命中，等于「一开背包全场景 mesh 枪
      *       跌回 collector」—— 上游 TML 注释里记载过的同款实机事故；</li>
-     *   <li><b>不在</b>镜内那一遍（PIP 二次渲染）—— 防御性闸门：提交都发生在
-     *       extract 阶段（镜内那遍开始之前），正常流程根本走不进这个分支；
-     *       万一有 mod 在镜内窗口里补提交，pose 语义未知，宁可拒收。
-     *       镜内那遍怎么消费世界表见 {@link #renderWorldAfterSolid}
-     *       （画但不清表，与 collector 的两遍一致裁定同构）；</li>
+     *   <li><b>允许</b>镜内那一遍（PIP 二次渲染）—— 这条闸门在 2026-09-02 被
+     *       <b>实机日志推翻后删除</b>。原以为「世界提交只发生在 extract 阶段、
+     *       镜内那遍只是重画同一批节点」，但用户实机 latest.log 打出了本类自己的
+     *       哨兵行（{@code A world mesh submit was attempted inside the scope PIP
+     *       re-render pass}）：<b>镜内那遍确实在重新提交世界 mesh 枪</b>。
+     *       机理（与本仓既有取证一致，此前被我读反）：extract 阶段产出的是
+     *       <b>提交节点</b>（{@code SubmitNodeStorage} 里的 {@code Submit} +
+     *       {@code ItemStackRenderState}/{@code GunModelSubmit} 载荷，见
+     *       {@code SCOPE_PIP_FPS_DECAY_INVESTIGATION_2026_08_29.md} §4.5 的
+     *       VisualVM 指纹），而<b>把节点画出来的那一步在每一遍 render 里各跑一次</b>
+     *       —— 枪模的 {@code submit}（也就是本方法的调用点）就在那一步里。
+     *       于是在这里拒收 ⇒ 镜内那遍只能回 collector + 顶点预算 ⇒
+     *       超过 {@code MeshWorldMaxVertices} 的高模枪被打成裸立方体，而主画面
+     *       那遍照常 GPU 烘焙 —— 正是用户回报的「镜内不烘焙、退镜/关二次渲染
+     *       就正常」。与 1.21.11 {@code 237dc153} / 26.1.2 {@code db360639}
+     *       同因同修。消费侧（{@link #renderWorldAfterSolid}）同步改为
+     *       「镜内那遍画完即清表」；</li>
      *   <li><b>不在</b>阴影 pass —— Iris 阴影遍的投影/MV 是太阳视角，
      *       登记进主视角的表必然画错；{@code MeshPolyInShadow=false} 时提交
      *       在 {@code PolyRenderPolicy} 就被拦了，这里是 true 时的第二道保险。</li>
@@ -250,8 +341,24 @@ public final class PolyMeshGpuRenderer {
         if (ScreenRenderTracker.isExtractingScreen()) {
             return false;
         }
-        if (com.tacz.guns.client.render.scope.ScopePipRenderer.isInsideScopeLevelRender()) {
-            return false;
+        // 【2026-09-02 实机推翻后删除的闸门】这里曾按 isInsideScopeLevelRender() 拒收，
+        // 理由是「世界提交只发生在 extract 阶段、镜内那遍不会重新提交」。用户实机
+        // latest.log 打印出了本类自己的哨兵行，证明【镜内那遍确实会重新提交】：
+        // 26.2 的 extract 阶段产出的是提交节点（SubmitNodeStorage 里的 Submit +
+        // ItemStackRenderState/GunModelSubmit 载荷），而「把节点画出来」那一步在
+        // 每一遍 LevelRenderer#render 里各跑一次，枪模的 submit 就在那一步里。
+        // 拒收等于把镜内那遍打回 collector + 顶点预算 ⇒ 超过 MeshWorldMaxVertices
+        // 的高模枪在镜内退化成裸立方体（用户回报的症状），而主画面那遍照常 GPU 烘焙。
+        // 与 1.21.11 237dc153 / 26.1.2 db360639 同因同修。配套的消费侧改动
+        // （镜内那遍画完即清表）见 renderWorldAfterSolid。
+        // 下面这段 if 只剩播报职责：把「本线也是每遍各自提交」这件事记进日志一次。
+        if (com.tacz.guns.client.render.scope.ScopePipRenderer.isInsideScopeLevelRender()
+                && !loggedScopeWorldSubmitInsideScopePass) {
+            loggedScopeWorldSubmitInsideScopePass = true;
+            LOGGER.info("[TacZMeshLoader] World mesh submits are produced inside the scope PIP re-render "
+                    + "pass on 26.2 too (each LevelRenderer#render pass re-runs the draw step of this "
+                    + "frame's submit nodes), so that pass registers and draws its own world entries. "
+                    + "(logged once)");
         }
         return !IrisCompat.isRenderShadow();
     }
@@ -522,11 +629,26 @@ public final class PolyMeshGpuRenderer {
      *       PictureInPictureRenderer / renderLevel 560 的收尾调用）：
      *       {@code insideLevelRender=false} 拒收；</li>
      *   <li><b>镜内那遍</b>（我们自己驱动的 levelRenderer.render，也在括号内）：
-     *       照画但<b>不清表、不占帧标志</b> —— 维护者 08-30 裁定两遍内容必须
-     *       一致（collector 也是两遍照画）；WORLD_DRAWS 在 extract 阶段登记、
-     *       每帧只一份，镜内清了主画面就没了。无光影时 mainRenderTarget()
-     *       已重定向到 pip target、MV 栈顶是镜内那遍自己 push 的 viewRotation
-     *       （同一个 render 方法、同一段字节码）—— 语义自动正确；</li>
+     *       <b>画完即清表</b>，但<b>不占</b> {@code worldDrawnThisFrame}
+     *       （那是主世界遍的重复消费防线，两遍是各自独立的提交/消费）。
+     *       无光影时 mainRenderTarget() 已重定向到 pip target、MV 栈顶是镜内
+     *       那遍自己 push 的 viewRotation（同一个 render 方法、同一段字节码）
+     *       —— 语义自动正确。
+     *
+     *       <p><b>为什么是「画完即清」（2026-09-02 实机改判，与 1.21.11
+     *       {@code 237dc153} / 26.1.2 {@code db360639} 同形）</b>：本线曾按
+     *       「WORLD_DRAWS 在 extract 阶段登记、每帧只一份」处理成「画而不清」，
+     *       并由用户实机 latest.log 推翻 —— 镜内那遍<b>确实重新提交</b>了世界
+     *       mesh 枪（哨兵行打印），因为 26.2 的 extract 产出的是<b>提交节点</b>
+     *       （{@code SubmitNodeStorage}，节点里挂着 {@code ItemStackRenderState} /
+     *       {@code GunModelSubmit} 载荷），而「把节点画出来」那一步在<b>每一遍</b>
+     *       {@code LevelRenderer#render} 里各跑一次，枪模的 submit 就在那一步里。
+     *       所以镜内那遍有<b>自己的一份表</b>：不清的话主画面那遍会把镜内那次
+     *       登记的条目再叠画一遍（白付一倍顶点开销，半透明骨骼还会叠加加倍），
+     *       而主画面那遍本来就会重新登记一份全新的。
+     *       {@code SimpleFeatureRenderPhaseMixin} 与本条并不矛盾：它保住的是
+     *       <b>节点</b>（主遍还要再画一次同一批节点），不是我们的绘制表。
+     *       详见 {@code docs/MESH_LOADER.md} §5.2-bis 第 13 项。</p></li>
      *   <li><b>主世界帧图</b>：消费 + 置帧标志 + 清表。</li>
      * </ul>
      *
@@ -573,9 +695,18 @@ public final class PolyMeshGpuRenderer {
             }
             if (!inScopePass) {
                 worldDrawnThisFrame = true;
-                WORLD_DRAWS.clear();
+            } else if (!loggedScopeWorldDraw) {
+                // 这条 log-once 是「镜内确实走了 GPU 烘焙」的硬证据 ——
+                // 用户此前只能靠帧率变化反推（2026-09-01 回报）。
+                loggedScopeWorldDraw = true;
+                LOGGER.info("[TacZMeshLoader] GPU world mesh pass active inside the scope PIP re-render pass: "
+                                + "drew {} world entries submitted by this pass, then cleared the table so the "
+                                + "main pass registers and draws its own. (logged once)",
+                        WORLD_DRAWS.size());
             }
-            // 镜内那遍：表保留原样，主画面那遍再消费。
+            // 两遍各自提交 ⇒ 两遍各自消费：画完即清。镜内那遍若不清，主画面那遍会把
+            // 镜内那次登记的条目再叠画一遍（白付一倍顶点开销，半透明骨骼还会加倍）。
+            WORLD_DRAWS.clear();
         } catch (Exception | LinkageError e) {
             // 分表禁用（A2）：世界路径失败只关世界闸，不连坐手部；
             // 不回写配置；LinkageError 一并接住（A3）。
@@ -613,7 +744,7 @@ public final class PolyMeshGpuRenderer {
      */
     private static void drawListViaRenderType(List<DrawEntry> draws) {
         IrisCompat.assignCommonEntityPipelinesToHandIfNeeded();
-        long totalIndices = drawViaRenderTypeCore(draws);
+        long totalIndices = drawViaRenderTypeCore(draws, true);
         if (!loggedFirstIrisDraw) {
             loggedFirstIrisDraw = true;
             LOGGER.info("[TacZMeshLoader] GPU mesh pass (RenderType route, shader-pack compatible) drew {} bones "
@@ -645,7 +776,7 @@ public final class PolyMeshGpuRenderer {
      * 完全同构，两层变换定理不区分 pass。</p>
      */
     private static void drawWorldListViaRenderType(List<DrawEntry> draws) {
-        long totalIndices = drawViaRenderTypeCore(draws);
+        long totalIndices = drawViaRenderTypeCore(draws, false);
         if (!loggedFirstWorldDraw) {
             loggedFirstWorldDraw = true;
             LOGGER.info("[TacZMeshLoader] GPU world mesh pass (RenderType route) drew {} bones "
@@ -653,7 +784,11 @@ public final class PolyMeshGpuRenderer {
         }
     }
 
-    private static long drawViaRenderTypeCore(List<DrawEntry> draws) {
+    /**
+     * @param handPass 手部表才裁目镜（{@code clipForViewmodel}）；世界表不裁 ——
+     *                 世界枪本就该出现在镜内画面里，与 collector 的世界枪一致。
+     */
+    private static long drawViaRenderTypeCore(List<DrawEntry> draws, boolean handPass) {
         Matrix4fStack mvStack = RenderSystem.getModelViewStack();
 
         Map<Identifier, List<DrawEntry>> byTexture = new HashMap<>();
@@ -663,7 +798,23 @@ public final class PolyMeshGpuRenderer {
 
         long totalIndices = 0;
         for (Map.Entry<Identifier, List<DrawEntry>> group : byTexture.entrySet()) {
-            RenderType renderType = RenderTypes.entityCutout(group.getKey());
+            // 【开镜 mesh 枪身裁剪 · 光影侧】与 collector 枪身完全同一份机制：
+            // 裁剪变体在掩码就绪时把 entityCutout 换成 scope_body_clipped
+            // （= entityCutout 配方 + SCOPE_MASK discard，视觉逐状态一致）。
+            // 该管线已由 assignScopePipelineToHand 归入 Iris HAND program，
+            // IrisScopeMaskState 对它写 tacz_ScopeMaskMode=1 —— 立方体枪身在
+            // 光影下裁剪正确走的就是这条已实证链路，mesh 只是同车。
+            // 掩码不就绪/未开镜时原样返回 entityCutout，行为与改动前逐位相同。
+            //
+            // 【判据必须用绘制时变体（2026-09-02 实机案）】手部表画在
+            // executeSolid 之后，那时阶段边界已把目镜几何消费清空 ——
+            // 若用 submit 时的 clipForViewmodel（查活几何）判定恒 false，
+            // mesh 枪身从未被裁。clipForViewmodelAtDraw 改看「本帧画过
+            // 允许裁视模的掩码」帧快照，与 cube 同开同关。
+            RenderType renderType = handPass
+                    ? com.tacz.guns.client.render.scope.ScopeBodyRenderTypes.clipForViewmodelAtDraw(
+                            RenderTypes.entityCutout(group.getKey()), group.getKey())
+                    : RenderTypes.entityCutout(group.getKey());
             for (DrawEntry entry : group.getValue()) {
                 // MV = MV_draw(栈顶) × pose_bone。压栈让 prepare() 自己取。
                 //
@@ -742,7 +893,58 @@ public final class PolyMeshGpuRenderer {
             byTexture.computeIfAbsent(entry.texture(), k -> new ArrayList<>()).add(entry);
         }
 
+        // 【纹理必须在 render pass 之外解析 —— 05170 实机踩坑 2ae4c29 移植】
+        // TextureManager.getTexture 对未加载纹理是懒加载：registerAndLoad ->
+        // ReloadableTexture.apply -> CommandEncoder.writeToTexture，而«pass 开着
+        // 不许发其他命令»的约束会让这次上传直接抛异常。全 GPU 提交的枪
+        // （每个可见部件都走 GPU 表）没有 collector 兄弟先去请求贴图，
+        // 我们就是第一个请求者 —— 在 pass 里解析 = 贴图永远加载不上、
+        // 每帧报错 + 枪面全紫黑（26.1.2 duyupack kar98un 实机复现；本仓
+        // resolveTextureView 与其逐字相同，世界 GPU 路径上线后同样暴露）。
+        Map<Identifier, GpuTextureView> viewsByTexture = new HashMap<>();
+        for (Identifier texture : byTexture.keySet()) {
+            GpuTextureView view = resolveTextureView(texture);
+            if (view == null) {
+                view = resolveTextureView(MissingTextureAtlasSprite.getLocation());
+            }
+            if (view != null) {
+                viewsByTexture.put(texture, view);
+            }
+        }
+
         CommandEncoder encoder = RenderSystem.getDevice().createCommandEncoder();
+
+        // 【开镜 mesh 枪身裁剪】与 collector 枪身的 clipForViewmodel 同开同关，
+        // 但判据用<b>绘制时变体</b>（maskReadyForViewmodelAtDraw）：手部表画在
+        // executeSolid 之后，那时阶段边界的 finally 已把目镜几何消费清空，
+        // 查活几何恒空 ⇒ 旧写法（maskReadyForViewmodel）判定<b>恒 false</b> ⇒
+        // mesh 枪身从未被裁（2026-09-02 实机案：主画面枪管一直穿进镜片画面，
+        // 仅二次渲染的镜内画面恰好是不含视模的整幅世界渲染才「看起来裁了」）。
+        // 变体改看帧快照：本帧阶段边界成功画过允许裁视模的掩码即裁 ——
+        // 孔径内的 mesh 枪身像素 discard，与立方体枪身一致。仅手部表：
+        // 世界枪不裁（它们本来就该出现在镜内画面里，与 collector 的世界枪
+        // 一致）。EMISSIVE 回退档不裁：lightmap 都拿不到的会话已在降级态，
+        // 宁简勿繁。
+        boolean clipAgainstOcular = draws == HAND_DRAWS
+                && lightmapView != null
+                && com.tacz.guns.client.render.scope.ScopeBodyRenderTypes.maskReadyForViewmodelAtDraw();
+        GpuTextureView maskView = null;
+        if (clipAgainstOcular) {
+            RenderTarget maskTarget = com.tacz.guns.client.render.scope.ScopeMaskTarget.current();
+            maskView = maskTarget != null ? maskTarget.getColorTextureView() : null;
+            clipAgainstOcular = maskView != null;
+        }
+        if (clipAgainstOcular && !loggedHandClipActive) {
+            // 【实机证据】R5 移植的裁剪判据此前被时序静默禁用（恒 false），
+            // 这一行是「裁剪真的生效了」的字段证据：没有它，用户只能靠画面
+            // 反推（上一轮就是这么误判的）。
+            loggedHandClipActive = true;
+            LOGGER.info("[TacZMeshLoader] GPU hand mesh pass: ocular clip ACTIVE — {} bones drawn "
+                            + "with the scope-aperture mask (first frame). The mesh gun body is now "
+                            + "discarded inside the ocular projection, same as the collector body.",
+                    draws.size());
+        }
+
         // 阶段边界不在任何 render pass 内（FeatureRenderDispatcherMixin 的字节码分析），
         // createRenderPass 的 isInRenderPass 断言安全。颜色 Optional.empty() = 不清屏，
         // 深度 OptionalDouble.empty() = 不清深度 —— executeSolid 画好的立方体深度要留着。
@@ -753,18 +955,21 @@ public final class PolyMeshGpuRenderer {
                 depthView,
                 OptionalDouble.empty())) {
             boolean lit = lightmapView != null;
-            pass.setPipeline(lit ? LIT_PIPELINE : EMISSIVE_PIPELINE);
+            pass.setPipeline(clipAgainstOcular ? LIT_CLIPPED_PIPELINE : (lit ? LIT_PIPELINE : EMISSIVE_PIPELINE));
             RenderSystem.bindDefaultUniforms(pass);
             if (lit) {
                 pass.bindTexture("Sampler2", lightmapView,
                         RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
             }
+            if (clipAgainstOcular) {
+                // NEAREST 与 ScopeMaskTextureHandle 的理由相同：掩码是二值数据，
+                // 线性过滤会让 > 0.5 判定在边界抖动出毛边。
+                pass.bindTexture(com.tacz.guns.client.render.scope.ScopeBodyRenderTypes.maskSamplerName(),
+                        maskView, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+            }
 
             for (Map.Entry<Identifier, List<DrawEntry>> group : byTexture.entrySet()) {
-                GpuTextureView textureView = resolveTextureView(group.getKey());
-                if (textureView == null) {
-                    textureView = resolveTextureView(MissingTextureAtlasSprite.getLocation());
-                }
+                GpuTextureView textureView = viewsByTexture.get(group.getKey());
                 if (textureView == null) {
                     continue;
                 }
@@ -783,23 +988,37 @@ public final class PolyMeshGpuRenderer {
                     pass.drawIndexed(entry.bone().indexCount, 1, 0, 0, 0);
                 }
             }
-            if (!loggedFirstDraw) {
-                loggedFirstDraw = true;
+            // 两张表各记一次首画：世界表在自定义 pass 上的首画是「世界 mesh 枪
+            // 确实走了 GPU 烘焙」的证据之一，与手部共用一个标志会被手部抢先吃掉
+            // （手部 pass 一帧内更早）。光影 RenderType 路线另有 loggedFirstWorldDraw。
+            boolean handTable = draws == HAND_DRAWS;
+            if (handTable ? !loggedFirstDraw : !loggedFirstWorldDrawCustomPass) {
+                if (handTable) {
+                    loggedFirstDraw = true;
+                } else {
+                    loggedFirstWorldDrawCustomPass = true;
+                }
                 long indices = 0;
                 for (DrawEntry entry : draws) {
                     indices += entry.bone().indexCount;
                 }
-                LOGGER.info("[TacZMeshLoader] GPU mesh pass drew {} bones ({} indices) on hand pass, lit={}",
-                        draws.size(), indices, lit);
+                LOGGER.info("[TacZMeshLoader] GPU mesh pass drew {} bones ({} indices) on the {} pass, lit={}",
+                        draws.size(), indices, handTable ? "hand" : "world", lit);
             }
         }
     }
+
+    /** 解析失败按纹理去重打日志（全 GPU 枪失败时逐帧重试，不去重会刷屏）。 */
+    private static final java.util.Set<Identifier> LOGGED_TEXTURE_FAILURES =
+            java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     private static GpuTextureView resolveTextureView(Identifier texture) {
         try {
             return Minecraft.getInstance().getTextureManager().getTexture(texture).getTextureView();
         } catch (Exception e) {
-            LOGGER.error("[TacZMeshLoader] Failed to resolve texture view for {}", texture, e);
+            if (LOGGED_TEXTURE_FAILURES.add(texture)) {
+                LOGGER.error("[TacZMeshLoader] Failed to resolve texture view for {} (logged once)", texture, e);
+            }
             return null;
         }
     }

@@ -254,6 +254,16 @@ public final class ScopeMaskRenderer {
      * 孔径的东西（蚀刻准星等）整片覆盖掉。只允许本帧第一次手部 pass 合成。</p>
      */
     private static boolean compositedThisFrame = false;
+    /**
+     * 【绘制时快照 · 2026-09-02】本帧掩码绘制时「允许裁视模」是否为真。
+     *
+     * <p>给<b>executeSolid 之后</b>才绘制的消费者（GPU mesh 手部表）用：那时
+     * 阶段边界已经把 {@code ScopeMaskGeometry} 消费清空（见
+     * {@link #renderAtPhaseBoundary} 的 finally），活几何永远查不到 —— 读这个
+     * 在 {@code drawMask} 成功路径上、清空之前记下的快照。每帧
+     * {@link #beginFrame()} 复位。</p>
+     */
+    private static boolean viewmodelClipMaskThisFrame = false;
 
     /**
      * 【2026-08-30 移除】这里曾经放「目镜斜率包围盒 → 屏幕 NDC」的换算与状态，
@@ -284,12 +294,24 @@ public final class ScopeMaskRenderer {
     public static void beginFrame() {
         maskDrawnLastFrame = maskDrawnThisFrame;
         maskDrawnThisFrame = false;
+        viewmodelClipMaskThisFrame = false;
         compositedThisFrame = false;
     }
 
     /** 本帧掩码是否已成功画进 target（供合成阶段判定 —— 它跑在掩码之后）。 */
     public static boolean hasMaskThisFrame() {
         return maskDrawnThisFrame;
+    }
+
+    /**
+     * 「本帧成功画过<b>允许裁视模</b>的掩码」（帧快照）。
+     *
+     * <p>供 executeSolid 之后才绘制的消费者（GPU mesh 手部表）做裁剪判定：
+     * 那时 {@link ScopeMaskGeometry} 已被本帧阶段边界消费清空，活几何恒空，
+     * 只能看本快照（详见 {@link #viewmodelClipMaskThisFrame} 注释）。</p>
+     */
+    public static boolean hasViewmodelClipMaskThisFrame() {
+        return maskDrawnThisFrame && viewmodelClipMaskThisFrame;
     }
 
     /** 上一帧是否画出过掩码（供 FOV 让位与镜内抓取判定 —— 它们跑在掩码之前）。 */
@@ -359,6 +381,9 @@ public final class ScopeMaskRenderer {
                 return;
             }
             drawMask(target);
+            // 【绘制时快照】在 finally 清空之前记下：executeSolid 之后才画的
+            // mesh 手部表只能靠这个快照知道「本帧画过允许裁视模的掩码」。
+            viewmodelClipMaskThisFrame = ScopeMaskGeometry.isViewmodelClipEnabled();
         } catch (Exception e) {
             failed = true;
             GunMod.LOGGER.error("[TACZ Scope] Failed to render ocular mask; mask disabled.", e);
