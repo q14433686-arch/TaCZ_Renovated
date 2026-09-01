@@ -63,18 +63,44 @@ Controllable、Shoulder Surfing、JEI/REI、Carry On、FirstPerson Model）的
 （开发史：WP07 撤回 → WP-LR2 重启并通过单机+专服验收，
 见 [`docs/records/LR2_INVENTORY.md`](docs/records/LR2_INVENTORY.md)。）
 
+**内置 Mesh 加载器（TML）**（R1 后随渲染线一并移植）：枪包可在 geo.json 骨骼上携带
+`poly_mesh` 网格（`"model_type": "mesh"`），由本 mod 直接解析渲染，带第一人称 /
+世界语境的 GPU 静态烘焙 + 目镜孔径裁剪；详见 [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md)
+与其 §8「枪包怎么用」。配置位于 `tacz-client.toml` 的 `[mesh_loader]` 段（19 项，
+全部接进局内「渲染」页）；把 `MeshEnable` 关掉即回退到纯立方体外观，行为等价于未装。
+**光影下两条 GPU 开关默认开**（R3 定稿的已知取舍，见 MESH_LOADER.md §3）；运行期行为
+在 26.1.2 上**尚未实机验证**，问题请按 MESH_LOADER.md §5 的复测矩阵反馈。
+
+**镜内画中画（PIP）与镜内裁切**（v4/v5）：除经典整屏变焦外，还提供重投影 PIP 与
+「二次渲染」PIP 两种瞄具模式，以及镜内文字 / 手臂 / 火光 / 枪身的孔径裁剪与
+低倍镜豁免；详见 [`docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md`](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md)。
+
+这不代表本项目是 TaCZ 或 LRTactical 的官方版本，也不代表所有第三方枪包、
+战术装备包或 shader pack 都已经兼容。TML 自身的来源与许可见
+[`docs/MESH_LOADER.md`](docs/MESH_LOADER.md) 开头与 §7。
+
 ---
 
-## 3. 瞄具渲染：深度孔径，不是 PIP
+## 3. 瞄具渲染：深度孔径 + 可选 PIP，不是「只有一种」
 
-**本端口的瞄具不是 Picture-in-Picture，不会为镜片再渲染一次世界。**
+本端口的瞄具底层仍是 **depth-aperture（深度孔径）**：在绘制边界备份/恢复深度并做目镜
+孔径拷贝。在此之上提供三种镜内显示模式（`RenderConfig` 的 `ScopePip*` 键，默认关闭，
+即经典整屏变焦）：
 
-26.1.2 线采用 **depth-aperture（深度孔径）** 方案：在绘制边界备份/恢复深度并做目镜
-孔径拷贝，镜片后看到的仍是同一次世界渲染——没有第二台相机，没有第二次 `renderLevel`。
-代码中的 `PictureInPictureRenderer` **仅用于枪械工作台的 GUI 模型预览**，与瞄具无关。
+| 模式 | 机制 | 默认 |
+|---|---|---|
+| 经典整屏变焦 | 不开 PIP：整屏 FOV 收窄，镜片处仅做孔径裁切 | **开**（`ScopePipEnable=false` 即此模式） |
+| PIP 重投影 | 镜片显示复用已渲染帧的放大重投影，镜外保持 1× | 关 |
+| PIP 二次渲染 | 用窄 FOV **再渲染一次世界**进镜片（原生分辨率，成本 = 一帧完整世界渲染；`ScopePipRerender`） | 关 |
 
-装有 Iris 时走单独的 HAND shader 接线（反射接入，不装 Iris 则完全不加载）；
-其他 shader pack 仍可能改写自定义管线的最终效果，不保证一致。
+代码中的 `PictureInPictureRenderer` **仅用于枪械工作台的 GUI 模型预览**，与上述瞄具 PIP
+无关。装有 Iris 时 PIP 走单独的管线/终局合成接线（反射接入，见
+[`docs/SCOPE_PIP_RERENDER_IRIS_PORT_2612_20260901.md`](docs/SCOPE_PIP_RERENDER_IRIS_PORT_2612_20260901.md)），
+不装 Iris 则不加载；其他 shader pack 仍可能改写自定义管线的最终效果，不保证一致。
+
+**开镜时的周边裁切**（手臂/火光/枪身/配件/mesh GPU 枪身，depth-aperture 版）与
+**低倍镜豁免**（< `ScopePipMinMagnification` 默认 4× 一律不裁）见
+[`docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md`](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md)。
 
 ---
 
@@ -153,6 +179,14 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
   实际合成走 mod 内部管线。
 - 可选 mod 的逐项状态（含**明确不适配**的 Just Zoom、无 NeoForge 版的 Zoomify 等）
   见 [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md)。
+- **TML / PIP / 镜内裁切全部未实机**：本仓没有运行环境，v5 之前的渲染线亦然。
+  已知取舍与复测清单见
+  [docs/MESH_LOADER.md](docs/MESH_LOADER.md) §3/§5 与
+  [docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md](docs/SCOPE_ARM_CLIP_26_1_2_2026_09_02.md) §4。
+- **Iris 光影下是同一未实机状态**：姊妹线多处标注未实机，本仓承接同一状态，不写 PASS。
+- **目录层级 `recipe/` 与 `recipes/`**：26.x 数据包布局（vanilla registry 读 `recipe/`）；
+  旧枪包的 `recipes/` 由 PackMapping 重映射、`recipes→recipe` 兼容，详见
+  [docs/PORT_01a05170_TO_NEOFORGE_26_1_2_20260901.md](docs/PORT_01a05170_TO_NEOFORGE_26_1_2_20260901.md)（v1-v5）。
 
 ---
 
@@ -163,6 +197,14 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 - 本端口与 TaCZ 上游代码：**GPL-3.0**（发布二进制必须随附完整对应源码）；
 - 默认枪包资源：**CC BY-NC-ND 4.0**（沿用上游声明）；
 - 随 jar 打包的 LuaJ：MIT；commons-math3：Apache-2.0；
+- **内置 TML（Mesh 加载器）**：移植自
+  [VellEagle/TacZMeshLoader](https://github.com/VellEagle/TacZMeshLoader)
+  `1.21.1_fabric`（**GPL-3.0**），经姊妹项目 TaCZ_Refabricated_Unofficial 26.1.2 线
+  中转；各源文件头保留移植声明，完整来源/许可/边界见
+  [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md) 开头与 §7。TML 作者的 GPL-3.0 许可
+  允许本仓库将其源码纳入本 GPL 项目并再分发，但**不构成**任何授权背书——上游问题
+  请回 [VellEagle/TacZMeshLoader](https://github.com/VellEagle/TacZMeshLoader) 仓库，
+  不要要求 TML 作者为本端口提供支持；
 - 其他第三方库与外部内容包可能有各自许可。
 
 详见 [`LICENSE`](LICENSE) 与 [`LICENSES.md`](LICENSES.md)。代码许可不会自动覆盖美术资源。
@@ -171,6 +213,8 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
 
 - 游戏语义主线：MCModderAnchor/TACZ → Sh1roCu/TACZ-Refabricated →
   [q14433686-arch/TaCZ_Refabricated_Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial) → 本仓库；
+- 渲染层（TML 上游）：[VellEagle/TacZMeshLoader](https://github.com/VellEagle/TacZMeshLoader)
+  （GPL-3.0，经上述姊妹线中转）；
 - 加载器习语参考（辅，未采用其渲染代码）：MUKSC/TACZ-1.21.1。
 
 本项目按"原样"提供，不附带担保。请勿把本移植的问题提交给 TaCZ 或 LRTactical 原作者。

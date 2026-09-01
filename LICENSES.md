@@ -10,6 +10,7 @@
 | 上游代码谱系 MCModderAnchor/TACZ、Sh1roCu/TACZ-Refabricated、q14433686-arch/TaCZ_Refabricated_Unofficial、MUKSC/TACZ-1.21.1 | GPL-3.0 |
 | `me/xjqsh/lrtactical` 内置层（109 个源文件；仅代码，不打包原作美术/音频） | GPL-3.0 ← [`LesRaisins-Studios/LesRaisins-Tactical-Equipements`](https://github.com/LesRaisins-Studios/LesRaisins-Tactical-Equipements)（Programmer: xjqsh，Artist: LeComte） |
 | `com/maydaymemory/mae`（`Pose` / `DummyPose`） | Mayday Animation Engine（`com.maydaymemory:mae`，SimpleBedrockModel 的编译期依赖）的**编译期桩**：一个空接口 + 一个 dummy 实现，不含 MAE 任何代码；仅在缺少 MAE 的编译环境中替代其 `Pose` 类型 |
+| `com/tacz/guns/compat/meshloader`（内置 TML，20 个源文件） | GPL-3.0 ← [`VellEagle/TacZMeshLoader`](https://github.com/VellEagle/TacZMeshLoader) `1.21.1_fabric`；经姊妹项目 TaCZ_Refabricated_Unofficial 26.1.2 线（`arena/01a05db3`）中转移植，各源文件头保留「移植自 VellEagle/TacZMeshLoader 1.21.1_fabric (GPL-3.0)」声明。TML 作者的许可允许纳入本 GPL 项目并再分发，但不构成授权背书；上游问题请回 TML 仓库 |
 | 原版枪模资源（模型/贴图/音效） | CC BY-NC-ND 4.0（**非商业**、禁止演绎；随 jar 分发的默认枪包受此约束，故本 mod jar 整体按非商业再分发处理，与原版 TaCZ 同一约束） |
 | 本仓库品牌图标 `icon.png` / `logo.png` | 本项目原创（`scripts/generate_branding.py`），**不是**官方 TaCZ 美术的衍生品 |
 

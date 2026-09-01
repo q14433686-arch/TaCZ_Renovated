@@ -322,8 +322,8 @@ public final class IrisCompat {
      * 世界路径用 {@code ENTITIES}。{@code EMISSIVE_ENTITIES} 刻意<b>不</b>用于本渲染器的
      * 无光照兜底管线：那条只跳过 lightmap 采样，不等于「恒全亮」。</p>
      *
-     * <p>{@code MeshGpuWorldUnderShaders} 保持默认 false：组合已按源码核实，但 26.1.2 上
-     * 没有实机验证（见 MESH_LOADER.md 复测矩阵）。</p>
+     * <p>{@code MeshGpuWorldUnderShaders} 默认开（R3 定稿：常驻 VBO 收益 > 亮度继承
+     * 取舍）；组合已按源码核实，但 26.1.2 上没有实机验证（见 MESH_LOADER.md 复测矩阵）。</p>
      */
     public static boolean assignMeshPipelineToEntity(RenderPipeline pipeline) {
         return assignPipelineToIrisAny(pipeline, new String[]{"ENTITIES"}, "mesh_entity_world");
