@@ -12,10 +12,10 @@ import net.neoforged.neoforge.common.ModConfigSpec;
  * 各自在自己的 flush 处消费；GUI / 预览 / 镜内 / 阴影由<b>提交侧</b>闸门挡在表外
  * —— 关 PR #33/#69/#70/#71 的「世界 pass 泄漏」正是提交侧没闸门 + 绘制时矩阵取自
  * 错误时刻两件事叠出来的。光影下两条路（{@code MeshGpuUnderShaders} /
- * {@code MeshGpuWorldUnderShaders}）曾经自 R3 起默认开，<b>R3 发版前又改回默认关</b>：维护者实机
- * 发现「高模枪挡住太阳/月亮的那部分几何会继承天体的自发光亮度」，且只有把这两个键关掉才消失
- * （第一人称、第三人称、展示台三种语境一致）⇒ 光影下的常驻 VBO 路径与光影包的照明语义仍然不
- * 等价，代码保留、默认值退回。附带修掉一条相关缺陷：以前「拿不到 lightmap」会一次性闩锁并把
+ * {@code MeshGpuWorldUnderShaders}）<b>默认开</b>（维护者 2026-09-01 裁定，与 26.2 R3 定稿、
+ * 26.1.2 线一致）：常驻 VBO 在光影下的收益胜过每帧 CPU 重变换；「高模枪挡住太阳/月亮的
+ * 那部分几何继承天体自发光亮度」是<b>已知、可观测、可整键关闭</b>的取舍，不再作为默认关的理由。
+ * 附带修掉一条相关缺陷：以前「拿不到 lightmap」会一次性闩锁并把
  * 整条路退化到 {@code EMISSIVE} 管线，而那条管线在光影包眼里是「自发光、不受阴影」；现在
  * 光影下拿不到 lightmap 直接退回 collector（见 {@code PolyMeshGpuRenderer#gpuMasterUsable}）。
  * 失联/异常时两条路也各自静默回 collector。详见 {@code docs/TML_GPU_STEP2_HANDFLUSH_20260831.md}
@@ -37,6 +37,7 @@ public final class MeshyConfig {
     public static ModConfigSpec.BooleanValue GPU_WORLD;
     public static ModConfigSpec.BooleanValue GPU_WORLD_UNDER_SHADERS;
     public static ModConfigSpec.IntValue GPU_LIGHT_CACHE_SIZE;
+    public static ModConfigSpec.IntValue GPU_BAKE_BUDGET_PER_FRAME;
     public static ModConfigSpec.IntValue GUI_MAX_VERTICES;
     public static ModConfigSpec.IntValue WORLD_MAX_VERTICES;
     public static ModConfigSpec.DoubleValue WORLD_FULL_DETAIL_DISTANCE;
@@ -52,22 +53,24 @@ public final class MeshyConfig {
         builder.comment("poly_mesh only: these three decide how mesh normals/winding are baked.",
                 "They only matter with a shader pack installed (vanilla's entity program",
                 "ignores va_normal), and they take effect when models are re-parsed (F3+T).",
-                "MeshPolyMirrorReverseWinding: mirror (Y flip) also reverses the emitted triangle",
-                "order, so front and back swap. That is what BedrockPolygon does for mirrors, and",
-                "this defaulted to ON for one round - but the collector path draws through",
-                "RenderTypes.entityCutout, which culls back faces: reversing the winding then hides",
-                "the outward faces and the gun comes out inside-out (near-black, highlights on the",
-                "far walls). Maintainer side-by-side vs the Forge reference (2026-08-31): OFF is",
-                "what matches. Keep it off; only turn it on for a pack authored the other way, or to",
-                "compare on the GPU path (its pipelines disable culling, so there it is subtle).",
-                "MeshPolyInvertNormals: extra global negation of the baked normals. Try it if",
+                "MeshPolyMirrorReverseWinding: the Y mirror flips each face's front/back, so the",
+                "baked outward normals contradict gl_FrontFacing unless the emission winding is",
+                "reversed to match (downstream audit A10: shader packs doing",
+                "'normal *= gl_FrontFacing ? 1 : -1' then put highlights on the wrong side).",
+                "Default ON. The classic near-black regression that once forced it off came from",
+                "the collector path drawing through entityCutout, whose back-face culling hid the",
+                "outward faces after the reversal - the poly collector path on this line now draws",
+                "through entityCutoutNoCull and the GPU pipelines disable culling, so the reversal",
+                "no longer starves any face. Pack-authored winding that is already mirror-consistent",
+                "can flip this off. Requires resource reload (F3+T).",
+                "MeshPolyInvertNormals: diagnostic global negation of the baked normals. Try it if",
                 "specular still shows on the wrong side with the option above at both settings.",
                 "MeshPolyPreferPackNormals: use the per-vertex normals shipped in the pack",
                 "(smooth shading) instead of one flat normal per face. Default off because that",
                 "is what upstream does (upstream has the same branch, compiled out by a constant,",
                 "so enabling it is not a divergence from upstream); packs with authored normals",
                 "look noticeably better on.");
-        POLY_MIRROR_REVERSE_WINDING = builder.define("MeshPolyMirrorReverseWinding", false);
+        POLY_MIRROR_REVERSE_WINDING = builder.define("MeshPolyMirrorReverseWinding", true);
         POLY_INVERT_NORMALS = builder.define("MeshPolyInvertNormals", false);
         POLY_PREFER_PACK_NORMALS = builder.define("MeshPolyPreferPackNormals", false);
 
@@ -120,13 +123,13 @@ public final class MeshyConfig {
                 "and is lit by the pack's gbuffers_hand program (the pipeline is registered with",
                 "IrisApi.assignPipeline(HAND)). Needs an audited Iris 1.10.x; if the flush hook is",
                 "not live the path refuses submissions and the gun keeps the collector route.",
-                "OFF by default again: R3 turned it on after an in-game pass, but the maintainer then",
-                "saw mesh gun geometry inherit the sun/moon brightness wherever it covered them, and",
-                "only turning this (and MeshGpuWorldUnderShaders) off removed it - so under a shader",
-                "pack the resident-VBO path is not lighting-equivalent yet. The code stays for A/B",
-                "testing; see docs/MESH_LOADER.md 5.9-5.10.",
+                "Default ON (maintainer ruling 2026-09-01, aligned with 26.2 R3 and 26.1.2): the",
+                "resident-VBO gain under a pack outweighs the per-frame CPU re-transform, and the",
+                "known sun/moon brightness inheritance on geometry covering them is an observable,",
+                "whole-key-switchable trade-off rather than a reason to stay off. Turn this (and",
+                "MeshGpuWorldUnderShaders) off if that brightness inheritance bothers you.",
                 "See docs/TML_GPU_STEP2_HANDFLUSH_20260831.md.");
-        GPU_UNDER_SHADERS = builder.define("MeshGpuUnderShaders", false);
+        GPU_UNDER_SHADERS = builder.define("MeshGpuUnderShaders", true);
 
         builder.comment("GPU static baking for WORLD contexts too: third-person guns held by",
                 "other players, dropped items, item frames and display statues draw from the same",
@@ -145,10 +148,11 @@ public final class MeshyConfig {
                 "registered with IrisApi.assignPipeline(IrisProgram.ENTITIES) (constant audited",
                 "against the Iris 1.10.7 jar via CI javap - EMISSIVE_ENTITIES is deliberately not",
                 "used). Like the hand path it needs the audited Iris flush hook and refuses",
-                "submissions when that hook is not live. OFF by default for the same reason as",
-                "MeshGpuUnderShaders (geometry inheriting the sun/moon brightness under a shader",
-                "pack; the world contexts showed it the same way, e.g. display stands).");
-        GPU_WORLD_UNDER_SHADERS = builder.define("MeshGpuWorldUnderShaders", false);
+                "submissions when that hook is not live. Default ON (maintainer ruling 2026-09-01,",
+                "same as MeshGpuUnderShaders and aligned with 26.2 R3 / 26.1.2); the sun/moon",
+                "brightness inheritance on covering geometry is a known, switchable trade-off.",
+                "Turn this and MeshGpuUnderShaders off if it bothers you.");
+        GPU_WORLD_UNDER_SHADERS = builder.define("MeshGpuWorldUnderShaders", true);
 
         builder.comment("How many quantized light levels of baked world VBOs to keep per gun model",
                 "(LRU). Upstream TML caches 8 unquantized levels; this port quantizes light first",
@@ -156,6 +160,17 @@ public final class MeshyConfig {
                 "level costs GPU memory proportional to the model's vertex count.",
                 "First-person baking is unaffected (it keeps a single level).");
         GPU_LIGHT_CACHE_SIZE = builder.defineInRange("MeshGpuLightCacheSize", 4, 1, 16);
+
+        // 【额度与容量解耦 —— 同步自 26.1.2/26.2 线（下游审查 A6 采纳）】原先每帧烘焙额度
+        // 直接取 LRU 容量（Math.max(4, cap)）：一个旋钮当两个用，于是「为省显存把容量调到 1」
+        // 的用户额度仍被顶到 4、想调大额度的用户得白花显存把 LRU 撑大。容量是显存语义、
+        // 额度是每帧 CPU/上传成本语义，两者独立。
+        builder.comment("How many world bakes may run in a single frame. Prevents evict-rebake",
+                "thrash when a scene spans more light levels than the cache holds - guns",
+                "beyond the budget fall back to the CPU path for that frame. Independent",
+                "of MeshGpuLightCacheSize (cache size = GPU memory; budget = per-frame",
+                "CPU/upload cost).");
+        GPU_BAKE_BUDGET_PER_FRAME = builder.defineInRange("MeshGpuBakeBudgetPerFrame", 4, 1, 64);
 
         builder.comment("Vertex budget for poly_mesh in GUI/FIXED/HEAD. Icons above this",
                 "budget render cube-only (or the pack's LOD model when present).",

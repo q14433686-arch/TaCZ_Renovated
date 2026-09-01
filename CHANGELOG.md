@@ -3,6 +3,52 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-09-02 第二轮修正（维护者指正；版本号未变）
+
+> 上轮移植只对了 1.21.11 线（`arena/01a05db2`）的 tip，而该线本身落后于 26.1.2 / 26.2 线的
+> 后续修复轮次。本轮按维护者指正逐项核对三线差异后补齐（证据：26.1.2 线
+> `SYNC_REPLY_TO_1211_20260902.md` §5 的默认值裁定表、26.2 线 `bb6fcb61`（下游审查 A10/A6）、
+> 26.1.2 线 `091dd5ec`/`be054bc7`/`d3f0fdc2`；逐 commit 读 diff 核实）。
+> 对照表：`docs/records/SYNC_SIBLING_0105DB2_20260901.md` §6。
+
+### 光影下烘焙两键默认开（维护者裁定，对齐 26.2 R3 定稿与 26.1.2）
+
+- `MeshGpuUnderShaders` / `MeshGpuWorldUnderShaders` 默认 `true`（原随 1.21.11 线旧 A/B 为 false）。
+  理由与 26.2 R3 终态一致：常驻 VBO 在光影下的收益胜过每帧 CPU 重变换；
+  「高模枪遮挡太阳/月亮处继承天体亮度」是已知、可观测、可整键关闭的取舍。
+  MeshyConfig 注释与中英语言描述同步更新。
+
+### 法线修复（下游审查 A10 —— 绕序×法线自洽，此前 1.21.11 线以默认关回避、未真修）
+
+- `PolyMesh` 换用 26.2 线 `bb6fcb61` 采纳后的现代烘焙形态：镜像（奇数次轴翻转）时
+  **反转发射绕序**（`MeshPolyMirrorReverseWinding` 默认 **true**），使变换后绕序叉积与
+  烘焙法线一致 —— 修复光影包 `normal *= gl_FrontFacing` 写法把高光贴到错误一侧的病症；
+  退化面优先退回枪包法线、再退化为确定方向（(0,1,0)，**绝不写零向量**，杜绝 NaN 高光）；
+  `MeshPolyPreferPackNormals` 逐顶点消费枪包平滑法线。
+- **配套修复当年逼退默认值的回归根因**：poly 的 collector 路径原走 `entityCutout`
+  （1.21.11 该管线默认剔除背面，绕序反转后被剔的正是朝外面 → 整枪近乎全黑）。
+  四个 poly 模型（枪/配件/弹药/方块）的 collector 提交改走 `entityCutoutNoCull`；
+  GPU 路径管线本就 `withCull(false)`。两条路径都不再因反转吞面。
+
+### 烘焙额度与 LRU 容量解耦（下游审查 A6）
+
+- 新增 `MeshGpuBakeBudgetPerFrame`（默认 4，1-64）：每帧烘焙额度独立于
+  `MeshGpuLightCacheSize`（显存语义），不再 `Math.max(4, 容量)` 一个旋钮当两个用；
+  额度耗尽时 log-once INFO（`[TacZMeshLoader] World bake budget ...`），溢出枪当帧回 collector。
+  Cloth 面板条目 + en/zh 语言键同步。
+
+### 本轮的核对结论（其余项）
+
+- 法线矩阵读取时刻修复（MV 栈 per-draw 压/弹）：1.21.11 线 `014f4b0` 已带、26.1.2 线
+  `SYNC_REPLY_TO_1211` §4 明确判定两线形状一致且正确 —— **已在，无需再动**。
+- Voxy ESC 崩溃三处封堵（allChanged 预热窗口取消 / `isMainStackBoundTo` / 释放拒绝熔断）、
+  A1（输出目标覆写防御）、A2/A3（分表禁用、不回写配置、catch LinkageError）、纹理视图
+  pass 外解析、镜内文字 log-once：核对后**均已在**（随 1.21.11 tip 移植）。
+- A5（ENTITY stride 逐帧哨兵）为 26.2 线独有防御、26.1.2 未采纳；本线同 26.1.2 不搬。
+- scope 五件套与 26.1.2 线的其余差异为 API 形状（CameraRenderState / ColorTargetState /
+  FeatureRenderDispatcher 构造器参数等），语义无缺；`captureSceneAfterIrisFinal` 补了
+  26.1.2 的 `getDeltaTracker()==null` 防御守卫。
+
 ## 1.1.8+neoforge.1.21.11.R1-hotfix — 2026-09-02 姊妹线渲染线全量移植（版本号未变）
 
 > 应项目要求把姊妹线 `arena/01a05db2` 的<b>全部实质性改动</b>等价移植到本线（NeoForge 1.21.11）：

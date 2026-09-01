@@ -60,7 +60,7 @@ public class TaczPolyMeshAttachmentModel extends BedrockAttachmentModel {
         if (snapshot.isEmpty()) {
             return;
         }
-        collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityCutout(tex),
+        collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityCutoutNoCull(tex),
                 (entryPose, consumer) -> snapshot.writeCutout(consumer, overlay));
         if (snapshot.hasTranslucent()) {
             collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityTranslucent(tex),

@@ -49,7 +49,7 @@ public class TaczPolyMeshAmmoModel extends BedrockAmmoModel {
         if (snapshot.isEmpty()) {
             return;
         }
-        collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityCutout(texture),
+        collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityCutoutNoCull(texture),
                 (entryPose, consumer) -> snapshot.writeCutout(consumer, overlay, red, green, blue, alpha));
         if (snapshot.hasTranslucent()) {
             collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityTranslucent(texture),

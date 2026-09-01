@@ -413,8 +413,7 @@ public class TaczPolyMeshGunModel extends BedrockGunModel {
         if (cached != null) {
             return cached;
         }
-        int cap = Math.max(1, MeshyConfig.GPU_LIGHT_CACHE_SIZE.get());
-        if (!PolyMeshGpuRenderer.tryReserveBake(cap)) {
+        if (!PolyMeshGpuRenderer.tryReserveBake()) {
             return null;
         }
         Map<String, PolyMeshGpuRenderer.BakedBone> bones = new HashMap<>();
@@ -444,6 +443,9 @@ public class TaczPolyMeshGunModel extends BedrockGunModel {
             return null;
         }
         worldBakedByLight.put(lightKey, bones);
+        // LRU 容量（显存语义）：只用于逐出最久未访问的光照档；与每帧烘焙额度
+        // （MeshGpuBakeBudgetPerFrame，CPU/上传成本语义）已解耦。
+        int cap = Math.max(1, MeshyConfig.GPU_LIGHT_CACHE_SIZE.get());
         while (worldBakedByLight.size() > cap) {
             // access-order LinkedHashMap：迭代器首位即最久未访问档。
             var it = worldBakedByLight.entrySet().iterator();
@@ -578,7 +580,7 @@ public class TaczPolyMeshGunModel extends BedrockGunModel {
         if (snapshot.isEmpty()) {
             return;
         }
-        collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityCutout(texture),
+        collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityCutoutNoCull(texture),
                 (entryPose, consumer) -> snapshot.writeCutout(consumer, overlay));
         if (snapshot.hasTranslucent()) {
             collector.submitCustomGeometry(new PoseStack(), RenderTypes.entityTranslucent(texture),

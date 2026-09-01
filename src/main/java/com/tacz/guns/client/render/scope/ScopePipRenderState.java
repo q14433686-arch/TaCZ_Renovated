@@ -527,7 +527,7 @@ public final class ScopePipRenderState {
         // 全 ADS，显示的第一帧就没有成品帧可贴。捕获本身无害（只是拷贝），
         // 何时上屏由合成的同一条阈决定。
         float progress = currentAimingProgress(mc,
-                Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false));
+                mc.getDeltaTracker() == null ? 0.0f : mc.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         if (progress < PIP_REVEAL_THRESHOLD) {
             sceneCaptured = false;
             return;
