@@ -512,6 +512,6 @@
   "config.tacz.client.render.scope_pip_sharpness.desc": "Unsharp-mask strength for the magnified lens. Weighted by zoom: 0 at 1x, full at 6x and above.",
   "config.tacz.client.render.scope_pip_world_zoom_share": "World Zoom Share",
   "config.tacz.client.render.scope_pip_world_zoom_share.desc": "How much of the scope zoom is applied to the world. 0 = pure PIP (world always 1x, softest lens). 1 = old whole-screen zoom (sharpest, equals disabling PIP).",
-  "config.tacz.client.render.mesh_gpu_bake_budget": "Mesh GPU Bake Budget (Per Frame)",
-  "config.tacz.client.render.mesh_gpu_bake_budget.desc": "How many world-gun bakes may run in one frame. Prevents evict-rebake thrash when a scene spans more light levels than the cache holds; overflow guns fall back to the CPU path for that frame. Independent of the light cache size (cache = GPU memory, budget = per-frame CPU/upload cost)."
+  "config.tacz.client.render.mesh_gpu_bake_budget_per_frame": "Mesh GPU Bake Budget (Per Frame)",
+  "config.tacz.client.render.mesh_gpu_bake_budget_per_frame.desc": "How many world-gun bakes may run in one frame. Prevents evict-rebake thrash when a scene spans more light levels than the cache holds; overflow guns fall back to the CPU path for that frame. Independent of the light cache size (cache = GPU memory, budget = per-frame CPU/upload cost)."
 }
