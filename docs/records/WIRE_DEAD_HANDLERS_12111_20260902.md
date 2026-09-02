@@ -1,8 +1,10 @@
 # 静默失效事件处理器接线记录（1.21.11 线，2026-09-02）
 
 > 任务来源：26.1.2 线交接工单
-> [`HANDOFF_DEAD_HANDLERS_TO_262_12111_20260903.md`](HANDOFF_DEAD_HANDLERS_TO_262_12111_20260903.md)
-> （26.1.2 线 commit `e5828f0`/`c216a66` 的修复 + 全目录审核结论）。
+> `HANDOFF_DEAD_HANDLERS_TO_262_12111_20260903.md`（该文件只存在于 26.1.2 线，
+> 本线无此文件，故不给相对链接；归档 commit：
+> [d3e1cd1](https://github.com/q14433686-arch/TaCZ_Renovated/commit/d3e1cd11758d2b59046fb1a30cc938a933ff3a29)；
+> 26.1.2 线修复 commit `e5828f0`/`c216a66`）。
 > 本线**未照抄 26.1.2 diff**：先跑 §1 注册面扫描确定本线实际缺陷清单（与本线
 > 现状一致：8 项），再按 §3 逐项在本线（NeoForge 21.11.45 / FML 10.0.36 / MC
 > 1.21.11，官方 Mojang mappings）指认 API 后落笔。
