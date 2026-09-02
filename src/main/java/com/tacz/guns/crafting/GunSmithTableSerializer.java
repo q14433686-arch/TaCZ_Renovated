@@ -3,7 +3,13 @@ package com.tacz.guns.crafting;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.tacz.guns.api.item.IAmmo;
+import com.tacz.guns.api.item.IAttachment;
+import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.api.item.attachment.AttachmentType;
 import com.tacz.guns.crafting.result.GunSmithTableResult;
+import com.tacz.guns.crafting.result.RawGunTableResult;
+import com.tacz.guns.resource.pojo.data.recipe.GunResult;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,6 +19,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,18 +60,36 @@ public final class GunSmithTableSerializer {
         ).apply(instance, ResultSpec::new));
 
         GunSmithTableResult toResult() {
-            return new GunSmithTableResult(ItemStack.EMPTY, group.orElse(null));
+            RawGunTableResult raw = new RawGunTableResult(type, id, Math.max(1, count));
+            if (GunSmithTableResult.GUN.equals(type)) {
+                EnumMap<AttachmentType, Identifier> parsedAttachments = new EnumMap<>(AttachmentType.class);
+                attachments.forEach((name, attachmentId) -> {
+                    try {
+                        parsedAttachments.put(AttachmentType.valueOf(name.toUpperCase(java.util.Locale.ROOT)), attachmentId);
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                });
+                raw.setExtraData(new GunResult(ammoCount, parsedAttachments));
+            }
+            return new GunSmithTableResult(raw, group.orElse(null));
         }
 
         static ResultSpec fromRecipe(GunSmithTableRecipe recipe) {
-            return new ResultSpec(
-                    GunSmithTableResult.CUSTOM,
-                    Identifier.withDefaultNamespace("air"),
-                    1,
-                    0,
-                    Optional.ofNullable(recipe.getResult().getGroup()),
-                    Map.of()
-            );
+            ItemStack stack = recipe.getResult().getResult();
+            String type = GunSmithTableResult.CUSTOM;
+            Identifier id = Identifier.withDefaultNamespace("air");
+            if (stack.getItem() instanceof IGun gun) {
+                type = GunSmithTableResult.GUN;
+                id = gun.getGunId(stack);
+            } else if (stack.getItem() instanceof IAmmo ammo) {
+                type = GunSmithTableResult.AMMO;
+                id = ammo.getAmmoId(stack);
+            } else if (stack.getItem() instanceof IAttachment attachment) {
+                type = GunSmithTableResult.ATTACHMENT;
+                id = attachment.getAttachmentId(stack);
+            }
+            return new ResultSpec(type, id, Math.max(1, stack.getCount()), 0,
+                    Optional.ofNullable(recipe.getResult().getGroup()), Map.of());
         }
     }
 
@@ -87,7 +112,7 @@ public final class GunSmithTableSerializer {
                         ingredients.add(new GunSmithTableIngredient(
                                 Ingredient.CONTENTS_STREAM_CODEC.decode(buffer), buffer.readInt()));
                     }
-                    ItemStack resultItem = ItemStack.STREAM_CODEC.decode(buffer);
+                    ItemStack resultItem = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
                     Identifier group = buffer.readIdentifier();
                     return new GunSmithTableRecipe(recipeId, new GunSmithTableResult(resultItem, group), ingredients);
                 }
@@ -100,7 +125,7 @@ public final class GunSmithTableSerializer {
                         Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient.getIngredientOrThrow());
                         buffer.writeInt(ingredient.getCount());
                     }
-                    ItemStack.STREAM_CODEC.encode(buffer, recipe.getResult().getResult());
+                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.getResult().getResult());
                     buffer.writeIdentifier(recipe.getResult().getGroup());
                 }
             };
