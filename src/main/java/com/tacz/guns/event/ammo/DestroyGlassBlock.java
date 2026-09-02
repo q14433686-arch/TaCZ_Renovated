@@ -11,8 +11,16 @@ import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.StainedGlassPaneBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
+/**
+ * 配置 {@code DestroyGlass} 开启时，子弹命中玻璃类方块（半透明方块、染色玻璃板、
+ * 以及乐器为 HAT 的栏杆类）将其击碎。{@link AmmoHitBlockEvent} 仅在服务端触发。
+ */
+@EventBusSubscriber(modid = GunMod.MOD_ID)
 public class DestroyGlassBlock {
+    @SubscribeEvent
     public static void onAmmoHitBlock(AmmoHitBlockEvent event) {
         Level level = event.getLevel();
         BlockState state = event.getState();
