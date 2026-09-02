@@ -3,6 +3,55 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 未发布（R2 之后，尚未 bump `mod_version`）
+
+> 回传 26.1.2 线「静默失效事件处理器」修复轮（26.1.2 线 commit `e5828f0` +
+> 交接工单 `HANDOFF_DEAD_HANDLERS_TO_262_12111_20260903.md`），本线先跑注册面
+> 扫描确认 8 项缺陷后逐项属地化接线；API 证据与扫描记录见
+> [`docs/records/WIRE_DEAD_HANDLERS_12111_20260902.md`](docs/records/WIRE_DEAD_HANDLERS_12111_20260902.md)。
+> **编译门走 CI；运行期未实机验证。**
+
+### 修复
+
+- **七个事件处理器「静默失效」批量接线**（移植时只带了方法逻辑、漏了 NeoForge
+  总线注册，配置开了也毫无反应；与 26.1.2 线同构的 8 项缺陷）：
+  - **跨维度服务端枪械状态机不刷新**（跨维度后客户端演完整套换弹动画、服务端
+    因 `reloadStateType` 残留直接早退不加子弹）：玩家接
+    `PlayerEvent.PlayerChangedDimensionEvent`（1.21.11 ≥1.21.2 传送重写后玩家
+    为同一实例物理移动，`ServerPlayer#teleport` patch 内
+    `firePlayerChangedDimensionEvent` 为触发点证据）＋非玩家生物接
+    `EntityTravelToDimensionEvent`（防御性；当前版本生物跨维度为复制、mixin
+    状态本就不随 NBT 走），并过滤同维度传送。
+  - **服务端 BURST 连发只打出第一发、Lua `safeAsyncTask` 永不执行**：
+    `CycleTaskHelper.tick()` 无人调用，现接
+    `net.neoforged.neoforge.event.tick.ServerTickEvent.Post`（21.x tick 重构后
+    包位已确认存在；本线扫描新确认，严重）。
+  - **服务端配置解析器不跑**：`HeadShotAABBConfigRead`（第三方生物自定义爆头
+    AABB）与 `InteractKeyConfigRead`（交互键黑白名单）接
+    `ModConfigEvent.Loading/.Reloading`（FML 10.0 的 `@EventBusSubscriber` 已
+    无 `Bus` 参数，`IModBusEvent` 自动路由 mod 总线——**未写**
+    `bus = Bus.MOD`）。
+  - **`AutoReloadWhenRespawn` 重生自动装弹无反应**：接
+    `PlayerEvent.PlayerRespawnEvent`（在 `PlayerList#respawn` 中新实例
+    `restoreFrom`+`initInventoryMenu` 之后触发）。
+  - **子弹射钟不响、`DestroyGlass` 射玻璃不碎**：`BellRing` /
+    `DestroyGlassBlock` 接 `AmmoHitBlockEvent`（发布点
+    `EntityKineticBullet#onHitBlock` 确认在）。
+  - **工作台/改装台全屏界面下快捷栏穿模**：`PreventsHotbarEvent` 改为
+    `shouldHideHotbar()` 查询，经 `ClientGameEvents#onRenderGuiLayer` 挂
+    `RenderGuiLayerEvent.Pre` + `VanillaGuiLayers.HOTBAR`（旧
+    `AtomicBoolean` 回调所宣称的「GuiMixin 转发」经全仓 grep 证实为幻影调用点，
+    已剔除）。
+  - **主手持枪可以左键挖方块（服务端侧无兜底）**：`PreventGunClick` 接
+    `PlayerInteractEvent.LeftClickBlock`（
+    `ServerPlayerGameMode#handleBlockBreakAction` 开头触发、取消即 return；
+    客户端拦截原本就在，本条是服务端权威侧）。
+- **`CommonLoadPack` 确认遗留空壳**：本线服务端枪包加载由
+  `CommonAssetsManager`（`AddServerReloadListenersEvent`）接管，类内注释声明
+  「有意不接线」（无行为变化）。
+- **`GunFinishReloadEvent` 确认谱系性 API 空壳**：定义在、构造器在，全谱系
+  从未有发布点（官方 1.20.1 同样从未 post），按纪律不补发射点。
+
 ## 1.1.8+neoforge.1.21.11.R2 — 2026-09-02
 
 > R2 = R1-hotfix 之后回传姊妹 1.21.11 线（`arena/01a05db2`）08-30~09-02 的全部修复，
