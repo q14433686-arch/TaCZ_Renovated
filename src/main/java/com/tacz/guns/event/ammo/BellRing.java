@@ -1,12 +1,21 @@
 package com.tacz.guns.event.ammo;
 
+import com.tacz.guns.GunMod;
 import com.tacz.guns.api.event.server.AmmoHitBlockEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
+/**
+ * 子弹命中方块时敲响钟（发布点：{@code EntityKineticBullet#onHitBlock}，
+ * 游戏总线 {@code NeoForge.EVENT_BUS.post}）。
+ */
+@EventBusSubscriber(modid = GunMod.MOD_ID)
 public class BellRing {
+    @SubscribeEvent
     public static void onAmmoHitBlock(AmmoHitBlockEvent event) {
         Level level = event.getLevel();
         BlockState state = event.getState();
