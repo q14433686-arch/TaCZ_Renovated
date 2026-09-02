@@ -1,5 +1,6 @@
 package com.tacz.guns.event.ammo;
 
+import com.tacz.guns.GunMod;
 import com.tacz.guns.api.event.server.AmmoHitBlockEvent;
 import com.tacz.guns.config.common.AmmoConfig;
 import com.tacz.guns.entity.EntityKineticBullet;
