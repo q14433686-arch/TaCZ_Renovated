@@ -84,6 +84,15 @@ public final class ClientGameEvents {
         if (VanillaGuiLayers.CROSSHAIR.equals(event.getName())
                 && RenderCrosshairEvent.shouldHideVanillaCrosshair()) {
             event.setCanceled(true);
+            return;
+        }
+        // 枪械工作台/改装台全屏界面下隐藏原版快捷栏，防止穿模。
+        // （本线证据：NeoForge 21.11 @ 1.21.11 分支
+        //   src/client/java/net/neoforged/neoforge/client/gui/VanillaGuiLayers.java HOTBAR；
+        //   RenderGuiLayerEvent.Pre 为 ICancellableEvent。见 docs/records/WIRE_DEAD_HANDLERS_12111_20260902.md）
+        if (VanillaGuiLayers.HOTBAR.equals(event.getName())
+                && PreventsHotbarEvent.shouldHideHotbar()) {
+            event.setCanceled(true);
         }
     }
 
