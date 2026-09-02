@@ -512,6 +512,6 @@
   "config.tacz.client.render.scope_pip_sharpness.desc": "镜内放大画面的钝化蒙版锐化强度。按倍率加权：1× 为 0，6× 及以上取满。",
   "config.tacz.client.render.scope_pip_world_zoom_share": "世界分担倍率比例",
   "config.tacz.client.render.scope_pip_world_zoom_share.desc": "瞄具倍率中有多少由世界承担。0 = 纯 PIP（镜外始终 1×，镜内最软）；1 = 旧整屏变焦（最锐，等于关闭 PIP）。",
-  "config.tacz.client.render.mesh_gpu_bake_budget": "Mesh GPU 每帧烘焙额度",
-  "config.tacz.client.render.mesh_gpu_bake_budget.desc": "一帧内最多为世界枪械执行多少次烘焙。防止同屏光照档数超过缓存容量时逐帧「逐出-重烘」打摆；超出额度的枪当帧回退 CPU 路径。与光照缓存档数相互独立（缓存=显存开销，额度=每帧 CPU/上传开销）。"
+  "config.tacz.client.render.mesh_gpu_bake_budget_per_frame": "Mesh GPU 每帧烘焙额度",
+  "config.tacz.client.render.mesh_gpu_bake_budget_per_frame.desc": "一帧内最多为世界枪械执行多少次烘焙。防止同屏光照档数超过缓存容量时逐帧「逐出-重烘」打摆；超出额度的枪当帧回退 CPU 路径。与光照缓存档数相互独立（缓存=显存开销，额度=每帧 CPU/上传开销）。"
 }

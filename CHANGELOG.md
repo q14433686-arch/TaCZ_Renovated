@@ -51,6 +51,40 @@
   额度耗尽时 log-once INFO（`[TacZMeshLoader] World bake budget ...`），溢出枪当帧回 collector。
   Cloth 面板条目 + en/zh 语言键同步。
 
+### 2026-09-02 第四轮同步（姊妹线 09-02 新增两笔）
+
+> 对照姊妹项目 [TaCZ_Refabricated_Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
+> `1.21.11` 分支（tip `6db3af93`）与 `26.1.2` 分支，逐 commit 比对 `src/` 的实质性改动：
+> 上一轮之后姊妹线只新增两笔代码改动，其余为 docs / CI 日志。两笔均已等价移植。
+> 记录：[`docs/records/SYNC_SIBLING_20260902_R4.md`](docs/records/SYNC_SIBLING_20260902_R4.md)。
+
+#### 收枪（put-away）动画恢复 —— 移植姊妹 1.21.11 线 `b8041ab9`（源自 26.2 线 `ffe45485`+`32af4025`）
+
+- 症状：切枪时旧枪的 `put_away` 动画看不到 —— 1.21.11 的 `ItemInHandRenderer` 在切枪当帧
+  立刻换成新的主手物，状态机虽已触发 `INPUT_PUT_AWAY`，却没有任何视模可画。
+- 根因：上游 `KeepingItemRenderer#keep` 的两处调用点在本代码库里都是注释状态，
+  收枪窗口从未开启。
+- 修法（与姊妹线同形）：
+  - `LocalPlayerDraw#doPutAway` 成为 **唯一** 的 `keep()` 调用点，且只在
+    `AnimateGeoItemRenderer#hasInitializedStateMachine(lastItem)` 成立时调用
+    （对齐上游把 `keep()` 写在 `isInitialized()` 之内的语义，避免开出「旧枪静止一瞬」的空窗口）；
+  - 新增 `AnimateGeoItemRenderer#hasInitializedStateMachine(ItemStack)`，把 `tryExit`
+    内部同源的判定暴露给调用点；
+  - `AnimateGeoItemRenderer#tryExit` / `GunItemRendererWrapper#tryExit` 里那两行注释
+    **保持注释**，并加注说明「只能有一个调用点」；
+  - `ItemInHandRendererMixin#keep` 的守卫由「窗口未过期就 return」改为
+    **最新一次收枪接管**（仅当同一把枪且新请求不会延长窗口时才不动它）——
+    原守卫会让连续快速切枪时第二把枪的 `put_away` 一帧都画不出来。
+- 证据级别：静态等价移植（姊妹线同名文件逐行对照，本线仅 loader 侧 import 差异）。
+  **实机未跑。**
+
+#### Cloth 面板语言键跟随 toml 键蛇形 —— 移植姊妹 26.1.2 线 `ca083b5d`
+
+- `config.tacz.client.render.mesh_gpu_bake_budget[.desc]` 改名为
+  `…mesh_gpu_bake_budget_per_frame[.desc]`，与 toml 键 `MeshGpuBakeBudgetPerFrame` 的蛇形一致。
+- 纯改名：字段绑定（`GPU_BAKE_BUDGET_PER_FRAME`、默认 4、区间 1-64）与显示文本一字未动；
+  Cloth 落盘用的是 toml 键，**已存配置零影响**。
+
 ### 2026-09-02 第三轮修正（用户报告：光影下 VBO 世界路径枪体不可见）
 
 - 用户报告：开光影且 `MeshGpuWorldUnderShaders` 默认开后，第三人称 / 掉落物 / 展示台的

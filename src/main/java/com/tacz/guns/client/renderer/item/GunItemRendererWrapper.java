@@ -130,6 +130,10 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
         });
         if (stateMachine.isInitialized()) {
             stateMachine.trigger(GunAnimationConstant.INPUT_PUT_AWAY);
+
+            // keep() 的唯一现行调用点在 LocalPlayerDraw#doPutAway（2026-09-02 起，与姊妹
+            // 1.21.11 线 b8041ab9 同源）。这行保持注释：**不要打开** —— 两处都开会重复
+            // 调用 keep（守卫只让它不致错，但触发时机会被后来者误判）。
 //            KeepingItemRenderer.getRenderer().keep(stack, putAwayTime);
             stateMachine.exit();
             stateMachine.setExitingTime(putAwayTime + 50);
