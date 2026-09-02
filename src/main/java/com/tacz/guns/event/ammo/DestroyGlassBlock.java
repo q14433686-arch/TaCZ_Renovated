@@ -1,5 +1,6 @@
 package com.tacz.guns.event.ammo;
 
+import com.tacz.guns.GunMod;
 import com.tacz.guns.api.event.server.AmmoHitBlockEvent;
 import com.tacz.guns.config.common.AmmoConfig;
 import com.tacz.guns.entity.EntityKineticBullet;
@@ -11,8 +12,16 @@ import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.StainedGlassPaneBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
+/**
+ * 子弹命中时破坏玻璃类方块（发布点：{@code EntityKineticBullet#onHitBlock}，
+ * 游戏总线 {@code NeoForge.EVENT_BUS.post}）。
+ */
+@EventBusSubscriber(modid = GunMod.MOD_ID)
 public class DestroyGlassBlock {
+    @SubscribeEvent
     public static void onAmmoHitBlock(AmmoHitBlockEvent event) {
         Level level = event.getLevel();
         BlockState state = event.getState();

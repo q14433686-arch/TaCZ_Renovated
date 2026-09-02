@@ -7,6 +7,38 @@
 
 （R2 定名之后的增量写在里；发布时并入下一版条目。）
 
+### 修复：7 个「静默失效」事件处理器补接线 —— 方法体在、事件总线从未注册（2026-09-02）
+
+- **症状**（26.1.2 线工单通报，本线独立扫描确认同一缺陷集合）：编译过、
+  启动无报错，但下述功能整块失效——①跨维度后服务端换弹「动画连贯、子弹
+  不变」（`reloadStateType` 残留）；②BURST 连发只出第一发、Lua
+  `safeAsyncTask` 永不执行（`CycleTaskHelper` 无人 tick，**最严重**）；
+  ③爆头 AABB 与交互键黑白名单两缓存永远为空；④重生不自动补弹；
+  ⑤子弹不敲钟、不碎玻璃；⑦主手持枪仍可左键挖掘（服务端兜底缺失）。
+- **根因**：移植时只搬了方法体，未挂任何 `@EventBusSubscriber`/`addListener`。
+- **修法**（全部为补接线，方法体语义不动）：
+  `TravelToDimensionEvent`→生物接 `EntityTravelToDimensionEvent`（传送前，
+  过滤同维度、排除玩家）+ 玩家接 `PlayerEvent.PlayerChangedDimensionEvent`
+  （传送后）；`ServerTickEvent`→`event.tick.ServerTickEvent.Post` 驱动
+  `CycleTaskHelper.tick()`；`LoadingConfigEvent`→`ModConfigEvent.Loading/.Reloading`
+  （mod 总线，按 `tacz-server.toml` 过滤）；`PlayerRespawnEvent`→
+  `PlayerEvent.PlayerRespawnEvent`（不过滤 `isEndConquered()`，对齐官方）；
+  `BellRing`/`DestroyGlassBlock`→补 `AmmoHitBlockEvent` 注解订阅（发布点
+  `EntityKineticBullet#onHitBlock` 原本就在）；`PreventGunClick`→
+  `PlayerInteractEvent.LeftClickBlock`（服务端兜底；客户端
+  `ClientPreventGunClick` 原本已接线）。
+- **明确不修**：`CommonLoadPack`（全谱系有意空壳）、`GunFinishReloadEvent`
+  （官方 1.20.1 也从未 post，不补发射点）、`ChangeGunPropertyEvent`（本线
+  经 `AttachmentPropertyManager` 在役，非孤儿）。工单第 6 项
+  `PreventsHotbarEvent` 本线**已在役**（`ClientGameEvents#onRenderGuiLayer`
+  真实转发，非 26.1.2 线的幻影调用点），且全层取消语义与官方 1.20.1
+  （无 overlay 过滤）及 refab 26.2（GuiMixin 取消整个 HUD 提取）两个权威
+  一致，不收窄为 HOTBAR-only——与 26.1.2 线修法有意分歧，论证见 records。
+- 逐 API 的 NeoForge 26.2 源码指认（`类#方法(签名)` @ 26.2.x 分支文件:行）、
+  四类扫描命令与结果、验收清单见
+  `docs/records/WIRE_DEAD_HANDLERS_262_20260902.md`。
+  **证据级别：静态闭环 + CI 编译门；运行期未实机验证，不宣称已修。**
+
 ### 修复：开镜 mesh 枪身裁剪判据时序 —— 高模枪身/配件从未被孔径裁掉（2026-09-02）
 
 - **症状**（用户实机，26.2 两线独有）：高模枪枪身（配件未知）仅开启二次
