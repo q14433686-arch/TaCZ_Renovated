@@ -299,12 +299,12 @@ public class Serializers {
         // （count 取值范围 [1,99]），所以下面的 NBT 分支用的是 OPTIONAL_CODEC。
         @Override
         public void write(FriendlyByteBuf buf, ItemStack value) {
-            ItemStack.STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, value);
+            ItemStack.OPTIONAL_STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, value);
         }
 
         @Override
         public ItemStack read(FriendlyByteBuf buf) {
-            return ItemStack.STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
+            return ItemStack.OPTIONAL_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
         }
 
         // 同理用 OPTIONAL_CODEC：ItemStack.CODEC 的 count 取值范围是 [1,99]，
