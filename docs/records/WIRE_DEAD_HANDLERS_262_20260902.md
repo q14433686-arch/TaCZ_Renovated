@@ -182,3 +182,13 @@ grep -rn "HeadShotAABBConfigRead.init\|InteractKeyConfigRead.init" src/main/java
 
 ---
 追记（CI）：
+
+- 2026-09-02，commit `7d4a7b8`（修复本体）push 后：
+  - `compile-check`（run 33689068024）✅ success，`./gradlew compileJava`
+    `BUILD SUCCESSFUL in 1m 17s`（2 actionable tasks: 2 executed），日志回推
+    `build-reports/compile-java.log`（commit `6557893`）；
+  - `build`（run 33689067990）✅ success；
+  - `consistency`（run 33689068001）✅ success。
+- 编译门含本次新增的全部注解与 import（26.1.2 线首推红过的「补注解忘补
+  `GunMod` import」陷阱本线未触发）。
+- 运行期验收（§6 七条）仍未执行；不宣称已修。
