@@ -3,6 +3,26 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
+## 未发布（R2 之后，尚未 bump `mod_version`）
+
+> 与姊妹项目 [TaCZ_Refabricated_Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
+> `26.1.2` 分支提交 [`6a4c21c2`](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/commit/6a4c21c2)
+> 的语义同步。**编译门走 CI，运行期未实机验证。**
+
+### 修复
+
+- **收枪（put-away）动画不渲染**：`LocalPlayerDraw#doPutAway` 从来没人调
+  `KeepingItemRenderer#keep()`（上游把该调用写成注释，本仓继承），于是第一人称手部渲染
+  在切枪当帧就换成新枪、旧枪的 `put_away` 一帧都画不出来，观感是「收枪动画被吞、切枪瞬间完成」。
+  现补回 `keep()`（唯一调用点，条件对齐上游 `isInitialized()` 语义，新增
+  `AnimateGeoItemRenderer#hasInitializedStateMachine`），并把 `keep()` 的时间窗守卫从
+  「窗口未过期一律忽略」改为「最新一次收枪接管」（同物品且请求更短仍忽略，不截断正在
+  播放的动画），修快速连切时第二把枪没有收枪动画的问题。
+  内置 LRTactical 的近战 / 投掷物 / 消耗品渲染器继承同一基类，一并获得该窗口（**行为扩大**）。
+  机制、加固论证与实测清单见
+  [`docs/SYNC_PUTAWAY_KEEP_26_1_2_20260902.md`](docs/SYNC_PUTAWAY_KEEP_26_1_2_20260902.md)；
+  **待实测**（含开镜中切枪、光影下不双影、与 Viewmodel Changer 一类模组共存）。
+
 ## 1.1.8+neoforge.26.1.2.R2 — 2026-09-02
 
 > R2 = R1-hotfix 之后回传的 26.2 修复 + 姊妹渲染线（v1–v5：TML Mesh 加载器 / PIP 二次渲染 /
