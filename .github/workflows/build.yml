@@ -21,7 +21,7 @@ on:
   push:
     branches:
       - 'arena/**'
-      - '26.2(main)'
+      - '26.2'
       - '26.1.2'
       - '1.21.11'
     paths-ignore:
