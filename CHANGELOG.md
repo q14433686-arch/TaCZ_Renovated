@@ -11,6 +11,27 @@
 
 ### 修复
 
+- **七个事件处理器「静默失效」批量接线**（移植时只带了方法逻辑、漏了 NeoForge 总线注册，
+  配置开了也毫无反应；证据与扫描记录见
+  [`docs/records/WIRE_DEAD_HANDLERS_2612_20260902.md`](docs/records/WIRE_DEAD_HANDLERS_2612_20260902.md)）：
+  - **跨维度服务端枪械状态机不刷新**（陈年 bug：跨维度后客户端演完整套换弹动画、
+    服务端因 `reloadStateType` 残留直接早退不加子弹）：接
+    `PlayerEvent.PlayerChangedDimensionEvent`（玩家，26.x 跨维度是同一实例被物理移动，
+    必须显式重置）＋ `EntityTravelToDimensionEvent`（非玩家生物，防御性；当前版本生物
+    跨维度是复制的、mixin 状态本就不随 NBT 走）。
+  - **服务端 BURST 连发只打出第一发、Lua `safeAsyncTask` 永不执行**：
+    `CycleTaskHelper.tick()` 无人调用，现接 `ServerTickEvent.Post`（本轮扫描新发现）。
+  - **服务端配置解析器不跑**：`HeadShotAABBConfigRead`（第三方生物自定义爆头 AABB）与
+    `InteractKeyConfigRead`（交互键黑白名单）接 `ModConfigEvent.Loading/.Reloading`
+    （mod 总线自动路由），首次加载、热重载与登入同步均触发。
+  - **`AutoReloadWhenRespawn` 重生自动装弹无反应**：接 `PlayerEvent.PlayerRespawnEvent`。
+  - **子弹射钟不响、`DestroyGlass` 射玻璃不碎**：`BellRing` / `DestroyGlassBlock`
+    接 `AmmoHitBlockEvent`（游戏总线）。
+  - **工作台/改装台全屏界面下快捷栏穿模**：`PreventsHotbarEvent` 迁至
+    `RenderGuiLayerEvent.Pre` + `VanillaGuiLayers.HOTBAR`（26.x GUI 架构的对应钩子）。
+  - **主手持枪可以左键挖方块（服务端侧无兜底）**：`PreventGunClick` 接
+    `PlayerInteractEvent.LeftClickBlock`（客户端拦截原本就在，本条是服务端权威侧）。
+
 - **收枪（put-away）动画不渲染**：`LocalPlayerDraw#doPutAway` 从来没人调
   `KeepingItemRenderer#keep()`（上游把该调用写成注释，本仓继承），于是第一人称手部渲染
   在切枪当帧就换成新枪、旧枪的 `put_away` 一帧都画不出来，观感是「收枪动画被吞、切枪瞬间完成」。

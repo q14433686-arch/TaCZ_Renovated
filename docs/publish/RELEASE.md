@@ -83,13 +83,19 @@
 1. 从目标分支读取 `minecraft_version`、`neo_version`、`mod_version`，不要凭记忆填写。
 2. 运行 `bash scripts/check_release_consistency.sh --strict`；必须通过。
 3. 运行目标分支规定的构建与测试；未执行项明确写“未测试”。
-4. 检查 jar 内版本元数据、mixin、AT 与 jar-in-jar 依赖。
-5. 平台文件的 Minecraft / NeoForge / Java / Loader 标签与 jar 一致。
-6. 文件 Changelog 只包含该版本事实，不复制别的分支的 PASS。
-7. GitHub Release 正文按 §3 模板逐段填写（环境、本次变化、链接与署名），不得直接套用平台自动生成的 changelog。
-8. 项目页保留非官方声明、来源（原始项目 + 语义主线 + NeoForge 骨架参考（MUKSC））、许可、姊妹项目及反馈链接。
-9. CurseForge Rewards 与 Modrinth Monetization 保持关闭。
-10. 发布后验证 GitHub、CurseForge、Modrinth 和 MC 百科链接没有失效。
+4. 冒烟必须含 **LAN 双人加入**（第二名玩家完整进入世界）：配方/实体数据全量同步类
+   缺陷只在该路径触发，单机日志零痕迹（R2 复盘：
+   [`../records/R2_RELEASE_RETRO_20260903.md`](../records/R2_RELEASE_RETRO_20260903.md)）。
+5. 检查 jar 内版本元数据、mixin、AT 与 jar-in-jar 依赖。
+6. 资产上传走 `release-assets` workflow（教程与热修 bump 规则见
+   [`ci/README.md`](ci/README.md)）：**禁止同名换弹**——替换资产必须先 bump
+   build metadata（如 `R2 → R2.1`）；世代记录（commit + sha256）由流程自动写入正文。
+7. 平台文件的 Minecraft / NeoForge / Java / Loader 标签与 jar 一致。
+8. 文件 Changelog 只包含该版本事实，不复制别的分支的 PASS。
+9. GitHub Release 正文按 §3 模板逐段填写（环境、本次变化、链接与署名），不得直接套用平台自动生成的 changelog。
+10. 项目页保留非官方声明、来源（原始项目 + 语义主线 + NeoForge 骨架参考（MUKSC））、许可、姊妹项目及反馈链接。
+11. CurseForge Rewards 与 Modrinth Monetization 保持关闭。
+12. 发布后验证 GitHub、CurseForge、Modrinth 和 MC 百科链接没有失效。
 
 ## 5. 项目级文案何时需要更新
 

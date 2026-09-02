@@ -82,6 +82,12 @@ public final class ClientGameEvents {
         if (VanillaGuiLayers.CROSSHAIR.equals(event.getName())
                 && RenderCrosshairEvent.shouldHideVanillaCrosshair()) {
             event.setCanceled(true);
+            return;
+        }
+        // 枪械工作台/改装台全屏界面下隐藏原版快捷栏，防止穿模
+        if (VanillaGuiLayers.HOTBAR.equals(event.getName())
+                && PreventsHotbarEvent.shouldHideHotbar()) {
+            event.setCanceled(true);
         }
     }
 

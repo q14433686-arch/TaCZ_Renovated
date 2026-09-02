@@ -1,0 +1,129 @@
+name: release-assets
+
+# ---------------------------------------------------------------------------
+# 【TaCZ_Renovated（NeoForge）26.1.2 线 · 待上线稿】
+# 代拟：26.1.2 侧 arena/01a063f1 会话，2026-09-03。
+# 目标：TaCZ_Renovated 仓库 `26.1.2` 分支 → 新建 `.github/workflows/release-assets.yml`
+#       （本文件全文，含本注释头）。
+# 上线方式与其它 workflow 一致：GitHub 网页 → Add file → Create new file → 粘贴 →
+# commit 到 `26.1.2` 分支（沙箱 Agent 的 token 无 `workflows` 权限，推不动正式件）。
+# 上线后按仓库惯例：本文件（docs/publish/ci/ 下的副本）即正式件的同源镜像，
+# 下次改动先改这里、再镜像到正式件（同 consistency.yml 的维护方式，AGENTS.md §1）。
+#
+# 为什么需要它：R2 发布复盘（docs/records/R2_RELEASE_RETRO_20260903.md）——
+# 2026-09-02 的 24h 内，三条线的 R2 jar 各手动上传/替换 3 次（共 9 个文件），
+# 三个不同的二进制共用同一个文件名与 tag，事后无法从名字区分世代、无 sha256 可查。
+# 本流程把「构建 → 校验 → 上传 → 世代留痕」收进一次点击：
+#   * 上传前跑 --strict 版本一致性门禁（AGENTS.md §1 的发布级要求）；
+#   * 默认【禁止同名换弹】：热修必须先 bump build metadata（R2 → R2.1），
+#     同名资产存在时直接失败并给出指引；allow_replace=true 仅限「传错当场重传」；
+#   * 每次上传自动在 Release 正文追加「资产世代记录」表
+#     （UTC 时间 / 构建 commit / 文件名 / sha256）。
+#
+# 使用教程：docs/publish/ci/README.md（首发 / 热修两个场景的完整步骤）。
+#
+# 其它两线的适配要点（勿原样照搬，逐条核对）：
+#   * 26.2 线：java-version 不变（25）；ref 默认值改 '26.2'；
+#     确认该线有无 scripts/check_release_consistency.sh，无则把该步骤按
+#     build.yml 的写法降级为「存在才跑」；
+#   * 1.21.11 线：java-version 改 '21'（该线 Java 21+）；ref 默认值改 '1.21.11'；
+#     同上核对脚本存在性；产物名前缀以该线 build.gradle 实际输出为准。
+#
+# API/行为依据（本仓 ⑤ 级来源 + 现役 runner 实测惯例）：
+#   * `gh release upload/view/edit` 预装于 ubuntu-latest runner，GH_TOKEN 用
+#     `${{ github.token }}`，`permissions: contents: write` 即可写 Release 资产与正文；
+#   * workflow_dispatch 的可选分支 = 文件所在分支：上线到 26.1.2 后，
+#     Run workflow 时左上角选 branch `26.1.2`；
+#   * jar 名 = `tacz-<mod_version>.jar`（build.gradle：version = mod_version，
+#     基名 tacz；与 R2 现役资产名一致）。
+# ---------------------------------------------------------------------------
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '目标 Release 的 tag（如 26.1.2_R2.1；Release 须已在网页端建好）'
+        required: true
+        type: string
+      ref:
+        description: '构建用的 git ref（分支名或 commit SHA）'
+        required: false
+        default: '26.1.2'
+        type: string
+      allow_replace:
+        description: '覆盖同名资产（仅限"传错当场重传"；正常热修请先 bump 版本号再来）'
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: release-assets-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Release 必须已存在（先网页建 tag+release，本流程只管资产与留痕）
+        run: gh release view "${{ inputs.tag }}" --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName
+
+      - name: 版本一致性门禁（AGENTS.md §1，发布级 --strict）
+        run: bash scripts/check_release_consistency.sh --strict
+
+      - name: 同名资产守卫（禁止同名换弹）
+        run: |
+          MOD_VERSION=$(grep -oP '^mod_version=\K.*' gradle.properties)
+          JAR_NAME="tacz-${MOD_VERSION}.jar"
+          echo "JAR_NAME=$JAR_NAME" >> "$GITHUB_ENV"
+          EXISTS=$(gh release view "${{ inputs.tag }}" --json assets -q '.assets[].name' | grep -Fx "$JAR_NAME" || true)
+          if [ -n "$EXISTS" ] && [ "${{ inputs.allow_replace }}" != "true" ]; then
+            echo "::error::Release ${{ inputs.tag }} 已有同名资产 ${JAR_NAME}。热修请先 bump gradle.properties 的 mod_version 尾段（如 ...R2 → ...R2.1，'+' 后是 SemVer build metadata，不影响枪包 >=1.1.8 检查），同步 README 三处 + CHANGELOG 并通过 --strict 后再跑本流程。确属传错文件当场重传，才允许 allow_replace=true。"
+            exit 1
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Full build
+        run: ./gradlew build --console=plain --stacktrace --no-daemon
+
+      - name: 定位产物并计算 sha256
+        run: |
+          set -e
+          ls -l build/libs/
+          if [ ! -f "build/libs/${JAR_NAME}" ]; then
+            echo "::error::build/libs/ 下没有 ${JAR_NAME}（gradle.properties 与实际产物名不一致？核对 build.gradle 的 version/archivesName）"
+            exit 1
+          fi
+          sha256sum "build/libs/${JAR_NAME}" | tee sha256.txt
+          echo "SHA256=$(cut -d' ' -f1 sha256.txt)" >> "$GITHUB_ENV"
+
+      - name: 上传资产
+        run: |
+          CLOBBER=""
+          [ "${{ inputs.allow_replace }}" = "true" ] && CLOBBER="--clobber"
+          gh release upload "${{ inputs.tag }}" "build/libs/${JAR_NAME}" $CLOBBER
+
+      - name: 世代记录写入 Release 正文（UTC 时间 / 构建 commit / 文件名 / sha256）
+        run: |
+          gh release view "${{ inputs.tag }}" --json body -q .body > body.md
+          if ! grep -q '## 资产世代记录' body.md; then
+            printf '\n## 资产世代记录\n\n| UTC 时间 | 构建 commit | 文件 | sha256 |\n|---|---|---|---|\n' >> body.md
+          fi
+          printf '| %s | %s | `%s` | `%s` |\n' \
+            "$(date -u +%FT%TZ)" "$(git rev-parse --short HEAD)" "$JAR_NAME" "$SHA256" >> body.md
+          gh release edit "${{ inputs.tag }}" --notes-file body.md
