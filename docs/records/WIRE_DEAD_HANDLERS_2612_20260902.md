@@ -82,3 +82,67 @@
 5. 服务端配置里第三方生物爆头 AABB 与交互键黑白名单在专服 + 联机客户端生效（登入同步）；
 6. 工作台/改装台界面打开时快捷栏隐藏，关闭后恢复；
 7. 主手持枪左键方块不再破坏方块（生存），交互键白名单方块仍可交互。
+
+## 5. 第二轮全目录推理审核（2026-09-03，覆盖 event 目录之外的全部注册面）
+
+工具与方法（均可复跑，命令见 §5.1）：仓库自带三脚本 + 五类自写扫描 + 上游两方目录对照
+（官方 MCModderAnchor/TACZ@1.20.1、姊妹 TaCZ_Refabricated_Unofficial@26.1.2，均现场浅克隆）。
+
+| 检查面 | 方法 | 结论 |
+|---|---|---|
+| Mixin 注册 | `docs/check_mixin_registration.py` | ✅ 44 注册 / 5 有意不注册，无脱册 |
+| 语言键 / mesh 配置奇偶 | `docs/check_lang_keys.py`、`docs/check_mesh_config_parity.py` | ✅ |
+| 网络包注册（tacz 23 个 + lrtactical 全部） | 逐类反查 `NetworkHandler` / `LrNetworkHandler` | ✅ 无未注册 payload |
+| 按键 / HUD 图层 / tooltip / 内建物品渲染器 | 反查 `ClientSetupEvent` | ✅ 11 键、5 层、4 tooltip 全注册 |
+| 配置项死链（common/client/sync/pre 全部字段） | 逐字段反查定义文件之外的引用 | ✅ 无「定义了但没人读」的配置 |
+| 自有 API 事件均有发布点 | 逐类反查 `new XxxEvent(` | ⚠️ 仅 `GunFinishReloadEvent` 无发布点，见下 |
+| 全仓 handler 形态孤儿类（`public static void on*` 等且零引用零注解） | 全 src 扫描 | ✅ 除本轮已修 8 项外无孤儿 |
+| 注释掉的注册 / TODO / FIXME | grep | ✅ 0 处 |
+| 与官方 + 姊妹项目 `event`、`client/event` 目录奇偶 | diff | ✅ 齐平（`ClientGameEvents` 为本仓分发器，官方 `FirstPersonRenderEvent` 已更名收编 `FirstPersonRenderGunEvent`） |
+| 本轮 7 项修复与官方 Forge 原实现逐行对照 | 现场克隆官方源码比对 | ✅ 语义等价（差异点见下） |
+
+### 已确认的谱系性遗留（有意不动）
+
+- **`GunFinishReloadEvent` 从未被任何版本触发**：官方 1.20.1 源码里同样只有事件类
+  与 KubeJS wrapper 注册，**没有 `new GunFinishReloadEvent(...)` 发布点**——
+  这是从谱系源头继承的「声明了但从未发射」的 API 空壳，不是本移植丢的。
+  按 AGENTS.md §2（不得声称未实际实现的东西）**不擅自补发射点**，保持与全谱系一致；
+  若未来上游补上，按上游位置同步。
+
+### 与官方原实现的两处已论证差异
+
+1. `ServerTickEvent`：官方用未分相位的 Forge `TickEvent.ServerTickEvent`，
+   实际每 tick 执行**两次** `CycleTaskHelper.tick()`（START+END 各一次）；本仓接
+   `ServerTickEvent.Post` 每 tick 一次。`CycleTaskTicker` 以
+   `System.currentTimeMillis()` 墙钟驱动，单次调用无行为漂移，
+   反而消除了同 tick 双推的理论重入。
+2. `TravelToDimensionEvent`：官方对玩家也走 `EntityTravelToDimensionEvent`
+   （Forge 时代玩家同实例、传送前重置有效）；26.x 玩家侧改用
+   `PlayerChangedDimensionEvent`（传送**后**触发），语义等价且更稳（见 §3）。
+   生物侧新增同维度过滤，比官方更保守。
+
+### 5.1 复跑命令（供后续轮次 / 其他分支移植）
+
+```bash
+python3 docs/check_mixin_registration.py && python3 docs/check_lang_keys.py
+# handler 孤儿扫描（零注解且零外部引用）
+for f in $(grep -rl "public static void on" src --include="*.java"); do
+  cls=$(basename $f .java)
+  refs=$(grep -rl --include="*.java" "\b$cls\b" src | grep -v "^$f$" | wc -l)
+  ann=$(grep -c "@EventBusSubscriber" $f)
+  [ "$refs" = 0 ] && [ "$ann" = 0 ] && echo "ORPHAN?: $f"
+done
+# 自有事件发布点扫描
+for f in src/main/java/com/tacz/guns/api/event/*/*.java; do
+  cls=$(basename $f .java)
+  [ "$(grep -rln --include='*.java' "new $cls" src | wc -l)" = 0 ] && echo "NEVER POSTED: $cls"
+done
+# 配置死链扫描
+for f in src/main/java/com/tacz/guns/config/{common,client,sync}/*.java; do
+  cls=$(basename $f .java)
+  grep -oP "public static ModConfigSpec\.\w+ \K\w+" $f | while read field; do
+    n=$(grep -rn --include="*.java" "$cls\.$field" src | grep -v "$f" | wc -l)
+    [ "$n" = 0 ] && echo "DEAD CONFIG: $cls.$field"
+  done
+done
+```
