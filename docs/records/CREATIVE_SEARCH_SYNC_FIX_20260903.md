@@ -50,15 +50,31 @@ if (!CreativeModeTabs.tryRebuildTabContents(enabledFeatures, hasPermissions, hol
 `SearchTree.empty()` 初始值上 → 输入任何关键词 `tree.search(...)` 都返回空 →
 「搜索栏搜不到任何物品」。
 
-26.1.2 与 1.21.11/26.2 的差别不在本 mod 的 `onSyncGunPack` 逻辑（三线的
-`onSyncGunPack` 方法体一致；26.2 仅有一处无关的 `gui.screen()` API 适配差异），
-`ModCreativeTabs`/item/creative/index 代码也一致，而在于 MC 版本的进服时序：
-`minecraft.player` 为空的窗口期是否落在 `OnDatapackSyncEvent` 之前。若同步到达时
-`minecraft.player` 仍为 null，本方法里的 `if (minecraft.player != null)` 会跳过
-`tryRebuildTabContents`，`CACHED_PARAMETERS` 保持 null，屏幕打开时自然会重建搜索树
-（正常）；若同步到达时 `minecraft.player` 已非 null（26.2/1.21.11 的时序），
-`tryRebuildTabContents` 被执行、`CACHED_PARAMETERS` 被钉住、搜索树被永久跳过（故障）。
-修复让两种情况都显式重建搜索树，与版本时序解耦。
+26.1.2 与 1.21.11/26.2 的差别**不在搜索/标签相关代码**：三线的 `onSyncGunPack`
+方法体一致（26.2 仅有一处无关的 `gui.screen()` API 适配差异），
+`ModCreativeTabs`/item/creative/index 代码也一致；且 vanilla 侧的
+`SessionSearchTrees` / `CreativeModeInventoryScreen#tryRebuildTabContents` /
+`CreativeModeTabs#tryRebuildTabContents` / `ItemDisplayParameters#needsUpdate`
+在 26.1.2 与 1.21.11 反编译源码里**功能逐行相同**（仅 decompiler 泛型显示差异与
+`tags()/getTags()`、`typeHolder()/getItemHolder()` 这类方法改名）。因此差异出在
+**运行时进服时序**（对应「缺陷被哪条线暴露」），而非搜索逻辑本身。下面两点为
+**推断（未实机验证）**，均可独立导致故障，且都可能因 MC/NeoForge 版本而异：
+
+1. **player/level 就绪窗口**：本方法的 `if (minecraft.player != null && level != null …)`
+   决定重建块是否执行。同步（`OnDatapackSyncEvent` → `ServerMessageSyncGunPack`）到达时
+   若 player/level 尚未就绪，if 块被跳过、`CACHED_PARAMETERS` 保持 null，屏幕首次打开
+   自然重建搜索树（正常）；若已就绪，if 块执行、`CACHED_PARAMETERS` 被钉住，屏幕
+   「参数未变」跳过搜索树重建（故障）。26.1.2 属前者、26.2/1.21.11 属后者。
+
+2. **钉住的 `hasPermissions` 值**：即使 if 块执行，也只在钉住的
+   `hasPermissions = player.isCreative()` 与屏幕后来问的
+   `player.canUseGameMasterBlocks() && operatorItemsTab` **恰好相等**时，屏幕才会跳过
+   重建（`needsUpdate` 按 hasPermissions 不等即重建）。两者是否相等取决于同步到达瞬间
+   客户端的游戏模式/权限是否已应用——这也随版本时序漂移。
+
+无论实际触发的是哪一条，缺陷本体都是同一个：mod 在进服早期把手伸进 vanilla 的全局
+缓存重建标签页、却不重建搜索树。修复（显式补 `updateCreativeTooltips` +
+`updateCreativeTags`）对两条触发路径都成立，把「依赖时序巧合」变成「确定性正确」。
 
 ## 2. 修复
 
@@ -120,3 +136,7 @@ searchTrees.updateCreativeTags(searchItems);
 - **运行期未实机验证**：需在 1.21.11 单机创造 + 专服各验证一次——
   ① 进服后打开创造搜索栏，输入枪名/子弹名/配件名/`tacz:` 前缀能出结果；
   ② 空关键词时搜索页仍列出全部物品；③ `/reload`（服务端）后搜索仍正常。
+- **触发路径待确认**：§1 的①②两条触发路径均为源码推断。若要一锤定音，可在
+  `onSyncGunPack` 开头临时打印 `minecraft.player == null`、`minecraft.level == null`、
+  `minecraft.player.isCreative()`、以及两次 `tryRebuildTabContents` 的返回值，
+  在 26.1.2 / 26.2 / 1.21.11 三条线各进一次创造单机对比日志即可。
