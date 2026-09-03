@@ -23,8 +23,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * 无内容包时接近空页是<b>正确行为</b>（本移植不打包原作美术）。
  *
  * <p>R1 教训备注：联机时本标签内容依赖 LR 索引网络同步；tacz 侧同步完成后的
- * 创造栏重建（ClientPacketHandlers.onSyncGunPack 的 tryRebuildTabContents）
- * 会连带重建本页——LR 无需自建重建逻辑，但 LR2-7 专服验收必须验证这一点。
+ * 创造栏重建（ClientPacketHandlers.onSyncGunPack 的 tryRebuildTabContents +
+ * refreshCreativeSearchTrees）会连带重建本页并重喂创造搜索索引——LR 无需自建
+ * 重建/重索引逻辑，但 LR2-7 专服验收必须验证这一点（含搜索页能搜到本页投掷物，
+ * 见 docs/records/CREATIVE_SEARCH_SYNC_FIX_262_20260903.md）。
  */
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> TABS =

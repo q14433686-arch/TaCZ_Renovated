@@ -7,6 +7,34 @@
 
 （R2 定名之后的增量写在里；发布时并入下一版条目。）
 
+### 修复：创造模式搜索栏搜不到任何物品（含 tacz / lrtactical 全部条目）（2026-09-03）
+
+- **症状**：创造栏各页物品齐全、无异常无日志，但搜索页任何关键词（连原版物品在内）
+  都返回空结果。
+- **根因**：`ClientPacketHandlers#onSyncGunPack` 在枪包同步后重建标签内容，却把
+  `CreativeModeTabs` 的记忆化参数（`CACHED_PARAMETERS`）钉成与创造界面稍后所呈参数相同
+  的值。26.2 的搜索栏不再按 `getHoverName()` 过滤，而是查 `SessionSearchTrees` 的异步树；
+  该树唯一的写入点在 `CreativeModeInventoryScreen#tryRebuildTabContents` 内，且位于
+  「参数未变 ⇒ 提前 `return false`」之后 ⇒ 索引一次都没建，查询落到
+  `CreativeModeTabSearchRegistry` 的静默兜底 `SearchTree.empty()`（所以不报错、只是恒空）。
+  附带同源缺陷：`hasPermissions` 取 `player.isCreative()`，而 26.2 界面侧的门是
+  `canUseGameMasterBlocks() && options.operatorItemsTab()`（前者自 1.21.11 起读权限集，
+  不再等价于 `Abilities#instabuild`）⇒「创造但非 op」的玩家会拿到按 op 门构建的
+  操作员页内容，且因记忆化命中界面不会自行纠正。
+- **修法**（均在 `ClientPacketHandlers`，非绕过、非空实现）：①`hasPermissions` 改用界面
+  同款门，使本处构建内容与界面将构建的内容一致；②两次 `tryRebuildTabContents` 之后新增
+  `refreshCreativeSearchTrees(...)`，逐字镜像 NeoForge 26.2 界面里的索引循环
+  （`allTabs().filter(hasSearchBar)` + 按页 key 调 `updateCreativeTooltips` /
+  `updateCreativeTags`），因此不依赖记忆化是否命中、也不依赖玩家之后是否重开界面；
+  ③新增 AT `public net.minecraft.client.multiplayer.ClientPacketListener searchTrees`
+  （字段名取自 NeoForge 26.2.x patch 中的原版被删行，非猜测）。
+- 26.2 逐 API 指认表、被排除的 6 类假设（`accept` vs `acceptAll`、`TabVisibility`、
+  后台 tooltip 线程安全、`LanguageMixin`、`TooltipEvent`、日志）、与 1.21.11 姊妹线的
+  有意差异及运行期验收清单见
+  `docs/records/CREATIVE_SEARCH_SYNC_FIX_262_20260903.md`。
+  同根因同修法已由项目发起人在 1.21.11 线实机测试 PASS；
+  **本线证据级别：静态闭环 + CI 编译门；运行期未实机验证，不宣称已修。**
+
 ### 修复：7 个「静默失效」事件处理器补接线 —— 方法体在、事件总线从未注册（2026-09-02）
 
 - **症状**（26.1.2 线工单通报，本线独立扫描确认同一缺陷集合）：编译过、
