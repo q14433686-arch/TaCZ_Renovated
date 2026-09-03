@@ -44,6 +44,17 @@
   [`docs/SYNC_PUTAWAY_KEEP_26_1_2_20260902.md`](docs/SYNC_PUTAWAY_KEEP_26_1_2_20260902.md)；
   **待实测**（含开镜中切枪、光影下不双影、与 Viewmodel Changer 一类模组共存）。
 
+- **创造模式搜索栏搜不到物品（防御性修复 / 时序隐患）**：`ClientPacketHandlers#onSyncGunPack`
+  收到枪包同步后两次调用静态 `CreativeModeTabs.tryRebuildTabContents(...)` 重建标签页展示列表，
+  但没有重建 `SessionSearchTrees`（1.21.x 起搜索栏查的是异步构建的 `FullTextSearchTree`），且把
+  vanilla 静态 `CACHED_PARAMETERS` 钉成与屏幕后续相同的参数，导致原版屏幕因「参数未变」跳过搜索树
+  重建、搜索栏整体失效。26.2 / 1.21.11 线已实机复现（同源修复：1.21.11 线 PR #41）；**26.1.2 线
+  当前可能未复现**（同步到达更早、if 块可能整体跳过），但代码缺陷完全一致，现镜像原版
+  `CreativeModeInventoryScreen#tryRebuildTabContents` 同款逻辑显式补调
+  `updateCreativeTooltips` / `updateCreativeTags`。补丁为惰性（if 块不执行则无任何变化）。
+  记录见 [`docs/records/CREATIVE_SEARCH_SYNC_FIX_2612_20260903.md`](docs/records/CREATIVE_SEARCH_SYNC_FIX_2612_20260903.md)。
+  **编译门走 CI，运行期未实机验证。**
+
 ## 1.1.8+neoforge.26.1.2.R2 — 2026-09-02
 
 > R2 = R1-hotfix 之后回传的 26.2 修复 + 姊妹渲染线（v1–v5：TML Mesh 加载器 / PIP 二次渲染 /
