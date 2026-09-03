@@ -9,8 +9,8 @@
 - **缺陷形态**：可编译、启动无报错、创造栏各页物品齐全，但搜索页任何关键词都返回空
   （无异常、无日志）。属「静默失效」类。
 - **证据级别**：静态闭环（NeoForge 26.2.x 官方 patch / 源码逐 API 指认 + 同世代在役
-  Mod 交叉印证）+ CI 编译门；**本线运行期未实机验证，不宣称已修**。同根因同修法在
-  1.21.11 线由发起人实机 PASS（见 §6），作为跨线旁证而非本线验收。
+  Mod 交叉印证）+ **CI 编译门已绿**（见 §7 首项）；**本线运行期未实机验证，不宣称已修**。
+  同根因同修法在 1.21.11 线由发起人实机 PASS（见 §6），作为跨线旁证而非本线验收。
 
 ## 1. 症状与判定
 
@@ -195,7 +195,16 @@
 沙箱无 JDK 且无网络（`~/.gradle` 为空、`maven.neoforged.net` 不可达），
 **编译门只能由 CI 承担**；运行期需实机：
 
-- [ ] CI `compileJava` / `build` 绿（AT 新条目被 ModDevGradle 自动检测并应用到编译类路径）。
+- [x] **CI 编译门绿**（2026-09-03，PR #43，代码提交 `39a5b12`）：`compile-check` 1m43s、
+      `build` 1m44s、`consistency` 8s 三个 workflow 均 success。CI 回推的
+      `build-reports/compile-java.log`（头部 `commit: 39a5b12f4d4e54dd749675e372b0e8615e69676f`）
+      末行 `BUILD SUCCESSFUL in 1m 14s`，无 error、无与本改动相关的 warning（仅既有的
+      binarypatcher artifact manifest 与 Gradle 弃用提示）⇒ ①新增 AT 条目
+      `public net.minecraft.client.multiplayer.ClientPacketListener searchTrees` 已被
+      ModDevGradle 自动检测并应用到编译类路径；②§4.1 表内全部 26.2 API 签名编译通过。
+      其后 CI 自推的 `ad3c652 ci-log: compile result (success) for 39a5b12f…` 只改该日志文件，
+      其 head 上三个 run 显示 `action_required`（审批门，非失败）。
+- [ ] 下列各项仍需实机（本线运行期未验证）：
 - [ ] 单机（创造 + 开作弊）：进世界后**第一次**开创造界面即切到搜索页，
       输 `tacz` 枪名关键词（如某枪包内的枪 id 片段）、`ammo`、配件名、`workbench`
       均有结果；`lrtactical` 投掷物可搜到。
