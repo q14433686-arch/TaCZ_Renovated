@@ -1,4 +1,4 @@
-commit: f5786a2855654c74ee7da05a9ef48616e778c7a5
+commit: a433d41da66a6296cd35346101967c71890c336f
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
 Calculating task graph as no cached configuration is available for tasks: compileJava
@@ -11,45 +11,45 @@ Loaded 127 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/
 [1m*** Started working on [4mdownloadJson[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
   ↓ https://piston-meta.mojang.com/v1/packages/6b6c2d7f875539647774da3e334b27d0a67331a4/1.21.11.json
- [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.63s
+ [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.36s
+[1m*** Started working on [4mdownloadClient[0m[0m
 [1m*** Started working on [4mdownloadServer[0m[0m
 [1m*** Started working on [4mdownloadClientMappings[0m[0m
-[1m*** Started working on [4mdownloadClient[0m[0m
+  ↓ https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar
   ↓ https://piston-data.mojang.com/v1/objects/031a68bebf55d824f66d6573d8c752f0e1bf232a/client.txt
   ↓ https://piston-data.mojang.com/v1/objects/ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd/client.jar
-  ↓ https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar
- [1m[92m✓[0m Completed [4mdownloadClientMappings[0m in 0.54s
+ [1m[92m✓[0m Completed [4mdownloadClientMappings[0m in 0.45s
 [1m*** Started working on [4mmergeMappings[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.7:fatjar
- [1m[92m✓[0m Completed [4mdownloadClient[0m in 1.01s
- [1m[92m✓[0m Completed [4mdownloadServer[0m in 1.31s
+ [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.70s
+ [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.84s
 [1m*** Started working on [4mextractServer[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.7:fatjar
- [1m[92m✓[0m Completed [4mextractServer[0m in 0.64s
- [1m[92m✓[0m Completed [4mmergeMappings[0m in 2.77s
+ [1m[92m✓[0m Completed [4mextractServer[0m in 0.49s
+ [1m[92m✓[0m Completed [4mmergeMappings[0m in 2.23s
 [1m*** Started working on [4mstripServer[0m[0m
 [1m*** Started working on [4mstripClient[0m[0m
- [1m[92m✓[0m Completed [4mstripServer[0m in 2.80s
- [1m[92m✓[0m Completed [4mstripClient[0m in 3.67s
+ [1m[92m✓[0m Completed [4mstripServer[0m in 2.17s
+ [1m[92m✓[0m Completed [4mstripClient[0m in 2.88s
 [1m*** Started working on [4mmerge[0m[0m
  ↳ Running external tool net.neoforged:mergetool:2.0.7:fatjar
- [1m[92m✓[0m Completed [4mmerge[0m in 3.27s
+ [1m[92m✓[0m Completed [4mmerge[0m in 2.57s
 [1m*** Started working on [4mrename[0m[0m
  ↳ Running external tool net.neoforged:AutoRenamingTool:2.0.17:all
- [1m[92m✓[0m Completed [4mrename[0m in 6.70s
+ [1m[92m✓[0m Completed [4mrename[0m in 5.13s
 [1m*** Started working on [4mbinaryPatch[0m[0m
   [33mWARNING: [0mnet.neoforged.installertools:binarypatcher:4.0.6:fatjar is not present in the artifact manifest
   ↓ https://maven.neoforged.net/releases/net/neoforged/installertools/binarypatcher/4.0.6/binarypatcher-4.0.6-fatjar.jar
  ↳ Running external tool net.neoforged.installertools:binarypatcher:4.0.6:fatjar
- [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.06s
+ [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.02s
 [1m*** Started working on [4mcopyUnpatchedClasses[0m[0m
- [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 2.31s
+ [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 1.78s
 [1m*** Started working on [4mapplyDevTransforms[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.12:fatjar
- [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 2.52s
+ [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 1.99s
 [1m*** Started working on [4mbinaryWithNeoForge[0m[0m
- [1m[92m✓[0m Completed [4mbinaryWithNeoForge[0m in 7.49s
-Total runtime: 33.97s
+ [1m[92m✓[0m Completed [4mbinaryWithNeoForge[0m in 5.90s
+Total runtime: 27.16s
 
 
 > Task :compileJava
@@ -115,7 +115,7 @@ Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
 19 warnings
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1788387614055.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1788433565384.json
 
 [Incubating] Problems report is available at: file:///home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/reports/problems/problems-report.html
 
@@ -125,7 +125,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 23s
+BUILD SUCCESSFUL in 1m 11s
 2 actionable tasks: 2 executed
 Configuration cache entry stored.
 
