@@ -1,4 +1,4 @@
-commit: c216a66161cfb1a5c44b5a0afecd190680242912
+commit: c2234f3c49fac525247eaed35d2c880f1adaa5b5
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
 Calculating task graph as no cached configuration is available for tasks: compileJava
@@ -10,13 +10,13 @@ Creating Minecraft artifacts without recompilation.
 Loaded 127 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
 [1m*** Started working on [4mdownloadManifest[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
- [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.67s
+ [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.54s
 [1m*** Started working on [4mdownloadJson[0m[0m
  [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.00s
 [1m*** Started working on [4mdownloadServer[0m[0m
 [1m*** Started working on [4mdownloadClient[0m[0m
- [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.04s
  [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.04s
+ [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.04s
 [1m*** Started working on [4mpreProcessJar[0m[0m
  [1m[92m♻[0m Used cache of [4mpreProcessJar[0m in 0.00s
 [1m*** Started working on [4mbinaryPatch[0m[0m
@@ -25,10 +25,22 @@ Loaded 127 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/
  [1m[92m♻[0m Used cache of [4mcopyUnpatchedClasses[0m in 0.00s
 [1m*** Started working on [4mapplyDevTransforms[0m[0m
  [1m[92m♻[0m Used cache of [4mapplyDevTransforms[0m in 0.00s
-Total runtime: 2.67s
+Total runtime: 1.77s
 
 
 > Task :compileJava
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:202: warning: [removal] ItemHandlerHelper in net.neoforged.neoforge.items has been deprecated and marked for removal
+                    ItemHandlerHelper.giveItemToPlayer(player, ammoItem);
+                    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:202: warning: [removal] giveItemToPlayer(Player,ItemStack) in ItemHandlerHelper has been deprecated and marked for removal
+                    ItemHandlerHelper.giveItemToPlayer(player, ammoItem);
+                                     ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:219: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
+    public int findAndExtractInventoryAmmos(IItemHandler itemHandler, ItemStack gunItem, int needAmmoCount) {
+                                            ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:231: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
+    public int findAndExtractInventoryAmmo(IItemHandler itemHandler, ItemStack gunItem, int needAmmoCount) {
+                                           ^
 /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/inventory/GunSmithTableMenu.java:129: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
         net.neoforged.neoforge.items.IItemHandler handler = new net.neoforged.neoforge.items.wrapper.InvWrapper(player.getInventory());
                                     ^
@@ -44,18 +56,6 @@ Total runtime: 2.67s
 /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/inventory/GunSmithTableMenu.java:169: warning: [removal] extractItem(int,int,boolean) in IItemHandler has been deprecated and marked for removal
                     handler.extractItem(slotIndex, recordCount.get(slotIndex), false);
                            ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:202: warning: [removal] ItemHandlerHelper in net.neoforged.neoforge.items has been deprecated and marked for removal
-                    ItemHandlerHelper.giveItemToPlayer(player, ammoItem);
-                    ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:202: warning: [removal] giveItemToPlayer(Player,ItemStack) in ItemHandlerHelper has been deprecated and marked for removal
-                    ItemHandlerHelper.giveItemToPlayer(player, ammoItem);
-                                     ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:219: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
-    public int findAndExtractInventoryAmmos(IItemHandler itemHandler, ItemStack gunItem, int needAmmoCount) {
-                                            ^
-/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:231: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
-    public int findAndExtractInventoryAmmo(IItemHandler itemHandler, ItemStack gunItem, int needAmmoCount) {
-                                           ^
 /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/ammo/AmmoSourceRegistry.java:29: warning: [removal] IItemHandler in net.neoforged.neoforge.items has been deprecated and marked for removal
     private static IItemHandler handler(LivingEntity shooter) {
                    ^
@@ -91,7 +91,7 @@ Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
 19 warnings
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1788384050105.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1788435436934.json
 
 [Incubating] Problems report is available at: file:///home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/reports/problems/problems-report.html
 
@@ -101,7 +101,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 38s
+BUILD SUCCESSFUL in 30s
 2 actionable tasks: 2 executed
 Configuration cache entry stored.
 
