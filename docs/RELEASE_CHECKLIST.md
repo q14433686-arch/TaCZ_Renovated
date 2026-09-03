@@ -39,6 +39,10 @@
 ## E. 客户端与 GPU
 
 - [ ] 无可选 Mod 的完整枪械、工作台、同步、资源重载回归。
+- [ ] **创造搜索栏**：进世界后第一次开创造界面即切搜索页，tacz 枪/弹药/配件/工作台与
+      lrtactical 投掷物均可搜到，`#` 标签搜索亦有结果；「创造+开作弊」与「创造+非 op」
+      两种权限态、以及「操作员物品页」选项开/关两态各测一次（逐条见
+      `records/CREATIVE_SEARCH_SYNC_FIX_262_20260903.md` §7）。
 - [ ] OpenGL 无 Iris：ocular mask、低/高倍准星、ring、配件、火光。
 - [ ] OpenGL + Iris 1.11.2：HAND solid/translucent、shadow、water/fog/particles、mode reset。
 - [ ] Vulkan（`earlyWindowControl=false`）：mask target、resize/reload、无 device loss。

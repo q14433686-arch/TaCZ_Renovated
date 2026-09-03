@@ -37,12 +37,21 @@ import com.tacz.guns.network.message.event.ServerMessageGunReload;
 import com.tacz.guns.network.message.event.ServerMessageGunShoot;
 import com.tacz.guns.resource.network.CommonNetworkCache;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.SessionSearchTrees;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.client.CreativeModeTabSearchRegistry;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
+
+import java.util.List;
 
 public final class ClientPacketHandlers {
     private ClientPacketHandlers() {
@@ -182,19 +191,60 @@ public final class ClientPacketHandlers {
         // Rebuild them now so the tab receives initialized gun/ammo/attachment/workbench stacks
         // instead of the bare registry items that have no data-pack id or dynamic model.
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.level != null && minecraft.getConnection() != null && minecraft.player != null) {
-            // LocalPlayer does not expose the server permission level in 26.1.2.
-            // Creative mode is the same gate used by the client tab screen for this local world;
-            // the custom TaCZ tab itself does not depend on this flag.
-            boolean hasPermissions = minecraft.player.isCreative();
+        ClientPacketListener connection = minecraft.getConnection();
+        if (minecraft.level != null && connection != null && minecraft.player != null) {
+            // 26.2: the creative tab screen derives this gate from
+            // Player#canUseGameMasterBlocks() && Options#operatorItemsTab(). isCreative() is not the
+            // same predicate any more (since 1.21.11 canUseGameMasterBlocks reads the permission
+            // set, not Abilities#instabuild), so mirroring the screen keeps the contents built here
+            // byte-identical to the ones the screen would build: the operator tab is neither served
+            // to a creative-but-not-op player nor stripped from an op player.
+            boolean hasPermissions =
+                    minecraft.player.canUseGameMasterBlocks() && minecraft.options.operatorItemsTab().get();
             // tryRebuildTabContents intentionally skips identical feature/permission inputs.
             // Flip once to invalidate the pre-sync build, then rebuild with the real permission
-            // state so vanilla operator-only tabs are not left in the temporary state.
+            // state so vanilla operator-only tabs are not left in the temporary state. The second
+            // pass is also what makes the search tab see the gun-pack stacks: it aggregates the
+            // other tabs' search stacks, so it needs one full pass after those tabs were filled.
             CreativeModeTabs.tryRebuildTabContents(
-                    minecraft.getConnection().enabledFeatures(), !hasPermissions, minecraft.level.registryAccess());
+                    connection.enabledFeatures(), !hasPermissions, minecraft.level.registryAccess());
             CreativeModeTabs.tryRebuildTabContents(
-                    minecraft.getConnection().enabledFeatures(), hasPermissions, minecraft.level.registryAccess());
+                    connection.enabledFeatures(), hasPermissions, minecraft.level.registryAccess());
+            refreshCreativeSearchTrees(connection, minecraft.level);
         }
+    }
+
+    /**
+     * Re-indexes the creative search trees from the tab contents that were just rebuilt.
+     *
+     * <p>Rebuilding the tab display lists is not enough to make the stacks searchable. The creative
+     * search bar queries the asynchronous trees owned by {@link SessionSearchTrees}, and vanilla
+     * only feeds them from {@code CreativeModeInventoryScreen#tryRebuildTabContents} -- a method that
+     * returns before its indexing step whenever {@code CreativeModeTabs.tryRebuildTabContents}
+     * reports "parameters unchanged". The two rebuild calls above leave the memoized parameters
+     * equal to the ones the screen presents on its next open, so the screen short-circuits, the
+     * trees keep their initial {@code SearchTree.empty()} value and every keyword silently matches
+     * nothing (guns, ammo, attachments, workbench and the LRTactical tab alike).
+     *
+     * <p>This mirrors the indexing loop NeoForge 26.2 puts in that screen method: every tab with a
+     * search bar is indexed under its own key, and the global search tab maps to
+     * {@link SessionSearchTrees#CREATIVE_NAMES} / {@link SessionSearchTrees#CREATIVE_TAGS}. Running
+     * it here is what the screen would have run, so it is also harmless in the cases where vanilla
+     * does rebuild and re-index on its own.
+     *
+     * <p>Runs on the client main thread (the payload handler enqueues work), which is the thread
+     * vanilla indexes from; the tree build itself is dispatched to the background executor by
+     * {@code SessionSearchTrees}.
+     */
+    private static void refreshCreativeSearchTrees(ClientPacketListener connection, ClientLevel level) {
+        SessionSearchTrees searchTrees = connection.searchTrees;
+        HolderLookup.Provider holders = level.registryAccess();
+        CreativeModeTabs.allTabs().stream().filter(CreativeModeTab::hasSearchBar).forEach(tab -> {
+            List<ItemStack> stacks = List.copyOf(tab.getDisplayItems());
+            searchTrees.updateCreativeTooltips(
+                    holders, stacks, CreativeModeTabSearchRegistry.getNameSearchKey(tab));
+            searchTrees.updateCreativeTags(stacks, CreativeModeTabSearchRegistry.getTagSearchKey(tab));
+        });
     }
 
     public static void onSyncBaseTimestamp(ServerMessageSyncBaseTimestamp message) {
