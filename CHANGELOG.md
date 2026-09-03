@@ -13,6 +13,16 @@
 
 ### 修复
 
+- **创造模式搜索栏搜不到任何物品**（1.21.11 / 26.2 线复现，26.1.2 线正常）：
+  `onSyncGunPack` 收到枪包同步后只调了静态
+  `CreativeModeTabs.tryRebuildTabContents` 重建各标签页展示列表、**没有**重建
+  `SessionSearchTrees` 搜索树；且该静态调用把 `CACHED_PARAMETERS` 钉成与屏幕后续
+  相同的参数，使屏幕打开时原版 `CreativeModeInventoryScreen#tryRebuildTabContents`
+  因「参数未变」跳过搜索树重建，搜索树停留在同步前的空索引 → 输入任何关键词都
+  无结果。修复：在标签重建后显式补 `searchTrees#updateCreativeTooltips` +
+  `updateCreativeTags`（镜像原版屏幕内同款代码）。证据与验收清单见
+  [`docs/records/CREATIVE_SEARCH_SYNC_FIX_20260903.md`](docs/records/CREATIVE_SEARCH_SYNC_FIX_20260903.md)。
+  **编译门走 CI；运行期未实机验证。**
 - **七个事件处理器「静默失效」批量接线**（移植时只带了方法逻辑、漏了 NeoForge
   总线注册，配置开了也毫无反应；与 26.1.2 线同构的 8 项缺陷）：
   - **跨维度服务端枪械状态机不刷新**（跨维度后客户端演完整套换弹动画、服务端

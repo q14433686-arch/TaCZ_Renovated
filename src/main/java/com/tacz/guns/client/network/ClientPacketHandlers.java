@@ -40,9 +40,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
+
+import java.util.List;
 
 public final class ClientPacketHandlers {
     private ClientPacketHandlers() {
@@ -194,6 +197,15 @@ public final class ClientPacketHandlers {
                     minecraft.getConnection().enabledFeatures(), !hasPermissions, minecraft.level.registryAccess());
             CreativeModeTabs.tryRebuildTabContents(
                     minecraft.getConnection().enabledFeatures(), hasPermissions, minecraft.level.registryAccess());
+            // tryRebuildTabContents 只重建各标签页的展示列表，不重建创造模式搜索栏实际查询的
+            // SessionSearchTrees 索引。原版 CreativeModeInventoryScreen 在重建标签的同时会调用
+            // searchTrees#updateCreativeTooltips/updateCreativeTags；但本同步发生在屏幕打开之前，
+            // 等屏幕打开时 tryRebuildTabContents 因参数未变而跳过，搜索树就停留在同步前的空索引上，
+            // 表现为「创造模式搜索栏搜不到任何物品」。这里显式补一次搜索树重建。
+            net.minecraft.client.multiplayer.SessionSearchTrees searchTrees = minecraft.getConnection().searchTrees();
+            List<ItemStack> searchItems = List.copyOf(CreativeModeTabs.searchTab().getDisplayItems());
+            searchTrees.updateCreativeTooltips(minecraft.level.registryAccess(), searchItems);
+            searchTrees.updateCreativeTags(searchItems);
         }
     }
 
