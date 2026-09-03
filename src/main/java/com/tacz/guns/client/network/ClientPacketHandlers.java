@@ -39,10 +39,13 @@ import com.tacz.guns.resource.network.CommonNetworkCache;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
+
+import java.util.List;
 
 public final class ClientPacketHandlers {
     private ClientPacketHandlers() {
@@ -194,6 +197,20 @@ public final class ClientPacketHandlers {
                     minecraft.getConnection().enabledFeatures(), !hasPermissions, minecraft.level.registryAccess());
             CreativeModeTabs.tryRebuildTabContents(
                     minecraft.getConnection().enabledFeatures(), hasPermissions, minecraft.level.registryAccess());
+
+            // 防御性修复（时序隐患）：上面两次静态 tryRebuildTabContents 只重建了各标签页的展示列表，
+            // 不会重建创造模式搜索栏查询的 SessionSearchTrees（1.21.x 起搜索栏查的是异步构建的
+            // FullTextSearchTree，而非 getHoverName）；同时它把 vanilla 的静态 CACHED_PARAMETERS 钉成了
+            // 与屏幕后续相同的参数，玩家再打开创造背包时 CreativeModeInventoryScreen#tryRebuildTabContents
+            // 会因「参数未变」返回 false 而跳过搜索树重建，搜索树停在空索引上 → 输入任何关键词都无结果。
+            // 26.2 / 1.21.11 线已实机复现（同源修复见 1.21.11 线 PR #41）；26.1.2 线因同步到达更早、
+            // 本 if 块可能整体被跳过而未复现，但代码缺陷完全一致，这里镜像原版屏幕内同款逻辑显式补建。
+            // List.copyOf 做不可变快照；updateCreativeTooltips 内部在 Util.backgroundExecutor 上异步构建，
+            // 主线程调用安全；其 TooltipFlag 为 NORMAL.asCreative()，不触发本 mod 带 isAdvanced() 门禁的 TooltipEvent。
+            net.minecraft.client.multiplayer.SessionSearchTrees searchTrees = minecraft.getConnection().searchTrees();
+            List<ItemStack> searchItems = List.copyOf(CreativeModeTabs.searchTab().getDisplayItems());
+            searchTrees.updateCreativeTooltips(minecraft.level.registryAccess(), searchItems);
+            searchTrees.updateCreativeTags(searchItems);
         }
     }
 
