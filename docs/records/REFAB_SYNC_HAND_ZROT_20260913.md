@@ -104,9 +104,11 @@ private static void resetFirstPersonArmLean(AvatarRenderer<?> avatar) {
 
 ### 1.6 验证状态（不得外推）
 
-- **编译**：本沙箱无 JDK/Gradle 缓存，未本地编译。等 `compile-check` workflow 回写
-  `build-reports/compile-java.log`。货源那条已过 1.21.11 线 CI 编译门，
-  **不把对方 CI 写成本线 PASS**。
+- **编译**：本沙箱无 JDK/Gradle 缓存，未本地编译；由 GitHub Actions 覆盖 ——
+  commit `191c283` 的 `compile-check`（run 34755319318）与完整 `build`
+  （run 34755319351）均 success，日志回写在 `build-reports/compile-java.log`。
+  货源那条另过 1.21.11 线 CI 编译门，**不把对方 CI 写成本线 PASS**。
+  编译通过**不等于**渲染行为 PASS，实机项见下。
 - **实机**：未执行。待跑清单：
   1. 第一人称手枪（默认包任一）：手掌与握把贴合、不再整体偏左；
   2. 双管霰弹换弹：手部与弹药对位，弹药不再悬浮；
@@ -176,5 +178,6 @@ bash scripts/check_release_consistency.sh
 bash scripts/check_release_consistency.sh --strict
 ```
 
-结果记录在本轮提交信息中。脚本按 `mod_version` 字符串在 README（>=3 次）与
+`consistency`（run 34755319341）在同一 commit 上 success；本地两次运行同样通过
+（README 4 次、CHANGELOG 2 次，模板占位符 6 项 OK）。脚本按 `mod_version` 字符串在 README（>=3 次）与
 CHANGELOG（>=1 次）出现次数判定，`-hotfix2` 后缀不需要改脚本。
