@@ -7,6 +7,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -41,6 +42,18 @@ public final class RenderHelper {
             avatar.renderRightHand(poseStack, collector, light, texture, slim, player);
         } else {
             avatar.renderLeftHand(poseStack, collector, light, texture, slim, player);
+        }
+        // Vanilla 1.21.9+ adds a ±0.1 zRot lean to both arms. TaCZ gun hand
+        // poses were authored against the straight 1.21.1 arm pose. The model
+        // is still a live reference until the collector flushes, so clear the
+        // added lean after submission and before the flush.
+        resetFirstPersonArmLean(avatar);
+    }
+
+    private static void resetFirstPersonArmLean(AvatarRenderer<?> renderer) {
+        if (renderer.getModel() instanceof PlayerModel playerModel) {
+            playerModel.leftArm.zRot = 0.0F;
+            playerModel.rightArm.zRot = 0.0F;
         }
     }
 
