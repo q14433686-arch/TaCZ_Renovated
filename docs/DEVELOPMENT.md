@@ -43,7 +43,7 @@ python3 -m unittest discover -s scripts/tests -p 'test_release_*.py' -v
 的拒绝路径，不需要下载游戏依赖。最终 jar 的 L0 检查用
 `python3 scripts/verify_release.py --tag <tag> --artifact`；部署与正文准备见
 [`publish/ci/README.md`](publish/ci/README.md)。正文仍为 `UNRELEASED` 或版本头不匹配时会被
-预检主动拦截；R3-hotfix 已同步为当前版本头，不需要也不应删除门禁。
+预检主动拦截；R3-hotfix2 已同步为当前版本头，不需要也不应删除门禁。
 
 ## 版本号（红线）
 

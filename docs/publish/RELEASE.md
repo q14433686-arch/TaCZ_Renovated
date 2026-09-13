@@ -103,17 +103,17 @@
 从 1.21.11 的发布自动化适配而来，但使用本线 **Java 25 / NeoForge 26.1.2**，
 保留上述版本、实机、禁止同名替换和来源署名规则。已发布的 R3 实机 PASS 来自
 维护者本轮确认，见 [`R3 签收记录`](../records/R3_CONFIRMATION_2612_20260907.md)，不是跨版本继承；
-当前 R3-hotfix 的新增改动仍须在最终构建上完成实机验收。
+当前 R3-hotfix2 的新增改动仍须在最终构建上完成实机验收。
 
 - 正式工作流 `.github/workflows/release.yml` **已由维护者上线**；
   [`ci/release.yml`](ci/release.yml) 是逐字节一致的同源模板，本次无需重复复制。
   定义已上线不表示已经执行发布上传。
-- 版本正文：[`RELEASE_NOTES.md`](RELEASE_NOTES.md)，本线 **R3-hotfix 正文与版本头已同步**
-  为 `1.1.8+neoforge.26.1.2.R3-hotfix`。以后每次发布仍须按本线 CHANGELOG 复核；
+- 版本正文：[`RELEASE_NOTES.md`](RELEASE_NOTES.md)，本线 **R3-hotfix2 正文与版本头已同步**
+  为 `1.1.8+neoforge.26.1.2.R3-hotfix2`。以后每次发布仍须按本线 CHANGELOG 复核；
   未定稿时可保留 `release-version: UNRELEASED` 阻止误发布，不得删除版本头门禁。
-- tag 必须已存在且与版本对应：当前 **R3-hotfix → `26.1.2_R3-hotfix`**；
+- tag 必须已存在且与版本对应：当前 **R3-hotfix2 → `26.1.2_R3-hotfix2`**；
   已发布的 `26.1.2_R3` 不得覆盖。发布 tag 应指向合并后的最终发布 commit。
-  R3-hotfix 源码/正文准备与 PR 合并不自动创建 tag 或 GitHub Release。
+  R3-hotfix2 源码/正文准备与 PR 合并不自动创建 tag 或 GitHub Release。
 - 流程：checkout **tag** → `--strict` 与版本/正文预检 → Lua 回归 → `gradlew build`
   → L0 检查（精确 jar 文件、mods.toml 版本/依赖、mixin 清单及内容、AT、JarJar 登记与
   内嵌库）→ 添加构建 commit / sha256 → 创建 GitHub Release，**默认草稿**。

@@ -3,7 +3,7 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 1.1.8+neoforge.26.1.2.R3-hotfix — 未发布
+## 1.1.8+neoforge.26.1.2.R3-hotfix2 — 未发布
 
 > 以下为**静态修复、待实测**：前三项由姊妹项目 refab 26.2(main) 侧针对玩家日志 `mclo.gs/39JqB2p`
 > 的可见 bug 修复移植而来，第四项同步 refab 26.1.2 PR #92 的 mesh 光影修复；同代码、同机制，
