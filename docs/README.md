@@ -53,6 +53,9 @@
   同步（mesh 枪身开镜裁剪、PIP 镜内世界表、开镜距离补偿、纹理预解析等）；
 - `REFAB_SYNC_PUTAWAY_KEEP_R6_20260902.md` —— 对 Fabric 26.2 线 tip `a408eb00`
   （PR #87）的第六轮同步（收枪 `keep()` 动画修复 + 守卫语义修正 + 调用点判定）；
+- `REFAB_SYNC_HAND_ZROT_20260913.md` —— 对 1.21.11 姊妹线 `469f646` 的同步
+  （第一人称手部错位：中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`；HMI 兼容登记未做；
+  版本号升 `R3-hotfix2`）；
 - `SYNC_SIBLING_0105E43_20260901.md` —— 对 1.21.11 姊妹线的等价移植对照；
 - `BUG_MESHGUNBODY_SCOPE_CLIP_RERENDER_20260902.md` —— 「高模枪身开镜不被孔径裁切」
   的根因时序、误判与回滚、帧快照修法全记录；

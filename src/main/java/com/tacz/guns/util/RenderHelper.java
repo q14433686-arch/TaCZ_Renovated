@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.tacz.guns.client.render.scope.ScopeBodyRenderTypes;
 import com.tacz.guns.compat.firstperson.FirstPersonAnimationCompat;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
@@ -19,6 +20,51 @@ public final class RenderHelper {
     private RenderHelper() {
     }
 
+    /**
+     * 第一人称手臂提交（26.2 Feature Rendering 的 collector 路径）。
+     *
+     * <p><b>中和 vanilla 1.21.9+ 第一人称手臂的 {@code zRot=±0.1}</b>
+     * （2026-09-13 同步自 Fabric 1.21.11 线 {@code 61ab4a0} / 26.1.2 线 {@code 44bb362a}，
+     * 三线同一份 vanilla 代码）。</p>
+     *
+     * <p>症状（全枪械第一人称手部错位）：所有手枪整体偏左、手没握住枪；
+     * 双管换弹时手部绑定/动画错位、弹药悬浮在手上方；错位量恒定、非常有规律。
+     * 1.21.1 上游无此问题，26.2 / 26.1.2 / 1.21.11 全分支复现。</p>
+     *
+     * <p>根因是 vanilla 在 1.21.1 → 1.21.9 的渲染重构里给
+     * {@code AvatarRenderer#renderHand} 加了两行（货源 commit 已对 1.21.11 反编译源码
+     * 逐行确认，1.21.9 / 1.21.10 / 26.1.2 同样存在；1.21.1 的
+     * {@code PlayerRenderer#renderArm} 没有这两行，手臂是笔直渲染的）：</p>
+     * <pre>
+     * model.leftArm.zRot = -0.1F;   // 约 -5.7°
+     * model.rightArm.zRot = 0.1F;   // 约 +5.7°
+     * </pre>
+     * <p>而 TACZ 全部枪模的手部定位（{@code righthand_pos}/{@code lefthand_pos}）
+     * 都是按 1.21.1 的 {@code zRot=0} 姿态 authored 的。手臂网格绕肩部 pivot
+     * 凭空多转 ±5.7°，手相对枪恒定偏转 —— 正是「错位一点点、很规律」的来源。</p>
+     *
+     * <p>修复：每次 vanilla 手部调用<b>之后</b>把<b>两条</b>手臂的 {@code zRot} 清零。
+     * 依据是 26.2 的提交语义：{@code submitModelPart} 只拷贝<b>矩阵</b>
+     * （{@code Pose#copy}），{@code ModelPart} 是<b>活引用</b>，旋转要到
+     * {@code submitHandsWithItems} 之后的 {@code renderAllFeatures} 才被读取 ——
+     * 因此 submit 之后、flush 之前的写入决定最终姿态。</p>
+     *
+     * <p>为什么必须两条一起清：vanilla 每次调用<i>同时</i>污染左右两条（调右手也写左臂）。
+     * 双持/换弹时会连续提交两次，后一次会把前一条重新污染。</p>
+     *
+     * <p>为什么不会破坏 vanilla 物品的手臂：本方法只在 TACZ 接管 viewmodel 时被调用
+     * （{@code ItemInHandRendererMixin#tacz$submitArmWithAnimatedItem} 拦下 vanilla 的
+     * {@code submitArmWithItem} 之后），TACZ 接管的 flush 里不存在 vanilla 手臂提交；
+     * 纯 vanilla 的 flush 根本走不到这里。</p>
+     *
+     * <p>与「镜内裁手」的关系：{@link #wrapForScopeClip} 只决定 collector 是否套代理
+     * （换 RenderType），与手臂骨骼姿态无关；清零这一步<b>无条件</b>执行。</p>
+     *
+     * <p>与 {@link com.tacz.guns.mixin.client.PlayerModelMixin} 第 0 帧那段手臂归零
+     * 的关系：那段只在 {@code ageInTicks == 0} 的 setupAnim 尾部生效，而
+     * {@code renderHand} 的 {@code ±0.1} 是 setupAnim <b>之后</b>写的，覆盖不到，
+     * 两处不重复也不冲突。</p>
+     */
     public static void renderFirstPersonArm(LocalPlayer player, HumanoidArm arm, PoseStack poseStack,
                                             SubmitNodeCollector collector, int light) {
         if (player == null || collector == null) {
@@ -42,8 +88,25 @@ public final class RenderHelper {
                 avatar.renderLeftHand(poseStack, collector, light, texture,
                         player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE));
             }
+            // 【手臂对齐修复】中和 vanilla 1.21.9+ 的 zRot=±0.1，见本方法注释。
+            resetFirstPersonArmLean(avatar);
         } finally {
             FirstPersonAnimationCompat.endDirectArmRender();
+        }
+    }
+
+    /**
+     * 中和 vanilla 1.21.9+ {@code AvatarRenderer#renderHand} 写入的
+     * {@code leftArm.zRot = -0.1F} / {@code rightArm.zRot = 0.1F}，
+     * 把第一人称手臂精确还原成 1.21.1 的笔直姿态（TACZ 枪模的手部定位是按该姿态
+     * authored 的）。必须在<b>每次</b> vanilla 手部调用之后、flush 之前执行，
+     * 且两条手臂一起清（vanilla 每次调用会同时污染左右两条）。
+     * 详见 {@link #renderFirstPersonArm(LocalPlayer, HumanoidArm, PoseStack, SubmitNodeCollector, int)}。
+     */
+    private static void resetFirstPersonArmLean(AvatarRenderer<?> avatar) {
+        if (avatar.getModel() instanceof PlayerModel playerModel) {
+            playerModel.leftArm.zRot = 0.0F;
+            playerModel.rightArm.zRot = 0.0F;
         }
     }
 
