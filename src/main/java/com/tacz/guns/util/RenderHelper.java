@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.client.render.scope.ScopeRenderTypes;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -59,6 +60,17 @@ public final class RenderHelper {
             avatar.renderRightHand(poseStack, target, light, skinTexture, slim, player);
         } else {
             avatar.renderLeftHand(poseStack, target, light, skinTexture, slim, player);
+        }
+        // Vanilla 1.21.9+ applies a ±0.1 zRot lean to both arms. TACZ viewmodels
+        // are authored against the straight-arm (1.21.1) pose; clear it after the
+        // submission while ModelPart remains a live reference until the collector flushes.
+        resetFirstPersonArmLean(avatar);
+    }
+
+    private static void resetFirstPersonArmLean(AvatarRenderer<?> renderer) {
+        if (renderer.getModel() instanceof PlayerModel playerModel) {
+            playerModel.leftArm.zRot = 0.0F;
+            playerModel.rightArm.zRot = 0.0F;
         }
     }
 

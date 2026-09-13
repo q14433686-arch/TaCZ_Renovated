@@ -22,7 +22,7 @@
 ## 工作流部署与后续维护
 
 本轮正式件已经就位，勿重复创建。以下步骤供首次部署到其他环境或日后更新时参考；
-每个新版本（包括 R3-hotfix）都须合入配套代码、版本文档与验收记录后，才能为最终源码创建发布 tag。
+每个新版本（包括 R3-hotfix2）都须合入配套代码、版本文档与验收记录后，才能为最终源码创建发布 tag。
 
 1. **发布 commit 必须包含配套代码/文档**，尤其是
    [`verify_release.py`](../../../scripts/verify_release.py)、
@@ -43,13 +43,13 @@ GitHub 的 `workflow_dispatch` 要求 workflow **先存在于默认分支**；�
 
 1. 按 [`RELEASE.md`](../RELEASE.md) §4 完成本线发布前核对，尤其是 **LAN 双人加入**。
 2. 确定新 `mod_version`，同步 README 三处与 CHANGELOG，`--strict` 通过。
-   已发布 R3 的实机 PASS 按维护者本轮确认记账；R3-hotfix 的新增改动仍须单独验收，
+   已发布 R3 的实机 PASS 按维护者本轮确认记账；R3-hotfix2 的新增改动仍须单独验收，
    今后也不能跨版本自动继承。
 3. 重写 [`RELEASE_NOTES.md`](../RELEASE_NOTES.md)：准确环境、本次变化、本构建验证边界、
-   来源与许可；首行 `release-version` 必须是最终完整版本号。R3-hotfix 已完成正文和版本头的
+   来源与许可；首行 `release-version` 必须是最终完整版本号。R3-hotfix2 已完成正文和版本头的
    初稿，仍不得擅自填入未经确认的专项 PASS。
 4. 为**包含上述文件与版本改动的发布 commit** 创建并推送新 tag；此时不要先建 Release。
-   tag 格式为 `26.1.2_` + build metadata 尾段，例如 `26.1.2_R3-hotfix` 或 `26.1.2_R3.1`。
+   tag 格式为 `26.1.2_` + build metadata 尾段，例如 `26.1.2_R3-hotfix2` 或 `26.1.2_R3.1`。
    已发布的 R3 tag 与二进制不得拿来承载尚未发布的修复。
 5. Actions → `release` → Run workflow，分支选 **26.1.2**：
    - `tag`：上一步已存在的新 tag；
@@ -59,11 +59,11 @@ GitHub 的 `workflow_dispatch` 要求 workflow **先存在于默认分支**；�
 6. 核对输出 jar 名、正文准确性、资产世代记录中的完整 commit 与 sha256；
    发布后再回填 README 下载链接，其他平台仍需按各平台规则单独上传。
 
-R3-hotfix 发布 CLI（**先合入并创建对应 tag，再执行；本次合并不自动发布**）：
+R3-hotfix2 发布 CLI（**先合入并创建对应 tag，再执行；本次合并不自动发布**）：
 
 ```bash
 gh workflow run release.yml --ref 26.1.2 \
-  -f tag=26.1.2_R3-hotfix -f title='TaCZ: Renovated — 26.1.2 R3-hotfix' -f draft=true
+  -f tag=26.1.2_R3-hotfix2 -f title='TaCZ: Renovated — 26.1.2 R3-hotfix2' -f draft=true
 ```
 
 `--ref` 指 workflow 所在分支；**真正构建的代码来自输入 tag**，不是该分支的最新 HEAD。
@@ -99,7 +99,7 @@ Release。此模板不是本次新版本首发的必装步骤。
 python3 -m unittest discover -s scripts/tests -p 'test_release_*.py' -v
 bash scripts/check_release_consistency.sh --strict
 # 最终版本/tag/正文准备好且已构建后：
-python3 scripts/verify_release.py --tag 26.1.2_R3-hotfix --artifact
+python3 scripts/verify_release.py --tag 26.1.2_R3-hotfix2 --artifact
 ```
 
 Python 3.11+ 即可运行发布门禁回归；它使用临时合成 ZIP 检查正常/异常产物结构，

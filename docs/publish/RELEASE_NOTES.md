@@ -1,5 +1,5 @@
-<!-- release-version: 1.1.8+neoforge.26.1.2.R3-hotfix -->
-# TaCZ: Renovated — Minecraft 26.1.2 / NeoForge（R3-hotfix）
+<!-- release-version: 1.1.8+neoforge.26.1.2.R3-hotfix2 -->
+# TaCZ: Renovated — Minecraft 26.1.2 / NeoForge（R3-hotfix2）
 
 > **非官方社区移植，不是 TaCZ 官方发布，也未获 TACZ Dev Team 审核或背书。
 > 本移植的问题请提交到本仓库，不要打扰原作者。**
@@ -11,7 +11,7 @@
 - Minecraft：**26.1.2**
 - NeoForge：**26.1.2.x**（开发基于 **26.1.2.97**）
 - Java：**25+**
-- Mod：**`1.1.8+neoforge.26.1.2.R3-hotfix`**
+- Mod：**`1.1.8+neoforge.26.1.2.R3-hotfix2`**
 - 必需前置：**无**
 
 不同 Minecraft 版本的文件不能混用；这不是 1.21.11 的版本。

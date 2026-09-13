@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """26.1.2 release preflight and built-jar L0 checks (Python 3.11+, stdlib only).
 
-    python3 scripts/verify_release.py --tag 26.1.2_R3-hotfix
-    python3 scripts/verify_release.py --tag 26.1.2_R3-hotfix --artifact
+    python3 scripts/verify_release.py --tag 26.1.2_R3-hotfix2
+    python3 scripts/verify_release.py --tag 26.1.2_R3-hotfix2 --artifact
 
 These checks do not constitute a gameplay test. See docs/publish/ci/README.md.
 """
