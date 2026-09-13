@@ -3,6 +3,52 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
+## 1.1.8+neoforge.26.2.R3-hotfix2 — 2026-09-13（未发布）
+
+### 修复：第一人称手部错位（全枪械）——中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`
+
+同步自 Fabric 1.21.11 线 `61ab4a0`（货源分支
+`q14433686-arch/TaCZ_Refabricated_Unofficial@arena/01a09a6c`，尖端 `469f646`），
+与 Fabric 26.1.2 线 `44bb362a` 同形。
+
+- **症状**：第一人称下所有手枪整体偏左、手没握住枪；双管换弹时手部绑定/动画错位、
+  弹药悬浮在手上方。错位量恒定、非常规律。1.21.1 上游无此问题，
+  26.2 / 26.1.2 / 1.21.11 三线全复现。
+- **根因**：vanilla 在 1.21.1 → 1.21.9 的渲染重构里给 `AvatarRenderer#renderHand`
+  新增了 `model.leftArm.zRot = -0.1F` / `model.rightArm.zRot = 0.1F`（约 ±5.7°；
+  货源 commit 已对 1.21.11 反编译源码逐行确认，1.21.9 / 1.21.10 / 26.1.2 同样存在，
+  1.21.1 的 `PlayerRenderer#renderArm` 没有这两行）。而 TACZ 全部枪模的
+  `righthand_pos` / `lefthand_pos` 都是按 1.21.1 的 `zRot=0` 姿态 authored 的，
+  手臂绕肩 pivot 凭空多转 ±5.7° ⇒ 手相对枪恒定偏转。
+- **修法**：`RenderHelper#renderFirstPersonArm`（collector 重载）在每次 vanilla
+  手部调用之后、flush 之前把**两条**手臂的 `zRot` 清零
+  （新增 `resetFirstPersonArmLean`）。依据是 26.2 的提交语义：`submitModelPart`
+  只拷贝矩阵、`ModelPart` 是活引用，旋转要到 `renderAllFeatures` 才被读取；
+  两条必须一起清，因为 vanilla 每次调用同时污染左右两条。只动 `zRot`，
+  不碰 vanilla 整备好的 `visible`/pose（后者一旦还原会重现「手臂残缺」，
+  见 `RenderHelper` 与 `ItemInHandRendererMixin` 的既有注释）。
+- **不影响 vanilla 物品**：本方法只在 TACZ 接管 viewmodel 时被调用，
+  TACZ 接管的 flush 里不存在 vanilla 手臂提交。
+- **证据级别**：同形移植，货源那条已过 1.21.11 线 CI 编译门；**本线编译门待 CI 回写、
+  实机未验**（沙箱无 JDK）。验收清单与逐项对照见
+  `docs/records/REFAB_SYNC_HAND_ZROT_20260913.md`。
+
+### 登记未做：Hold My Items 5.x 兼容旁路
+
+货源 `3164deb` + `0768131` + `7daac62`（维护者 2026-09-12 已在 1.21.11 实机通过）。
+沿用货源 `docs/HOLD_MY_ITEMS_COMPAT.md` §6.1 的判断，26.2 线**不预先移植**：
+探针健康时该代码零收益，代价却是多一个打进库类（`org.luaj.vm2.lib.jse.JavaMethod`）
+的 mixin 与整轮重跑验证矩阵。触发条件与前提核对写在
+`docs/records/REFAB_SYNC_HAND_ZROT_20260913.md` §3。
+
+### 版本号
+
+`1.1.8+neoforge.26.2.R3-hotfix` → `1.1.8+neoforge.26.2.R3-hotfix2`。命名沿用 R2 那一轮
+的格式（`R<n>` → `R<n>-hotfix` → `R<n>-hotfix2`，小写、序号直接接在 `hotfix` 后面，
+中间不放 `.` / `-` / `_`）；该规矩本轮补进 `gradle.properties` 注释与 README。
+同步位置：`gradle.properties`、README（版本句 / 支持表 / SemVer 段 / 文档表）、
+本文件当前条目、`docs/PORTING_STATUS.md`、`AGENTS.md`。
+
 ## 1.1.8+neoforge.26.2.R3-hotfix — 2026-09-09
 
 ### 同步 Fabric 26.2(main) `1b4af9f`：Iris scope-mask Fix-A（2026-09-09）
