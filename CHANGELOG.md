@@ -3,7 +3,7 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 1.1.8+neoforge.1.21.11.R3-hotfix（2026-09-08）
+## 1.1.8+neoforge.1.21.11.R3-hotfix2（2026-09-13）
 
 > R3 之后的热修。含两批内容：① 玩家日志 `mclo.gs/39JqB2p` 可见 bug 三项
 > （A/C/D；B/E 本线无路径）+ 高模枪光影检视反射修复（refab PR #92 同形）；
@@ -13,6 +13,11 @@
 > [`docs/records/MESH_GPU_IRIS_PASS_LIFETIME_12111_20260908.md`](docs/records/MESH_GPU_IRIS_PASS_LIFETIME_12111_20260908.md)、
 > [`docs/records/RECIPE_VIEWER_SYNC_12111_20260908.md`](docs/records/RECIPE_VIEWER_SYNC_12111_20260908.md)。
 > 编译门走 CI；**运行期未实机验证，不宣称 PASS。**
+>
+> HOTFIX2（2026-09-13）同步姊妹 1.21.11 分支最新的第一人称手部对齐修复：
+> vanilla 1.21.9+ 给两条手臂写入的 `zRot=±0.1` 会让按 1.21.1 姿态制作的枪械手部恒定偏转；
+> 在 TaCZ 提交手臂后、collector flush 前清零两条手臂的 `zRot`，恢复枪械模型所需的直臂姿态。
+> 该修复仅作用于 TaCZ 接管的第一人称手部路径，不改变 vanilla 物品渲染。
 
 ### 修复
 
