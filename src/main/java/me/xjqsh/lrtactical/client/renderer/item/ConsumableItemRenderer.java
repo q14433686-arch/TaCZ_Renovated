@@ -106,8 +106,8 @@ public class ConsumableItemRenderer
         float yRotOffset = Mth.lerp(partialTick, player.yBobO, player.yBob);
         float xRot = player.getViewXRot(partialTick) - xRotOffset;
         float yRot = player.getViewYRot(partialTick) - yRotOffset;
-        poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F));
-        poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F));
+        poseStack.rotate(Axis.XP.rotationDegrees(xRot * -0.1F));
+        poseStack.rotate(Axis.YP.rotationDegrees(yRot * -0.1F));
         BedrockPart rootNode = model.getRootNode();
         if (rootNode != null) {
             xRot = (float) Math.tanh(xRot / 25) * 25;
@@ -119,7 +119,7 @@ public class ConsumableItemRenderer
         }
 
         poseStack.translate(0, 1.5f, 0);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(180f));
+        poseStack.rotate(Axis.ZP.rotationDegrees(180f));
         doExtraTransforms(poseStack, model, stack);
 
         model.submit(poseStack, ctx, collector, getRenderType(stack), light, OverlayTexture.NO_OVERLAY);
@@ -176,7 +176,7 @@ public class ConsumableItemRenderer
         DisplayTransform.applyOffset(poseStack, display.getDisplayOffset());
 
         poseStack.translate(0.5, 1.5f, 0.5);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(180f));
+        poseStack.rotate(Axis.ZP.rotationDegrees(180f));
 
         RenderType renderType = RenderTypes.entityCutout(display.getTexture());
         model.submit(poseStack, ctx, collector, renderType, light, overlay);
@@ -187,7 +187,7 @@ public class ConsumableItemRenderer
                                           int light, int overlay, Identifier texture) {
         poseStack.pushPose();
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, buffer) -> {
             PoseStack snapshot = new PoseStack();
             snapshot.last().pose().set(pose.pose());

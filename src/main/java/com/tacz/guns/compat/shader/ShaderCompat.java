@@ -1,6 +1,6 @@
 package com.tacz.guns.compat.shader;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.tacz.guns.compat.iris.IrisCompat;
 import net.minecraft.world.item.ItemStack;
 

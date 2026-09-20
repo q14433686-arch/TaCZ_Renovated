@@ -20,7 +20,6 @@ import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.client.renderer.state.GameRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.neoforged.neoforge.common.NeoForge;
-import org.joml.Matrix4fc;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -57,20 +56,16 @@ public abstract class GameRendererMixin {
     @Unique
     private boolean tacz$renderingItemInHand;
 
+    // 26.3: renderItemInHand 的形参随 GameRenderer 内部重构漂移，注入用「空形参」形式
+    // （只声明 CallbackInfo），对目标签名漂移天然免疫。
     @Inject(method = "renderItemInHand", at = @At("HEAD"))
-    private void tacz$beginHandPass(CameraRenderState cameraState,
-                                    float partialTick,
-                                    Matrix4fc projection,
-                                    CallbackInfo ci) {
+    private void tacz$beginHandPass(CallbackInfo ci) {
         this.tacz$renderingItemInHand = true;
         ScopeMaskRenderer.setInHandPass(true);
     }
 
     @Inject(method = "renderItemInHand", at = @At("RETURN"))
-    private void tacz$endHandPass(CameraRenderState cameraState,
-                                  float partialTick,
-                                  Matrix4fc projection,
-                                  CallbackInfo ci) {
+    private void tacz$endHandPass(CallbackInfo ci) {
         this.tacz$renderingItemInHand = false;
         ScopeMaskRenderer.setInHandPass(false);
     }
@@ -139,11 +134,11 @@ public abstract class GameRendererMixin {
             method = "renderLevel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/LevelRenderer;render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lorg/joml/Matrix4fc;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V",
+                    target = "Lnet/minecraft/client/renderer/LevelRenderer;render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;Lorg/joml/Vector4f;ZZ)V",
                     shift = At.Shift.AFTER
             )
     )
-    private void tacz$captureSceneForScopePip(DeltaTracker deltaTracker, CallbackInfo ci) {
+    private void tacz$captureSceneForScopePip(CallbackInfo ci) {
         ScopePipTrace.mark("VANILLA LevelRenderer#render END (anything after this draws over the finished world)");
         ScopePipRenderer.captureScene(this.minecraft);
         // 【光影路径】无光影时这一句立即返回（合成仍在阶段边界完成，
@@ -171,13 +166,16 @@ public abstract class GameRendererMixin {
             method = "renderLevel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/LevelRenderer;render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lorg/joml/Matrix4fc;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V",
+                    target = "Lnet/minecraft/client/renderer/LevelRenderer;render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;Lorg/joml/Vector4f;ZZ)V",
                     shift = At.Shift.BEFORE
             )
     )
-    private void tacz$renderScopePipView(DeltaTracker deltaTracker, CallbackInfo ci) {
+    private void tacz$renderScopePipView(CallbackInfo ci) {
+        // 26.3: renderLevel() 不再带 DeltaTracker 形参（GameRenderer 内部改从
+        // gameRenderState 取渲染状态），镜内那一遍需要的 partialTick 改由
+        // Minecraft 的 DeltaTracker 提供 —— 同一帧内同一对象，取值与旧形参逐位相同。
         ScopePipRenderer.renderScopeView(this.minecraft, this.resourcePool,
-                this.fogRenderer, this.gameRenderState, deltaTracker);
+                this.fogRenderer, this.gameRenderState, this.minecraft.getDeltaTracker());
         // 紧接着就是 vanilla 那一遍。有了这个界标，日志里「谁在什么阶段解析了哪个 target」
         // 就能一眼分段。
         ScopePipTrace.mark("VANILLA LevelRenderer#render BEGIN (its clear pass wipes the main target)");

@@ -1,19 +1,19 @@
 package com.tacz.guns.client.render.scope;
 
-import com.mojang.blaze3d.GpuFormat;
+import com.mojang.renderpearl.api.GpuFormat;
 import com.mojang.blaze3d.ProjectionType;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.pipeline.BindGroupLayout;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.pipeline.BindGroupLayout;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
-import com.mojang.blaze3d.systems.CommandEncoder;
-import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.renderpearl.api.commands.CommandEncoder;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuTexture;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.TimelessAPI;
@@ -162,7 +162,7 @@ public final class ScopePipRenderer {
 
     private static RenderPipeline compositePipeline() {
         if (compositePipeline == null) {
-            BindGroupLayout maskLayout = BindGroupLayout.builder().withSampler(MASK_SAMPLER).build();
+            BindGroupLayout maskLayout = BindGroupLayout.builder().withUniform(MASK_SAMPLER, com.mojang.renderpearl.api.pipeline.UniformType.COMBINED_IMAGE_SAMPLER).build();
             compositePipeline = RenderPipeline.builder(RenderPipelines.POST_PROCESSING_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_pip_composite"))
                     .withVertexShader("core/screenquad")
@@ -582,7 +582,7 @@ public final class ScopePipRenderer {
         if (mc.player == null) {
             return 1.0f;
         }
-        ItemStack stack = KeepingItemRenderer.getRenderer().getCurrentItem();
+        ItemStack stack = KeepingItemRenderer.getCurrentRenderItem();
         if (!(stack.getItem() instanceof IGun iGun)) {
             return 1.0f;
         }
@@ -1145,7 +1145,7 @@ public final class ScopePipRenderer {
                     () -> "tacz_scope_pip_composite",
                     main.getColorTextureView(),
                     Optional.empty())) {
-                pass.setPipeline(compositePipeline());
+                pass.setPipeline(RenderSystem.getCompiledPipeline(compositePipeline()));
                 // Globals（ScreenSize）由它提供，收缩带的纵横比修正要用。
                 RenderSystem.bindDefaultUniforms(pass);
                 // 倍率与锐化强度经 ColorModulator 的 r/g 送进着色器。
@@ -1154,10 +1154,10 @@ public final class ScopePipRenderer {
                                 new Matrix4f(),
                                 new Vector4f(magnification, sharpness(), paintLensFlag(), 1.0f)));
                 // 场景拷贝：LINEAR。着色器里的 Catmull-Rom 重建用一组硬件双线性抽头拼出来。
-                pass.bindTexture("InSampler", scene.getColorTextureView(),
+                pass.setUniform("InSampler", scene.getColorTextureView(),
                         RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR));
                 // 掩码：NEAREST。二值数据，线性过滤会在边缘产生 0.5 附近的中间值。
-                pass.bindTexture(MASK_SAMPLER, mask.getColorTextureView(),
+                pass.setUniform(MASK_SAMPLER, mask.getColorTextureView(),
                         RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
                 // 无顶点缓冲的全屏三角形：core/screenquad.vsh 用 gl_VertexID 造顶点。
                 pass.draw(3, 1, 0, 0);

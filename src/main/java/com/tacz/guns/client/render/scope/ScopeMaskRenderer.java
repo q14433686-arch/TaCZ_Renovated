@@ -1,18 +1,18 @@
 package com.tacz.guns.client.render.scope;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.GpuFormat;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.buffers.GpuBuffer;
+import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.systems.CommandEncoder;
-import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.renderpearl.api.commands.CommandEncoder;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.MeshData;
-import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator;
@@ -453,7 +453,9 @@ public final class ScopeMaskRenderer {
                         target.getColorTextureView(),
                         // 每帧从全黑重来。掩码是「当帧目镜盖到哪」，没有历史含义。
                         Optional.of(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f)))) {
-                    pass.setPipeline(MASK_PIPELINE);
+                    // 26.3: RenderPass#setPipeline 收 CompiledRenderPipeline，
+                    // 先编译再传。
+                    pass.setPipeline(RenderSystem.getCompiledPipeline(MASK_PIPELINE));
                     // 这两句缺一不可，是照 PreparedRenderType#drawFromBuffer 抄的：
                     //   bindDefaultUniforms 提供 Projection / Fog 等全局 uniform；
                     //   DynamicTransforms 提供 ModelViewMat 与 ColorModulator。

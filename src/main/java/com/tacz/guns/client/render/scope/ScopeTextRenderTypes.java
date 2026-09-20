@@ -1,7 +1,7 @@
 package com.tacz.guns.client.render.scope;
 
-import com.mojang.blaze3d.pipeline.BindGroupLayout;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.BindGroupLayout;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.tacz.guns.GunMod;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -77,7 +77,7 @@ public final class ScopeTextRenderTypes {
     private static final String MASK_SAMPLER = "ScopeMaskSampler";
 
     private static final BindGroupLayout MASK_SAMPLER_LAYOUT =
-            BindGroupLayout.builder().withSampler(MASK_SAMPLER).build();
+            BindGroupLayout.builder().withUniform(MASK_SAMPLER, com.mojang.renderpearl.api.pipeline.UniformType.COMBINED_IMAGE_SAMPLER).build();
 
     /**
      * 裁剪文字管线 = vanilla TEXT 配方 + SCOPE_MASK 三件套。

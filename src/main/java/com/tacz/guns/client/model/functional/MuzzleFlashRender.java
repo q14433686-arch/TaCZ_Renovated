@@ -105,7 +105,7 @@ public class MuzzleFlashRender implements IFunctionalSubmitter {
             backgroundPose.last().pose().set(frozenPose.last().pose());
             backgroundPose.last().normal().set(frozenPose.last().normal());
             backgroundPose.scale(frozenScale, frozenScale, frozenScale);
-            backgroundPose.mulPose(Axis.ZP.rotationDegrees(frozenRotation));
+            backgroundPose.rotate(Axis.ZP.rotationDegrees(frozenRotation));
             backgroundPose.translate(0, -1, 0);
             collector.submitCustomGeometry(backgroundPose, backgroundType,
                     (pose, buffer) -> MUZZLE_FLASH_MODEL.renderToBuffer(
@@ -115,7 +115,7 @@ public class MuzzleFlashRender implements IFunctionalSubmitter {
             glowPose.last().pose().set(frozenPose.last().pose());
             glowPose.last().normal().set(frozenPose.last().normal());
             glowPose.scale(frozenScale / 2, frozenScale / 2, frozenScale / 2);
-            glowPose.mulPose(Axis.ZP.rotationDegrees(frozenRotation));
+            glowPose.rotate(Axis.ZP.rotationDegrees(frozenRotation));
             glowPose.translate(0, -0.9, 0);
             collector.submitCustomGeometry(glowPose, glowType,
                     (pose, buffer) -> MUZZLE_FLASH_MODEL.renderToBuffer(

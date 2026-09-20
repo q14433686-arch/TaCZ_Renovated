@@ -1,10 +1,10 @@
 package com.tacz.guns.client.render.scope;
 
-import com.mojang.blaze3d.pipeline.BindGroupLayout;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.BindGroupLayout;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.compat.iris.IrisCompat;
 import net.minecraft.client.renderer.BindGroupLayouts;
@@ -70,7 +70,7 @@ public final class ScopeBodyRenderTypes {
 
     /** 掩码采样器的 bind group layout。仿 vanilla DISSOLVE_MASK_SAMPLER 的做法自建。 */
     private static final BindGroupLayout MASK_SAMPLER_LAYOUT =
-            BindGroupLayout.builder().withSampler(MASK_SAMPLER).build();
+            BindGroupLayout.builder().withUniform(MASK_SAMPLER, com.mojang.renderpearl.api.pipeline.UniformType.COMBINED_IMAGE_SAMPLER).build();
 
     /** 供 meshloader 的 GPU 裁剪管线复用（同一个 layout 实例 = 同一个 sampler 名）。 */
     public static BindGroupLayout maskSamplerLayout() {
@@ -198,7 +198,7 @@ public final class ScopeBodyRenderTypes {
                     .withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE))
                     .withCull(false)
                     .withVertexBinding(0, com.mojang.blaze3d.vertex.DefaultVertexFormat.ENTITY)
-                    .withPrimitiveTopology(com.mojang.blaze3d.PrimitiveTopology.QUADS)
+                    .withPrimitiveTopology(com.mojang.renderpearl.api.pipeline.PrimitiveTopology.QUADS)
                     .withDepthStencilState(DepthStencilState.DEFAULT)
                     .build();
 

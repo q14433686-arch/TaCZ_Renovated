@@ -1,6 +1,6 @@
 package com.tacz.guns.compat.iris;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.init.CompatRegistry;
 import net.minecraft.client.renderer.SubmitNodeCollector;

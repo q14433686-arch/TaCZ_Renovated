@@ -40,7 +40,7 @@ public class ModBlocks {
             "target", TargetBlock::new, ModBlocks::wood);
     public static final DeferredBlock<Block> STATUE = BLOCKS.registerBlock(
             "statue", StatueBlock::new,
-            p -> p.sound(SoundType.STONE).strength(2.0F, 3.0F).noOcclusion().pushReaction(PushReaction.DESTROY));
+            p -> p.sound(SoundType.STONE).strength(2.0F, 3.0F).noOcclusion().pushReaction(PushReaction.POPPED));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GunSmithTableBlockEntity>> GUN_SMITH_TABLE_BE =
             TILE_ENTITIES.register("gun_smith_table", () -> new BlockEntityType<>(
@@ -56,6 +56,6 @@ public class ModBlocks {
             TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "bullet_ignore"));
 
     private static BlockBehaviour.Properties wood(BlockBehaviour.Properties properties) {
-        return properties.sound(SoundType.WOOD).strength(2.0F, 3.0F).noOcclusion().pushReaction(PushReaction.DESTROY);
+        return properties.sound(SoundType.WOOD).strength(2.0F, 3.0F).noOcclusion().pushReaction(PushReaction.POPPED);
     }
 }

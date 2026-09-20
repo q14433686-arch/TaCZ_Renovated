@@ -41,6 +41,12 @@ public class GunSmithTableIngredient {
         return Objects.requireNonNull(getIngredient(), "Gun smith ingredient has not been resolved");
     }
 
+    /** 尚未解析成功时的原始 {@code item} JSON；已解析则为 {@code null}。 */
+    @Nullable
+    public JsonElement getRawItem() {
+        return this.rawIngredient;
+    }
+
     /**
      * Resolve on demand using the currently bound built-in item/tag registries. The retry behavior
      * is intentional: a first call can happen before tags are applied during a resource reload.

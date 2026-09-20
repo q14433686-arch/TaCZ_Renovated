@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import static com.tacz.guns.util.InputExtraCheck.isInGame;
 
@@ -55,7 +55,7 @@ public final class MeleeAttackKeys {
 
     /** 鼠标按下时触发（左键=轻击，右键=重击）。 */
     public static void onMousePress(InputEvent.MouseButton.Post event) {
-        if (event.getAction() != GLFW.GLFW_PRESS) {
+        if (event.getAction() != InputConstants.PRESS) {
             return;
         }
         // 必须用本仓库既有的 isInGame()，不能自己写 mc.screen != null ——
@@ -67,9 +67,9 @@ public final class MeleeAttackKeys {
             return;
         }
         int button = event.getButton();
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+        if (button == InputConstants.MOUSE_BUTTON_LEFT) {
             tryAttack(MeleeAction.LEFT);
-        } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        } else if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
             tryAttack(MeleeAction.RIGHT);
         }
     }

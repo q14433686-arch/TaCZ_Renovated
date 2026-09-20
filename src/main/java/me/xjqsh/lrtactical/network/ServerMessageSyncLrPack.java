@@ -7,6 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import com.tacz.guns.util.BufMapCodec;
 
 import java.util.Map;
 
@@ -40,15 +41,18 @@ public class ServerMessageSyncLrPack implements CustomPacketPayload {
     }
 
     public ServerMessageSyncLrPack(FriendlyByteBuf buf) {
-        this(buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()),
-                buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()),
-                buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()));
+        // 26.3: FriendlyByteBuf#readMap/writeMap 已移除，改走 BufMapCodec（线格式不变）。
+        // 显式 lambda 而非方法引用——WP07 坑 B-8：NeoForge 的 IFriendlyByteBufExtension
+        // 扩展重载使 FriendlyByteBuf::readUtf 类方法引用产生歧义，必须写成 lambda。
+        this(BufMapCodec.readMap(buf, b -> b.readIdentifier(), b -> b.readUtf()),
+                BufMapCodec.readMap(buf, b -> b.readIdentifier(), b -> b.readUtf()),
+                BufMapCodec.readMap(buf, b -> b.readIdentifier(), b -> b.readUtf()));
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeMap(this.throwableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
-        buf.writeMap(this.meleeIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
-        buf.writeMap(this.consumableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
+        BufMapCodec.writeMap(buf, this.throwableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
+        BufMapCodec.writeMap(buf, this.meleeIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
+        BufMapCodec.writeMap(buf, this.consumableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
     }
 
     @Override

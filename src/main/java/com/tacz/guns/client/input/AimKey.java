@@ -9,18 +9,17 @@ import com.tacz.guns.util.InputExtraCheck;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import org.lwjgl.glfw.GLFW;
 
 import static com.tacz.guns.util.InputExtraCheck.isInGame;
 
 public class AimKey {
     public static final KeyMapping AIM_KEY = new KeyMapping("key.tacz.aim.desc",
             InputConstants.Type.MOUSE,
-            GLFW.GLFW_MOUSE_BUTTON_RIGHT,
+            InputConstants.MOUSE_BUTTON_RIGHT,
             TaCZKeyCategory.TACZ);
 
     public static void onAimPress(InputEvent.MouseButton.Post event) {
-        if (isInGame() && AIM_KEY.matchesMouse(new net.minecraft.client.input.MouseButtonEvent(0.0, 0.0, new net.minecraft.client.input.MouseButtonInfo(event.getButton(), event.getModifiers())))) {
+        if (isInGame() && AIM_KEY.matches(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player == null || player.isSpectator()) {
                 return;
@@ -33,10 +32,10 @@ public class AimKey {
                 if (!KeyConfig.HOLD_TO_AIM.get()) {
                     action = !operator.isAim();
                 }
-                if (event.getAction() == GLFW.GLFW_PRESS) {
+                if (event.getAction() == InputConstants.PRESS) {
                     IClientPlayerGunOperator.fromLocalPlayer(player).aim(action);
                 }
-                if (KeyConfig.HOLD_TO_AIM.get() && event.getAction() == GLFW.GLFW_RELEASE) {
+                if (KeyConfig.HOLD_TO_AIM.get() && event.getAction() == InputConstants.RELEASE) {
                     IClientPlayerGunOperator.fromLocalPlayer(player).aim(false);
                 }
             }
