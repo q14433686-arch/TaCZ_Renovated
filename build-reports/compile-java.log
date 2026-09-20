@@ -1,4 +1,16 @@
-commit: 191c283f8d544474db70f87faa9e098279675244
+commit: b593b2273164ea3b9d5ccad274331140bdf1ea1b
+Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+
+Welcome to Gradle 9.2.1!
+
+Here are the highlights of this release:
+ - Windows ARM support
+ - Improved publishing APIs
+ - Better guidance for dependency verification failures
+
+For more details see https://docs.gradle.org/9.2.1/release-notes.html
+
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
 Calculating task graph as no cached configuration is available for tasks: compileJava
@@ -7,52 +19,609 @@ Calculating task graph as no cached configuration is available for tasks: compil
 Creating Minecraft artifacts without recompilation.
 
 > Task :createMinecraftArtifacts
-Loaded 137 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
+Loaded 136 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
 [1m*** Started working on [4mdownloadManifest[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
- [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.45s
+ [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.43s
 [1m*** Started working on [4mdownloadJson[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
-  ↓ https://piston-meta.mojang.com/v1/packages/bc42e43dfe43d65a2f6c2c1dbb322c75134e51fe/26.2.json
- [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.09s
+  ↓ https://piston-meta.mojang.com/v1/packages/96c00d95a31328714d3811cfade2804bb050e455/26.3.json
+ [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.08s
 [1m*** Started working on [4mdownloadClient[0m[0m
 [1m*** Started working on [4mdownloadServer[0m[0m
-  ↓ https://piston-data.mojang.com/v1/objects/2dc72797acbc1b63fc16a11c4ac393605f453754/client.jar
-  ↓ https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar
- [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.90s
- [1m[92m✓[0m Completed [4mdownloadServer[0m in 1.03s
+  ↓ https://piston-data.mojang.com/v1/objects/e877b6a07acd633fb3bb475002175cec036e7b87/client.jar
+  ↓ https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar
+ [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.56s
+ [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.64s
 [1m*** Started working on [4mpreProcessJar[0m[0m
- ↳ Running external tool net.neoforged.installertools:installertools:4.0.16:fatjar
- [1m[92m✓[0m Completed [4mpreProcessJar[0m in 2.91s
+ ↳ Running external tool net.neoforged.installertools:installertools:4.0.17:fatjar
+ [1m[92m✓[0m Completed [4mpreProcessJar[0m in 2.36s
 [1m*** Started working on [4mbinaryPatch[0m[0m
   [33mWARNING: [0mnet.neoforged.installertools:binarypatcher:4.0.17:fatjar is not present in the artifact manifest
   ↓ https://maven.neoforged.net/releases/net/neoforged/installertools/binarypatcher/4.0.17/binarypatcher-4.0.17-fatjar.jar
  ↳ Running external tool net.neoforged.installertools:binarypatcher:4.0.17:fatjar
- [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.42s
+ [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.02s
 [1m*** Started working on [4mcopyUnpatchedClasses[0m[0m
- [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 2.87s
+ [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 2.36s
 [1m*** Started working on [4mapplyDevTransforms[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.12:fatjar
- [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 3.14s
-Performing periodic cache maintenance on /home/runner/.gradle/caches/neoformruntime
-Cleaning intermediate results cache in /home/runner/.gradle/caches/neoformruntime/intermediate_results
- Maximum age: 744h
- Maximum cache size: 10 GiB
- [0;2;3m16 files found[0m
- [0;2;3m267 MiB overall size[0m
- [0;2;3m0 expired keys found[0m
-[0;2;3m Deleted 8 outdated lock files
-Total runtime: 14.60s
+ [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 2.48s
+Total runtime: 12.06s
 
 
 > Task :compileJava
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/crafting/PartialNbtIngredient.java:18: error: cannot find symbol
+import net.minecraft.resources.HolderSetCodec;
+                              ^
+  symbol:   class HolderSetCodec
+  location: package net.minecraft.resources
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:8: error: package org.lwjgl.glfw does not exist
+import org.lwjgl.glfw.GLFW;
+                     ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:10: error: cannot find symbol
+import net.minecraft.server.packs.AbstractPackResources;
+                                 ^
+  symbol:   class AbstractPackResources
+  location: package net.minecraft.server.packs
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:34: error: cannot find symbol
+public class DelegatingPackResources extends AbstractPackResources {
+                                             ^
+  symbol: class AbstractPackResources
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:67: error: cannot find symbol
+    public void listResources(PackType type, String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+                                                                                     ^
+  symbol:   class ResourceOutput
+  location: class DelegatingPackResources
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:82: error: cannot find symbol
+    private void listLegacyVanillaRecipes(String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+                                                                                  ^
+  symbol:   class ResourceOutput
+  location: class DelegatingPackResources
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/renderer/item/AnimateGeoItemRenderer.java:355: error: incompatible types: Matrix4f cannot be converted to Quaternionfc
+        poseStack.rotate(transformMatrix);
+                         ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/me/xjqsh/lrtactical/client/input/MeleeAttackKeys.java:120: error: method swing in class LivingEntity cannot be applied to given types;
+        player.swing(InteractionHand.MAIN_HAND);
+              ^
+  required: InteractionHand,SwingAnimation,boolean
+  found:    InteractionHand
+  reason: actual and formal argument lists differ in length
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:199: error: no suitable method found for placeItemBackInInventory(ItemStack)
+                    player.getInventory().placeItemBackInInventory(ammoItem);
+                                         ^
+    method Inventory.placeItemBackInInventory(ItemStack,Prediction) is not applicable
+      (actual and formal argument lists differ in length)
+    method Inventory.placeItemBackInInventory(ItemStack,boolean,Prediction) is not applicable
+      (actual and formal argument lists differ in length)
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/crafting/PartialNbtIngredient.java:35: error: cannot find symbol
+            HolderSetCodec.create(Registries.ITEM, BuiltInRegistries.ITEM.holderByNameCodec(), false)
+            ^
+  symbol:   variable HolderSetCodec
+  location: class PartialNbtIngredient
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:103: error: cannot find symbol
+        boolean flag = event.key() == GLFW.GLFW_KEY_LEFT;
+                                      ^
+  symbol:   variable GLFW
+  location: class ForgeSlider
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:104: error: cannot find symbol
+        if (flag || event.key() == GLFW.GLFW_KEY_RIGHT) {
+                                   ^
+  symbol:   variable GLFW
+  location: class ForgeSlider
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/render/scope/ScopeFinalRingOverlay.java:275: error: method renderAllFeatures in class FeatureRenderDispatcher cannot be applied to given types;
+            mc.gameRenderer.featureRenderDispatcher().renderAllFeatures(storage);
+                                                     ^
+  required: RenderPass,FeatureRenderDispatcher.PreparedFrame
+  found:    SubmitNodeStorage
+  reason: actual and formal argument lists differ in length
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/render/scope/ScopePipRenderer.java:928: error: method render in class LevelRenderer cannot be applied to given types;
+                mc.levelRenderer.render(
+                                ^
+  required: GraphicsResourceAllocator,boolean,CameraRenderState,GpuBufferSlice,Vector4f,boolean,boolean
+  found:    GraphicsResourceAllocator,DeltaTracker,boolean,CameraRenderState,Matrix4f,GpuBufferSlice,Vector4f,boolean
+  reason: actual and formal argument lists differ in length
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/event/FirstPersonRenderGunEvent.java:208: error: incompatible types: Matrix4f cannot be converted to Quaternionfc
+        poseStack.rotate(transformMatrix);
+                         ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/network/message/ClientMessageUnloadAttachment.java:70: error: no suitable method found for drop(ItemStack,boolean)
+                player.drop(attachmentItem, false);
+                      ^
+    method ServerPlayer.drop(ItemStack,boolean,Prediction) is not applicable
+      (actual and formal argument lists differ in length)
+    method ServerPlayer.drop(boolean) is not applicable
+      (actual and formal argument lists differ in length)
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/util/RenderHelper.java:73: error: cannot find symbol
+        AvatarRenderer<?> avatar = Minecraft.getInstance().getEntityRenderDispatcher().getPlayerRenderer(player);
+                                                                                      ^
+  symbol:   method getPlayerRenderer(LocalPlayer)
+  location: class EntityRenderDispatcher
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:122: error: cannot find symbol
+                        .openPrimary(new PackLocationInfo(gunPack.name, Component.literal(gunPack.name), PackSource.BUILT_IN, Optional.empty()));
+                        ^
+  symbol:   method openPrimary(PackLocationInfo)
+  location: class PathResourcesSupplier
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:125: error: cannot find symbol
+                        .openPrimary(new PackLocationInfo(gunPack.name, Component.literal(gunPack.name), PackSource.BUILT_IN, Optional.empty()));
+                        ^
+  symbol:   method openPrimary(PackLocationInfo)
+  location: class FileResourcesSupplier
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:61: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:66: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:111: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:116: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:124: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:131: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:146: error: <anonymous com.tacz.guns.resource.GunPackLoader$2> is not abstract and does not override abstract method openResources(PackLocationInfo,Metadata) in ResourcesSupplier
+        Pack.ResourcesSupplier resourcesSupplier = new Pack.ResourcesSupplier() {
+                                                                                ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:147: error: method does not override or implement a method from a supertype
+            @Override
+            ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:149: error: incompatible types: DelegatingPackResources cannot be converted to PackResources
+                return pack;
+                       ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:152: error: method does not override or implement a method from a supertype
+            @Override
+            ^
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1789300029213.json
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+29 errors
+
+> Task :compileJava FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1789938701958.json
 
 [Incubating] Problems report is available at: file:///home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/me/xjqsh/lrtactical/client/input/MeleeAttackKeys.java:120: error: method swing in class LivingEntity cannot be applied to given types;
+          player.swing(InteractionHand.MAIN_HAND);
+                ^
+    required: InteractionHand,SwingAnimation,boolean
+    found:    InteractionHand
+    reason: actual and formal argument lists differ in length
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/render/scope/ScopeFinalRingOverlay.java:275: error: method renderAllFeatures in class FeatureRenderDispatcher cannot be applied to given types;
+              mc.gameRenderer.featureRenderDispatcher().renderAllFeatures(storage);
+                                                       ^
+    required: RenderPass,FeatureRenderDispatcher.PreparedFrame
+    found:    SubmitNodeStorage
+    reason: actual and formal argument lists differ in length
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/render/scope/ScopePipRenderer.java:928: error: method render in class LevelRenderer cannot be applied to given types;
+                  mc.levelRenderer.render(
+                                  ^
+    required: GraphicsResourceAllocator,boolean,CameraRenderState,GpuBufferSlice,Vector4f,boolean,boolean
+    found:    GraphicsResourceAllocator,DeltaTracker,boolean,CameraRenderState,Matrix4f,GpuBufferSlice,Vector4f,boolean
+    reason: actual and formal argument lists differ in length
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:199: error: no suitable method found for placeItemBackInInventory(ItemStack)
+                      player.getInventory().placeItemBackInInventory(ammoItem);
+                                           ^
+      method Inventory.placeItemBackInInventory(ItemStack,Prediction) is not applicable
+        (actual and formal argument lists differ in length)
+      method Inventory.placeItemBackInInventory(ItemStack,boolean,Prediction) is not applicable
+        (actual and formal argument lists differ in length)
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/network/message/ClientMessageUnloadAttachment.java:70: error: no suitable method found for drop(ItemStack,boolean)
+                  player.drop(attachmentItem, false);
+                        ^
+      method ServerPlayer.drop(ItemStack,boolean,Prediction) is not applicable
+        (actual and formal argument lists differ in length)
+      method ServerPlayer.drop(boolean) is not applicable
+        (actual and formal argument lists differ in length)
+  Note: Recompile with -Xlint:deprecation for details.
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/crafting/PartialNbtIngredient.java:18: error: cannot find symbol
+  import net.minecraft.resources.HolderSetCodec;
+                                ^
+    symbol:   class HolderSetCodec
+    location: package net.minecraft.resources
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:10: error: cannot find symbol
+  import net.minecraft.server.packs.AbstractPackResources;
+                                   ^
+    symbol:   class AbstractPackResources
+    location: package net.minecraft.server.packs
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:67: error: cannot find symbol
+      public void listResources(PackType type, String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+                                                                                       ^
+    symbol:   class ResourceOutput
+    location: class DelegatingPackResources
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:82: error: cannot find symbol
+      private void listLegacyVanillaRecipes(String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+                                                                                    ^
+    symbol:   class ResourceOutput
+    location: class DelegatingPackResources
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/crafting/PartialNbtIngredient.java:35: error: cannot find symbol
+              HolderSetCodec.create(Registries.ITEM, BuiltInRegistries.ITEM.holderByNameCodec(), false)
+              ^
+    symbol:   variable HolderSetCodec
+    location: class PartialNbtIngredient
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:103: error: cannot find symbol
+          boolean flag = event.key() == GLFW.GLFW_KEY_LEFT;
+                                        ^
+    symbol:   variable GLFW
+    location: class ForgeSlider
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:104: error: cannot find symbol
+          if (flag || event.key() == GLFW.GLFW_KEY_RIGHT) {
+                                     ^
+    symbol:   variable GLFW
+    location: class ForgeSlider
+  Note: Recompile with -Xlint:unchecked for details.
+  Note: Some input files use or override a deprecated API.
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:61: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:66: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:111: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:116: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:124: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:131: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:147: error: method does not override or implement a method from a supertype
+              @Override
+              ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:152: error: method does not override or implement a method from a supertype
+              @Override
+              ^
+  Note: Some input files use unchecked or unsafe operations.
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/util/RenderHelper.java:73: error: cannot find symbol
+          AvatarRenderer<?> avatar = Minecraft.getInstance().getEntityRenderDispatcher().getPlayerRenderer(player);
+                                                                                        ^
+    symbol:   method getPlayerRenderer(LocalPlayer)
+    location: class EntityRenderDispatcher
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:122: error: cannot find symbol
+                          .openPrimary(new PackLocationInfo(gunPack.name, Component.literal(gunPack.name), PackSource.BUILT_IN, Optional.empty()));
+                          ^
+    symbol:   method openPrimary(PackLocationInfo)
+    location: class PathResourcesSupplier
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:125: error: cannot find symbol
+                          .openPrimary(new PackLocationInfo(gunPack.name, Component.literal(gunPack.name), PackSource.BUILT_IN, Optional.empty()));
+                          ^
+    symbol:   method openPrimary(PackLocationInfo)
+    location: class FileResourcesSupplier
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:146: error: <anonymous com.tacz.guns.resource.GunPackLoader$2> is not abstract and does not override abstract method openResources(PackLocationInfo,Metadata) in ResourcesSupplier
+          Pack.ResourcesSupplier resourcesSupplier = new Pack.ResourcesSupplier() {
+                                                                                  ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/renderer/item/AnimateGeoItemRenderer.java:355: error: incompatible types: Matrix4f cannot be converted to Quaternionfc
+          poseStack.rotate(transformMatrix);
+                           ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/event/FirstPersonRenderGunEvent.java:208: error: incompatible types: Matrix4f cannot be converted to Quaternionfc
+          poseStack.rotate(transformMatrix);
+                           ^
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:149: error: incompatible types: DelegatingPackResources cannot be converted to PackResources
+                  return pack;
+                         ^
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:34: error: cannot find symbol
+  public class DelegatingPackResources extends AbstractPackResources {
+                                               ^
+    symbol: class AbstractPackResources
+  /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:8: error: package org.lwjgl.glfw does not exist
+  import org.lwjgl.glfw.GLFW;
+                       ^
+  29 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':compileJava'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:135)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:133)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.DefaultNodeExecutor.executeLocalTaskNode(DefaultNodeExecutor.java:55)
+	at org.gradle.execution.plan.DefaultNodeExecutor.execute(DefaultNodeExecutor.java:34)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:343)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:328)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler output below.
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/me/xjqsh/lrtactical/client/input/MeleeAttackKeys.java:120: error: method swing in class LivingEntity cannot be applied to given types;
+        player.swing(InteractionHand.MAIN_HAND);
+              ^
+  required: InteractionHand,SwingAnimation,boolean
+  found:    InteractionHand
+  reason: actual and formal argument lists differ in length
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/render/scope/ScopeFinalRingOverlay.java:275: error: method renderAllFeatures in class FeatureRenderDispatcher cannot be applied to given types;
+            mc.gameRenderer.featureRenderDispatcher().renderAllFeatures(storage);
+                                                     ^
+  required: RenderPass,FeatureRenderDispatcher.PreparedFrame
+  found:    SubmitNodeStorage
+  reason: actual and formal argument lists differ in length
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/render/scope/ScopePipRenderer.java:928: error: method render in class LevelRenderer cannot be applied to given types;
+                mc.levelRenderer.render(
+                                ^
+  required: GraphicsResourceAllocator,boolean,CameraRenderState,GpuBufferSlice,Vector4f,boolean,boolean
+  found:    GraphicsResourceAllocator,DeltaTracker,boolean,CameraRenderState,Matrix4f,GpuBufferSlice,Vector4f,boolean
+  reason: actual and formal argument lists differ in length
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/api/item/gun/AbstractGunItem.java:199: error: no suitable method found for placeItemBackInInventory(ItemStack)
+                    player.getInventory().placeItemBackInInventory(ammoItem);
+                                         ^
+    method Inventory.placeItemBackInInventory(ItemStack,Prediction) is not applicable
+      (actual and formal argument lists differ in length)
+    method Inventory.placeItemBackInInventory(ItemStack,boolean,Prediction) is not applicable
+      (actual and formal argument lists differ in length)
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/network/message/ClientMessageUnloadAttachment.java:70: error: no suitable method found for drop(ItemStack,boolean)
+                player.drop(attachmentItem, false);
+                      ^
+    method ServerPlayer.drop(ItemStack,boolean,Prediction) is not applicable
+      (actual and formal argument lists differ in length)
+    method ServerPlayer.drop(boolean) is not applicable
+      (actual and formal argument lists differ in length)
+Note: Recompile with -Xlint:deprecation for details.
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/crafting/PartialNbtIngredient.java:18: error: cannot find symbol
+import net.minecraft.resources.HolderSetCodec;
+                              ^
+  symbol:   class HolderSetCodec
+  location: package net.minecraft.resources
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:10: error: cannot find symbol
+import net.minecraft.server.packs.AbstractPackResources;
+                                 ^
+  symbol:   class AbstractPackResources
+  location: package net.minecraft.server.packs
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:67: error: cannot find symbol
+    public void listResources(PackType type, String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+                                                                                     ^
+  symbol:   class ResourceOutput
+  location: class DelegatingPackResources
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:82: error: cannot find symbol
+    private void listLegacyVanillaRecipes(String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+                                                                                  ^
+  symbol:   class ResourceOutput
+  location: class DelegatingPackResources
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/crafting/PartialNbtIngredient.java:35: error: cannot find symbol
+            HolderSetCodec.create(Registries.ITEM, BuiltInRegistries.ITEM.holderByNameCodec(), false)
+            ^
+  symbol:   variable HolderSetCodec
+  location: class PartialNbtIngredient
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:103: error: cannot find symbol
+        boolean flag = event.key() == GLFW.GLFW_KEY_LEFT;
+                                      ^
+  symbol:   variable GLFW
+  location: class ForgeSlider
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:104: error: cannot find symbol
+        if (flag || event.key() == GLFW.GLFW_KEY_RIGHT) {
+                                   ^
+  symbol:   variable GLFW
+  location: class ForgeSlider
+Note: Recompile with -Xlint:unchecked for details.
+Note: Some input files use or override a deprecated API.
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:61: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:66: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:111: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:116: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:124: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:131: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:147: error: method does not override or implement a method from a supertype
+            @Override
+            ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:152: error: method does not override or implement a method from a supertype
+            @Override
+            ^
+Note: Some input files use unchecked or unsafe operations.
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/util/RenderHelper.java:73: error: cannot find symbol
+        AvatarRenderer<?> avatar = Minecraft.getInstance().getEntityRenderDispatcher().getPlayerRenderer(player);
+                                                                                      ^
+  symbol:   method getPlayerRenderer(LocalPlayer)
+  location: class EntityRenderDispatcher
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:122: error: cannot find symbol
+                        .openPrimary(new PackLocationInfo(gunPack.name, Component.literal(gunPack.name), PackSource.BUILT_IN, Optional.empty()));
+                        ^
+  symbol:   method openPrimary(PackLocationInfo)
+  location: class PathResourcesSupplier
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:125: error: cannot find symbol
+                        .openPrimary(new PackLocationInfo(gunPack.name, Component.literal(gunPack.name), PackSource.BUILT_IN, Optional.empty()));
+                        ^
+  symbol:   method openPrimary(PackLocationInfo)
+  location: class FileResourcesSupplier
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:146: error: <anonymous com.tacz.guns.resource.GunPackLoader$2> is not abstract and does not override abstract method openResources(PackLocationInfo,Metadata) in ResourcesSupplier
+        Pack.ResourcesSupplier resourcesSupplier = new Pack.ResourcesSupplier() {
+                                                                                ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/renderer/item/AnimateGeoItemRenderer.java:355: error: incompatible types: Matrix4f cannot be converted to Quaternionfc
+        poseStack.rotate(transformMatrix);
+                         ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/event/FirstPersonRenderGunEvent.java:208: error: incompatible types: Matrix4f cannot be converted to Quaternionfc
+        poseStack.rotate(transformMatrix);
+                         ^
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/GunPackLoader.java:149: error: incompatible types: DelegatingPackResources cannot be converted to PackResources
+                return pack;
+                       ^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/resource/DelegatingPackResources.java:34: error: cannot find symbol
+public class DelegatingPackResources extends AbstractPackResources {
+                                             ^
+  symbol: class AbstractPackResources
+/home/runner/work/TaCZ_Renovated/TaCZ_Renovated/src/main/java/com/tacz/guns/client/gui/components/ForgeSlider.java:8: error: package org.lwjgl.glfw does not exist
+import org.lwjgl.glfw.GLFW;
+                     ^
+29 errors
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:89)
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:50)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.delegateAndHandleErrors(NormalizingJavaCompiler.java:98)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:38)
+	at org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:38)
+	at org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:46)
+	at org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:36)
+	at org.gradle.jvm.toolchain.internal.DefaultToolchainJavaCompiler.execute(DefaultToolchainJavaCompiler.java:57)
+	at org.gradle.api.tasks.compile.JavaCompile.lambda$createToolchainCompiler$3(JavaCompile.java:206)
+	at org.gradle.api.internal.tasks.compile.CleaningJavaCompiler.execute(CleaningJavaCompiler.java:53)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalCompilerFactory.lambda$createRebuildAllCompiler$0(IncrementalCompilerFactory.java:55)
+	at org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:70)
+	at org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:44)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:66)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:64)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:48)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler.execute(CompileJavaBuildOperationReportingCompiler.java:48)
+	at org.gradle.api.tasks.compile.JavaCompile.performCompilation(JavaCompile.java:224)
+	at org.gradle.api.tasks.compile.JavaCompile.performIncrementalCompilation(JavaCompile.java:165)
+	at org.gradle.api.tasks.compile.JavaCompile.compile(JavaCompile.java:150)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.doExecute(IncrementalTaskAction.java:45)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.execute(IncrementalTaskAction.java:26)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:252)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:237)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:220)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:203)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:170)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:68)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:38)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:28)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeAndStoreInCache(BuildCacheStep.java:145)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$4(BuildCacheStep.java:101)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$5(BuildCacheStep.java:101)
+	at org.gradle.internal.Try$Success.map(Try.java:170)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithCache(BuildCacheStep.java:85)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$0(BuildCacheStep.java:74)
+	at org.gradle.internal.Either$Left.fold(Either.java:116)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:64)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:35)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:62)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:40)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:76)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:136)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:66)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:38)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:297)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:44)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:31)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:64)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+	... 30 more
+
 
 Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
 
@@ -60,8 +629,8 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 7s
+BUILD FAILED in 1m 17s
 2 actionable tasks: 2 executed
 Configuration cache entry stored.
 
-== job status: success ==
+== job status: failure ==
