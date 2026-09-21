@@ -23,7 +23,7 @@ public class FireSelectKey {
     }
 
     public static void onFireSelectMousePress(InputEvent.MouseButton.Post event) {
-        if (isInGame() && event.getAction() == InputConstants.PRESS && FIRE_SELECT_KEY.matchesMouse(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
+        if (isInGame() && event.getAction() == InputConstants.PRESS && FIRE_SELECT_KEY.matches(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
             doFireSelectLogic();
         }
     }

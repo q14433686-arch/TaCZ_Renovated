@@ -1,5 +1,6 @@
 package com.tacz.guns.network.message;
 
+import net.minecraft.util.Prediction;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.attachment.AttachmentType;
@@ -67,7 +68,8 @@ public class ClientMessageUnloadAttachment implements CustomPacketPayload {
                 return;
             }
             if (!inventory.add(attachmentItem)) {
-                player.drop(attachmentItem, false);
+                // 26.3: drop(ItemStack, boolean) 已删，第三参 Prediction 必填（服务端发起的掉落）。
+                player.drop(attachmentItem, false, Prediction.SERVER_ONLY);
             }
             AttachmentPropertyManager.postChangeEvent(player, gunItem);
             if (message.attachmentType == AttachmentType.EXTENDED_MAG) {

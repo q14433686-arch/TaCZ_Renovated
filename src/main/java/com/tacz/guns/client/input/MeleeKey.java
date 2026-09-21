@@ -22,7 +22,7 @@ public class MeleeKey {
     }
 
     public static void onMeleeMousePress(InputEvent.MouseButton.Post event) {
-        if (isInGame() && event.getAction() == InputConstants.PRESS && MELEE_KEY.matchesMouse(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
+        if (isInGame() && event.getAction() == InputConstants.PRESS && MELEE_KEY.matches(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
             doMeleeLogic();
         }
     }

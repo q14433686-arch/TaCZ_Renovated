@@ -24,7 +24,7 @@ public class ZoomKey {
     }
 
     public static void onZoomMousePress(InputEvent.MouseButton.Post event) {
-        if (isInGame() && event.getAction() == InputConstants.PRESS && ZOOM_KEY.matchesMouse(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
+        if (isInGame() && event.getAction() == InputConstants.PRESS && ZOOM_KEY.matches(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
             doZoomLogic();
         }
     }
