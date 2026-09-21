@@ -85,7 +85,7 @@ public final class DisplayTransform {
     public record EntityTransform(Vector3f rotation, Vector3f translation, Vector3f scale) {
         public void apply(PoseStack poseStack) {
             poseStack.translate(translation.x(), translation.y(), translation.z());
-            poseStack.mulPose(new Quaternionf().rotationXYZ(
+            poseStack.rotate(new Quaternionf().rotationXYZ(
                     rotation.x() * Mth.DEG_TO_RAD,
                     rotation.y() * Mth.DEG_TO_RAD,
                     rotation.z() * Mth.DEG_TO_RAD));

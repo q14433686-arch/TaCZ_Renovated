@@ -30,6 +30,12 @@ sourceSets.main.resources {
 repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
+    // Modrinth maven: ZigyTheBird PAL publishes its merged Fabric+NeoForge jars here.
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content { includeGroup "maven.modrinth" }
+    }
     // Optional recipe-viewer compile APIs. Runtime use remains conditional on the
     // corresponding mod being installed by the player.
     maven {
@@ -60,7 +66,21 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 sourceSets {
     main {
         java {
-            // Work package ⑤: compile client animation/gltf APIs.
+            // 26.3 work package: compile client animation/gltf APIs.
+            //
+            // [Disabled integrations — no 26.3 artifacts, verified 2026-09-21]
+            // Same policy as the Fabric sister 26.3 line: keep the facade classes,
+            // exclude only the IMPL sources that hard-depend on APIs we cannot
+            // compile against. This is a DISABLED state, not a fix; restore by
+            // re-adding the compileOnly coordinate in gradle.properties/build.gradle
+            // and dropping the matching exclude lines.
+            //   REI (+Architectury)  — neoforge latest 26.2.820/26.2.821, no 26.3.
+            //   Controllable         — latest 0.26.1+26.2, no 26.3.
+            //   Shoulder Surfing     — latest 26.2-5.0.7, no 26.3.
+            exclude 'com/tacz/guns/compat/rei/**'
+            exclude 'com/tacz/guns/compat/controllable/ControllableInner.java'
+            exclude 'com/tacz/guns/compat/shouldersurfing/ShoulderSurfingCompatInner.java'
+            exclude 'com/tacz/guns/compat/shouldersurfing/ShoulderSurfingPlugin.java'
         }
     }
 }
@@ -177,53 +197,54 @@ dependencies {
     jarJar files(commonsMath3ForJarJar)
     jarJar files(luajForJarJar)
 
-    // 26.2 recipe viewers: JEI 30.24.0.176 / REI 26.2.820 for NeoForge.
-    // These integrations are optional at runtime and are discovered only when the
-    // corresponding viewer is present.
-    compileOnly "mezz.jei:jei-26.2-neoforge:${jei_neoforge_version}"
-    compileOnly "curse.maven:roughly-enough-items-310111:${rei_neoforge_file}"
-    compileOnly "dev.architectury:architectury-neoforge:${rei_architectury_version}"
-    compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rei_cloth_config_version}"
+    // 26.3 recipe viewers: JEI 31.0.0.5 for NeoForge (jei-26.3-neoforge, beta channel —
+    // the exact build the sister Fabric 26.3 line validated in-game).
+    // REI has NO 26.3 artifact (neoforge latest 26.2.820, verified 2026-09-21):
+    // compat/rei/** is excluded in sourceSets and the integration is disabled.
+    compileOnly "mezz.jei:jei-26.3-neoforge:${jei_neoforge_version}"
+
+    // Cloth Config — optional at runtime (config screen). 26.3.158.
+    compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_neoforge_version}"
 
     // ZigyTheBird Player Animation Library (PAL) — optional at runtime
     // (modid player_animation_library); drives TACZ third-person gun animations.
-    // CurseForge file 8674798 = "1.2.6+26.2": a merged Fabric+NeoForge jar,
-    // so this compile classpath is the actual NeoForge-capable 26.2 publication.
-    // NOTE: PAL's public version numbers include the game line ("1.2.6+26.2");
-    // a bare "1.2.6" Modrinth coordinate is not the published artifact.
+    // 26.3: resolved from the Modrinth maven (1.2.7 = "1.2.7+26.3" beta merged
+    // Fabric+NeoForge jar — the same artifact the sister 26.3 line compiles against).
+    // NOTE: PAL's public version numbers include the game line ("1.2.7+26.3");
+    // the Modrinth maven coordinate is the bare "1.2.7".
     // Escape hatch: drop the downloaded jar (PlayerAnimationLibMerged-*.jar)
-    // into libs/ and Gradle will use it instead of CurseMaven.
+    // into libs/ and Gradle will use it instead of the Modrinth maven.
     def localPal = fileTree(dir: 'libs', include: 'PlayerAnimationLib*.jar')
     if (!localPal.isEmpty()) {
         compileOnly localPal
     } else {
-        compileOnly "curse.maven:player-animation-library-1283899:${player_animation_lib_file}"
+        compileOnly "maven.modrinth:player-animation-library:${player_animation_lib_version}"
     }
 
-    // MrCrayfish's Controllable 0.26.1 — optional at runtime (modid controllable);
-    // controller bindings + gun-fire rumble. CurseForge file 8403602 is the
-    // NeoForge 26.2 jar. No configure-time downloads here.
-    // Escape hatch: if CurseMaven refuses this file, download
-    // controllable-neoforge-0.26.1+26.2-signed.jar from
-    // https://github.com/MrCrayfish/Controllable/releases/tag/v0.26.1%2B26.2
-    // (or the CurseForge file page) into libs/ and Gradle will use it instead.
-    def localControllable = fileTree(dir: 'libs', include: 'controllable-neoforge*.jar')
-    if (!localControllable.isEmpty()) {
-        compileOnly localControllable
-    } else {
-        compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
-    }
+    // MrCrayfish's Controllable — DISABLED for 26.3: no 26.3 artifact (latest is
+    // 0.26.1+26.2, verified 2026-09-21 on github MrCrayfish/Controllable releases).
+    // ControllableInner is excluded in sourceSets; ControllableCompat is the disabled
+    // facade. Restore: set controllable_neoforge_file, uncomment the block below,
+    // drop the ControllableInner exclude.
+    // def localControllable = fileTree(dir: 'libs', include: 'controllable-neoforge*.jar')
+    // if (!localControllable.isEmpty()) {
+    //     compileOnly localControllable
+    // } else {
+    //     compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
+    // }
 
-    // Exopandora's Shoulder Surfing Reloaded 5.x — optional at runtime
-    // (modid shouldersurfing). 5.x event/plugin API only.
-    // CurseForge file 8445037 = ShoulderSurfing-NeoForge-26.2-5.0.7.
-    // Escape hatch: drop ShoulderSurfing-NeoForge-*.jar into libs/ to override.
-    def localShoulderSurfing = fileTree(dir: 'libs', include: 'ShoulderSurfing-NeoForge*.jar')
-    if (!localShoulderSurfing.isEmpty()) {
-        compileOnly localShoulderSurfing
-    } else {
-        compileOnly "curse.maven:shoulder-surfing-reloaded-243190:${shoulder_surfing_neoforge_file}"
-    }
+    // Exopandora's Shoulder Surfing Reloaded — DISABLED for 26.3: no 26.3 artifact
+    // (latest 26.2-5.0.7). ShoulderSurfingCompatInner/ShoulderSurfingPlugin are excluded
+    // in sourceSets; ShoulderSurfingCompat is the disabled facade; the bundled
+    // shouldersurfing_plugin.json resource is archived under docs/patch/.
+    // Restore: set shoulder_surfing_neoforge_file, uncomment, drop the two excludes,
+    // restore src/main/resources/shouldersurfing_plugin.json from docs/patch/.
+    // def localShoulderSurfing = fileTree(dir: 'libs', include: 'ShoulderSurfing-NeoForge*.jar')
+    // if (!localShoulderSurfing.isEmpty()) {
+    //     compileOnly localShoulderSurfing
+    // } else {
+    //     compileOnly "curse.maven:shoulder-surfing-reloaded-243190:${shoulder_surfing_neoforge_file}"
+    // }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

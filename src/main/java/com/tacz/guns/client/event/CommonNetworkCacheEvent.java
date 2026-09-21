@@ -22,6 +22,8 @@ public final class CommonNetworkCacheEvent {
         }
         CommonNetworkCache.INSTANCE.clear();
         ClientIndexManager.clear();
+        // Drop any coalesced recipe-viewer refresh that never got to run in that world.
+        com.tacz.guns.client.compat.RecipeViewerReloadBridge.clear();
         // Reset the static base timestamp so a stale value from a previous world does
         // not corrupt the first shoot packet sent after joining the next world.
         LocalPlayerDataHolder.clientBaseTimestamp = -1L;

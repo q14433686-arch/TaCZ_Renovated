@@ -3,6 +3,90 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
+## 1.1.8+neoforge.26.3.R1 — 2026-09-21（未发布 · 编译级移植）
+
+> **状态红线**：本轮为 **26.2（R3-hotfix2 源码基线）→ 26.3 全量端口**，对照姊妹仓
+> 26.3 分支的《26.3 移植指南》逐项等价移植。**当前仅到「CI 编译绿」这一级**，
+> 以下所有条目在实机上的效果均**未实测**（维护者验收前的统一口径，AGENTS.md §2）。
+> NeoForge 26.3 当前仅有 **beta 通道**，本线钉选 `26.3.0.7-beta`（维护者已批准；
+> 稳定版发布后重钉，不另起版本号）。
+
+### Mojang 侧（加载器无关）
+
+- **包迁移**：`com.mojang.blaze3d.*` 渲染类型迁移到 `com.mojang.renderpearl.api.*`
+  （GpuBufferSlice / GpuTextureView / RenderPass / CommandEncoder / pipeline.* 等）。
+- **Render pass 归属倒置**：`FeatureRenderDispatcher#renderAllFeatures` 拆成
+  `prepareFrame(storage)` + 静态 `renderAllFeatures(RenderPass, PreparedFrame)`；
+  `RenderSystem.output{Color,Depth}TextureOverride` 删除，输出目标改由自开
+  RenderPass 显式携带。瞄具掩码 / PIP 合成 / 遮光环最终覆盖 / 高模 GPU 绘制
+  全部改道（`FeatureRenderDispatcherMixin` 注入点移至 `prepareFrame` RETURN；
+  `PreparedFrameSolidMixin` 删除，世界高模改挂
+  `LevelRenderer#executeSolid(...)` RETURN 复用其 RenderPass）。
+- **第一人称拆分**：`ItemInHandRenderer` 拆为 `FirstPersonHandsAndItems`（状态）
+  + `FirstPersonHandsAndItemsRenderer`（渲染），mixin 同步改名；
+  `KeepingItemRenderer` 新增 `getCurrentRenderItem()` 空安全取值。
+- **着色器方言**：shaderc + SPIR-V —— `#moj_import` → `#include`、varying 显式
+  `layout(location = N)`、`#extension GL_ARB_separate_shader_objects`；
+  掩码 UV 分母改 `textureSize(ScopeMaskSampler, 0)`（与 Iris 注入片段同款）。
+- **管线编译按需 + 异步**：新增 `ScopePipelinePrewarm`（客户端 tick 预热全部
+  自定义管线 + Iris `ImmediateState.bypass` 反射旁路），防光影下首次开镜
+  `getCompiledPipelineNullable` 返回 null 撞 Iris NPE（姊妹仓 2026-09-20 实机
+  崩溃日志；本仓未实测）。
+- **掩码颜色被雾污染**（姊妹仓 26.3 实机发现，vanilla 也受影响）：掩码 pass 显式
+  绑 `FogMode.NONE` 空雾 UBO（`bindEmptyFog`，经新 `GameRendererProjectionAccessor`
+  取 `fogRenderer`）。本仓未实测。
+- **战利品表 schema 重写**：`condition`/`function` → `type`、`conditions[]` → 单
+  `condition`（多条 `all_of`+`terms`）、`block_state_property` → `match_block`、
+  补 `random_sequence`；六份方块战利品表重写，`LootTableInjection` 新增
+  `LegacyLootCompat.migrateSchema` 运行期迁移让第三方旧枪包不炸。
+- **方块掉落双份**：`AbstractGunSmithTableBlock#playerWillDestroy` 对非根半边的
+  手工 `popResource` 移除（与根半边战利品表叠加会爆两个工作台；姊妹仓
+  2026-09-20 实测，本仓未实测），掉落全部交给战利品表。
+- **配方 codec 延迟解析**：`GunSmithTableSerializer` 材料字段改
+  `ExtraCodecs.JSON` 原样读入 + `GunSmithTableIngredient` 延迟解析
+  （`getRawItem()`），防旧语法枪包材料在 26.3 动态注册表加载时炸整个存档
+  （姊妹仓实机日志；本仓未实测）。
+- 其余 §2 小改名全套（swing 返回值、受伤冷却拆分 `DamageCooldownUtil`、
+  `KeyEvent#keycode`、输入常量、`openUri`、`PushReaction.POPPED`、
+  `BufMapCodec` 手写 map 读写等）。
+
+### Iris 26.3 侧
+
+- **mode 判别改道**：26.3 删了 `GlRenderPipeline#info()` 且后端 pass 不再有按名
+  采样器表 —— 新增 `IrisFrontendRenderPassMixin`（前后端 pass 配对登记）+
+  标记采样器 `ScopeMaskMode2Sampler`（挂准星 / 镜内文字一族管线），
+  `IrisScopeMaskState#resolveMode` 按 draw 的前端管线声明 / 采样器集合判别。
+- `IrisGlCommandEncoderMixin`：hook 点 `trySetup` → `setupDraw(GlRenderPass)`
+  （返回值没了，无条件应用）；`IrisExtendedShaderMixin#iris$setupState` 改空形参
+  注入（Iris 26.3 签名变更，旧签名 APPLY 阶段直接抛 InvalidInjectionException）。
+- **高模法线**：GPU poly 逐骨骼绘制期间强制管线重绑
+  （`isForcingPipelineRebind` → mixin 清 `lastPipeline`），防同管线连续绘制时
+  Iris 只给第一根骨骼算 `iris_NormalMat`（姊妹仓实机「开枪瞬间才正确」一案；
+  本仓未实测）。
+
+### 配方同步与 JEI
+
+- `OnDatapackSyncEvent#sendRecipes(RecipeType)` 请求本 Mod 配方类型的
+  RecipeContentPayload（26.3 服务端不再全量同步配方）。
+- 新增 `RecipeViewerReloadBridge`：枪包缓存同步后合并重启 JEI
+  （首选 `mezz.jei.common.Internal#restartJei()`，不用 Fabric 生命周期事件 ——
+  那会丢服务端同步的配方表），兜底一次资源重载；REI 分支全反射保留。
+
+### 兼容层（**禁用**，非修复）
+
+- REI（+Architectury）、Controllable、Shoulder Surfing Reloaded：**上游无 26.3
+  构件，集成整体禁用**（门面保留，IMPL 源码按 sourceSets 排除，
+  `shouldersurfing_plugin.json` 摘至 `docs/patch/` 存档）；上游发布后回补。
+- Zoomify：NeoForge 侧本就无构建（26.2 起即如此），门面维持 no-op。
+- JEI 钉选 `31.0.0.5`（姊妹仓 26.3 线实机验证过的构建，含 `restartJei` 反射路径）。
+
+### 构建与工具链
+
+- NeoForge `26.3.0.7-beta`（beta 钉选，见 `gradle.properties` 注释）；MC 版本区间
+  收紧为 `[26.3]`；JEI / Cloth Config / PAL 钉 26.3 构建。
+- 基线：`26.2` 分支 R3-hotfix2 源码（未发布的 26.2 热修含在本次移植内 ——
+  第一人称手臂 `zRot` 清零等，见下一条目）。
+
 ## 1.1.8+neoforge.26.2.R3-hotfix2 — 2026-09-13（未发布）
 
 ### 修复：第一人称手部错位（全枪械）——中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`

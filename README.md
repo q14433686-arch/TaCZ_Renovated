@@ -5,33 +5,37 @@
   <a href="https://github.com/q14433686-arch/TaCZ_Renovated"><img src="https://img.shields.io/badge/GitHub-q14433686-arch%2FTaCZ--Renovated-24292e?logo=github&logoColor=white" alt="GitHub" height="20"></a>
 </p>
 
-# [UNOFFICIAL] TaCZ: Renovated — Minecraft 26.2 / NeoForge
+# [UNOFFICIAL] TaCZ: Renovated — Minecraft 26.3 / NeoForge
 
 > **English**: This project is an **unofficial community port/derivative** of the TaCZ: Reborn series. It is **not** the official TaCZ, and it is **not** produced, endorsed, or supported by the original TaCZ team (Xqyao / Shuairon / Yumeko). It is provided **as-is** with no warranty of any kind; use at your own risk.
 >
 > **中文**：本项目是 TaCZ: Reborn 系列的**非官方社区移植/衍生作品**，**不是官方 TaCZ**，与 TaCZ 原团队（Xqyao / Shuairon / Yumeko）**无关**，也**未获得**其认可或支持。本项目**按“原样”提供**，不提供任何明示或暗示的担保，使用风险自负。
 
-本仓库是把 `26.1.2` 线 R1 基线社区移植到 **Minecraft 26.2（NeoForge）** 的工作线。
-当前源码版本 `1.1.8+neoforge.26.2.R3-hotfix2`（R3-hotfix2 尚未发布；`R1` /
-`R1-hotfix` / `R2` / `R3` / `R3-hotfix`（2026-09-09）均已发布）。
-游戏语义（瞄具渲染、PIP、mesh 裁剪等）以 Fabric 26.2 姊妹线
-（`q14433686-arch/TaCZ_Refabricated_Unofficial`）为权威 —— 每轮同步逐 commit
-核对本线基线后等价移植，对照与「搬了什么 / 不搬什么 + 理由」记录在
+本仓库是把 `26.2` 线 R3-hotfix2 基线社区移植到 **Minecraft 26.3（NeoForge）** 的工作线。
+当前源码版本 `1.1.8+neoforge.26.3.R1`（**R1 尚未发布**；本轮为 26.3 全量端口，
+目前为**编译级移植，实机验收未做** —— 见 [docs/PORTING_STATUS.md](docs/PORTING_STATUS.md)）。
+26.2 线的 `R1` / `R1-hotfix` / `R2` / `R3` / `R3-hotfix`（2026-09-09）均已发布。
+游戏语义（瞄具渲染、PIP、mesh 裁剪等）以 Fabric 姊妹线 26.3 分支
+（`q14433686-arch/TaCZ_Refabricated_Unofficial`）为权威 —— 本轮 26.3 移植按其
+《26.3 移植指南》（快照入仓：[`docs/lineage/`](docs/lineage/)）
+逐项核对等价移植，「搬了什么 / 不搬什么 + 理由」记录在
 [`docs/records/`](docs/records/)。
 
 ### 选择你的版本 / Pick your version
 
 | MC / Loader | 线 | 当前状态 |
 |---|---|---|
-| **26.2 / NeoForge（本仓库，`26.2` 分支）** | [`26.2`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.2) | `R1` / `R1-hotfix` / `R2` / `R3` / `R3-hotfix` 已发布；当前源码为 **R3-hotfix2**（`1.1.8+neoforge.26.2.R3-hotfix2`，第一人称手部错位修复 —— 见 [CHANGELOG](CHANGELOG.md)） |
+| **26.3 / NeoForge（本仓库，`26.3` 分支）** | [`26.3`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.3) | **R1 移植中**（`1.1.8+neoforge.26.3.R1`，编译级、待实机验收 —— 见 [CHANGELOG](CHANGELOG.md)）；NeoForge 26.3 目前仅 **beta 通道**（钉选 `26.3.0.7-beta`） |
+| 26.2 / NeoForge | [`26.2`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.2) | `R1` / `R1-hotfix` / `R2` / `R3` / `R3-hotfix` 已发布；源码基线为 **R3-hotfix2**（26.3 线的直接母本） |
 | 26.1.2 / NeoForge | [`26.1.2`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.1.2) | `R1` / `R1-hotfix` 已发布 |
 | 1.21.11 / NeoForge | [`1.21.11`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/1.21.11) | `R1` / `R1-hotfix` 已发布 |
-| Fabric 姊妹项目 | [`q14433686-arch/TaCZ_Refabricated_Unofficial`](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial) | 1.21.11 Fabric 主线 + 26.2 Fabric 工作线（本仓库游戏语义权威线） |
+| Fabric 姊妹项目 | [`q14433686-arch/TaCZ_Refabricated_Unofficial`](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial) | 1.21.11 Fabric 主线 + 26.2 / 26.3 Fabric 工作线（本仓库游戏语义权威线，26.3 移植指南出处） |
 
 ## 1. 支持环境
 
-- Minecraft **26.2**
-- NeoForge **`26.2.0.64`**（钉选构建，见 `gradle.properties`）
+- Minecraft **26.3**
+- NeoForge **`26.3.0.7-beta`**（**beta 通道**钉选构建，见 `gradle.properties`；
+  26.3 尚无 stable，稳定后重钉）
 - Java **25**
 - **无硬依赖**（LesRaisins-Tactical 功能已内置到本 Mod，不可分离）
 
@@ -66,7 +70,7 @@ LR 内容包。范围与边界（含明确排除的 `flash_shield`）见
 - **第 0 步**安全子集（CPU 路径，无 GPU 赌注）+ **第 1 步**GPU 静态烘焙
   （第一人称视角）+ **第 2 步**世界语境烘焙（世界掉落 / 第三人称 mesh 枪），均已实装；
 - **开镜孔径裁剪**：镜体、准星、镜内视模（含 mesh 枪身 / 配件，与 cube 枪身同开同关）
-  全部按 26.2 离屏目镜掩码裁到镜口 —— 含 2026-09-02 修复的「mesh 枪身裁剪判据
+  全部按离屏目镜掩码裁到镜口（26.3 起掩码 pass 走显式 RenderPass 重定向）—— 含 2026-09-02 修复的「mesh 枪身裁剪判据
   时序 bug（高模枪身从未被孔径裁掉）」，全程记录见
   [docs/records/BUG_MESHGUNBODY_SCOPE_CLIP_RERENDER_20260902.md](docs/records/BUG_MESHGUNBODY_SCOPE_CLIP_RERENDER_20260902.md)；
 - GPU 烘焙在**光影下默认开**（取舍：Complementary 系光影下 GPU 静态光照非动态，
@@ -111,7 +115,7 @@ Cloth Config；未装时该入口给下载提示；两处改的是同一份配�
 2. 本 Mod **没有必装前置** —— 单独把 TaCZ 放进 `mods/` 即可运行（Cloth Config 等
    均为可选集成，见 §2 / [COMPATIBILITY.md](COMPATIBILITY.md)）。
 3. 首次启动会自动把默认枪包解压到 `.minecraft/tacz/`。
-4. 环境要求见 §1（MC 26.2 + NeoForge `26.2.0.64` + Java 25）。
+4. 环境要求见 §1（MC 26.3 + NeoForge `26.3.0.7-beta` + Java 25）。
 
 ## 4. 第三方枪包
 
@@ -129,16 +133,17 @@ Cloth Config；未装时该入口给下载提示；两处改的是同一份配�
 
 ## 5. 可选 Mod
 
-Cloth Config、PAL、Controllable、SSR、JEI/REI、Iris、Carry On、First-person
-Model、Punchy!（First-person Model / Not Enough Animations 当前无 NeoForge 26.2
-文件，兼容桥保持 dormant）。逐项坐标与核验状态：
+Cloth Config、PAL、JEI、Iris、Carry On 等。**26.3 起以下兼容为「禁用」而非「修复」**
+（上游暂无 26.3 构件，门面保留、恢复后回补）：REI（+Architectury）、Controllable、
+Shoulder Surfing Reloaded；First-person Model / Not Enough Animations 同样无
+26.3 文件，兼容桥保持 dormant。逐项坐标与核验状态：
 [COMPATIBILITY.md](COMPATIBILITY.md)。
 
 ## 6. 开发与验证
 
 - **JDK 25**；构建用仓内 Gradle 9.2.1 / ModDevGradle 2.0.144
   （[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)）。
-- **源码权威**：游戏语义以 Fabric 26.2 姊妹线为权威；每轮同步逐 commit 核对，
+- **源码权威**：游戏语义以 Fabric 姊妹线（26.3 线为其 26.3 分支）为权威；每轮同步逐 commit 核对，
   「搬 / 不搬 + 理由」记录在 `docs/records/`（AGENTS.md §0）。
 - **验证纪律**（[AGENTS.md](AGENTS.md)）：CI 编译门 ≠ 实机 PASS；实机结论必须写清
   谁在哪个 commit 上跑的。当前候选的真实状态与剩余闸门见
@@ -147,14 +152,14 @@ Model、Punchy!（First-person Model / Not Enough Animations 当前无 NeoForge 
 
 ## 7. 枪包版本约束
 
-Mod 的 id 是 `tacz`，版本号形如 `1.1.8+neoforge.26.2.R3-hotfix2`。
+Mod 的 id 是 `tacz`，版本号形如 `1.1.8+neoforge.26.3.R1`。
 
 - **`1.1.8` 是 Mod 自身的版本**，不代表 Minecraft 版本。它是 Mod 自己的 SemVer
   版本号，延续原版 TaCZ 系列的版本线。
-- **`+neoforge.26.2.R3-hotfix2` 是 build metadata** —— `+` 是 SemVer 标准的
-  build-metadata 分隔符，标识加载器（`neoforge`）、Minecraft 版本（`26.2`）与
-  发布标签（`R3-hotfix2`）。**SemVer build metadata 不参与版本排序**：`>=1.1.8` 与
-  `>=1.1.8+neoforge.26.2.R3-hotfix2` 等价，比较时忽略 `+` 之后的部分。
+- **`+neoforge.26.3.R1` 是 build metadata** —— `+` 是 SemVer 标准的
+  build-metadata 分隔符，标识加载器（`neoforge`）、Minecraft 版本（`26.3`）与
+  发布标签（`R1`）。**SemVer build metadata 不参与版本排序**：`>=1.1.8` 与
+  `>=1.1.8+neoforge.26.3.R1` 等价，比较时忽略 `+` 之后的部分。
   热修标签沿用 R2 那一轮的格式：`R<n>` → `R<n>-hotfix` → `R<n>-hotfix2`，
   小写、序号直接接在 `hotfix` 后面，中间不放 `.` / `-` / `_`。
 - 因此枪包声明 `supported_mod_versions: ">=1.1.8"` 即可匹配本 Mod 任意
@@ -166,7 +171,7 @@ Mod 的 id 是 `tacz`，版本号形如 `1.1.8+neoforge.26.2.R3-hotfix2`。
 |---|---|
 | [COMPATIBILITY.md](COMPATIBILITY.md) | 可选 Mod 与图形后端的逐项状态 |
 | [LICENSES.md](LICENSES.md) | 代码、资源与依赖许可（含 TML 来源） |
-| [CHANGELOG.md](CHANGELOG.md) | 版本变更（R3、R3-hotfix 已发布；R3-hotfix2 为当前源码、待发布） |
+| [CHANGELOG.md](CHANGELOG.md) | 版本变更（26.3 线 R1 为当前源码、待发布；26.2 线至 R3-hotfix 已发布） |
 | [docs/README.md](docs/README.md) | 完整文档索引（用户 / 开发 / 子系统 / 档案） |
 | [docs/MESH_LOADER.md](docs/MESH_LOADER.md) | TML：机制、配置表、枪包用法、验证清单 |
 | [docs/GUNPACKS.md](docs/GUNPACKS.md) | 枪包双端安装、重载、版本谓词 |

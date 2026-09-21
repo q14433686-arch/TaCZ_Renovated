@@ -7,7 +7,8 @@ import com.tacz.guns.GunMod;
 import com.tacz.guns.crafting.RecipeCompat;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.AbstractPackResources;
+import net.minecraft.server.packs.AbstractPackMetadataResources;
+import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class DelegatingPackResources extends AbstractPackResources {
+public class DelegatingPackResources extends AbstractPackMetadataResources implements PackResources {
     private final PackMetadataSection packMeta;
     private final List<PackResources> delegates;
     private final Map<String, List<PackResources>> namespacesAssets;
@@ -64,7 +65,7 @@ public class DelegatingPackResources extends AbstractPackResources {
     }
 
     @Override
-    public void listResources(PackType type, String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+    public void listResources(PackType type, String resourceNamespace, String paths, PackResources.ResourceOutput resourceOutput) {
         for (PackResources delegate : this.delegates) {
             delegate.listResources(type, resourceNamespace, paths, resourceOutput);
         }
@@ -79,7 +80,7 @@ public class DelegatingPackResources extends AbstractPackResources {
         }
     }
 
-    private void listLegacyVanillaRecipes(String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+    private void listLegacyVanillaRecipes(String resourceNamespace, String paths, PackResources.ResourceOutput resourceOutput) {
         String legacyPath = RecipeCompat.toLegacyRecipesDirectory(paths);
         if (legacyPath == null) {
             return;

@@ -1,6 +1,7 @@
 package com.tacz.guns.mixin.client;
 
 import cn.sh1rocu.tacz.compat.meshloader.render.PolyMeshGpuRenderer;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.client.render.scope.ScopeMaskRenderer;
 import com.tacz.guns.client.render.scope.ScopeFinalRingOverlay;
@@ -20,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * 在 {@code renderAllFeatures} 的<b>阶段边界</b>插入瞄具掩码 pass 与镜内画中画的合成。
  *
- * <h2>为什么必须是这个位置</h2>
+ * <h2>为什么必须是这个位置（26.2 的论证，作为背景保留）</h2>
  * 26.2 的绘制结构（字节码确认）：
  * <pre>
  * renderAllFeatures(storage) {
@@ -33,30 +34,36 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * }
  * </pre>
  * 也就是说<b>各阶段之间不在任何 render pass 内</b>，
- * 满足 {@code CommandEncoder#createRenderPass} 开头那句断言：
- * <pre>
- * if (this.isInRenderPass) throw new IllegalStateException(
- *     "Close the existing render pass before creating a new one!");
- * </pre>
+ * 满足 {@code CommandEncoder#createRenderPass} 开头那句断言。
+ * 这正是 r51 失败的反面：vanilla 自己的多 target 从来都是
+ * <b>成批地、在阶段边界</b>切 —— 本 mixin 就是回到那个模式。
  *
- * <p>这正是 r51 失败的反面。当时给 {@code ocular} 配了个 outputTarget 不同的
- * RenderType 走 collector，引擎按 RenderType 分批执行，于是
- * 「主 target → 掩码 target → 主 target」的切换被<b>零散穿插</b>进 solid 阶段内部，
- * 触发 {@code VK_ERROR_DEVICE_LOST}。vanilla 自己的多 target 从来都是
- * <b>成批地、在阶段边界</b>切 —— 本 mixin 就是回到那个模式。</p>
+ * <h2>26.3：注入点从「阶段边界」搬到 prepareFrame 之后</h2>
  *
- * <h2>地基已验证</h2>
- * 上一轮用一个空 pass 探针单独验过这个时机（实测预览块变绿），
- * 证明「阶段边界切 OutputTarget」不会重演 r51 的设备丢失。
+ * <p>26.2 的 {@code renderAllFeatures} 自己不开 pass，各 {@code executeXxx}
+ * 内部各开各的，所以阶段之间是「无 pass 状态」，我们可以在那里插一个
+ * 自己的 pass 画掩码。<b>26.3 把 pass 的归属整个倒过来了</b>：
+ * {@code GameRenderer#renderItemInHand}（GR:399-408）先
+ * {@code createRenderPass("Item in hand")}，再把这个 pass 当参数一路传进
+ * {@code renderAllFeatures(renderPass, frame)} → {@code executeSolid(renderPass)}。
+ * {@code FeatureRenderDispatcher} 内部<b>一个 pass 都不开</b>。
  *
- * <h2>注入点选择</h2>
- * 用 {@code INVOKE + executeSolid} 而不是 {@code HEAD}：
- * {@code HEAD} 处 {@code prepareFrame} 还没跑，
- * 而 {@code prepareFrame} 里有 {@code stagedVertexBuffer.upload()}；
- * 掩码几何必须在 upload <b>之后</b>才能拿到顶点数据。
+ * <p>于是原来的阶段边界已经身处 vanilla 的 pass 之内，再调
+ * {@code createRenderPass} 必然撞上：
+ * <pre>Close the existing render pass before creating a new one!</pre>
+ * （refab 2026-09-18 实机日志：掩码整条被禁用，随后镜身管线拿不到掩码而崩。）
  *
- * <p>{@code shift = BEFORE} 保证掩码在 solid 之前完成 —— 镜身在 solid 阶段绘制，
- * 采样掩码时它必须已经就绪。</p>
+ * <p>新锚点选 {@code prepareFrame} 的 RETURN，它同时满足三个约束：
+ * <ul>
+ *   <li>在 {@code prepareFrameWithContext} 的 {@code stagedVertexBuffer.upload()}
+ *       <b>之后</b> —— 掩码几何要的顶点数据已经上传（这是原注释里
+ *       「必须在 upload 之后」那条约束，依旧成立）；</li>
+ *   <li>在 vanilla {@code createRenderPass("Item in hand")} <b>之前</b> ——
+ *       try-with-resources 的资源按书写顺序初始化，{@code prepareFrame} 是
+ *       第一个，pass 是第二个（GR:399-405），所以此刻确实还没有 pass 开着；</li>
+ *   <li>仍在 {@code executeSolid} 之前 —— 镜身在 solid 阶段采样掩码，
+ *       掩码必须先就绪。</li>
+ * </ul>
  */
 @Mixin(FeatureRenderDispatcher.class)
 public abstract class FeatureRenderDispatcherMixin {
@@ -135,31 +142,26 @@ public abstract class FeatureRenderDispatcherMixin {
         ScopePipRenderer.setCurrentPreparingStorage(null);
     }
 
-    @Inject(
-            method = "renderAllFeatures",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;executeSolid()V",
-                    shift = At.Shift.BEFORE
-            )
-    )
-    private void tacz$scopeMaskAtPhaseBoundary(SubmitNodeStorage storage, CallbackInfo ci) {
+    @Inject(method = "prepareFrame", at = @At("RETURN"))
+    private void tacz$scopeMaskAtPhaseBoundary(SubmitNodeStorage storage,
+                                               CallbackInfoReturnable<FeatureRenderDispatcher.PreparedFrame> cir) {
         // 【Step 2】画真正的目镜掩码。
         ScopeMaskRenderer.renderAtPhaseBoundary();
-        // 【遮光环最终覆盖】就在此刻快照手持那一遍的投影/模型视图 —— 再晚一点
-        // （手部几何画完之后）这两个矩阵就被还原成世界的了，延后重画会飘。
-        if (ScopeMaskRenderer.isInHandPass()) {
-            ScopeFinalRingOverlay.captureHandTransform();
-        }
         // 【镜内画中画】紧跟掩码之后合成。三者的先后关系是硬约束：
         //
         //   掩码           -> 知道镜内是哪些像素
-        //   合成（这一句）  -> 那些像素被贴上放大后的世界
+        //   合成（这一句）  -> 那些像素被贴上离屏渲染的放大世界
         //   executeSolid…  -> 镜身在镜内 discard（PIP 画面得以留住）；
         //                     准星反向裁剪只画镜内（浮在 PIP 画面之上）
         //
         // 往前挪掩码还没就绪，往后挪（比如手持渲染之后）准星会被 PIP 盖掉。
         ScopePipRenderer.compositeAtPhaseBoundary();
+        // 【遮光环最终覆盖】就在此刻快照手持那一遍的投影/模型视图 —— 再晚一点
+        // （手部几何画完之后）这两个矩阵就被还原成世界的了，延后重画会飘。
+        // 内部自判手部 pass + 队列非空，无光影零开销。
+        if (ScopeMaskRenderer.isInHandPass()) {
+            ScopeFinalRingOverlay.captureHandTransform();
+        }
     }
 
     /**
@@ -170,27 +172,43 @@ public abstract class FeatureRenderDispatcherMixin {
      * GUI 系（GuiItemAtlas / PictureInPictureRenderer / renderLevel 560 的
      * 收尾调用）—— <b>26.2 的世界实体 pass 不经过 renderAllFeatures</b>
      * （LevelRenderer.render 的帧图 lambda 直调 executeSolid）。
-     * 世界表（WORLD_DRAWS）的消费点因此在 {@code PreparedFrameSolidMixin}
-     * （executeSolid RETURN，调用者判据见 {@code LevelRendererWorldPassMixin}）。</p>
+     * 世界表（WORLD_DRAWS）的消费点因此在 {@code LevelRendererWorldPassMixin}
+     * （LevelRenderer#executeSolid RETURN，调用者判据见该类）。</p>
      *
      * <p>关 PR（#33/#69/#70/#71）画在 executeSolid 之前、并且用一张全局 WORLD 表，
      * GUI / 掉落物于是会在<b>世界</b> pass 里被画出去（这就是「贴图不对」那类症状）。
      * 这里只在手部 pass 消费 HAND_DRAWS（{@code renderAfterSolid} 内部判
      * {@code ScopeMaskRenderer#isInHandPass}），其余调用者直接把手部残留清空。</p>
      *
-     * <p>时机安全性与上面掩码同理：executeSolid 返回后不在任何 render pass 内，
-     * {@code createRenderPass} 的 isInRenderPass 断言不会触发；且立方体几何已进深度
-     * 缓冲，GPU poly 用同一张 depth view 做深度测试即可正确遮挡。</p>
+     * <h2>26.3：同样被迫离开「无 pass」的阶段边界</h2>
+     *
+     * <p>理由与上面的掩码注入点完全相同 —— {@code executeSolid} 之后仍在
+     * vanilla 那个 "Item in hand" pass 内部，{@code PolyMeshGpuRenderer}
+     * 要自开 pass 就会撞 isInRenderPass 断言。</p>
+     *
+     * <p>一度搬到 {@code renderItemInHand} 的 RETURN —— 但那里
+     * {@code modelViewStack} 已 pop（无光影下只有正北跟手），且 Iris 下手部
+     * 由 {@code HandRenderer} 在 {@code LevelRenderer.render} 内部自调
+     * {@code renderAllFeatures}（拖到外面画 = 顶点格式/HAND program 全错 ⇒
+     * 拉伸成片）。refab 2026-09-20/21 两轮实机定案（§4.6）：
+     * <b>留在 renderAllFeatures 内、executeSolid 之后</b>。</p>
+     *
+     * <p>「pass 内不许再开 pass」的问题用另一种方式解决：不自开，
+     * 把 {@code renderAllFeatures} 的形参 {@code renderPass} 直接传下去录制
+     * （世界表 {@code LevelRendererWorldPassMixin} 已是同一做法）。
+     * {@code renderAllFeatures} 是静态方法，处理器随之为静态。</p>
      */
     @Inject(
             method = "renderAllFeatures",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;executeSolid()V",
+                    target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;executeSolid(Lcom/mojang/renderpearl/api/commands/RenderPass;)V",
                     shift = At.Shift.AFTER
             )
     )
-    private void tacz$polyMeshGpuAfterSolid(SubmitNodeStorage storage, CallbackInfo ci) {
-        PolyMeshGpuRenderer.renderAfterSolid();
+    private static void tacz$polyMeshAfterHandSolid(RenderPass renderPass,
+                                                    FeatureRenderDispatcher.PreparedFrame frame,
+                                                    CallbackInfo ci) {
+        PolyMeshGpuRenderer.renderAfterSolid(renderPass);
     }
 }

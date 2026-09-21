@@ -58,7 +58,7 @@ public final class FirstPersonAnimationCompat {
 
     /** Returns the kept/main-hand stack that TACZ will actually draw this frame. */
     public static ItemStack getMainRenderStack(LocalPlayer player) {
-        ItemStack kept = KeepingItemRenderer.getRenderer().getCurrentItem();
+        ItemStack kept = KeepingItemRenderer.getCurrentRenderItem();
         return kept != null && !kept.isEmpty() ? kept : player.getMainHandItem();
     }
 

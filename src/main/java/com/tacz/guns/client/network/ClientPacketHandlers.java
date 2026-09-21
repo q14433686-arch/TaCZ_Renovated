@@ -189,6 +189,10 @@ public final class ClientPacketHandlers {
         // requested NeoForge recipe-content payload. Those native packets trigger REI's
         // reload and JEI's startup/restart respectively, after the indexes above are ready.
         // Do not invoke REI's internal reload hook here: it races the normal REI reload.
+        // 26.3: the server may be remote (or NeoForge's recipe-content payload may be
+        // consumed before JEI's plugin pass), so also queue the coalesced viewer refresh —
+        // it restarts JEI with the freshly installed cache once the client thread ticks.
+        com.tacz.guns.client.compat.RecipeViewerReloadBridge.requestReload();
 
         // Creative tab contents are built before the integrated server sends the gun-pack cache.
         // Rebuild them now so the tab receives initialized gun/ammo/attachment/workbench stacks

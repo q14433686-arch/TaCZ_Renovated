@@ -239,7 +239,7 @@ public abstract class AnimateGeoItemRenderer<M extends BedrockAnimatedModel, CTX
         }
         Quaternionf quaternion = MathUtil.multiplyQuaternion(model.getCameraAnimationObject().rotationQuaternion, multiplier);
         PoseStack poseStack = event.getPoseStack();
-        poseStack.mulPose(quaternion);
+        poseStack.rotate(quaternion);
     }
 
     /**
@@ -262,8 +262,8 @@ public abstract class AnimateGeoItemRenderer<M extends BedrockAnimatedModel, CTX
             float yRotOffset = Mth.lerp(partialTick, player.yBobO, player.yBob);
             float xRot = player.getViewXRot(partialTick) - xRotOffset;
             float yRot = player.getViewYRot(partialTick) - yRotOffset;
-            poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F));
-            poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F));
+            poseStack.rotate(Axis.XP.rotationDegrees(xRot * -0.1F));
+            poseStack.rotate(Axis.YP.rotationDegrees(yRot * -0.1F));
             BedrockPart rootNode = model.getRootNode();
             if (rootNode != null) {
                 xRot = (float) Math.tanh(xRot / 25) * 25;
@@ -277,7 +277,7 @@ public abstract class AnimateGeoItemRenderer<M extends BedrockAnimatedModel, CTX
             // 从渲染原点 (0, 24, 0) 移动到模型原点 (0, 0, 0)
             poseStack.translate(0, 1.5f, 0);
             // 基岩版模型是上下颠倒的，需要翻转过来。
-            poseStack.mulPose(Axis.ZP.rotationDegrees(180f));
+            poseStack.rotate(Axis.ZP.rotationDegrees(180f));
             doExtraTransforms(poseStack, model, stack);
 
             var stateMachine = getStateMachine(stack);
@@ -306,7 +306,7 @@ public abstract class AnimateGeoItemRenderer<M extends BedrockAnimatedModel, CTX
             // 从渲染原点 (0, 24, 0) 移动到模型原点 (0, 0, 0)
             poseStack.translate(0.5, 1.5f, 0.5);
             // 基岩版模型是上下颠倒的，需要翻转过来。
-            poseStack.mulPose(Axis.ZP.rotationDegrees(180f));
+            poseStack.rotate(Axis.ZP.rotationDegrees(180f));
             model.submit(poseStack, ctx, collector, RenderTypes.entityCutout(
                     getTextureLocation(stack)
             ), light, overlay);

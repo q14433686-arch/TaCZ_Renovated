@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.fml.ModList;
-import org.lwjgl.glfw.GLFW;
 
 import java.net.URI;
 
@@ -26,13 +25,13 @@ import static com.tacz.guns.util.InputExtraCheck.isInGame;
  */
 public class ConfigKey {
     public static final KeyMapping OPEN_CONFIG_KEY = new KeyMapping("key.tacz.open_config.desc",
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_T,
+            InputConstants.Type.KEYBOARD,
+            InputConstants.KEY_T,
             TaCZKeyCategory.TACZ);
 
     public static void onOpenConfig(InputEvent.Key event) {
-        if (isInGame() && event.getAction() == GLFW.GLFW_PRESS
-                && OPEN_CONFIG_KEY.matches(new net.minecraft.client.input.KeyEvent(event.getKey(), event.getScanCode(), event.getModifiers()))) {
+        if (isInGame() && event.getAction() == InputConstants.PRESS
+                && OPEN_CONFIG_KEY.matches(InputConstants.Type.KEYBOARD.getOrCreate(event.getKey()))) {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player == null || player.isSpectator()) {
                 return;

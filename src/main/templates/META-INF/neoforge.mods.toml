@@ -38,18 +38,18 @@ logoBlur=false
 #logoFile="logo.png" #optional
 
 # A text field displayed in the mod UI
-credits="Original TaCZ: Serene Wave Studio / Timeless Squad. Unofficial ports: Sh1roCu (Fabric 1.21.1), q14433686-arch (Fabric 26.x), MUKSC (NeoForge 1.21.1). This tree is an unofficial NeoForge 26.2 port."
+credits="Original TaCZ: Serene Wave Studio / Timeless Squad. Unofficial ports: Sh1roCu (Fabric 1.21.1), q14433686-arch (Fabric 26.x), MUKSC (NeoForge 1.21.1). This tree is an unofficial NeoForge 26.3 port."
 
 # The authors of the mod, displayed in the mod UI (optional)
-authors="Serene Wave Studio | Timeless Squad (original); unofficial NeoForge 26.2 port"
+authors="Serene Wave Studio | Timeless Squad (original); unofficial NeoForge 26.3 port"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Unofficial NeoForge 26.2 port of Timeless and Classics Zero (TaCZ).
+Unofficial NeoForge 26.3 port of Timeless and Classics Zero (TaCZ).
 
 THIS IS UNOFFICIAL. Do not report bugs to the original authors (MCModderAnchor / Serene Wave Studio).
 Forward-ported from the audited NeoForge 26.1.2 R1 baseline; includes the built-in LRTactical framework (excluding flash_shield and original ARR art).
-26.2 scope rendering uses the stage-boundary off-screen ocular mask.
+26.3 scope rendering uses the stage-boundary off-screen ocular mask.
 '''
 
 [[mixins]]

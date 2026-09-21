@@ -1,5 +1,6 @@
 package com.tacz.guns.compat.cloth.widget;
 
+import com.mojang.blaze3d.Blaze3D;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.neoforged.fml.loading.FMLPaths;
 import net.minecraft.util.Util;
@@ -15,7 +16,9 @@ import java.util.Optional;
 
 public class OpenGunPackDirEntry extends AbstractConfigListEntry<Boolean> {
     private final Button button = Button.builder(Component.translatable("config.tacz.open_gunpack_folder"), button -> {
-        Util.getPlatform().openUri(FMLPaths.GAMEDIR.get().resolve("tacz").toUri());
+        // 26.3: Util.OS 不再负责开链接（openUri 从 OS 枚举上移除），
+        // 改由 Blaze3D.openUri 统一处理（对齐 vanilla ConfirmLinkScreen 的做法）。
+        Blaze3D.openUri(FMLPaths.GAMEDIR.get().resolve("tacz").toUri());
         button.setFocused(false);
     }).bounds(0, 0, 150, 20).build();
 

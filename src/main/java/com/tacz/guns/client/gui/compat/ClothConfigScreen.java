@@ -1,5 +1,8 @@
 package com.tacz.guns.client.gui.compat;
 
+import java.net.URISyntaxException;
+import java.net.URI;
+import com.mojang.blaze3d.Blaze3D;
 import com.tacz.guns.init.CompatRegistry;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
@@ -67,12 +70,23 @@ public class ClothConfigScreen extends Screen {
 
     private void openUrl(String url) {
         if (StringUtils.isNotBlank(url) && minecraft != null) {
+            // 26.3: ConfirmLinkScreen 只收 URI（不再有 String 重载），
+            // 开链接也从 Util.OS#openUri 移到 Blaze3D#openUri
+            // （对齐 vanilla ConfirmLinkScreen#confirmLinkNow）。
+            // 这里的 URL 是硬编码常量，但仍走 parseAndValidateUntrustedUri ——
+            // 它会校验协议白名单（http/https），解析失败就不弹窗，而不是抛到调用栈上。
+            final URI uri;
+            try {
+                uri = Util.parseAndValidateUntrustedUri(url);
+            } catch (URISyntaxException e) {
+                return;
+            }
             minecraft.setScreenAndShow(new ConfirmLinkScreen(yes -> {
                 if (yes) {
-                    Util.getPlatform().openUri(url);
+                    Blaze3D.openUri(uri);
                 }
                 minecraft.setScreenAndShow(this);
-            }, url, true));
+            }, uri, true));
         }
     }
 }

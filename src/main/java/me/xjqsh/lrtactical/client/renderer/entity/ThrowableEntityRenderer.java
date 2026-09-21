@@ -111,14 +111,14 @@ public class ThrowableEntityRenderer
 
         if (state.entityTransform != null) {
             // 官方 0.4.3：飞行朝向之后套 display 的 entity_transform（默认 Z90 + 偏移）
-            poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot));
-            poseStack.mulPose(Axis.XP.rotationDegrees(state.xRot));
+            poseStack.rotate(Axis.YP.rotationDegrees(state.yRot));
+            poseStack.rotate(Axis.XP.rotationDegrees(state.xRot));
             state.entityTransform.apply(poseStack);
         } else {
             // 没装内容包：沿用 26.2 占位姿态，避免原版图标沉到地里
             poseStack.translate(0, 0.15, 0);
-            poseStack.mulPose(Axis.YN.rotationDegrees(state.yRot));
-            poseStack.mulPose(Axis.XP.rotationDegrees(state.xRot));
+            poseStack.rotate(Axis.YN.rotationDegrees(state.yRot));
+            poseStack.rotate(Axis.XP.rotationDegrees(state.xRot));
             poseStack.translate(0, 0.35, -0.15);
         }
 

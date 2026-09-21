@@ -8,24 +8,23 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import org.lwjgl.glfw.GLFW;
 
 import static com.tacz.guns.util.InputExtraCheck.isInGame;
 
 public class ZoomKey {
     public static final KeyMapping ZOOM_KEY = new KeyMapping("key.tacz.zoom.desc",
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_V,
+            InputConstants.Type.KEYBOARD,
+            InputConstants.KEY_V,
             TaCZKeyCategory.TACZ);
 
     public static void onZoomKeyPress(InputEvent.Key event) {
-        if (isInGame() && event.getAction() == GLFW.GLFW_PRESS && ZOOM_KEY.matches(new net.minecraft.client.input.KeyEvent(event.getKey(), event.getScanCode(), event.getModifiers()))) {
+        if (isInGame() && event.getAction() == InputConstants.PRESS && ZOOM_KEY.matches(InputConstants.Type.KEYBOARD.getOrCreate(event.getKey()))) {
             doZoomLogic();
         }
     }
 
     public static void onZoomMousePress(InputEvent.MouseButton.Post event) {
-        if (isInGame() && event.getAction() == GLFW.GLFW_PRESS && ZOOM_KEY.matchesMouse(new net.minecraft.client.input.MouseButtonEvent(0.0, 0.0, new net.minecraft.client.input.MouseButtonInfo(event.getButton(), event.getModifiers())))) {
+        if (isInGame() && event.getAction() == InputConstants.PRESS && ZOOM_KEY.matchesMouse(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
             doZoomLogic();
         }
     }

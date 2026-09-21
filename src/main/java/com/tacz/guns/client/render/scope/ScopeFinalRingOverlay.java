@@ -1,7 +1,8 @@
 package com.tacz.guns.client.render.scope;
 
 import com.mojang.blaze3d.ProjectionType;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.tacz.guns.GunMod;
@@ -9,6 +10,7 @@ import com.tacz.guns.client.renderer.snapshot.BedrockRenderSnapshot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import org.joml.Matrix4f;
@@ -45,7 +47,9 @@ import java.util.List;
  *   <li><b>不自建 {@code FeatureRenderDispatcher}</b>：26.2 的构造函数改成吃
  *       {@code RenderBuffers}（1.21.11 那版吃 7 个参数，在这里编译不过）。
  *       官方配方是 {@code Minecraft.getInstance().gameRenderer.featureRenderDispatcher()
- *       .renderAllFeatures(storage)}（见 NeoForge 26.2 迁移指南）。</li>
+ *       .renderAllFeatures(storage)}（见 NeoForge 26.2 迁移指南）。<b>26.3 更新</b>：
+ *       renderAllFeatures 变 static (RenderPass, PreparedFrame)，输出目标改由
+ *       自开的 RenderPass 显式携带（见 {@link #flush} 内的调用序列）。</li>
  *   <li><b>不调 {@code SubmitNodeStorage#endFrame}</b>：26.2 里它连同 {@code clear}
  *       一起被移除，{@code renderAllFeatures} 自己收尾。</li>
  *   <li><b>刷新点不是 Iris 的 {@code finalizeLevelRendering} TAIL</b>：那一步跑在
@@ -237,6 +241,15 @@ public final class ScopeFinalRingOverlay {
         List<RingDraw> rings = List.copyOf(PENDING);
         List<TextDraw> texts = List.copyOf(PENDING_TEXT);
         HandTransform transform = handTransform;
+        // 26.3：重画目标从「renderAllFeatures 隐式画主目标」变为显式携带，
+        // 先取主目标（Iris 合成已收工，主 target 即最终画面）。
+        var main = mc.gameRenderer.mainRenderTarget();
+        if (main == null) {
+            PENDING.clear();
+            PENDING_TEXT.clear();
+            handTransform = null;
+            return;
+        }
         PENDING.clear();
         PENDING_TEXT.clear();
         handTransform = null;
@@ -272,7 +285,22 @@ public final class ScopeFinalRingOverlay {
                     }
                 }
             }
-            mc.gameRenderer.featureRenderDispatcher().renderAllFeatures(storage);
+            // 【26.3 输出目标改由 RenderPass 显式携带】
+            // 26.2 的 renderAllFeatures(storage) 自己开 pass 画到主目标；26.3 里
+            // FeatureRenderDispatcher 不再自开任何 pass，renderAllFeatures 变成
+            // static (RenderPass, PreparedFrame)，输出目标在 createRenderPass 时
+            // 显式指定。写法对齐 Iris 26.3 HandRenderer 的调用序列：
+            // prepareFrame → createRenderPass(主目标的两个 view) → renderAllFeatures → frame.close。
+            var dispatcher = mc.gameRenderer.featureRenderDispatcher();
+            var frame = dispatcher.prepareFrame(storage);
+            try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                    () -> "TACZ Scope Final Ring Overlay",
+                    main.getColorTextureView(), java.util.Optional.empty(),
+                    main.getDepthTextureView(), java.util.OptionalDouble.empty())) {
+                FeatureRenderDispatcher.renderAllFeatures(renderPass, frame);
+            } finally {
+                frame.close();
+            }
             if (!loggedRendered) {
                 loggedRendered = true;
                 GunMod.LOGGER.info("[TACZ Scope] Drew the physical ocular ring after the PIP composite.");

@@ -1,12 +1,33 @@
 # 移植状态
 
-目标版本：Minecraft **26.2** + NeoForge **26.2.0.64**（release）。
-当前源码版本：**1.1.8+neoforge.26.2.R3-hotfix2**（未发布）。
-状态：**R3-hotfix 已发布（2026-09-09）；R3 / R2 / R1 / R1-hotfix 亦已发布。** 本页按工作包
-记录历史矩阵；发布封口的验证状态以 CHANGELOG / docs/records 为准，本文未把
-未跑项标为 PASS。
+目标版本：Minecraft **26.3** + NeoForge **26.3.0.7-beta**（beta 钉选）。
+当前源码版本：**1.1.8+neoforge.26.3.R1**（未发布）。
+状态：**26.3 全量端口已完成源码层移植（编译级，实机验收全部未做）**；26.2 线
+`R3-hotfix` 已发布（2026-09-09），`R3 / R2 / R1 / R1-hotfix` 亦已发布，26.3 线以
+未发布的 R3-hotfix2 源码为直接母本。本页按工作包记录历史矩阵；发布封口的验证
+状态以 CHANGELOG / docs/records 为准，本文未把未跑项标为 PASS。
 
-> 最后更新：2026-09-01。本文只记录诚实状态；README 不作为逐包进度日志。
+> 最后更新：2026-09-21（26.3 移植日）。本文只记录诚实状态；README 不作为逐包进度日志。
+
+## 26.3 工作包（当前线）
+
+> 移植依据：姊妹仓 26.3 分支的
+> [`docs/lineage/PORT_GUIDE_26_3_FOR_RENOVATED_NEOFORGE_20260921.md`](lineage/PORT_GUIDE_26_3_FOR_RENOVATED_NEOFORGE_20260921.md)
+> （已快照入仓）。执行计划见
+> [`docs/investigations/WP263_0_PORT_PLAN_20260921.md`](investigations/WP263_0_PORT_PLAN_20260921.md)。
+> **下表「已落地」= 源码已移植 + 静态核对；全部条目实机状态 = 未实测。**
+
+| 工作包 | 已落地 | 尚缺验收（全部未实测） |
+|---|---|---|
+| WP-263-0 计划与证据 | 依赖矩阵 / API 核验表 / 七阶段执行序（WP263_0_PORT_PLAN） | — |
+| WP-263-1 依赖与包迁移 | NF 26.3.0.7-beta / JEI 31.0.0.5 / Cloth 26.3.158 钉选；renderpearl 包迁移全量 | CI 编译绿 |
+| WP-263-2 渲染重构 | pass 归属倒置（§2.4）、第一人称拆分（§2.3）、投影 accessor（§2.5）、shader 方言（§2.6）、管线预热（§2.7） | 八朝向跟手 / 开镜掩码 / PIP / 水下雾 |
+| WP-263-3 高模 | PolyMeshGpuRenderer 26.3 化（externalPass / ExecuteInfo / 强制重绑） | 无光影 + 光影高模全矩阵 |
+| WP-263-4 Iris | mode 标记采样器判别、setupDraw/空形参注入、FrontendRenderPass 配对 | 光影下裁剪 / 首次开镜不崩 |
+| WP-263-5 数据与同步 | 战利品表 schema + 迁移层、配方 codec 延迟解析、sendRecipes、RecipeViewerReloadBridge | 挖工作台 / 旧枪包进存档 / 专服 JEI |
+| WP-263-6 兼容门面 | REI / Controllable / SSR 禁用（IMPL 排除、plugin json 存档） | 上游 26.3 构件后回补 |
+| WP-263-7 发布准备 | README / CHANGELOG / 版本一致性脚本通过 | 实机验收 + 发布闸门（RELEASE_CHECKLIST） |
+
 
 ## 26.2 工作包
 

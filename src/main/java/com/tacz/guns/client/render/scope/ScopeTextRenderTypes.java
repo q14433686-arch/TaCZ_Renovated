@@ -1,7 +1,10 @@
 package com.tacz.guns.client.render.scope;
 
-import com.mojang.blaze3d.pipeline.BindGroupLayout;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.BindGroupLayout;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.UniformType;
 import com.tacz.guns.GunMod;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -77,7 +80,19 @@ public final class ScopeTextRenderTypes {
     private static final String MASK_SAMPLER = "ScopeMaskSampler";
 
     private static final BindGroupLayout MASK_SAMPLER_LAYOUT =
-            BindGroupLayout.builder().withSampler(MASK_SAMPLER).build();
+            BindGroupLayout.builder()
+                    // 26.3: withSampler(name) 没了，采样器统一并入 withUniform，
+                    // 由 UniformType.COMBINED_IMAGE_SAMPLER 表达「图像+采样器」组合。
+                    .withUniform(MASK_SAMPLER, UniformType.COMBINED_IMAGE_SAMPLER)
+                    .build();
+
+    /** 与 {@code ScopeBodyRenderTypes.MODE2_SAMPLER} 同名同义：mode 2 标记采样器（文字 = 镜外 discard 一族）。 */
+    private static final String MODE2_SAMPLER = "ScopeMaskMode2Sampler";
+
+    private static final BindGroupLayout MODE2_SAMPLER_LAYOUT =
+            BindGroupLayout.builder()
+                    .withUniform(MODE2_SAMPLER, UniformType.COMBINED_IMAGE_SAMPLER)
+                    .build();
 
     /**
      * 裁剪文字管线 = vanilla TEXT 配方 + SCOPE_MASK 三件套。
@@ -95,6 +110,14 @@ public final class ScopeTextRenderTypes {
                     .withFragmentShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_text"))
                     .withShaderDefine("SCOPE_MASK")
                     .withBindGroupLayout(MASK_SAMPLER_LAYOUT)
+                    // 文字与准星同侧（mode 2）：标记采样器供光影下按 draw 判别。
+                    .withBindGroupLayout(MODE2_SAMPLER_LAYOUT)
+                    // 26.3 必须显式声明 color target，否则 setPipeline 抛
+                    // "color attachment count must match ... target state count"。
+                    // 母本 vanilla TEXT 用的是 TRANSLUCENT 混合
+                    // （RenderPipelines:818），文字要靠 alpha 混合才不会带黑底，
+                    // 这里必须跟着用 TRANSLUCENT，不能用 DEFAULT。
+                    .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
                     .build();
 
     /**
@@ -122,12 +145,22 @@ public final class ScopeTextRenderTypes {
                     .withFragmentShader(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "core/scope_text_final"))
                     .withShaderDefine("SCOPE_MASK")
                     .withBindGroupLayout(MASK_SAMPLER_LAYOUT)
+                    // 26.3 必须显式声明 color target（同 CLIPPED_TEXT_PIPELINE，
+                    // 母本是 TEXT，必须 TRANSLUCENT）。不挂 mode 2 标记：本管线
+                    // 刻意不 assign 给 Iris，光影下不存在 mode 判别问题。
+                    .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
                     .build();
 
     /** 本仓所有自定义管线都在这里登记；见类注释的移植说明。 */
     public static void registerPipeline(RegisterRenderPipelinesEvent event) {
         event.registerPipeline(CLIPPED_TEXT_PIPELINE);
         event.registerPipeline(FINAL_TEXT_PIPELINE);
+    }
+
+    /** 裁剪文字管线预热（同 {@code ScopeBodyRenderTypes#prewarmCompiledPipelines}）。 */
+    public static void prewarmCompiledPipelines() {
+        ScopePipelinePrewarm.touch(CLIPPED_TEXT_PIPELINE);
+        ScopePipelinePrewarm.touch(FINAL_TEXT_PIPELINE);
     }
 
     private static boolean irisAssignmentAttempted = false;
@@ -139,9 +172,12 @@ public final class ScopeTextRenderTypes {
      * <p><b>这不是双保险，而是必选项</b>：光影包激活时掩码<b>没有</b>整体停用
      * （那是 Iris 桥落地之前的旧政策，早已废弃）。桥落地后，光影下这条管线由
      * 光影包的 HAND 程序接管，裁剪靠 {@code IrisShaderCreatorMixin} 注入的
-     * {@code tacz_ScopeMaskMode} 分支执行 —— 而分支的开关值来自
-     * {@code IrisScopeMaskState#resolveMode} 按管线 location 查表。
-     * 不 assign，管线就进不了 HAND 程序，那张表也就永远查不到它，
+     * {@code tacz_ScopeMaskMode} 分支执行。mode 的判别（26.3 起）<b>不</b>再查
+     * 管线 location（26.3 删除了 {@code GlRenderPipeline#info()}，查不到）：
+     * 本渲染类型在绑定掩码之外多挂一个标记采样器
+     * {@code ScopeMaskMode2Sampler}，{@code IrisScopeMaskState#resolveMode}
+     * 按本条 draw 的 {@code GlRenderPass#samplers} key 集合判出 mode 2
+     * （与准星同侧，镜外 discard）。不 assign，管线就进不了 HAND 程序，
      * 于是光影下文字与准星一样完全不裁。
      */
     private static void ensureIrisCompatibility() {
@@ -168,6 +204,8 @@ public final class ScopeTextRenderTypes {
                         RenderSetup.builder(CLIPPED_TEXT_PIPELINE)
                                 .withTexture("Sampler0", id)
                                 .withTexture(MASK_SAMPLER, ScopeMaskTextureHandle.ID)
+                                // 管线声明了标记采样器就必须绑（同一张掩码纹理）。
+                                .withTexture(MODE2_SAMPLER, ScopeMaskTextureHandle.ID)
                                 // useLightmap 提供 Sampler2 —— vanilla text
                                 // 的 RenderSetup（lambda$static$20 字节码实读）
                                 // 就这一项，别多也别少。
