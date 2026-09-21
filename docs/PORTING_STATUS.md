@@ -20,7 +20,7 @@
 | 工作包 | 已落地 | 尚缺验收（全部未实测） |
 |---|---|---|
 | WP-263-0 计划与证据 | 依赖矩阵 / API 核验表 / 七阶段执行序（WP263_0_PORT_PLAN） | — |
-| WP-263-1 依赖与包迁移 | NF 26.3.0.7-beta / JEI 31.0.0.5 / Cloth 26.3.158 钉选；renderpearl 包迁移全量 | CI 编译绿 |
+| WP-263-1 依赖与包迁移 | NF 26.3.0.7-beta / JEI 31.0.0.5 / Cloth 26.3.158 钉选；renderpearl 包迁移全量 | **CI 编译绿已达成**（compile-check / build / consistency 三工作流，2026-09-21，`a4a30bd`）；实机验收未做 |
 | WP-263-2 渲染重构 | pass 归属倒置（§2.4）、第一人称拆分（§2.3）、投影 accessor（§2.5）、shader 方言（§2.6）、管线预热（§2.7） | 八朝向跟手 / 开镜掩码 / PIP / 水下雾 |
 | WP-263-3 高模 | PolyMeshGpuRenderer 26.3 化（externalPass / ExecuteInfo / 强制重绑） | 无光影 + 光影高模全矩阵 |
 | WP-263-4 Iris | mode 标记采样器判别、setupDraw/空形参注入、FrontendRenderPass 配对 | 光影下裁剪 / 首次开镜不崩 |
