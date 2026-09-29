@@ -24,7 +24,7 @@
 | WP-263-2 渲染重构 | pass 归属倒置（§2.4）、第一人称拆分（§2.3）、投影 accessor（§2.5）、shader 方言（§2.6）、管线预热（§2.7） | 八朝向跟手 / 开镜掩码 / PIP / 水下雾 |
 | WP-263-3 高模 | PolyMeshGpuRenderer 26.3 化（externalPass / ExecuteInfo / 强制重绑） | 无光影 + 光影高模全矩阵 |
 | WP-263-4 Iris | mode 标记采样器判别、setupDraw/空形参注入、FrontendRenderPass 配对 | 光影下裁剪 / 首次开镜不崩 |
-| WP-263-5 数据与同步 | 战利品表 schema + 迁移层、配方 codec 延迟解析、sendRecipes、RecipeViewerReloadBridge | 挖工作台 / 旧枪包进存档 / 专服 JEI |
+| WP-263-5 数据与同步 | 战利品表 schema + 迁移层、配方 codec 延迟解析、sendRecipes、RecipeViewerReloadBridge、枪包 lang 保底（GunPackLangCompat，同步自姊妹仓 f52dab8e） | 挖工作台 / 旧枪包进存档 / 专服 JEI / 坏 lang 枪包实测 |
 | WP-263-6 兼容门面 | REI / Controllable / SSR 禁用（IMPL 排除、plugin json 存档） | 上游 26.3 构件后回补 |
 | WP-263-7 发布准备 | README / CHANGELOG / 版本一致性脚本通过 | 实机验收 + 发布闸门（RELEASE_CHECKLIST） |
 

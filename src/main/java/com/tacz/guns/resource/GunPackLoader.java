@@ -129,9 +129,12 @@ public enum GunPackLoader implements RepositorySource {
 
         for (GunPack gunPack : gunPacks) {
             PackResources packResources;
+            // title 用枪包的目录名 / 文件名：GunPackLangCompat 等兼容层的日志靠它指出"是哪个包"
+            // （同步自姊妹仓 26.3 线 f52dab8e；packId 仍是 gunpack.meta.json 声明的 name）。
+            Component packTitle = Component.literal(String.valueOf(gunPack.path.getFileName()));
             if (Files.isDirectory(gunPack.path)) {
                 packResources = new PathPackResources.PathResourcesSupplier(gunPack.path)
-                        .openResources(new PackLocationInfo(gunPack.name, Component.literal(gunPack.name), PackSource.BUILT_IN, Optional.empty()), EMPTY_PACK_METADATA)
+                        .openResources(new PackLocationInfo(gunPack.name, packTitle, PackSource.BUILT_IN, Optional.empty()), EMPTY_PACK_METADATA)
                         .findFirst().orElse(null);
             } else {
                 // 26.3: Pack.ResourcesSupplier 的 openPrimary/openFull 换成了
@@ -139,7 +142,7 @@ public enum GunPackLoader implements RepositorySource {
                 // 这里要的就是"主 pack 本体"，取 openResources 的第一个元素即可
                 // （overlay 由 metadata.overlays() 驱动，枪包不使用）。
                 packResources = new FilePackResources.FileResourcesSupplier(gunPack.path)
-                        .openResources(new PackLocationInfo(gunPack.name, Component.literal(gunPack.name), PackSource.BUILT_IN, Optional.empty()), EMPTY_PACK_METADATA)
+                        .openResources(new PackLocationInfo(gunPack.name, packTitle, PackSource.BUILT_IN, Optional.empty()), EMPTY_PACK_METADATA)
                         .findFirst().orElse(null);
             }
             if (packResources == null) {

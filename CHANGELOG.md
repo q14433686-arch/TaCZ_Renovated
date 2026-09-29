@@ -64,6 +64,23 @@
   Iris 只给第一根骨骼算 `iris_NormalMat`（姊妹仓实机「开枪瞬间才正确」一案；
   本仓未实测）。
 
+### 枪包 lang 文件保底（同步自姊妹仓 26.3 线 `f52dab8e`，2026-09-29）
+
+- **症状**（姊妹仓玩家实机反馈）：装 Enlisted Gun Pack v1.2.1.3 后整局游戏变英文、
+  所有文本显示为 `item.xxx` 原始键。根因：该包 `assets/ww/lang/en_us.json` 少一个
+  逗号；**26.3 的 `ClientLanguage#loadFrom` 删掉了逐命名空间的 catch**，Gson 的
+  `JsonSyntaxException` 一路抛到 `LanguageManager`，后者只记一条
+  `WARN Unable to load languages` 就跳过 `Language.inject` —— 本仓把所有枪包合并成
+  一个 `tacz_resources` 资源包，任何一个第三方枪包的坏 lang 文件都能让全局翻译
+  失效（26.2 只会 "Skipped language file" 跳过该文件）。
+- **处理（绕过，非根治；枪包文件本身不改）**：新增
+  `cn.sh1rocu.tacz.util.GunPackLangCompat` —— lang 文件合法则原字节放行；不合法则
+  容错扫描救回 `"key": "value"` 条目、重序列化为严格 JSON，并以 `[GunPackLang]`
+  WARN 指明枪包（title 改为 zip/目录名便于定位）、文件、原始错误、保留/丢弃条目数。
+  `DelegatingPackResources#getResource / listResources` 对 `lang/*.json` 套用该保底。
+- **验证状态**：姊妹仓 CI 编译绿 + 单文件 ECJ/Gson 桩测（Enlisted 的 6 条全部
+  救回），实机未验；本仓同为编译级（**未实测**）。
+
 ### 配方同步与 JEI
 
 - `OnDatapackSyncEvent#sendRecipes(RecipeType)` 请求本 Mod 配方类型的
