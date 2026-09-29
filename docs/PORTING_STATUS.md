@@ -15,18 +15,24 @@
 > [`docs/lineage/PORT_GUIDE_26_3_FOR_RENOVATED_NEOFORGE_20260921.md`](lineage/PORT_GUIDE_26_3_FOR_RENOVATED_NEOFORGE_20260921.md)
 > （已快照入仓）。执行计划见
 > [`docs/investigations/WP263_0_PORT_PLAN_20260921.md`](investigations/WP263_0_PORT_PLAN_20260921.md)。
-> **下表「已落地」= 源码已移植 + 静态核对；全部条目实机状态 = 未实测。**
+> **下表「已落地」= 源码已移植 + 静态核对；除另行标注外，实机状态 = 未实测。**
 
-| 工作包 | 已落地 | 尚缺验收（全部未实测） |
+| 工作包 | 已落地 | 尚缺验收（除另行标注外未实测） |
 |---|---|---|
 | WP-263-0 计划与证据 | 依赖矩阵 / API 核验表 / 七阶段执行序（WP263_0_PORT_PLAN） | — |
 | WP-263-1 依赖与包迁移 | NF 26.3.0.7-beta / JEI 31.0.0.5 / Cloth 26.3.158 钉选；renderpearl 包迁移全量 | **CI 编译绿已达成**（compile-check / build / consistency 三工作流，2026-09-21，`a4a30bd`）；实机验收未做 |
 | WP-263-2 渲染重构 | pass 归属倒置（§2.4）、第一人称拆分（§2.3）、投影 accessor（§2.5）、shader 方言（§2.6）、管线预热（§2.7） | 八朝向跟手 / 开镜掩码 / PIP / 水下雾 |
 | WP-263-3 高模 | PolyMeshGpuRenderer 26.3 化（externalPass / ExecuteInfo / 强制重绑） | 无光影 + 光影高模全矩阵 |
 | WP-263-4 Iris | mode 标记采样器判别、setupDraw/空形参注入、FrontendRenderPass 配对 | 光影下裁剪 / 首次开镜不崩 |
-| WP-263-5 数据与同步 | 战利品表 schema + 迁移层、配方 codec 延迟解析、sendRecipes、RecipeViewerReloadBridge、枪包 lang 保底（GunPackLangCompat，同步自姊妹仓 f52dab8e） | 挖工作台 / 旧枪包进存档 / 专服 JEI / 坏 lang 枪包实测 |
+| WP-263-5 数据与同步 | 战利品表 schema + 迁移层、配方 codec 延迟解析、sendRecipes、RecipeViewerReloadBridge、枪包 lang 保底（GunPackLangCompat，同步自姊妹仓 f52dab8e；**实机 PASS** 2026-09-30，`dc9e4b0`） | 挖工作台 / 旧枪包进存档 / 专服 JEI |
 | WP-263-6 兼容门面 | REI / Controllable / SSR 禁用（IMPL 排除、plugin json 存档） | 上游 26.3 构件后回补 |
 | WP-263-7 发布准备 | README / CHANGELOG / 版本一致性脚本通过 | 实机验收 + 发布闸门（RELEASE_CHECKLIST） |
+
+### 26.3 后续修复（移植指南与姊妹仓之外）
+
+| 修复 | 内容 | 验证状态 |
+|---|---|---|
+| 弹孔朝向（2026-09-30） | `BulletHoleParticle#extract` 四元数改为 `getRotation(d)·Rx(-90°)·Rz(180°)`：1.21.1 原四边形躺 XZ 平面（+Y 为法线）而 26.x vanilla 顶点管线固定 XY 平面（+Z 为法线），旧写法六面法线全错（墙面→水平朝下、地面→竖直朝南、天花板→竖直朝北）。姊妹仓 26.3 线同病未修。 | 数值验证六面；**实机待验**（打六个面确认弹孔贴面） |
 
 
 ## 26.2 工作包
