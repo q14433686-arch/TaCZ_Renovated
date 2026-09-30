@@ -10,7 +10,13 @@ import com.google.gson.Strictness;
 import com.google.gson.stream.JsonReader;
 import com.tacz.guns.GunMod;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -152,11 +158,47 @@ public final class RecipeCompat {
         if (raw.isJsonArray()) {
             JsonArray src = raw.getAsJsonArray();
             JsonArray out = new JsonArray(src.size());
+            JsonArray resolvedItems = new JsonArray();
             boolean changed = false;
+            boolean hasTagOrMissingItem = false;
             for (JsonElement e : src) {
                 JsonElement n = normalizeLegacyIngredient(e);
                 changed |= n != e;
                 out.add(n);
+                if (n.isJsonPrimitive() && n.getAsJsonPrimitive().isString()) {
+                    String str = n.getAsString();
+                    if (str.startsWith("#")) {
+                        // 【数组内嵌 #tag 展开（同步自姊妹仓 c7160480）】26.3 的物品列表
+                        // codec（HolderSetCodec）仅允许单个字符串写 "#tag"，数组分支走
+                        // Holder.CODEC.listOf()，遇到 "#" 直接抛异常 —— 多枪包里
+                        // ["#forge:ingots/steel", "minecraft:iron_ingot"] 这类旧写法会
+                        // 整条材料解析失败。把数组内的标签展开为已绑定物品 ID 列表。
+                        hasTagOrMissingItem = true;
+                        Identifier tagId = Identifier.tryParse(str.substring(1));
+                        if (tagId != null) {
+                            TagKey<Item> tagKey = TagKey.create(Registries.ITEM, tagId);
+                            for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tagKey)) {
+                                holder.unwrapKey().ifPresent(key -> resolvedItems.add(new JsonPrimitive(key.identifier().toString())));
+                            }
+                        }
+                    } else {
+                        Identifier itemId = Identifier.tryParse(str);
+                        if (itemId != null && BuiltInRegistries.ITEM.containsKey(itemId)
+                                && BuiltInRegistries.ITEM.getValue(itemId) != Items.AIR) {
+                            resolvedItems.add(new JsonPrimitive(itemId.toString()));
+                        } else {
+                            // 未安装联动模组的物品 ID：与其让整条材料解析失败，不如记号后过滤。
+                            hasTagOrMissingItem = true;
+                        }
+                    }
+                }
+            }
+            if (hasTagOrMissingItem && !resolvedItems.isEmpty()) {
+                // 注意调用时机：本方法也会在 DelegatingPackResources 的 recipes→recipe
+                // 改写期（注册表加载早期，标签尚未绑定）被调到 —— 那时 getTagOrEmpty 为空，
+                // 标签条目会被剔除但保留其余已知物品，比旧行为（整条材料报错）严格更好；
+                // 枪匠台材料的延迟解析发生在标签绑定后，可拿到完整展开。
+                return resolvedItems;
             }
             return changed ? out : raw;
         }

@@ -101,6 +101,52 @@
 - **验证状态**：本仓 CI 编译绿；**实机未验**（修复写法已数值验证，待维护者
   进游戏确认六面朝向）。
 
+### 姊妹仓 26.3 线增量同步（2026-09-30，待实机验证）
+
+> 源：`c7160480`（recipe_sync 断连修复）、`abfaeffd`（REI 恢复）、`146aa42e`（SSR
+> 恢复 + 依赖更新）。跳过项：`2478a0cb`（其仓 hotfix 版本记账，不适用本仓未发布 R1）、
+> `48cc7778`（其仓文档措辞，本仓 lang 条目已为实机 PASS）、`7401e72c`/`716744d6`/
+> `047fe172`（误提交文件清理/新增，本仓从未提交过这些文件）。
+
+- **多枪包进档配方同步断连修复（c7160480，本线为 NeoForge 原生
+  `RecipeContentPayload` 路径）**：此前 `OnDatapackSyncEvent#sendRecipes` 触发
+  `GunSmithTableSerializer.STREAM_CODEC.encode` 时，任一材料延迟解析失败
+  （`getIngredient() == null`）或空标签（`items()` 为空）都会在编码期抛异常、
+  NeoForge 包装为 `EncoderException` 直接踢出进档玩家。修复：encode 只编码
+  已解析且非空的材料（`!isEmpty() && items().findAny().isPresent()`），并对
+  `id`/`result`/`group` 做非空兜底；`recipe.init()` 包裹 try/catch 防单条坏
+  结果数据断连。姊妹仓同时修复的 `StrictNBTIngredient`（Fabric 自定义材料）
+  与 `sanitizeSyncedRecipes`（Fabric API `RecipeMapMixin.bySyncedSerializer`
+  反射清理）在本线无对应物 —— 本线 `PartialNbtIngredient` 本就是 NeoForge 原生
+  `items`+`nbt` codec 形态，原生配方同步路径也不同，不适用。
+- **`RecipeCompat#normalizeLegacyIngredient` 数组内嵌 `#tag` 展开（c7160480）**：
+  26.3 物品列表 codec 不允许数组里写 `"#tag"`（数组分支走 `Holder.CODEC.listOf()`
+  直接抛异常），旧枪包 `["#forge:ingots/steel", "minecraft:iron_ingot"]` 这类写法
+  此前整条材料解析失败；现展开为已绑定物品 ID 并过滤未安装联动模组的物品 ID。
+  注意本方法亦在 `recipes→recipe` 改写期（标签绑定前）被调用：彼时标签条目剔除、
+  保留已知物品，仍严格优于旧行为（整条报错）。
+- **REI 兼容恢复（abfaeffd/146aa42e）**：REI 26.3 线已发布 NeoForge 构件
+  （上游 26.3 分支 `platforms=fabric,neoforge`），钉 `RoughlyEnoughItems-neoforge:
+  26.3.823` + `architectury-neoforge:22.0.3`（与姊妹线同版本），撤销
+  `compat/rei/**` 的 sourceSets 排除。同步姊妹的 `REIPlugin` 补注册
+  `GUN_SMITH_TABLE` 的 table subtype 与 `REIClientPlugin` 的
+  `Component.translatable → item.getName(icon)`（26.3 API 变化）；本线自有的
+  延迟解析/空材料兜底展示逻辑保留（优于姊妹的过滤式实现）。运行时仍为可选
+  依赖（玩家装了才生效）。
+- **Shoulder Surfing Reloaded 兼容恢复（146aa42e）**：上游 tag `26.3-5.2.0`
+  发布 NeoForge 构建（`neoForgeCompatibleMinecraftVersions=26.3`），经 Modrinth
+  maven 钉 `26.3-5.2.0+neoforge`，撤销 IMPL 排除、还原
+  `shouldersurfing_plugin.json`，门面从"恒 false 禁用态"恢复为按
+  `ModList` 探测的真实实现（准星干预、双手枪 adaptive aim 插件同 26.2 行）。
+- **依赖**：Cloth Config `26.3.158 → 26.3.159`（REI 26.3 分支与姊妹线同引用）。
+  JEI 维持 `31.0.0.5`（姊妹实机验证版）：更新的稳定 tag `v31.7.0` 与 beta
+  `31.8.0.48` 已存在，但其精确 maven 构件坐标无法在本沙箱解析，待下次钉版
+  复查再动。Zoomify `2.16.3+26.3` / ModMenu `21.0.0` 为 Fabric 生态依赖，
+  与本 NeoForge 线无关，不同步。
+- **验证状态**：以上全部为 CI 编译绿 + 静态核对（上游构件经 GitHub 源仓核实；
+  maven 直连在本沙箱不可达，依赖解析由 CI 编译工作流兜底验证）；**实机未验**
+  （重点：多枪包进档不断连、REI 类别/配方/查询显示、SSR 准星与持枪 adaptive aim）。
+
 ### 配方同步与 JEI
 
 - `OnDatapackSyncEvent#sendRecipes(RecipeType)` 请求本 Mod 配方类型的

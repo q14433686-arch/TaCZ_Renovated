@@ -7,6 +7,7 @@ import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAttachment;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.attachment.AttachmentType;
+import com.tacz.guns.GunMod;
 import com.tacz.guns.crafting.result.GunSmithTableResult;
 import com.tacz.guns.crafting.result.RawGunTableResult;
 import com.tacz.guns.resource.pojo.data.recipe.GunResult;
@@ -154,15 +155,42 @@ public final class GunSmithTableSerializer {
                     // RecipeContentPayload. Results loaded from a gun pack are intentionally
                     // lazy, so resolve them at this post-reload network boundary rather than
                     // serializing ItemStack.EMPTY into the client recipe content.
-                    recipe.init();
-                    buffer.writeIdentifier(recipe.getId());
-                    buffer.writeInt(recipe.getInputs().size());
+                    //
+                    // 【多枪包进档断连修复（同步自姊妹仓 c7160480）】本 payload 逐条调用本
+                    // encode：任何一条材料延迟解析失败（getIngredient() == null）或空标签
+                    // （items() 为空）都会让 Ingredient 编码抛异常，NeoForge 把它包成
+                    // EncoderException 直接踢出进档玩家。因此只编码已解析且非空的材料，
+                    // 并对 id/result/group 做非空兜底 —— 宁可少显示一个材料格，也不能
+                    // 让整包断连。
+                    try {
+                        recipe.init();
+                    } catch (RuntimeException e) {
+                        GunMod.LOGGER.warn("Failed to init gun smith table recipe result {} for recipe sync, encoding empty result", recipe.getId(), e);
+                    }
+                    Identifier recipeId = recipe.getId() != null
+                            ? recipe.getId()
+                            : Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "empty");
+                    buffer.writeIdentifier(recipeId);
+                    List<GunSmithTableIngredient> validInputs = new ArrayList<>(recipe.getInputs().size());
                     for (GunSmithTableIngredient ingredient : recipe.getInputs()) {
-                        Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient.getIngredientOrThrow());
+                        Ingredient resolved = ingredient.getIngredient();
+                        if (resolved != null && !resolved.isEmpty() && resolved.items().findAny().isPresent()) {
+                            validInputs.add(ingredient);
+                        }
+                    }
+                    buffer.writeInt(validInputs.size());
+                    for (GunSmithTableIngredient ingredient : validInputs) {
+                        Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient.getIngredient());
                         buffer.writeInt(ingredient.getCount());
                     }
-                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.getResult().getResult());
-                    buffer.writeIdentifier(recipe.getResult().getGroup());
+                    ItemStack resultStack = recipe.getResult() != null && recipe.getResult().getResult() != null
+                            ? recipe.getResult().getResult()
+                            : ItemStack.EMPTY;
+                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, resultStack);
+                    Identifier group = recipe.getResult() != null && recipe.getResult().getGroup() != null
+                            ? recipe.getResult().getGroup()
+                            : Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "empty");
+                    buffer.writeIdentifier(group);
                 }
             };
 

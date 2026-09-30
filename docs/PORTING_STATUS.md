@@ -25,7 +25,7 @@
 | WP-263-3 高模 | PolyMeshGpuRenderer 26.3 化（externalPass / ExecuteInfo / 强制重绑） | 无光影 + 光影高模全矩阵 |
 | WP-263-4 Iris | mode 标记采样器判别、setupDraw/空形参注入、FrontendRenderPass 配对 | 光影下裁剪 / 首次开镜不崩 |
 | WP-263-5 数据与同步 | 战利品表 schema + 迁移层、配方 codec 延迟解析、sendRecipes、RecipeViewerReloadBridge、枪包 lang 保底（GunPackLangCompat，同步自姊妹仓 f52dab8e；**实机 PASS** 2026-09-30，`dc9e4b0`） | 挖工作台 / 旧枪包进存档 / 专服 JEI |
-| WP-263-6 兼容门面 | REI / Controllable / SSR 禁用（IMPL 排除、plugin json 存档） | 上游 26.3 构件后回补 |
+| WP-263-6 兼容门面 | REI 26.3.823 + Architectury 22.0.3 **恢复参编**（2026-09-30，同步姊妹 abfaeffd）；SSR 26.3-5.2.0+neoforge **恢复参编**（同步姊妹 146aa42e，plugin json 还原）；Controllable 仍禁用（上游无 26.3 构件，2026-09-30 复核） | REI 类别/查询/配方显示、SSR 准星与 adaptive aim 实机验证 |
 | WP-263-7 发布准备 | README / CHANGELOG / 版本一致性脚本通过 | 实机验收 + 发布闸门（RELEASE_CHECKLIST） |
 
 ### 26.3 后续修复（移植指南与姊妹仓之外）
@@ -33,6 +33,8 @@
 | 修复 | 内容 | 验证状态 |
 |---|---|---|
 | 弹孔朝向（2026-09-30） | `BulletHoleParticle#extract` 四元数改为 `getRotation(d)·Rx(-90°)·Rz(180°)`：1.21.1 原四边形躺 XZ 平面（+Y 为法线）而 26.x vanilla 顶点管线固定 XY 平面（+Z 为法线），旧写法六面法线全错（墙面→水平朝下、地面→竖直朝南、天花板→竖直朝北）。姊妹仓 26.3 线同病未修。 | 数值验证六面；**实机待验**（打六个面确认弹孔贴面） |
+| 配方同步断连（2026-09-30，姊妹 c7160480） | `GunSmithTableSerializer#encode` 只编码已解析非空材料 + id/result/group 兜底 + `init()` 异常隔离；`RecipeCompat#normalizeLegacyIngredient` 展开数组内嵌 `#tag`、过滤未安装模组物品。防多枪包进档 `EncoderException` 踢人。 | CI 编译绿；**实机待验**（多枪包进档不断连） |
+| REI / SSR 兼容恢复（2026-09-30，姊妹 abfaeffd / 146aa42e） | REI 26.3.823 + Architectury 22.0.3、SSR 26.3-5.2.0+neoforge 钉选并恢复 IMPL 参编；Cloth 26.3.159。 | CI 编译绿；**实机待验**（REI 显示 / SSR 准星与 adaptive aim） |
 
 
 ## 26.2 工作包

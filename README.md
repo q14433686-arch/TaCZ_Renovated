@@ -133,10 +133,11 @@ Cloth Config；未装时该入口给下载提示；两处改的是同一份配�
 
 ## 5. 可选 Mod
 
-Cloth Config、PAL、JEI、Iris、Carry On 等。**26.3 起以下兼容为「禁用」而非「修复」**
-（上游暂无 26.3 构件，门面保留、恢复后回补）：REI（+Architectury）、Controllable、
-Shoulder Surfing Reloaded；First-person Model / Not Enough Animations 同样无
-26.3 文件，兼容桥保持 dormant。逐项坐标与核验状态：
+Cloth Config、PAL、JEI、REI、SSR、Iris、Carry On 等。REI（26.3.823 + Architectury
+22.0.3）与 Shoulder Surfing Reloaded（26.3-5.2.0+neoforge）已于 2026-09-30 随上游
+26.3 构件发布**恢复参编**（同步姊妹仓，实机待验）。**仍为「禁用」而非「修复」**：
+Controllable（上游暂无 26.3 构件，门面保留）；First-person Model /
+Not Enough Animations 同样无 26.3 文件，兼容桥保持 dormant。逐项坐标与核验状态：
 [COMPATIBILITY.md](COMPATIBILITY.md)。
 
 ## 6. 开发与验证

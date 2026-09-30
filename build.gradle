@@ -68,19 +68,24 @@ sourceSets {
         java {
             // 26.3 work package: compile client animation/gltf APIs.
             //
-            // [Disabled integrations — no 26.3 artifacts, verified 2026-09-21]
+            // [Restored integrations — 26.3 artifacts published, verified 2026-09-30]
+            //   REI 26.3.823 + Architectury 22.0.3 — maven.shedaniel.me / maven.architectury.dev
+            //     (REI 26.3 branch gradle.properties: platforms=fabric,neoforge; same
+            //      versions the Fabric sister 26.3 line restored in abfaeffd).
+            //   Shoulder Surfing Reloaded 26.3-5.2.0+neoforge — Modrinth maven
+            //     (upstream tag 26.3-5.2.0: neoForgeCompatibleMinecraftVersions=26.3;
+            //      sister restored the fabric twin in 146aa42e).
+            // compat/rei/** 与 shouldersurfing IMPL 重新参编。
+            //
+            // [Still-disabled integrations — no 26.3 artifacts, re-verified 2026-09-30]
             // Same policy as the Fabric sister 26.3 line: keep the facade classes,
             // exclude only the IMPL sources that hard-depend on APIs we cannot
             // compile against. This is a DISABLED state, not a fix; restore by
             // re-adding the compileOnly coordinate in gradle.properties/build.gradle
             // and dropping the matching exclude lines.
-            //   REI (+Architectury)  — neoforge latest 26.2.820/26.2.821, no 26.3.
-            //   Controllable         — latest 0.26.1+26.2, no 26.3.
-            //   Shoulder Surfing     — latest 26.2-5.0.7, no 26.3.
-            exclude 'com/tacz/guns/compat/rei/**'
+            //   Controllable — latest 0.26.1+26.2, no 26.3 (Zoomify/ModMenu 同为
+            //   Fabric 生态依赖，与本 NeoForge 线无关).
             exclude 'com/tacz/guns/compat/controllable/ControllableInner.java'
-            exclude 'com/tacz/guns/compat/shouldersurfing/ShoulderSurfingCompatInner.java'
-            exclude 'com/tacz/guns/compat/shouldersurfing/ShoulderSurfingPlugin.java'
         }
     }
 }
@@ -199,11 +204,20 @@ dependencies {
 
     // 26.3 recipe viewers: JEI 31.0.0.5 for NeoForge (jei-26.3-neoforge, beta channel —
     // the exact build the sister Fabric 26.3 line validated in-game).
-    // REI has NO 26.3 artifact (neoforge latest 26.2.820, verified 2026-09-21):
-    // compat/rei/** is excluded in sourceSets and the integration is disabled.
+    // Newer builds exist (stable tag v31.7.0, beta 31.8.0.48 per the sister's
+    // 2026-09-30 verification) but the exact maven build coordinate cannot be
+    // resolved from this sandbox; keep the in-game-validated pin for now.
     compileOnly "mezz.jei:jei-26.3-neoforge:${jei_neoforge_version}"
 
-    // Cloth Config — optional at runtime (config screen). 26.3.158.
+    // REI — 26.3.823 for NeoForge (maven.shedaniel.me; restored 2026-09-30, the same
+    // version the Fabric sister line uses; REI's 26.3 branch targets
+    // platforms=fabric,neoforge). Architectury 22.0.3 is REI's API dependency
+    // (maven.architectury.dev). Runtime stays optional — installed by the player.
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+    compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
+
+    // Cloth Config — optional at runtime (config screen). 26.3.159 (2026-09-30 bump;
+    // REI's 26.3 branch and the sister line both reference 26.3.159).
     compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_neoforge_version}"
 
     // ZigyTheBird Player Animation Library (PAL) — optional at runtime
@@ -233,18 +247,18 @@ dependencies {
     //     compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
     // }
 
-    // Exopandora's Shoulder Surfing Reloaded — DISABLED for 26.3: no 26.3 artifact
-    // (latest 26.2-5.0.7). ShoulderSurfingCompatInner/ShoulderSurfingPlugin are excluded
-    // in sourceSets; ShoulderSurfingCompat is the disabled facade; the bundled
-    // shouldersurfing_plugin.json resource is archived under docs/patch/.
-    // Restore: set shoulder_surfing_neoforge_file, uncomment, drop the two excludes,
-    // restore src/main/resources/shouldersurfing_plugin.json from docs/patch/.
-    // def localShoulderSurfing = fileTree(dir: 'libs', include: 'ShoulderSurfing-NeoForge*.jar')
-    // if (!localShoulderSurfing.isEmpty()) {
-    //     compileOnly localShoulderSurfing
-    // } else {
-    //     compileOnly "curse.maven:shoulder-surfing-reloaded-243190:${shoulder_surfing_neoforge_file}"
-    // }
+    // Exopandora's Shoulder Surfing Reloaded — RESTORED for 26.3 (2026-09-30):
+    // upstream tag 26.3-5.2.0 publishes a NeoForge build
+    // (neoForgeCompatibleMinecraftVersions=26.3); the Fabric sister line restored
+    // its twin in 146aa42e. Resolved from the Modrinth maven by version string
+    // (26.3-5.2.0+neoforge). ShoulderSurfingCompatInner/ShoulderSurfingPlugin are
+    // back in sourceSets and shouldersurfing_plugin.json is restored to resources.
+    def localShoulderSurfing = fileTree(dir: 'libs', include: 'ShoulderSurfing-NeoForge*.jar')
+    if (!localShoulderSurfing.isEmpty()) {
+        compileOnly localShoulderSurfing
+    } else {
+        compileOnly "maven.modrinth:shoulder-surfing-reloaded:${shoulder_surfing_version}"
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

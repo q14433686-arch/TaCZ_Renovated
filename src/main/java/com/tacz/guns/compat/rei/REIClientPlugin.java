@@ -18,7 +18,6 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +46,9 @@ public class REIClientPlugin implements me.shedaniel.rei.api.client.plugins.REIC
             BlockItem item = entry.getValue().getBlock();
             ItemStack icon = BlockItemBuilder.create(item).setId(entry.getKey()).build();
             CategoryIdentifier<GunSmithTableDisplay> id = CategoryIdentifier.of(GunMod.MOD_ID, "plugins/gun_smith_table/" + entry.getKey().toString().replace(':', '_'));
-            registry.add(new GunSmithTableCategory(Component.translatable(entry.getValue().getPojo().getName()), icon, id));
+            // 26.3：Component.translatable 已不可用（姊妹仓 abfaeffd 同步），
+            // 改用物品自身的名称组件 —— 显示同一翻译键。
+            registry.add(new GunSmithTableCategory(item.getName(icon), icon, id));
             displays.put(entry.getKey(), id);
             registry.addWorkstations(id, EntryStacks.of(icon));
         }
