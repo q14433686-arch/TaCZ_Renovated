@@ -9,8 +9,9 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 
 /**
- * 读取 {@code tacz-server.toml}（{@code GunMod} 以 {@code ModConfig.Type.SERVER}
- * 注册的 {@code ServerConfig.spec}）中的列表型配置到查找缓存：
+ * 读取 {@code tacz-server.toml}（{@code GunMod} 以 {@code ModConfig.Type.SYNCED}
+ * 注册的 {@code ServerConfig.spec}；26.3.0.51-beta 起 SERVER 改名 SYNCED，
+ * 文件名显式保留）中的列表型配置到查找缓存：
  * 爆头 AABB（{@link HeadShotAABBConfigRead}）与交互键黑白名单
  * （{@link InteractKeyConfigRead}）。
  *

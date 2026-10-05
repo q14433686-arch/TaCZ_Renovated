@@ -25,7 +25,7 @@
 
 | MC / Loader | 线 | 当前状态 |
 |---|---|---|
-| **26.3 / NeoForge（本仓库，`26.3` 分支）** | [`26.3`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.3) | **R1 移植中**（`1.1.8+neoforge.26.3.R1`，编译级、待实机验收 —— 见 [CHANGELOG](CHANGELOG.md)）；NeoForge 26.3 目前仅 **beta 通道**（钉选 `26.3.0.7-beta`） |
+| **26.3 / NeoForge（本仓库，`26.3` 分支）** | [`26.3`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.3) | **R1 移植中**（`1.1.8+neoforge.26.3.R1`，编译级、待实机验收 —— 见 [CHANGELOG](CHANGELOG.md)）；NeoForge 26.3 目前仅 **beta 通道**（钉选 `26.3.0.51-beta`，2026-10-05 因上游 FML 破坏性变更重钉，见 CHANGELOG） |
 | 26.2 / NeoForge | [`26.2`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.2) | `R1` / `R1-hotfix` / `R2` / `R3` / `R3-hotfix` 已发布；源码基线为 **R3-hotfix2**（26.3 线的直接母本） |
 | 26.1.2 / NeoForge | [`26.1.2`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.1.2) | `R1` / `R1-hotfix` 已发布 |
 | 1.21.11 / NeoForge | [`1.21.11`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/1.21.11) | `R1` / `R1-hotfix` 已发布 |
@@ -34,7 +34,7 @@
 ## 1. 支持环境
 
 - Minecraft **26.3**
-- NeoForge **`26.3.0.7-beta`**（**beta 通道**钉选构建，见 `gradle.properties`；
+- NeoForge **`26.3.0.51-beta`**（**beta 通道**钉选构建，见 `gradle.properties`；
   26.3 尚无 stable，稳定后重钉）
 - Java **25**
 - **无硬依赖**（LesRaisins-Tactical 功能已内置到本 Mod，不可分离）
@@ -115,7 +115,7 @@ Cloth Config；未装时该入口给下载提示；两处改的是同一份配�
 2. 本 Mod **没有必装前置** —— 单独把 TaCZ 放进 `mods/` 即可运行（Cloth Config 等
    均为可选集成，见 §2 / [COMPATIBILITY.md](COMPATIBILITY.md)）。
 3. 首次启动会自动把默认枪包解压到 `.minecraft/tacz/`。
-4. 环境要求见 §1（MC 26.3 + NeoForge `26.3.0.7-beta` + Java 25）。
+4. 环境要求见 §1（MC 26.3 + NeoForge `26.3.0.51-beta` + Java 25）。
 
 ## 4. 第三方枪包
 

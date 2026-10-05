@@ -108,6 +108,15 @@ file="META-INF/accesstransformer.cfg"
     ordering="NONE"
     side="BOTH"
 
+# 2026-10-05: the jar needs the FML 12.0.8+ config enum (ModConfig.Type.LOCAL/SYNCED);
+# without this gate, older 26.3 betas (.0-.7) load the jar and die with NoSuchFieldError.
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
 [[dependencies.${mod_id}]]
     modId="iris"
     type="optional"

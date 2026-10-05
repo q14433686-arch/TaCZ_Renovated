@@ -8,8 +8,9 @@
 > **状态红线**：本轮为 **26.2（R3-hotfix2 源码基线）→ 26.3 全量端口**，对照姊妹仓
 > 26.3 分支的《26.3 移植指南》逐项等价移植。**当前仅到「CI 编译绿」这一级**，
 > 以下所有条目在实机上的效果均**未实测**（维护者验收前的统一口径，AGENTS.md §2）。
-> NeoForge 26.3 当前仅有 **beta 通道**，本线钉选 `26.3.0.7-beta`（维护者已批准；
-> 稳定版发布后重钉，不另起版本号）。
+> NeoForge 26.3 当前仅有 **beta 通道**，本线钉选 `26.3.0.51-beta`（维护者已批准；
+> 2026-10-05 自 `26.3.0.7-beta` 重钉 —— 上游 FML 破坏性变更，见下方运行时兼容修复；
+> 稳定版发布后再重钉，不另起版本号）。
 
 ### Mojang 侧（加载器无关）
 
@@ -101,6 +102,32 @@
 - **验证状态**：本仓 CI 编译绿；**实机未验**（修复写法已数值验证，待维护者
   进游戏确认六面朝向）。
 
+### NeoForge 26.3.0.51-beta 运行时兼容修复（2026-10-05，维护者实机日志 RawOutput.log）
+
+> 维护者启动器把 NeoForge 自动升到 `26.3.0.51-beta`（FML 12.0.8）：本仓按
+> `26.3.0.7-beta` 编译的 jar 在其上**进游戏即崩**。逐项修复并把编译钉选重钉到
+> `.51`（维护者实机运行版本）。
+
+- **致命：`ModConfig.Type.COMMON/SERVER` 被上游移除** —— FML（FancyModLoader，
+  2026-10-04 main）把配置枚举改为 `LOCAL / CLIENT / SYNCED / STARTUP`，
+  旧 jar 在 `GunMod` 构造期直接 `NoSuchFieldError: ModConfig$Type ... COMMON` →
+  tacz 加载失败 → 游戏崩溃。修复：`COMMON→LOCAL`、`SERVER→SYNCED`（语义一一
+  对应），并**显式保留旧文件名** `tacz-common.toml` / `tacz-server.toml`
+  （新枚举默认名会变成 `tacz-local.toml` / `tacz-synced.toml`，老用户的现有
+  配置会被无视；`LoadingConfigEvent` 的文件名匹配也依赖它）。
+- **mixin 准备期 NPE**：`VoxyCompatMixinPlugin` 裸调 `ModList.get()`，而 FML
+  12.0.8 下 mixin 准备期 `ModList` 尚未初始化 → `InvalidMixinException`
+  ×3 刷日志（本仓 Iris/Punchy 插件注释早有记录，Voxy 这个漏网）。修复：改用
+  `FMLLoader.getCurrent().getLoadingModList().getModFileById("voxy")` 同款探测。
+- **新增 neoforge 依赖门槛**（`neoforge.mods.toml` 此前只有 minecraft/iris/punchy
+  依赖项）：`[26.3.0.51-beta,)` —— 新 jar 需要 FML 12.0.8+ 的配置枚举，旧 beta
+  （.0–.7）加载会得到镜像的 `NoSuchFieldError`，加门槛让它被干净拒绝而不是硬崩。
+- **钉选重钉**：`neo_version` `26.3.0.7-beta → 26.3.0.51-beta`（维护者的实机
+  运行版本；beta 通道政策不变，稳定版发布后再重钉）。
+- **验证状态**：CI 编译绿（针对 .51 编译 = 兼容面由编译器背书）；**实机待验**
+  （进游戏、`tacz-common.toml`/`tacz-server.toml` 老文件被继续读取、
+  voxy 不在场时无 mixin ERROR）。
+
 ### 姊妹仓 26.3 线增量同步（2026-09-30，待实机验证）
 
 > 源：`c7160480`（recipe_sync 断连修复）、`abfaeffd`（REI 恢复）、`146aa42e`（SSR
@@ -165,7 +192,7 @@
 
 ### 构建与工具链
 
-- NeoForge `26.3.0.7-beta`（beta 钉选，见 `gradle.properties` 注释）；MC 版本区间
+- NeoForge `26.3.0.51-beta`（beta 钉选，见 `gradle.properties` 注释；2026-10-05 重钉）；MC 版本区间
   收紧为 `[26.3]`；JEI / Cloth Config / PAL 钉 26.3 构建。
 - 基线：`26.2` 分支 R3-hotfix2 源码（未发布的 26.2 热修含在本次移植内 ——
   第一人称手臂 `zRot` 清零等，见下一条目）。

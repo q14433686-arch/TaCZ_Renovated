@@ -1,6 +1,6 @@
 # 移植状态
 
-目标版本：Minecraft **26.3** + NeoForge **26.3.0.7-beta**（beta 钉选）。
+目标版本：Minecraft **26.3** + NeoForge **26.3.0.51-beta**（beta 钉选；2026-10-05 自 .7 重钉，上游 FML 破坏性变更）。
 当前源码版本：**1.1.8+neoforge.26.3.R1**（未发布）。
 状态：**26.3 全量端口已完成源码层移植（编译级，实机验收全部未做）**；26.2 线
 `R3-hotfix` 已发布（2026-09-09），`R3 / R2 / R1 / R1-hotfix` 亦已发布，26.3 线以
@@ -20,7 +20,7 @@
 | 工作包 | 已落地 | 尚缺验收（除另行标注外未实测） |
 |---|---|---|
 | WP-263-0 计划与证据 | 依赖矩阵 / API 核验表 / 七阶段执行序（WP263_0_PORT_PLAN） | — |
-| WP-263-1 依赖与包迁移 | NF 26.3.0.7-beta / JEI 31.0.0.5 / Cloth 26.3.158 钉选；renderpearl 包迁移全量 | **CI 编译绿已达成**（compile-check / build / consistency 三工作流，2026-09-21，`a4a30bd`）；实机验收未做 |
+| WP-263-1 依赖与包迁移 | NF 26.3.0.51-beta（2026-10-05 重钉）/ JEI 31.0.0.5 / Cloth 26.3.159 钉选；renderpearl 包迁移全量 | **CI 编译绿已达成**（compile-check / build / consistency 三工作流，2026-09-21，`a4a30bd`）；实机验收未做 |
 | WP-263-2 渲染重构 | pass 归属倒置（§2.4）、第一人称拆分（§2.3）、投影 accessor（§2.5）、shader 方言（§2.6）、管线预热（§2.7） | 八朝向跟手 / 开镜掩码 / PIP / 水下雾 |
 | WP-263-3 高模 | PolyMeshGpuRenderer 26.3 化（externalPass / ExecuteInfo / 强制重绑） | 无光影 + 光影高模全矩阵 |
 | WP-263-4 Iris | mode 标记采样器判别、setupDraw/空形参注入、FrontendRenderPass 配对 | 光影下裁剪 / 首次开镜不崩 |
@@ -35,6 +35,7 @@
 | 弹孔朝向（2026-09-30） | `BulletHoleParticle#extract` 四元数改为 `getRotation(d)·Rx(-90°)·Rz(180°)`：1.21.1 原四边形躺 XZ 平面（+Y 为法线）而 26.x vanilla 顶点管线固定 XY 平面（+Z 为法线），旧写法六面法线全错（墙面→水平朝下、地面→竖直朝南、天花板→竖直朝北）。姊妹仓 26.3 线同病未修。 | 数值验证六面；**实机待验**（打六个面确认弹孔贴面） |
 | 配方同步断连（2026-09-30，姊妹 c7160480） | `GunSmithTableSerializer#encode` 只编码已解析非空材料 + id/result/group 兜底 + `init()` 异常隔离；`RecipeCompat#normalizeLegacyIngredient` 展开数组内嵌 `#tag`、过滤未安装模组物品。防多枪包进档 `EncoderException` 踢人。 | CI 编译绿；**实机待验**（多枪包进档不断连） |
 | REI / SSR 兼容恢复（2026-09-30，姊妹 abfaeffd / 146aa42e） | REI 26.3.823 + Architectury 22.0.3、SSR 26.3-5.2.0+neoforge 钉选并恢复 IMPL 参编；Cloth 26.3.159。 | CI 编译绿；**实机待验**（REI 显示 / SSR 准星与 adaptive aim） |
+| NeoForge .51 运行时兼容（2026-10-05，维护者 RawOutput.log） | `ModConfig.Type` COMMON→LOCAL、SERVER→SYNCED（FML 12.0.8 移除旧枚举，进游戏即崩），显式保留 tacz-common/server.toml 文件名；VoxyCompatMixinPlugin 改 LoadingModList 探测（修 mixin 期 NPE）；mods.toml 加 neoforge `[26.3.0.51-beta,)` 门槛；neo_version 重钉 .51。 | CI 编译绿；**实机待验**（进游戏 + 老配置文件被读取） |
 
 
 ## 26.2 工作包
