@@ -1,4 +1,4 @@
-commit: 6f7a0db16894402a891d3e5968604e2fb80609ce
+commit: 44971f4051fb2f0e6b192be8c9babd3d84102ca9
 Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
 ............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
 
@@ -19,34 +19,34 @@ Calculating task graph as no cached configuration is available for tasks: compil
 Creating Minecraft artifacts without recompilation.
 
 > Task :createMinecraftArtifacts
-Loaded 136 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
+Loaded 135 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
 [1m*** Started working on [4mdownloadManifest[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
- [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.36s
+ [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.43s
 [1m*** Started working on [4mdownloadJson[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
   ↓ https://piston-meta.mojang.com/v1/packages/4fe1aa1ef8da1cb95c5bad1fb98890ca56dd8ca3/26.3.json
- [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.07s
+ [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.15s
 [1m*** Started working on [4mdownloadServer[0m[0m
 [1m*** Started working on [4mdownloadClient[0m[0m
-  ↓ https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar
   ↓ https://piston-data.mojang.com/v1/objects/e877b6a07acd633fb3bb475002175cec036e7b87/client.jar
- [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.62s
- [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.71s
+  ↓ https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar
+ [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.80s
+ [1m[92m✓[0m Completed [4mdownloadServer[0m in 1.02s
 [1m*** Started working on [4mpreProcessJar[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.17:fatjar
- [1m[92m✓[0m Completed [4mpreProcessJar[0m in 2.23s
+ [1m[92m✓[0m Completed [4mpreProcessJar[0m in 3.12s
 [1m*** Started working on [4mbinaryPatch[0m[0m
   [33mWARNING: [0mnet.neoforged.installertools:binarypatcher:4.0.17:fatjar is not present in the artifact manifest
   ↓ https://maven.neoforged.net/releases/net/neoforged/installertools/binarypatcher/4.0.17/binarypatcher-4.0.17-fatjar.jar
  ↳ Running external tool net.neoforged.installertools:binarypatcher:4.0.17:fatjar
- [1m[92m✓[0m Completed [4mbinaryPatch[0m in 2.80s
+ [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.86s
 [1m*** Started working on [4mcopyUnpatchedClasses[0m[0m
- [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 2.06s
+ [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 3.02s
 [1m*** Started working on [4mapplyDevTransforms[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.12:fatjar
- [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 2.32s
-Total runtime: 11.02s
+ [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 3.31s
+Total runtime: 15.67s
 
 
 > Task :compileJava
@@ -54,7 +54,7 @@ Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1791198517788.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1791199150903.json
 
 [Incubating] Problems report is available at: file:///home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/reports/problems/problems-report.html
 
@@ -64,7 +64,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 4s
+BUILD SUCCESSFUL in 1m 34s
 2 actionable tasks: 2 executed
 Configuration cache entry stored.
 
