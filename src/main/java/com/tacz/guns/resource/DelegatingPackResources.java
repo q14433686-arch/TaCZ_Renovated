@@ -4,10 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import com.tacz.guns.GunMod;
+import cn.sh1rocu.tacz.util.GunPackLangCompat;
 import com.tacz.guns.crafting.RecipeCompat;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.AbstractPackResources;
+import net.minecraft.server.packs.AbstractPackMetadataResources;
+import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -31,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class DelegatingPackResources extends AbstractPackResources {
+public class DelegatingPackResources extends AbstractPackMetadataResources implements PackResources {
     private final PackMetadataSection packMeta;
     private final List<PackResources> delegates;
     private final Map<String, List<PackResources>> namespacesAssets;
@@ -64,9 +66,15 @@ public class DelegatingPackResources extends AbstractPackResources {
     }
 
     @Override
-    public void listResources(PackType type, String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+    public void listResources(PackType type, String resourceNamespace, String paths, PackResources.ResourceOutput resourceOutput) {
+        // 语言文件：经 GunPackLangCompat 保底，见该类注释
+        // （26.3 起一个坏 lang JSON 会让 vanilla 放弃加载全部翻译）。
+        boolean langListing = GunPackLangCompat.mayListLangFiles(paths);
         for (PackResources delegate : this.delegates) {
-            delegate.listResources(type, resourceNamespace, paths, resourceOutput);
+            PackResources.ResourceOutput output = langListing
+                    ? GunPackLangCompat.wrapOutput(GunPackLangCompat.describe(delegate), resourceOutput)
+                    : resourceOutput;
+            delegate.listResources(type, resourceNamespace, paths, output);
         }
         // 26.1.2 RecipeManager no longer scans JSON itself: it copies the minecraft:recipe
         // datapack registry, whose FileToIdConverter only lists data/<ns>/recipe/.
@@ -79,7 +87,7 @@ public class DelegatingPackResources extends AbstractPackResources {
         }
     }
 
-    private void listLegacyVanillaRecipes(String resourceNamespace, String paths, ResourceOutput resourceOutput) {
+    private void listLegacyVanillaRecipes(String resourceNamespace, String paths, PackResources.ResourceOutput resourceOutput) {
         String legacyPath = RecipeCompat.toLegacyRecipesDirectory(paths);
         if (legacyPath == null) {
             return;
@@ -130,9 +138,17 @@ public class DelegatingPackResources extends AbstractPackResources {
     @Nullable
     @Override
     public IoSupplier<InputStream> getResource(PackType type, Identifier location) {
-        IoSupplier<InputStream> existing = getDelegateResource(type, location);
-        if (existing != null) {
-            return existing;
+        // 主查找内联（而非走 getDelegateResource）：lang 文件保底需要知道"是哪个子包
+        // 提供的这份文件"，GunPackLangCompat 的 WARN 靠它指出枪包身份
+        // （26.3 起任一枪包的坏 lang JSON 会让 vanilla 放弃加载全部翻译）。
+        for (PackResources pack : getCandidatePacks(type, location)) {
+            IoSupplier<InputStream> ioSupplier = pack.getResource(type, location);
+            if (ioSupplier != null) {
+                if (GunPackLangCompat.isLangFile(location)) {
+                    return GunPackLangCompat.wrap(GunPackLangCompat.describe(pack), location, ioSupplier);
+                }
+                return ioSupplier;
+            }
         }
         if (type != PackType.SERVER_DATA) {
             return null;

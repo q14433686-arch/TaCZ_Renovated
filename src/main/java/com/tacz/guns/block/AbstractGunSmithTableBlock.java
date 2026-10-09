@@ -139,14 +139,11 @@ public abstract class AbstractGunSmithTableBlock extends BaseEntityBlock {
 
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        // Only the root carries the custom BlockId. Preserve it when survival breaks the
-        // companion half, otherwise the normal loot table cannot reconstruct the data item.
-        if (!level.isClientSide() && !player.isCreative() && !isRoot(state)) {
-            ItemStack drop = getCloneItemStack(level, pos, state, true);
-            if (!drop.isEmpty()) {
-                popResource(level, pos, drop);
-            }
-        }
+        // 多方块工作台不在这里手工掉落。挖掉任一半时，另一半经 updateShape 变 AIR →
+        // Block.updateOrDestroy → level.destroyBlock(pos, dropResources=true) 走自己的战利品表；
+        // 战利品表用 match_block 只让根方块（foot/lower）那一半掉落，并从根的方块实体拷 BlockId。
+        // 早前这里对「挖非根半边」额外 popResource 一个克隆物品，与根半边的战利品表掉落叠加 →
+        // 挖上半/头部时爆出两个工作台（姊妹仓 2026-09-20 实测），已移除（未实测：本仓）。
         return super.playerWillDestroy(level, pos, state, player);
     }
 

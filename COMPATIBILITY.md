@@ -24,6 +24,13 @@
 
 ## 依赖钉选
 
+> **26.3 增量（2026-09-30，详见 CHANGELOG「姊妹仓 26.3 线增量同步」与
+> PORTING_STATUS「26.3 后续修复」）**：REI `26.3.823`（+Architectury `22.0.3`，
+> maven.shedaniel.me / maven.architectury.dev）与 SSR `26.3-5.2.0+neoforge`
+> （Modrinth maven）已恢复参编；Cloth `26.3.159`；JEI 维持 `31.0.0.5`
+> （jei-26.3-neoforge）。Controllable 仍禁用（上游无 26.3 构件）。下表为
+> 26.2 线的历史证据，供回溯。
+
 | Mod | 26.2 NeoForge 构建 | 本仓接入 | 当前状态 |
 |---|---|---|---|
 | Cloth Config | `26.2.155`，`me.shedaniel.cloth:cloth-config-neoforge:26.2.155` | T 键 / Mods 配置页；缺失时下载提示 | 坐标与 API 已核；未实机 |

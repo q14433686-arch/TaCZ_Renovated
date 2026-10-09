@@ -15,10 +15,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
@@ -148,6 +150,22 @@ public class BulletHoleParticle extends SingleQuadParticle {
      * <p>正确做法：用带 Camera 的重载，让父类自己算出相机相对坐标；
      * 颜色则通过 {@code rCol/gCol/bCol/alpha} 字段传递（父类 {@code extractRotatedQuad}
      * 内部用 {@code ARGB.colorFromFloat(this.alpha, this.rCol, this.gCol, this.bCol)} 取值）。</p>
+     *
+     * <p><b>第 9 轮修复：弹孔只朝固定方向（打在任何面上朝向都不对）。</b></p>
+     *
+     * <p>1.21.1 原实现自己排布四角，四边形躺在 <b>XZ 平面</b>（局部 +Y 是法线），
+     * 而 {@code Direction#getRotation()} 的约定正是"把局部 +Y 转到命中面法线"
+     * （1.21.11 与 26.3 的该方法逐字相同，语义未变）。26.2 移植到
+     * {@code SingleQuadParticle#extractRotatedQuad} 后，父类顶点管线固定从
+     * <b>XY 平面</b>四角 (±1,±1,0) 出发（局部 +Z 是法线），同一个四元数喂进去
+     * 法线就全错了：墙面命中→四边形水平朝下（侧看近乎不可见）、地面命中→竖直朝南、
+     * 天花板命中→竖直朝北。</p>
+     *
+     * <p>修正：先做 +Z→+Y 的基变换（Rx(-90°)）再左乘 {@code getRotation()}，
+     * 末尾补 Rz(180°) 使四个角的 UV 走向与 1.21.1 原版完全一致（已按 JOML
+     * 哈密顿乘法语义对六个面逐一数值验证：四角世界坐标与 UV 分配均与原版吻合）。
+     * 原 1.21.1 代码把四角局部 Y 抬高 0.01（渲染时 ×quadSize）防 z-fighting，
+     * 这里等价地改为沿命中面法线偏移粒子位置同样的量。</p>
      */
     @Override
     public void extract(QuadParticleRenderState state, Camera camera, float partialTicks) {
@@ -172,9 +190,18 @@ public class BulletHoleParticle extends SingleQuadParticle {
         this.bCol = baseB * colorPercent;
         this.alpha = baseA * fade;
         try {
-            // 使用方向四元数旋转四边形；位置交给带 Camera 的重载计算。
-            Quaternionf quaternion = this.direction.getRotation();
-            this.extractRotatedQuad(state, camera, quaternion, partialTicks);
+            // 第 9 轮修复：getRotation() 的约定是"局部 +Y → 命中面法线"（1.21.1 原四边形躺在 XZ 平面），
+            // 而 26.x 父类的四边形固定在 XY 平面（局部 +Z 是法线）。
+            // 先 Rx(-90°) 把 +Z 基变换到 +Y，再左乘 getRotation()；末尾 Rz(180°) 对齐 1.21.1 原版 UV 走向。
+            Quaternionf quaternion = this.direction.getRotation()
+                    .mul(new Quaternionf().rotationX(-Mth.HALF_PI).rotateZ(Mth.PI));
+            // 原 1.21.1 实现把四角局部 Y 抬高 0.01（×quadSize）防 z-fighting，等价转化为沿法线的位置偏移。
+            float offset = 0.01F * this.getQuadSize(partialTicks);
+            Vec3 camPos = camera.position();
+            float x = (float) (Mth.lerp(partialTicks, this.xo, this.x) - camPos.x()) + this.direction.getStepX() * offset;
+            float y = (float) (Mth.lerp(partialTicks, this.yo, this.y) - camPos.y()) + this.direction.getStepY() * offset;
+            float z = (float) (Mth.lerp(partialTicks, this.zo, this.z) - camPos.z()) + this.direction.getStepZ() * offset;
+            this.extractRotatedQuad(state, quaternion, x, y, z, partialTicks);
         } finally {
             this.rCol = baseR;
             this.gCol = baseG;

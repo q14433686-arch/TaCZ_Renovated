@@ -1,5 +1,8 @@
 package com.tacz.guns.client.gui;
 
+import java.net.URISyntaxException;
+import java.net.URI;
+import com.mojang.blaze3d.Blaze3D;
 import com.tacz.guns.mixin.client.ScreenAccessor;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -414,12 +417,22 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
                 }
                 String url = packInfo.getUrl();
                 if (StringUtils.isNotBlank(url) && minecraft != null) {
+                    // 26.3: ConfirmLinkScreen 只收 URI；开链接改走 Blaze3D#openUri。
+                    // 这个 URL 来自枪包作者填写的 pack info（真正的不可信输入），
+                    // 所以必须过 parseAndValidateUntrustedUri 的协议白名单 ——
+                    // 解析失败就当没这个链接，不弹窗也不抛异常。
+                    final URI uri;
+                    try {
+                        uri = Util.parseAndValidateUntrustedUri(url);
+                    } catch (URISyntaxException e) {
+                        return;
+                    }
                     minecraft.setScreenAndShow(new ConfirmLinkScreen(yes -> {
                         if (yes) {
-                            Util.getPlatform().openUri(url);
+                            Blaze3D.openUri(uri);
                         }
                         minecraft.setScreenAndShow(this);
-                    }, url, false));
+                    }, uri, false));
                 }
             }
         }));

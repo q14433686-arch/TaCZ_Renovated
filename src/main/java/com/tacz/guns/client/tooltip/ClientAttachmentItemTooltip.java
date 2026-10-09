@@ -145,8 +145,8 @@ public class ClientAttachmentItemTooltip implements ClientTooltipComponent {
     }
 
     private static boolean isShiftDown() {
-        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), InputConstants.KEY_LSHIFT)
-                || InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), InputConstants.KEY_RSHIFT);
+        return InputConstants.isKeyDown(InputConstants.KEY_LSHIFT)
+                || InputConstants.isKeyDown(InputConstants.KEY_RSHIFT);
     }
 
     public static String rgbToHex(int rgb) {

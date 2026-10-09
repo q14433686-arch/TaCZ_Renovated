@@ -1,5 +1,6 @@
 package me.xjqsh.lrtactical.item;
 
+import net.minecraft.util.Prediction;
 import me.xjqsh.lrtactical.api.item.IThrowable;
 import me.xjqsh.lrtactical.capability.CustomItemCoolDowns;
 import me.xjqsh.lrtactical.entity.ThrowableItemEntity;
@@ -190,7 +191,8 @@ public class ThrowableItem extends Item implements IThrowable, com.tacz.guns.api
             if (stack.isEmpty()) {
                 player.setItemInHand(InteractionHand.MAIN_HAND, detonator);
             } else if (!player.getInventory().add(detonator)) {
-                player.drop(detonator, false);
+                // 26.3: drop(ItemStack, boolean) 已删，第三参 Prediction 必填（服务端发起的掉落）。
+                player.drop(detonator, false, Prediction.SERVER_ONLY);
             }
         }
         return true;

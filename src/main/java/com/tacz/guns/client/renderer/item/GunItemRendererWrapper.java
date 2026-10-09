@@ -198,7 +198,7 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
             float zoom = iGun.getAimingZoom(stack);
             float multiplier = 1 - aimingProgress + aimingProgress / (float) Math.sqrt(zoom);
             Quaternionf quaternion = MathUtil.multiplyQuaternion(model.getCameraAnimationObject().rotationQuaternion, multiplier);
-            poseStack.mulPose(quaternion);
+            poseStack.rotate(quaternion);
             // 截至目前，摄像机动画数据已消费完毕。是否有更好的清理动画数据的方法？
             model.cleanCameraAnimationTransform();
         });
@@ -242,8 +242,8 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
             float yRotOffset = Mth.lerp(partialTick, player.yBobO, player.yBob);
             float xRot = player.getViewXRot(partialTick) - xRotOffset;
             float yRot = player.getViewYRot(partialTick) - yRotOffset;
-            poseStack.mulPose(Axis.XP.rotationDegrees(xRot * -0.1F));
-            poseStack.mulPose(Axis.YP.rotationDegrees(yRot * -0.1F));
+            poseStack.rotate(Axis.XP.rotationDegrees(xRot * -0.1F));
+            poseStack.rotate(Axis.YP.rotationDegrees(yRot * -0.1F));
             BedrockPart rootNode = gunModel.getRootNode();
             if (rootNode != null) {
                 xRot = (float) Math.tanh(xRot / 25) * 25;
@@ -256,7 +256,7 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
             // 从渲染原点 (0, 24, 0) 移动到模型原点 (0, 0, 0)
             poseStack.translate(0, 1.5f, 0);
             // 基岩版模型是上下颠倒的，需要翻转过来。
-            poseStack.mulPose(Axis.ZP.rotationDegrees(180f));
+            poseStack.rotate(Axis.ZP.rotationDegrees(180f));
             // 应用持枪姿态变换，如第一人称摄像机定位
             FirstPersonRenderGunEvent.applyFirstPersonGunTransform(player, stack, poseStack, gunModel, partialTick);
 
@@ -394,7 +394,7 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
 
     private static void renderSlotTexture(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, int packedOverlay, Identifier texture) {
         poseStack.translate(0.5, 1.5, 0.5);
-        poseStack.mulPose(Axis.ZN.rotationDegrees(180));
+        poseStack.rotate(Axis.ZN.rotationDegrees(180));
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, buffer) -> {
             // 26.2: 必须使用回调参数 pose（= 提交那一刻 poseStack.last().copy() 的快照），
             // 而不是外层 poseStack —— 回调执行时它早已被 popPose/复用，
@@ -444,9 +444,9 @@ public class GunItemRendererWrapper extends AnimateGeoItemRenderer<BedrockGunMod
         poseStack.translate(0, 1.5, 0);
         for (int i = nodePath.size() - 1; i >= 0; i--) {
             BedrockPart t = nodePath.get(i);
-            poseStack.mulPose(Axis.XN.rotation(t.xRot));
-            poseStack.mulPose(Axis.YN.rotation(t.yRot));
-            poseStack.mulPose(Axis.ZN.rotation(t.zRot));
+            poseStack.rotate(Axis.XN.rotation(t.xRot));
+            poseStack.rotate(Axis.YN.rotation(t.yRot));
+            poseStack.rotate(Axis.ZN.rotation(t.zRot));
             if (t.getParent() != null) {
                 poseStack.translate(-t.x * scale.x() / 16.0F, -t.y * scale.y() / 16.0F, -t.z * scale.z() / 16.0F);
             } else {

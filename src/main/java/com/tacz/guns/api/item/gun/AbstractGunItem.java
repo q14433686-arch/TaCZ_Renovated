@@ -1,5 +1,6 @@
 package com.tacz.guns.api.item.gun;
 
+import net.minecraft.util.Prediction;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import com.tacz.guns.api.TimelessAPI;
@@ -196,7 +197,8 @@ public abstract class AbstractGunItem extends Item implements IGun, IAnimationIt
                 for (int i = 0; i <= roundCount; i++) {
                     int count = Math.min(tmpAmmoCount, stackSize);
                     ItemStack ammoItem = AmmoItemBuilder.create().setId(ammoId).setCount(count).build();
-                    player.getInventory().placeItemBackInInventory(ammoItem);
+                    // 26.3: placeItemBackInInventory 增加 Prediction 形参（服务端发起的回弹）。
+                        player.getInventory().placeItemBackInInventory(ammoItem, Prediction.SERVER_ONLY);
                     tmpAmmoCount -= stackSize;
                 }
                 setCurrentAmmoCount(gunItem, 0);

@@ -39,16 +39,18 @@ public class ServerMessageSyncLrPack implements CustomPacketPayload {
         this.consumableIndex = consumableIndex;
     }
 
+    // 26.3: FriendlyByteBuf#readMap/writeMap 被移除（readCollection/writeCollection 同批）。
+    // 用等价的 BufMapCodec 手写 varint 循环，线格式与 26.2 完全一致（先 varint 条目数，再逐条 k/v）。
     public ServerMessageSyncLrPack(FriendlyByteBuf buf) {
-        this(buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()),
-                buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()),
-                buf.readMap(b -> b.readIdentifier(), b -> b.readUtf()));
+        this(com.tacz.guns.util.BufMapCodec.readMap(buf, b -> b.readIdentifier(), b -> b.readUtf()),
+                com.tacz.guns.util.BufMapCodec.readMap(buf, b -> b.readIdentifier(), b -> b.readUtf()),
+                com.tacz.guns.util.BufMapCodec.readMap(buf, b -> b.readIdentifier(), b -> b.readUtf()));
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeMap(this.throwableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
-        buf.writeMap(this.meleeIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
-        buf.writeMap(this.consumableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
+        com.tacz.guns.util.BufMapCodec.writeMap(buf, this.throwableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
+        com.tacz.guns.util.BufMapCodec.writeMap(buf, this.meleeIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
+        com.tacz.guns.util.BufMapCodec.writeMap(buf, this.consumableIndex, (b, k) -> b.writeIdentifier(k), (b, v) -> b.writeUtf(v));
     }
 
     @Override

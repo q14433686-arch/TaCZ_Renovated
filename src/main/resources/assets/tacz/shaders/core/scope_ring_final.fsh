@@ -1,4 +1,5 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
 // 物理目镜框（遮光环）的「最终覆盖」片元着色器。
 //
@@ -17,8 +18,13 @@
 // 合成盖掉」—— 光影下合成跑在 LevelRenderer#render 之后，也就是画在手部之后。
 //
 // 顶点着色器直接复用 core/scope_body（与 vanilla entity.vsh 逐字节相同）。
+//
+// 【26.3 方言变更】#moj_import -> #include、varying 显式 layout(location = N)、
+// 需要 GL_ARB_separate_shader_objects。本文件配对的顶点着色器是 core/scope_body
+// （= vanilla entity.vsh 逐字拷贝），所以这里的 in 编号必须与 entity.fsh 完全
+// 一致，否则会取错 varying。
 
-#moj_import <minecraft:dynamictransforms.glsl>
+#include <minecraft:dynamictransforms.glsl>
 
 uniform sampler2D Sampler0;
 
@@ -26,26 +32,26 @@ uniform sampler2D Sampler0;
 uniform sampler2D DissolveMaskSampler;
 #endif
 
-in float sphericalVertexDistance;
-in float cylindricalVertexDistance;
+layout(location = 0) in float sphericalVertexDistance;
+layout(location = 1) in float cylindricalVertexDistance;
 #ifdef PER_FACE_LIGHTING
-in vec4 vertexPerFaceColorBack;
-in vec4 vertexPerFaceColorFront;
+layout(location = 2) in vec4 vertexPerFaceColorBack;
+layout(location = 3) in vec4 vertexPerFaceColorFront;
 #else
-in vec4 vertexColor;
+layout(location = 2) in vec4 vertexColor;
 #endif
 
 #ifndef EMISSIVE
-in vec4 lightMapColor;
+layout(location = 4) in vec4 lightMapColor;
 #endif
 
 #ifndef NO_OVERLAY
-in vec4 overlayColor;
+layout(location = 5) in vec4 overlayColor;
 #endif
 
-in vec2 texCoord0;
+layout(location = 6) in vec2 texCoord0;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     vec4 color = texture(Sampler0, texCoord0);

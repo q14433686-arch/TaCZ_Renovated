@@ -37,6 +37,16 @@ public class GunSmithTableIngredient {
         this.count = Math.max(1, count);
     }
 
+    /**
+     * 尚未解析成功时的原始 {@code item} JSON；已解析则为 {@code null}。
+     * 26.3 配方注册表走 codec 加载（RegistryDataLoader），材料字段必须以原始 JSON
+     * 读入延迟解析 —— 见 {@code GunSmithTableSerializer#INGREDIENT_CODEC}。
+     */
+    @Nullable
+    public JsonElement getRawItem() {
+        return this.rawIngredient;
+    }
+
     public Ingredient getIngredientOrThrow() {
         return Objects.requireNonNull(getIngredient(), "Gun smith ingredient has not been resolved");
     }

@@ -1,19 +1,20 @@
 package com.tacz.guns.client.render.scope;
 
-import com.mojang.blaze3d.GpuFormat;
+import com.mojang.renderpearl.api.GpuFormat;
 import com.mojang.blaze3d.ProjectionType;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.pipeline.BindGroupLayout;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.pipeline.BindGroupLayout;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.UniformType;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
-import com.mojang.blaze3d.systems.CommandEncoder;
-import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.renderpearl.api.commands.CommandEncoder;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuTexture;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.api.DefaultAssets;
 import com.tacz.guns.api.TimelessAPI;
@@ -162,7 +163,9 @@ public final class ScopePipRenderer {
 
     private static RenderPipeline compositePipeline() {
         if (compositePipeline == null) {
-            BindGroupLayout maskLayout = BindGroupLayout.builder().withSampler(MASK_SAMPLER).build();
+            // 26.3: withSampler(name) 并入 withUniform(name, COMBINED_IMAGE_SAMPLER)。
+            BindGroupLayout maskLayout = BindGroupLayout.builder()
+                    .withUniform(MASK_SAMPLER, UniformType.COMBINED_IMAGE_SAMPLER).build();
             compositePipeline = RenderPipeline.builder(RenderPipelines.POST_PROCESSING_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "pipeline/scope_pip_composite"))
                     .withVertexShader("core/screenquad")
@@ -196,6 +199,16 @@ public final class ScopePipRenderer {
 
     /** 场景纹理里是否有一张可用的本帧镜内画面。 */
     private static boolean sceneCaptured = false;
+
+    /** PIP 合成管线预热（同 {@code ScopeBodyRenderTypes#prewarmCompiledPipelines}）。 */
+    public static void prewarmCompiledPipelines() {
+        try {
+            ScopePipelinePrewarm.touch(compositePipeline());
+        } catch (Throwable ignored) {
+            // compositePipeline 是刻意懒构建的：构建失败交给原 catch 路径自我停用，
+            // 预热本身也必须哑巴。
+        }
+    }
 
     /**
      * 「{@code mainRenderTarget()} 正在被重定向」窗口，同时就是要顶上去的那个 target。
@@ -582,7 +595,7 @@ public final class ScopePipRenderer {
         if (mc.player == null) {
             return 1.0f;
         }
-        ItemStack stack = KeepingItemRenderer.getRenderer().getCurrentItem();
+        ItemStack stack = KeepingItemRenderer.getCurrentRenderItem();
         if (!(stack.getItem() instanceof IGun iGun)) {
             return 1.0f;
         }
@@ -925,16 +938,24 @@ public final class ScopePipRenderer {
                     && VoxyScopePipelineCompat.swapIn(voxySystemThisPass);
             insideScopeLevelRender = true;
             try {
+                // 26.3 签名变更：LevelRenderer#render 去掉了 DeltaTracker 与
+                // Matrix4fc(viewRotation) 两个形参（前者不再需要，后者改由方法内部
+                // 从 cameraState.viewRotationMatrix 取），末尾新增 consistentDepthRequired。
+                //
+                // consistentDepthRequired 传 false：该参只在「有后处理 post chain
+                // 生效」时为 true，作用是把 always-on-top 特性画到一张独立深度图
+                // 再回积分到主深度。镜内这一遍不接任何 post chain、也不需要
+                // always-on-top 的深度一致性，传 false 即走「直接用主深度」的
+                // 那条分支，与 26.2 那边根本没有这一步的行为一致。
                 mc.levelRenderer.render(
                         allocator,
-                        deltaTracker,
                         // 方块高亮线框：镜内不画，屏幕空间的描边在镜内没有意义。
                         false,
                         camera,
-                        camera.viewRotationMatrix,
                         fogRenderer.getBuffer(FogRenderer.FogMode.WORLD),
                         camera.fogData.color,
-                        renderSky);
+                        renderSky,
+                        false);
             } finally {
                 // 必须最先清：从这里往后（主画面那一遍）各 phase 要恢复「取完就清空」的原样。
                 currentPreparingStorage = null;
@@ -1145,7 +1166,8 @@ public final class ScopePipRenderer {
                     () -> "tacz_scope_pip_composite",
                     main.getColorTextureView(),
                     Optional.empty())) {
-                pass.setPipeline(compositePipeline());
+                // 26.3: setPipeline 收 CompiledRenderPipeline。
+                pass.setPipeline(RenderSystem.getCompiledPipeline(compositePipeline()));
                 // Globals（ScreenSize）由它提供，收缩带的纵横比修正要用。
                 RenderSystem.bindDefaultUniforms(pass);
                 // 倍率与锐化强度经 ColorModulator 的 r/g 送进着色器。
@@ -1154,10 +1176,10 @@ public final class ScopePipRenderer {
                                 new Matrix4f(),
                                 new Vector4f(magnification, sharpness(), paintLensFlag(), 1.0f)));
                 // 场景拷贝：LINEAR。着色器里的 Catmull-Rom 重建用一组硬件双线性抽头拼出来。
-                pass.bindTexture("InSampler", scene.getColorTextureView(),
+                pass.setUniform("InSampler", scene.getColorTextureView(),
                         RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR));
                 // 掩码：NEAREST。二值数据，线性过滤会在边缘产生 0.5 附近的中间值。
-                pass.bindTexture(MASK_SAMPLER, mask.getColorTextureView(),
+                pass.setUniform(MASK_SAMPLER, mask.getColorTextureView(),
                         RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
                 // 无顶点缓冲的全屏三角形：core/screenquad.vsh 用 gl_VertexID 造顶点。
                 pass.draw(3, 1, 0, 0);

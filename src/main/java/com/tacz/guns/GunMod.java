@@ -37,8 +37,15 @@ public class GunMod {
     public GunMod(IEventBus modEventBus, ModContainer modContainer) {
         container = modContainer;
         modContainer.registerConfig(ModConfig.Type.STARTUP, PreLoadConfig.spec, "tacz-pre.toml");
-        modContainer.registerConfig(ModConfig.Type.COMMON, CommonConfig.spec);
-        modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.spec);
+        // 【26.3.0.51-beta / FML 12.0.8 兼容】ModConfig.Type 的 COMMON/SERVER 已被上游移除，
+        // 新枚举为 LOCAL / CLIENT / SYNCED / STARTUP（FancyModLoader main，2026-10-04）。
+        // COMMON→LOCAL（双端加载、全局 config 目录、不同步 —— 语义一致）、SERVER→SYNCED
+        // （服务端加载并同步到客户端 —— 语义一致）。新枚举的默认文件名会变成
+        // tacz-local.toml / tacz-synced.toml，这里显式传旧文件名 tacz-common.toml /
+        // tacz-server.toml，老用户的现有配置文件与 LoadingConfigEvent 的文件名匹配
+        // 均保持不变（CLIENT 的默认名 tacz-client.toml 新旧相同，无需显式）。
+        modContainer.registerConfig(ModConfig.Type.LOCAL, CommonConfig.spec, "tacz-common.toml");
+        modContainer.registerConfig(ModConfig.Type.SYNCED, ServerConfig.spec, "tacz-server.toml");
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.spec);
 
         CapabilityRegistry.ATTACHMENT_TYPES.register(modEventBus);
@@ -68,7 +75,7 @@ public class GunMod {
         AttachmentPropertyManager.registerModifier();
         // LRTactical is an internal layer of the tacz mod container, not a second mod.
         me.xjqsh.lrtactical.EquipmentMod.register(modEventBus);
-        LOGGER.info("TaCZ NeoForge 26.2 port R2 loading. modId={}", MOD_ID);
+        LOGGER.info("TaCZ NeoForge 26.3 port R1 loading. modId={}", MOD_ID);
     }
 
     private static void registerDefaultExtraGunPack() {

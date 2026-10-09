@@ -39,7 +39,7 @@ public final class AdsMouseSensitivity {
         }
         APPLYING.set(true);
         try {
-            ItemStack kept = KeepingItemRenderer.getRenderer().getCurrentItem();
+            ItemStack kept = KeepingItemRenderer.getCurrentRenderItem();
             ItemStack mainHandItem = kept != null && !kept.isEmpty() ? kept : player.getMainHandItem();
             IGun iGun = IGun.getIGunOrNull(mainHandItem);
             if (iGun == null) {

@@ -20,6 +20,7 @@ import com.tacz.guns.client.input.ReloadKey;
 import com.tacz.guns.client.input.ShootKey;
 import com.tacz.guns.client.input.ZoomKey;
 import com.tacz.guns.client.sound.SoundPlayManager;
+import com.tacz.guns.client.render.scope.ScopePipelinePrewarm;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -66,6 +67,10 @@ public final class ClientGameEvents {
         AimKey.cancelAim(mc);
         ShootKey.autoShoot(mc, true);
         SoundPlayManager.onClientTick(mc);
+        // 26.3：瞄具自定义管线预热（防光影下首次开镜 NPE，见 ScopePipelinePrewarm）。
+        ScopePipelinePrewarm.tick(mc);
+        // 26.3：枪包同步后的 JEI/REI 轻量重启（RecipeViewerReloadBridge，同帧合并）。
+        com.tacz.guns.client.compat.RecipeViewerReloadBridge.tick(mc);
     }
 
     @SubscribeEvent

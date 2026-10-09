@@ -1,4 +1,5 @@
 #version 330
+#extension GL_ARB_separate_shader_objects : require
 
 // 【镜内文字 · 最终覆盖】片元着色器。
 //
@@ -19,11 +20,16 @@
 // 所以光影下的对策是：文字【根本不进 Iris 管线】，延后到 LevelRenderer#render
 // 返回之后、用本管线（不 assign 给 Iris，因此由我们自己的着色器执行）重画。
 // 这样字形、alpha 裁剪、目镜裁剪全部回到我们手里。
+//
+// 【26.3 方言变更】#moj_import -> #include、varying 显式 layout(location = N)、
+// 需要 GL_ARB_separate_shader_objects；in 编号与 core/scope_text.vsh 的 out
+// 严格配对。掩码 UV 分母改用 textureSize(ScopeMaskSampler, 0)，globals.glsl
+// 依赖随之移除。无 OIT 路径（本管线不挂 OIT define），不引入 oit.glsl。
 
-#moj_import <minecraft:dynamictransforms.glsl>
+#include <minecraft:dynamictransforms.glsl>
 #ifdef SCOPE_MASK
 // globals.glsl 提供 ScreenSize（scope_body.fsh 同款用法）。
-#moj_import <minecraft:globals.glsl>
+#include <minecraft:globals.glsl>
 #endif
 
 uniform sampler2D Sampler0;
@@ -34,16 +40,18 @@ uniform sampler2D Sampler0;
 uniform sampler2D ScopeMaskSampler;
 #endif
 
-in vec4 vertexColor;
-in vec2 texCoord0;
+layout(location = 2) in vec4 vertexColor;
+layout(location = 3) in vec2 texCoord0;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
 #ifdef SCOPE_MASK
     // 与 scope_body.fsh / scope_text.fsh 完全一致的采样约定：
     // gl_FragCoord 左下原点，掩码 target 纹理原点也在左下，不翻 Y。
-    vec2 maskUv = gl_FragCoord.xy / ScreenSize;
+    // 分母用 textureSize 取代 ScreenSize（与 scope_text.fsh 26.3 同款）：
+    // 对本分支的 Globals UBO 绑定状态零依赖。
+    vec2 maskUv = gl_FragCoord.xy / vec2(textureSize(ScopeMaskSampler, 0));
     if (texture(ScopeMaskSampler, maskUv).r <= 0.5) {
         // 目镜投影之外 —— 文字被镜筒挡住，不可见。
         discard;

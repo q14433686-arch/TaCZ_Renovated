@@ -30,6 +30,12 @@ sourceSets.main.resources {
 repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
+    // Modrinth maven: ZigyTheBird PAL publishes its merged Fabric+NeoForge jars here.
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content { includeGroup "maven.modrinth" }
+    }
     // Optional recipe-viewer compile APIs. Runtime use remains conditional on the
     // corresponding mod being installed by the player.
     maven {
@@ -60,7 +66,26 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 sourceSets {
     main {
         java {
-            // Work package ⑤: compile client animation/gltf APIs.
+            // 26.3 work package: compile client animation/gltf APIs.
+            //
+            // [Restored integrations — 26.3 artifacts published, verified 2026-09-30]
+            //   REI 26.3.823 + Architectury 22.0.3 — maven.shedaniel.me / maven.architectury.dev
+            //     (REI 26.3 branch gradle.properties: platforms=fabric,neoforge; same
+            //      versions the Fabric sister 26.3 line restored in abfaeffd).
+            //   Shoulder Surfing Reloaded 26.3-5.2.0+neoforge — Modrinth maven
+            //     (upstream tag 26.3-5.2.0: neoForgeCompatibleMinecraftVersions=26.3;
+            //      sister restored the fabric twin in 146aa42e).
+            // compat/rei/** 与 shouldersurfing IMPL 重新参编。
+            //
+            // [Still-disabled integrations — no 26.3 artifacts, re-verified 2026-09-30]
+            // Same policy as the Fabric sister 26.3 line: keep the facade classes,
+            // exclude only the IMPL sources that hard-depend on APIs we cannot
+            // compile against. This is a DISABLED state, not a fix; restore by
+            // re-adding the compileOnly coordinate in gradle.properties/build.gradle
+            // and dropping the matching exclude lines.
+            //   Controllable — latest 0.26.1+26.2, no 26.3 (Zoomify/ModMenu 同为
+            //   Fabric 生态依赖，与本 NeoForge 线无关).
+            exclude 'com/tacz/guns/compat/controllable/ControllableInner.java'
         }
     }
 }
@@ -177,52 +202,62 @@ dependencies {
     jarJar files(commonsMath3ForJarJar)
     jarJar files(luajForJarJar)
 
-    // 26.2 recipe viewers: JEI 30.24.0.176 / REI 26.2.820 for NeoForge.
-    // These integrations are optional at runtime and are discovered only when the
-    // corresponding viewer is present.
-    compileOnly "mezz.jei:jei-26.2-neoforge:${jei_neoforge_version}"
-    compileOnly "curse.maven:roughly-enough-items-310111:${rei_neoforge_file}"
-    compileOnly "dev.architectury:architectury-neoforge:${rei_architectury_version}"
-    compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${rei_cloth_config_version}"
+    // 26.3 recipe viewers: JEI 31.0.0.5 for NeoForge (jei-26.3-neoforge, beta channel —
+    // the exact build the sister Fabric 26.3 line validated in-game).
+    // Newer builds exist (stable tag v31.7.0, beta 31.8.0.48 per the sister's
+    // 2026-09-30 verification) but the exact maven build coordinate cannot be
+    // resolved from this sandbox; keep the in-game-validated pin for now.
+    compileOnly "mezz.jei:jei-26.3-neoforge:${jei_neoforge_version}"
+
+    // REI — 26.3.823 for NeoForge (maven.shedaniel.me; restored 2026-09-30, the same
+    // version the Fabric sister line uses; REI's 26.3 branch targets
+    // platforms=fabric,neoforge). Architectury 22.0.3 is REI's API dependency
+    // (maven.architectury.dev). Runtime stays optional — installed by the player.
+    compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+    compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
+
+    // Cloth Config — optional at runtime (config screen). 26.3.159 (2026-09-30 bump;
+    // REI's 26.3 branch and the sister line both reference 26.3.159).
+    compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_neoforge_version}"
 
     // ZigyTheBird Player Animation Library (PAL) — optional at runtime
     // (modid player_animation_library); drives TACZ third-person gun animations.
-    // CurseForge file 8674798 = "1.2.6+26.2": a merged Fabric+NeoForge jar,
-    // so this compile classpath is the actual NeoForge-capable 26.2 publication.
-    // NOTE: PAL's public version numbers include the game line ("1.2.6+26.2");
-    // a bare "1.2.6" Modrinth coordinate is not the published artifact.
+    // 26.3: resolved from the Modrinth maven (1.2.7 = "1.2.7+26.3" beta merged
+    // Fabric+NeoForge jar — the same artifact the sister 26.3 line compiles against).
+    // NOTE: PAL's public version numbers include the game line ("1.2.7+26.3");
+    // the Modrinth maven coordinate is the bare "1.2.7".
     // Escape hatch: drop the downloaded jar (PlayerAnimationLibMerged-*.jar)
-    // into libs/ and Gradle will use it instead of CurseMaven.
+    // into libs/ and Gradle will use it instead of the Modrinth maven.
     def localPal = fileTree(dir: 'libs', include: 'PlayerAnimationLib*.jar')
     if (!localPal.isEmpty()) {
         compileOnly localPal
     } else {
-        compileOnly "curse.maven:player-animation-library-1283899:${player_animation_lib_file}"
+        compileOnly "maven.modrinth:player-animation-library:${player_animation_lib_version}"
     }
 
-    // MrCrayfish's Controllable 0.26.1 — optional at runtime (modid controllable);
-    // controller bindings + gun-fire rumble. CurseForge file 8403602 is the
-    // NeoForge 26.2 jar. No configure-time downloads here.
-    // Escape hatch: if CurseMaven refuses this file, download
-    // controllable-neoforge-0.26.1+26.2-signed.jar from
-    // https://github.com/MrCrayfish/Controllable/releases/tag/v0.26.1%2B26.2
-    // (or the CurseForge file page) into libs/ and Gradle will use it instead.
-    def localControllable = fileTree(dir: 'libs', include: 'controllable-neoforge*.jar')
-    if (!localControllable.isEmpty()) {
-        compileOnly localControllable
-    } else {
-        compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
-    }
+    // MrCrayfish's Controllable — DISABLED for 26.3: no 26.3 artifact (latest is
+    // 0.26.1+26.2, verified 2026-09-21 on github MrCrayfish/Controllable releases).
+    // ControllableInner is excluded in sourceSets; ControllableCompat is the disabled
+    // facade. Restore: set controllable_neoforge_file, uncomment the block below,
+    // drop the ControllableInner exclude.
+    // def localControllable = fileTree(dir: 'libs', include: 'controllable-neoforge*.jar')
+    // if (!localControllable.isEmpty()) {
+    //     compileOnly localControllable
+    // } else {
+    //     compileOnly "curse.maven:controllable-317269:${controllable_neoforge_file}"
+    // }
 
-    // Exopandora's Shoulder Surfing Reloaded 5.x — optional at runtime
-    // (modid shouldersurfing). 5.x event/plugin API only.
-    // CurseForge file 8445037 = ShoulderSurfing-NeoForge-26.2-5.0.7.
-    // Escape hatch: drop ShoulderSurfing-NeoForge-*.jar into libs/ to override.
+    // Exopandora's Shoulder Surfing Reloaded — RESTORED for 26.3 (2026-09-30):
+    // upstream tag 26.3-5.2.0 publishes a NeoForge build
+    // (neoForgeCompatibleMinecraftVersions=26.3); the Fabric sister line restored
+    // its twin in 146aa42e. Resolved from the Modrinth maven by version string
+    // (26.3-5.2.0+neoforge). ShoulderSurfingCompatInner/ShoulderSurfingPlugin are
+    // back in sourceSets and shouldersurfing_plugin.json is restored to resources.
     def localShoulderSurfing = fileTree(dir: 'libs', include: 'ShoulderSurfing-NeoForge*.jar')
     if (!localShoulderSurfing.isEmpty()) {
         compileOnly localShoulderSurfing
     } else {
-        compileOnly "curse.maven:shoulder-surfing-reloaded-243190:${shoulder_surfing_neoforge_file}"
+        compileOnly "maven.modrinth:shoulder-surfing-reloaded:${shoulder_surfing_version}"
     }
 }
 
@@ -233,6 +268,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
             neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,

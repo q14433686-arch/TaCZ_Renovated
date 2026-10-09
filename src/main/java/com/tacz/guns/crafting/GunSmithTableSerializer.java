@@ -7,6 +7,7 @@ import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAttachment;
 import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.attachment.AttachmentType;
+import com.tacz.guns.GunMod;
 import com.tacz.guns.crafting.result.GunSmithTableResult;
 import com.tacz.guns.crafting.result.RawGunTableResult;
 import com.tacz.guns.resource.pojo.data.recipe.GunResult;
@@ -29,12 +30,43 @@ import java.util.Optional;
  * Semantics copied from Fabric 26.1.2 {@code GunSmithTableSerializer} (RecipeCompat).
  */
 public final class GunSmithTableSerializer {
+    /**
+     * 材料编解码器：{@code item} 字段以<b>原始 JSON</b> 读入，交给
+     * {@link GunSmithTableIngredient#GunSmithTableIngredient(JsonElement, int)} 延迟解析。
+     *
+     * <h2>为什么不能直接 {@code Ingredient.CODEC.fieldOf("item")}（姊妹仓 2026-09-21 实机日志）</h2>
+     * <p>枪包里大量材料仍是旧写法：{@code {"tag":"c:ingots/iron"}}、
+     * {@code {"type":"tacz:nbt","nbt":{...},"partial":true,"items":"tacz:attachment"}}。
+     * 这些写法只有 {@link GunSmithTableIngredient#resolve} 里的
+     * {@code RecipeCompat.normalizeLegacyIngredient} 会改写成 26.3 认得的形态；同一份
+     * JSON 的 Gson 路径（GUI/JEI）一直走那里，所以界面正常。但本 codec 是<b>配方注册表</b>
+     * 加载路径（26.3 {@code RegistryDataLoader} 把 {@code minecraft:recipe} 当动态注册表
+     * 加载），此前直接把原文喂给 {@code Ingredient.CODEC}：{@code No key ... Not a string
+     * ... Not a json array}。动态注册表任一元素解析失败 ⇒ {@code Failed to load registries
+     * due to errors} ⇒ <b>整个存档进不去</b>（未实测：本仓；姊妹仓 26.3 实录）。</p>
+     *
+     * <p>{@code ExtraCodecs.JSON} 把任意值原样转成 {@code JsonElement}，后续解析、失败
+     * 日志、判空语义全部与 Gson 路径统一；编码方向仍写出解析后的 Ingredient。</p>
+     */
     private static final Codec<GunSmithTableIngredient> INGREDIENT_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Ingredient.CODEC.fieldOf("item").forGetter(GunSmithTableIngredient::getIngredientOrThrow),
+                    net.minecraft.util.ExtraCodecs.JSON.fieldOf("item").forGetter(GunSmithTableSerializer::encodeIngredient),
                     Codec.INT.optionalFieldOf("count", 1).forGetter(GunSmithTableIngredient::getCount)
             ).apply(instance, GunSmithTableIngredient::new)
     );
+
+    /** 编码方向：能解析就写解析后的 Ingredient，否则回写原文（不让一条坏材料炸掉整表编码）。 */
+    private static com.google.gson.JsonElement encodeIngredient(GunSmithTableIngredient ingredient) {
+        Ingredient resolved = ingredient.getIngredient();
+        if (resolved != null) {
+            var result = Ingredient.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, resolved).result();
+            if (result.isPresent()) {
+                return result.get();
+            }
+        }
+        com.google.gson.JsonElement raw = ingredient.getRawItem();
+        return raw != null ? raw : com.google.gson.JsonNull.INSTANCE;
+    }
 
     private static final Codec<Map<String, Identifier>> ATTACHMENTS_CODEC =
             Codec.unboundedMap(Codec.STRING, Identifier.CODEC);
@@ -123,15 +155,42 @@ public final class GunSmithTableSerializer {
                     // RecipeContentPayload. Results loaded from a gun pack are intentionally
                     // lazy, so resolve them at this post-reload network boundary rather than
                     // serializing ItemStack.EMPTY into the client recipe content.
-                    recipe.init();
-                    buffer.writeIdentifier(recipe.getId());
-                    buffer.writeInt(recipe.getInputs().size());
+                    //
+                    // 【多枪包进档断连修复（同步自姊妹仓 c7160480）】本 payload 逐条调用本
+                    // encode：任何一条材料延迟解析失败（getIngredient() == null）或空标签
+                    // （items() 为空）都会让 Ingredient 编码抛异常，NeoForge 把它包成
+                    // EncoderException 直接踢出进档玩家。因此只编码已解析且非空的材料，
+                    // 并对 id/result/group 做非空兜底 —— 宁可少显示一个材料格，也不能
+                    // 让整包断连。
+                    try {
+                        recipe.init();
+                    } catch (RuntimeException e) {
+                        GunMod.LOGGER.warn("Failed to init gun smith table recipe result {} for recipe sync, encoding empty result", recipe.getId(), e);
+                    }
+                    Identifier recipeId = recipe.getId() != null
+                            ? recipe.getId()
+                            : Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "empty");
+                    buffer.writeIdentifier(recipeId);
+                    List<GunSmithTableIngredient> validInputs = new ArrayList<>(recipe.getInputs().size());
                     for (GunSmithTableIngredient ingredient : recipe.getInputs()) {
-                        Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient.getIngredientOrThrow());
+                        Ingredient resolved = ingredient.getIngredient();
+                        if (resolved != null && !resolved.isEmpty() && resolved.items().findAny().isPresent()) {
+                            validInputs.add(ingredient);
+                        }
+                    }
+                    buffer.writeInt(validInputs.size());
+                    for (GunSmithTableIngredient ingredient : validInputs) {
+                        Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient.getIngredient());
                         buffer.writeInt(ingredient.getCount());
                     }
-                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.getResult().getResult());
-                    buffer.writeIdentifier(recipe.getResult().getGroup());
+                    ItemStack resultStack = recipe.getResult() != null && recipe.getResult().getResult() != null
+                            ? recipe.getResult().getResult()
+                            : ItemStack.EMPTY;
+                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, resultStack);
+                    Identifier group = recipe.getResult() != null && recipe.getResult().getGroup() != null
+                            ? recipe.getResult().getGroup()
+                            : Identifier.fromNamespaceAndPath(GunMod.MOD_ID, "empty");
+                    buffer.writeIdentifier(group);
                 }
             };
 

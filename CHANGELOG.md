@@ -3,6 +3,200 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
+## 1.1.8+neoforge.26.3.R1 — 2026-09-21（未发布 · 编译级移植）
+
+> **状态红线**：本轮为 **26.2（R3-hotfix2 源码基线）→ 26.3 全量端口**，对照姊妹仓
+> 26.3 分支的《26.3 移植指南》逐项等价移植。**当前仅到「CI 编译绿」这一级**，
+> 以下所有条目在实机上的效果均**未实测**（维护者验收前的统一口径，AGENTS.md §2）。
+> NeoForge 26.3 当前仅有 **beta 通道**，本线钉选 `26.3.0.51-beta`（维护者已批准；
+> 2026-10-05 自 `26.3.0.7-beta` 重钉 —— 上游 FML 破坏性变更，见下方运行时兼容修复；
+> 稳定版发布后再重钉，不另起版本号）。
+
+### Mojang 侧（加载器无关）
+
+- **包迁移**：`com.mojang.blaze3d.*` 渲染类型迁移到 `com.mojang.renderpearl.api.*`
+  （GpuBufferSlice / GpuTextureView / RenderPass / CommandEncoder / pipeline.* 等）。
+- **Render pass 归属倒置**：`FeatureRenderDispatcher#renderAllFeatures` 拆成
+  `prepareFrame(storage)` + 静态 `renderAllFeatures(RenderPass, PreparedFrame)`；
+  `RenderSystem.output{Color,Depth}TextureOverride` 删除，输出目标改由自开
+  RenderPass 显式携带。瞄具掩码 / PIP 合成 / 遮光环最终覆盖 / 高模 GPU 绘制
+  全部改道（`FeatureRenderDispatcherMixin` 注入点移至 `prepareFrame` RETURN；
+  `PreparedFrameSolidMixin` 删除，世界高模改挂
+  `LevelRenderer#executeSolid(...)` RETURN 复用其 RenderPass）。
+- **第一人称拆分**：`ItemInHandRenderer` 拆为 `FirstPersonHandsAndItems`（状态）
+  + `FirstPersonHandsAndItemsRenderer`（渲染），mixin 同步改名；
+  `KeepingItemRenderer` 新增 `getCurrentRenderItem()` 空安全取值。
+- **着色器方言**：shaderc + SPIR-V —— `#moj_import` → `#include`、varying 显式
+  `layout(location = N)`、`#extension GL_ARB_separate_shader_objects`；
+  掩码 UV 分母改 `textureSize(ScopeMaskSampler, 0)`（与 Iris 注入片段同款）。
+- **管线编译按需 + 异步**：新增 `ScopePipelinePrewarm`（客户端 tick 预热全部
+  自定义管线 + Iris `ImmediateState.bypass` 反射旁路），防光影下首次开镜
+  `getCompiledPipelineNullable` 返回 null 撞 Iris NPE（姊妹仓 2026-09-20 实机
+  崩溃日志；本仓未实测）。
+- **掩码颜色被雾污染**（姊妹仓 26.3 实机发现，vanilla 也受影响）：掩码 pass 显式
+  绑 `FogMode.NONE` 空雾 UBO（`bindEmptyFog`，经新 `GameRendererProjectionAccessor`
+  取 `fogRenderer`）。本仓未实测。
+- **战利品表 schema 重写**：`condition`/`function` → `type`、`conditions[]` → 单
+  `condition`（多条 `all_of`+`terms`）、`block_state_property` → `match_block`、
+  补 `random_sequence`；六份方块战利品表重写，`LootTableInjection` 新增
+  `LegacyLootCompat.migrateSchema` 运行期迁移让第三方旧枪包不炸。
+- **方块掉落双份**：`AbstractGunSmithTableBlock#playerWillDestroy` 对非根半边的
+  手工 `popResource` 移除（与根半边战利品表叠加会爆两个工作台；姊妹仓
+  2026-09-20 实测，本仓未实测），掉落全部交给战利品表。
+- **配方 codec 延迟解析**：`GunSmithTableSerializer` 材料字段改
+  `ExtraCodecs.JSON` 原样读入 + `GunSmithTableIngredient` 延迟解析
+  （`getRawItem()`），防旧语法枪包材料在 26.3 动态注册表加载时炸整个存档
+  （姊妹仓实机日志；本仓未实测）。
+- 其余 §2 小改名全套（swing 返回值、受伤冷却拆分 `DamageCooldownUtil`、
+  `KeyEvent#keycode`、输入常量、`openUri`、`PushReaction.POPPED`、
+  `BufMapCodec` 手写 map 读写等）。
+
+### Iris 26.3 侧
+
+- **mode 判别改道**：26.3 删了 `GlRenderPipeline#info()` 且后端 pass 不再有按名
+  采样器表 —— 新增 `IrisFrontendRenderPassMixin`（前后端 pass 配对登记）+
+  标记采样器 `ScopeMaskMode2Sampler`（挂准星 / 镜内文字一族管线），
+  `IrisScopeMaskState#resolveMode` 按 draw 的前端管线声明 / 采样器集合判别。
+- `IrisGlCommandEncoderMixin`：hook 点 `trySetup` → `setupDraw(GlRenderPass)`
+  （返回值没了，无条件应用）；`IrisExtendedShaderMixin#iris$setupState` 改空形参
+  注入（Iris 26.3 签名变更，旧签名 APPLY 阶段直接抛 InvalidInjectionException）。
+- **高模法线**：GPU poly 逐骨骼绘制期间强制管线重绑
+  （`isForcingPipelineRebind` → mixin 清 `lastPipeline`），防同管线连续绘制时
+  Iris 只给第一根骨骼算 `iris_NormalMat`（姊妹仓实机「开枪瞬间才正确」一案；
+  本仓未实测）。
+
+### 枪包 lang 文件保底（同步自姊妹仓 26.3 线 `f52dab8e`，2026-09-29）
+
+- **症状**（姊妹仓玩家实机反馈）：装 Enlisted Gun Pack v1.2.1.3 后整局游戏变英文、
+  所有文本显示为 `item.xxx` 原始键。根因：该包 `assets/ww/lang/en_us.json` 少一个
+  逗号；**26.3 的 `ClientLanguage#loadFrom` 删掉了逐命名空间的 catch**，Gson 的
+  `JsonSyntaxException` 一路抛到 `LanguageManager`，后者只记一条
+  `WARN Unable to load languages` 就跳过 `Language.inject` —— 本仓把所有枪包合并成
+  一个 `tacz_resources` 资源包，任何一个第三方枪包的坏 lang 文件都能让全局翻译
+  失效（26.2 只会 "Skipped language file" 跳过该文件）。
+- **处理（绕过，非根治；枪包文件本身不改）**：新增
+  `cn.sh1rocu.tacz.util.GunPackLangCompat` —— lang 文件合法则原字节放行；不合法则
+  容错扫描救回 `"key": "value"` 条目、重序列化为严格 JSON，并以 `[GunPackLang]`
+  WARN 指明枪包（title 改为 zip/目录名便于定位）、文件、原始错误、保留/丢弃条目数。
+  `DelegatingPackResources#getResource / listResources` 对 `lang/*.json` 套用该保底。
+- **验证状态**：姊妹仓 CI 编译绿 + 单文件 ECJ/Gson 桩测（Enlisted 的 6 条全部
+  救回）；本仓 **实机 PASS**（维护者 2026-09-30 验收，dc9e4b0，Enlisted zip 按文档
+  步骤实测通过）。
+
+### 弹孔朝向修复（2026-09-30，待实机验证）
+
+- **症状**（维护者实机反馈，姊妹仓 26.3 线同样存在）：打出的弹孔只朝固定方向
+  （正北），与命中的方块面无关。
+- **根因**：1.21.1 原实现自行排布四角，四边形躺在 **XZ 平面**（局部 +Y 为法线），
+  `Direction#getRotation()` 的约定正是"把局部 +Y 转到命中面法线"（1.21.11 与
+  26.3 该方法逐字相同）。26.2 移植改用 `SingleQuadParticle#extractRotatedQuad`
+  后，vanilla 顶点管线固定从 **XY 平面**四角 (±1,±1,0) 出发（局部 +Z 为法线），
+  同一四元数喂进去法线全错：墙面命中→水平朝下、地面命中→竖直朝南、天花板命中→
+  竖直朝北。26.2 与 26.3 的该管线逐字相同，非 26.3 回归。
+- **修复**（`BulletHoleParticle#extract`）：四元数改为
+  `getRotation(d)·Rx(-90°)·Rz(180°)` —— 先做 +Z→+Y 基变换再套 `getRotation()`，
+  末尾 Rz(180°) 对齐 1.21.1 原版 UV 走向（已按 JOML 哈密顿乘法对六面逐一数值
+  验证，四角世界坐标与 UV 分配均与原版吻合）；原版"四角局部 Y 抬高 0.01 防
+  z-fighting"等价转化为沿命中面法线的位置偏移。位置改由本方法显式计算后走
+  6 参重载（与带 Camera 重载的算法一致，仅多法向偏移）。
+- **验证状态**：本仓 CI 编译绿；**实机未验**（修复写法已数值验证，待维护者
+  进游戏确认六面朝向）。
+
+### NeoForge 26.3.0.51-beta 运行时兼容修复（2026-10-05，维护者实机日志 RawOutput.log）
+
+> 维护者启动器把 NeoForge 自动升到 `26.3.0.51-beta`（FML 12.0.8）：本仓按
+> `26.3.0.7-beta` 编译的 jar 在其上**进游戏即崩**。逐项修复并把编译钉选重钉到
+> `.51`（维护者实机运行版本）。
+
+- **致命：`ModConfig.Type.COMMON/SERVER` 被上游移除** —— FML（FancyModLoader，
+  2026-10-04 main）把配置枚举改为 `LOCAL / CLIENT / SYNCED / STARTUP`，
+  旧 jar 在 `GunMod` 构造期直接 `NoSuchFieldError: ModConfig$Type ... COMMON` →
+  tacz 加载失败 → 游戏崩溃。修复：`COMMON→LOCAL`、`SERVER→SYNCED`（语义一一
+  对应），并**显式保留旧文件名** `tacz-common.toml` / `tacz-server.toml`
+  （新枚举默认名会变成 `tacz-local.toml` / `tacz-synced.toml`，老用户的现有
+  配置会被无视；`LoadingConfigEvent` 的文件名匹配也依赖它）。
+- **mixin 准备期 NPE**：`VoxyCompatMixinPlugin` 裸调 `ModList.get()`，而 FML
+  12.0.8 下 mixin 准备期 `ModList` 尚未初始化 → `InvalidMixinException`
+  ×3 刷日志（本仓 Iris/Punchy 插件注释早有记录，Voxy 这个漏网）。修复：改用
+  `FMLLoader.getCurrent().getLoadingModList().getModFileById("voxy")` 同款探测。
+- **新增 neoforge 依赖门槛**（`neoforge.mods.toml` 此前只有 minecraft/iris/punchy
+  依赖项）：`[26.3.0.51-beta,)` —— 新 jar 需要 FML 12.0.8+ 的配置枚举，旧 beta
+  （.0–.7）加载会得到镜像的 `NoSuchFieldError`，加门槛让它被干净拒绝而不是硬崩。
+- **钉选重钉**：`neo_version` `26.3.0.7-beta → 26.3.0.51-beta`（维护者的实机
+  运行版本；beta 通道政策不变，稳定版发布后再重钉）。
+- **验证状态**：CI 编译绿（针对 .51 编译 = 兼容面由编译器背书）；**实机待验**
+  （进游戏、`tacz-common.toml`/`tacz-server.toml` 老文件被继续读取、
+  voxy 不在场时无 mixin ERROR）。
+
+### 姊妹仓 26.3 线增量同步（2026-09-30，待实机验证）
+
+> 源：`c7160480`（recipe_sync 断连修复）、`abfaeffd`（REI 恢复）、`146aa42e`（SSR
+> 恢复 + 依赖更新）。跳过项：`2478a0cb`（其仓 hotfix 版本记账，不适用本仓未发布 R1）、
+> `48cc7778`（其仓文档措辞，本仓 lang 条目已为实机 PASS）、`7401e72c`/`716744d6`/
+> `047fe172`（误提交文件清理/新增，本仓从未提交过这些文件）。
+
+- **多枪包进档配方同步断连修复（c7160480，本线为 NeoForge 原生
+  `RecipeContentPayload` 路径）**：此前 `OnDatapackSyncEvent#sendRecipes` 触发
+  `GunSmithTableSerializer.STREAM_CODEC.encode` 时，任一材料延迟解析失败
+  （`getIngredient() == null`）或空标签（`items()` 为空）都会在编码期抛异常、
+  NeoForge 包装为 `EncoderException` 直接踢出进档玩家。修复：encode 只编码
+  已解析且非空的材料（`!isEmpty() && items().findAny().isPresent()`），并对
+  `id`/`result`/`group` 做非空兜底；`recipe.init()` 包裹 try/catch 防单条坏
+  结果数据断连。姊妹仓同时修复的 `StrictNBTIngredient`（Fabric 自定义材料）
+  与 `sanitizeSyncedRecipes`（Fabric API `RecipeMapMixin.bySyncedSerializer`
+  反射清理）在本线无对应物 —— 本线 `PartialNbtIngredient` 本就是 NeoForge 原生
+  `items`+`nbt` codec 形态，原生配方同步路径也不同，不适用。
+- **`RecipeCompat#normalizeLegacyIngredient` 数组内嵌 `#tag` 展开（c7160480）**：
+  26.3 物品列表 codec 不允许数组里写 `"#tag"`（数组分支走 `Holder.CODEC.listOf()`
+  直接抛异常），旧枪包 `["#forge:ingots/steel", "minecraft:iron_ingot"]` 这类写法
+  此前整条材料解析失败；现展开为已绑定物品 ID 并过滤未安装联动模组的物品 ID。
+  注意本方法亦在 `recipes→recipe` 改写期（标签绑定前）被调用：彼时标签条目剔除、
+  保留已知物品，仍严格优于旧行为（整条报错）。
+- **REI 兼容恢复（abfaeffd/146aa42e）**：REI 26.3 线已发布 NeoForge 构件
+  （上游 26.3 分支 `platforms=fabric,neoforge`），钉 `RoughlyEnoughItems-neoforge:
+  26.3.823` + `architectury-neoforge:22.0.3`（与姊妹线同版本），撤销
+  `compat/rei/**` 的 sourceSets 排除。同步姊妹的 `REIPlugin` 补注册
+  `GUN_SMITH_TABLE` 的 table subtype 与 `REIClientPlugin` 的
+  `Component.translatable → item.getName(icon)`（26.3 API 变化）；本线自有的
+  延迟解析/空材料兜底展示逻辑保留（优于姊妹的过滤式实现）。运行时仍为可选
+  依赖（玩家装了才生效）。
+- **Shoulder Surfing Reloaded 兼容恢复（146aa42e）**：上游 tag `26.3-5.2.0`
+  发布 NeoForge 构建（`neoForgeCompatibleMinecraftVersions=26.3`），经 Modrinth
+  maven 钉 `26.3-5.2.0+neoforge`，撤销 IMPL 排除、还原
+  `shouldersurfing_plugin.json`，门面从"恒 false 禁用态"恢复为按
+  `ModList` 探测的真实实现（准星干预、双手枪 adaptive aim 插件同 26.2 行）。
+- **依赖**：Cloth Config `26.3.158 → 26.3.159`（REI 26.3 分支与姊妹线同引用）。
+  JEI 维持 `31.0.0.5`（姊妹实机验证版）：更新的稳定 tag `v31.7.0` 与 beta
+  `31.8.0.48` 已存在，但其精确 maven 构件坐标无法在本沙箱解析，待下次钉版
+  复查再动。Zoomify `2.16.3+26.3` / ModMenu `21.0.0` 为 Fabric 生态依赖，
+  与本 NeoForge 线无关，不同步。
+- **验证状态**：以上全部为 CI 编译绿 + 静态核对（上游构件经 GitHub 源仓核实；
+  maven 直连在本沙箱不可达，依赖解析由 CI 编译工作流兜底验证）；**实机未验**
+  （重点：多枪包进档不断连、REI 类别/配方/查询显示、SSR 准星与持枪 adaptive aim）。
+
+### 配方同步与 JEI
+
+- `OnDatapackSyncEvent#sendRecipes(RecipeType)` 请求本 Mod 配方类型的
+  RecipeContentPayload（26.3 服务端不再全量同步配方）。
+- 新增 `RecipeViewerReloadBridge`：枪包缓存同步后合并重启 JEI
+  （首选 `mezz.jei.common.Internal#restartJei()`，不用 Fabric 生命周期事件 ——
+  那会丢服务端同步的配方表），兜底一次资源重载；REI 分支全反射保留。
+
+### 兼容层（**禁用**，非修复）
+
+- REI（+Architectury）、Controllable、Shoulder Surfing Reloaded：**上游无 26.3
+  构件，集成整体禁用**（门面保留，IMPL 源码按 sourceSets 排除，
+  `shouldersurfing_plugin.json` 摘至 `docs/patch/` 存档）；上游发布后回补。
+- Zoomify：NeoForge 侧本就无构建（26.2 起即如此），门面维持 no-op。
+- JEI 钉选 `31.0.0.5`（姊妹仓 26.3 线实机验证过的构建，含 `restartJei` 反射路径）。
+
+### 构建与工具链
+
+- NeoForge `26.3.0.51-beta`（beta 钉选，见 `gradle.properties` 注释；2026-10-05 重钉）；MC 版本区间
+  收紧为 `[26.3]`；JEI / Cloth Config / PAL 钉 26.3 构建。
+- 基线：`26.2` 分支 R3-hotfix2 源码（未发布的 26.2 热修含在本次移植内 ——
+  第一人称手臂 `zRot` 清零等，见下一条目）。
+
 ## 1.1.8+neoforge.26.2.R3-hotfix2 — 2026-09-13（未发布）
 
 ### 修复：第一人称手部错位（全枪械）——中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`

@@ -1,11 +1,11 @@
 package com.tacz.guns.client.gui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
 
@@ -100,8 +100,10 @@ public class ForgeSlider extends AbstractSliderButton {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        boolean flag = event.key() == GLFW.GLFW_KEY_LEFT;
-        if (flag || event.key() == GLFW.GLFW_KEY_RIGHT) {
+        // 26.3: KeyEvent#key() is now an SDL scancode; vanilla's own AbstractSliderButton
+        // switched to the InputWithModifiers isLeft()/isRight() default methods, so we do too.
+        boolean flag = event.isLeft();
+        if (flag || event.isRight()) {
             if (this.minValue > this.maxValue) {
                 flag = !flag;
             }
