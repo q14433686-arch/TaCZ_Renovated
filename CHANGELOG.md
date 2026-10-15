@@ -3,7 +3,7 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
-## 1.1.8+neoforge.26.2.R3-hotfix2 — 2026-09-13（未发布）
+## 1.1.8+neoforge.26.2.R3-hotfix3 — 2026-09-13（未发布）
 
 ### 修复：第一人称手部错位（全枪械）——中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`
 
@@ -43,7 +43,7 @@
 
 ### 版本号
 
-`1.1.8+neoforge.26.2.R3-hotfix` → `1.1.8+neoforge.26.2.R3-hotfix2`。命名沿用 R2 那一轮
+`1.1.8+neoforge.26.2.R3-hotfix` → `1.1.8+neoforge.26.2.R3-hotfix3`。命名沿用 R2 那一轮
 的格式（`R<n>` → `R<n>-hotfix` → `R<n>-hotfix2`，小写、序号直接接在 `hotfix` 后面，
 中间不放 `.` / `-` / `_`）；该规矩本轮补进 `gradle.properties` 注释与 README。
 同步位置：`gradle.properties`、README（版本句 / 支持表 / SemVer 段 / 文档表）、

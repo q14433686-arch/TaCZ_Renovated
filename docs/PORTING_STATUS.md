@@ -1,7 +1,7 @@
 # 移植状态
 
 目标版本：Minecraft **26.2** + NeoForge **26.2.0.64**（release）。
-当前源码版本：**1.1.8+neoforge.26.2.R3-hotfix2**（未发布）。
+当前源码版本：**1.1.8+neoforge.26.2.R3-hotfix3**（未发布）。
 状态：**R3-hotfix 已发布（2026-09-09）；R3 / R2 / R1 / R1-hotfix 亦已发布。** 本页按工作包
 记录历史矩阵；发布封口的验证状态以 CHANGELOG / docs/records 为准，本文未把
 未跑项标为 PASS。
@@ -34,7 +34,7 @@
 
 ## 版本基线
 
-- **26.2 R3-hotfix2（当前工作树，未发布）**：R3-hotfix + 第一人称手部错位修复
+- **26.2 R3-hotfix3（当前工作树，未发布）**：R3-hotfix + 第一人称手部错位修复
   （中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`，同步自 Fabric 1.21.11 线 `61ab4a0`）；
   编译门待 CI 回写、实机未验。
 - **26.2 R3-hotfix（2026-09-09 发布）**：R3 + Iris scope-mask Fix-A / JEI·REI 枪匠台配方与
