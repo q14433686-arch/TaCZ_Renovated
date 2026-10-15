@@ -15,10 +15,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
@@ -172,9 +174,16 @@ public class BulletHoleParticle extends SingleQuadParticle {
         this.bCol = baseB * colorPercent;
         this.alpha = baseA * fade;
         try {
-            // 使用方向四元数旋转四边形；位置交给带 Camera 的重载计算。
-            Quaternionf quaternion = this.direction.getRotation();
-            this.extractRotatedQuad(state, camera, quaternion, partialTicks);
+            // Direction 的局部 +Y 法线约定 → vanilla XY 四边形的局部 +Z 法线约定。
+            // 右乘基变换；Rz(180°) 对齐原 XZ 四边形的 UV 走向。
+            Quaternionf quaternion = this.direction.getRotation()
+                    .mul(new Quaternionf().rotationX(-Mth.HALF_PI).rotateZ(Mth.PI));
+            float offset = 0.01F * this.getQuadSize(partialTicks);
+            Vec3 camPos = camera.position();
+            float x = (float) (Mth.lerp(partialTicks, this.xo, this.x) - camPos.x()) + this.direction.getStepX() * offset;
+            float y = (float) (Mth.lerp(partialTicks, this.yo, this.y) - camPos.y()) + this.direction.getStepY() * offset;
+            float z = (float) (Mth.lerp(partialTicks, this.zo, this.z) - camPos.z()) + this.direction.getStepZ() * offset;
+            this.extractRotatedQuad(state, quaternion, x, y, z, partialTicks);
         } finally {
             this.rCol = baseR;
             this.gCol = baseG;
