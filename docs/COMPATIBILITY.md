@@ -31,6 +31,7 @@
 | Carry On | ✅ 可用 | — | 搬运枪械工作台等方块 |
 | FirstPerson Model | ✅ 可用 | — | 第一人称身体模型共存 |
 | ImmediatelyFast | ✅ 无需适配 | — | 26.x 渲染架构下无需集成，装了也不冲突 |
+| Yes Steve Model (YSM) | 🔧 契约就绪 | — | mod id `yes_steve_model`；TaCZ 侧提供 molang 门面 + 第一人称握手，见 [YSM_COMPAT.md](YSM_COMPAT.md)（YSM 侧 compat 仍为 stub，装在一起暂无动画） |
 | Just Zoom | ❌ 不适配 | — | 无上游先例，项目决定不做原创适配 |
 | Zoomify | — | — | 26.1 线无 NeoForge 版，无从适配 |
 | Accelerated Rendering | — | — | 无 26.1.2 Feature Rendering 版，兼容层禁用 |

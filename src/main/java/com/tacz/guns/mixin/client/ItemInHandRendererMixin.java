@@ -8,6 +8,7 @@ import com.tacz.guns.api.client.other.KeepingItemRenderer;
 import com.tacz.guns.client.renderer.item.AnimateGeoItemRenderer;
 import com.tacz.guns.compat.firstperson.FirstPersonAnimationCompat;
 import com.tacz.guns.compat.shader.ShaderCompat;
+import com.tacz.guns.compat.ysm.YsmCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -147,6 +148,15 @@ public class ItemInHandRendererMixin implements KeepingItemRenderer {
         }
 
         if (!ShaderCompat.shouldRenderInCurrentHandPhase(renderStack)) {
+            return;
+        }
+
+        // 【YSM 适配】外部渲染器（Yes Steve Model）声明「这一帧的枪我自己画」时不重复提交。
+        // YSM 在玩家模型定位点（tac_pistol / tac_rifle）上用 ItemRenderer#renderStatic 画枪；
+        // 若它的第一人称手臂接管没有取消掉 vanilla 的 renderArmWithItem，就会与本视模叠成两把枪。
+        // 该标志默认 false，只有 YSM 主动调用 YsmCompat.setExternalGunRender(true) 时才生效，
+        // 且每个客户端 tick 结束都会被复位 —— 没有调用方时行为与改动前完全一致。
+        if (YsmCompat.isExternalGunRenderActive()) {
             return;
         }
 
