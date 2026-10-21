@@ -3,14 +3,45 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 1.1.8+neoforge.26.1.2.R3-hotfix2 — 未发布
+## 1.1.8+neoforge.26.1.2.R3-hotfix3 — 未发布
+
+> 同步姊妹项目 [TaCZ_Refabricated_Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
+> `26.1.2` 分支至 `5bf6352`（含 26.3 线弹孔朝向修复的 26.1.2 回移），并新增 YSM（Yes Steve Model）兼容门面。
+> **运行期尚无维护者实机 PASS**，源码与离线校验以 `compile-check` / `verify_bullet_hole_orientation` / `verify_ysm_compat` 为准。
+> 与「开光影世界全透明」问题**无关**，后者另行跟进。
+
+### 修复
+
+- **弹孔朝向修复**：同步姊妹 26.1.2 PR #112（来源 26.3 线 `e1f57a2`）的粒子朝向/法线偏移修正。
+  将方向旋转应用到 vanilla XY 粒子四边形时补齐局部 +Z→+Y 基变换（`Rx(-90°) * Rz(180°)`），维持现有 UV 角序；
+  防 z-fighting 改为沿命中面法线偏移，并显式保持相机相对坐标。新增六面几何与源码静态验证
+  `scripts/verify_bullet_hole_orientation.py`（5 项通过）。详细回移范围、暂缓项与基线差异见
+  [`docs/YSM_COMPAT.md`](docs/YSM_COMPAT.md) 的同步记录链接与 [`docs/SYNC_26_3_BACKPORT_26_1_2_20261021.md`](docs/SYNC_26_3_BACKPORT_26_1_2_20261021.md) 的姊妹侧原文。
+  验证限制：离线四元数模型 + 静态源码检查，不替代客户端六面实机验证。
+
+### 新增
+
+- **YSM（Yes Steve Model）兼容门面**：新增 `com.tacz.guns.compat.ysm.YsmCompat`（9 个 molang 变量
+  `tac_hold_gun` / `tac_gun_type` / `tac_gun_id` / `tac_is_fire` / `tac_is_aim` / `tac_is_reload` / `tac_is_melee` / `tac_is_draw` / `tac_fire_mode`），
+  语义逐条对齐 YSM 1.20.1 Forge 版 `TacBinding`/`TacAnimHandler`；内部改用 `instanceof IGunOperator`
+  而非无检查转型，索引失败/实体未被 mixin 时返回中性值并只记一次 WARN。另提供 `beginSelfFlashPass()/endSelfFlashPass()`
+  成对控制 `MuzzleFlashRender.isSelf`/`ShellRender.isSelf`。
+  第一人称渲染归属握手：`YsmCompat.setExternalGunRender(true)` 让外部渲染器声明「这一帧的枪我自己画」，
+  `ItemInHandRendererMixin` 据此早退，避免与 YSM 在定位点上 `renderStatic` 出的枪重叠；标志由 `ClientTickEvent.Post` 每 tick 复位。
+  新增客户端配置 `YsmCompat`（`tacz-client.toml`，默认 `true`）。YSM 侧 compat 仍为 stub（`TacCompat.isLoaded()` 恒 false），
+  故装在一起暂无枪械动画，不构成「YSM 已适配完成」。契约见 [`docs/YSM_COMPAT.md`](docs/YSM_COMPAT.md)，
+  离线验证 `scripts/verify_ysm_compat.py`（11 项通过）。
+
+## 1.1.8+neoforge.26.1.2.R3-hotfix2 — 2026-09-13
 
 > 以下为**静态修复、待实测**：前三项由姊妹项目 refab 26.2(main) 侧针对玩家日志 `mclo.gs/39JqB2p`
-> 的可见 bug 修复移植而来，第四项同步 refab 26.1.2 PR #92 的 mesh 光影修复；同代码、同机制，
+> 的可见 bug 修复移植而来，第四项同步 refab 26.1.2 PR #92 的 mesh 光影修复；第五项同步
+> 姊妹 26.1.2 PR #101 的第一人称手部错位修复（`zRot=±0.1`）。同代码、同机制，
 > CI 编译门以本分支 compile-check / build 为准；
 > **运行期尚无维护者实机 PASS**。与「开光影世界全透明」问题**无关**，后者另行跟进。
 > 可见 bug 三项的证据与适用性矩阵见
-> [`docs/records/VISIBLE_BUGS_39JqB2p_2612_20260908.md`](docs/records/VISIBLE_BUGS_39JqB2p_2612_20260908.md)。
+> [`docs/records/VISIBLE_BUGS_39JqB2p_2612_20260908.md`](docs/records/VISIBLE_BUGS_39JqB2p_2612_20260908.md)；
+> 手部错位修复见 [`docs/records/R3_CONFIRMATION_2612_20260907.md`](docs/records/R3_CONFIRMATION_2612_20260907.md) 的补充记录。
 
 ### 修复
 
@@ -37,6 +68,9 @@
   更正 2026-09-01「仅压栈即与 26.2 等价」的旧结论。**性能与外观均未实测**；该症状早于上面三项，
   不归因于删除 `assignCommonEntityPipelinesToHandIfNeeded`。证据见
   [`docs/records/MESH_GPU_IRIS_PASS_LIFETIME_2612_20260908.md`](docs/records/MESH_GPU_IRIS_PASS_LIFETIME_2612_20260908.md)。
+- **第一人称手部错位（`zRot=±0.1`）**：同步姊妹 26.1.2 PR #101（来源 1.21.11 线 `61ab4a0`），中和 vanilla 1.21.9+
+  `AvatarRenderer#renderHand` 新增的 `leftArm.zRot=-0.1F` / `rightArm.zRot=0.1F`，在 `RenderHelper#renderFirstPersonArm`
+  每次 vanilla 手部调用后将两条手臂 `zRot` 清零，精确还原 1.21.1 语义；两条一起清，避免双持时后一次污染前一条。
 
 ## 1.1.8+neoforge.26.1.2.R3 — 2026-09-07
 

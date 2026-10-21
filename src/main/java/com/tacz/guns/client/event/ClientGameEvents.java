@@ -68,6 +68,8 @@ public final class ClientGameEvents {
         ShootKey.autoShoot(mc, true);
         SoundPlayManager.onClientTick(mc);
         RecipeViewerReloadBridge.tick(mc);
+        // YSM 握手每 tick 复位，漏掉 finally 最多多抑制一帧
+        com.tacz.guns.compat.ysm.YsmCompat.clearExternalGunRender();
     }
 
     @SubscribeEvent
