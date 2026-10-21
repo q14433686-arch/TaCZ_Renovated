@@ -25,16 +25,32 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * 26.1.2 codec for the legacy TACZ gun-smith recipe JSON.
+ * 1.21.11 codec for the legacy TACZ gun-smith recipe JSON.
  * Semantics copied from Fabric 26.1.2 {@code GunSmithTableSerializer} (RecipeCompat).
  */
 public final class GunSmithTableSerializer {
     private static final Codec<GunSmithTableIngredient> INGREDIENT_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Ingredient.CODEC.fieldOf("item").forGetter(GunSmithTableIngredient::getIngredientOrThrow),
+                    net.minecraft.util.ExtraCodecs.JSON.fieldOf("item").forGetter(GunSmithTableSerializer::encodeIngredient),
                     Codec.INT.optionalFieldOf("count", 1).forGetter(GunSmithTableIngredient::getCount)
             ).apply(instance, GunSmithTableIngredient::new)
     );
+
+    // Registry recipes must pass through the same legacy normalization as the Gson loader.
+    // Decode raw JSON now; resolve Ingredient only after item tags have been bound.
+    private static com.google.gson.JsonElement encodeIngredient(GunSmithTableIngredient ingredient) {
+        com.google.gson.JsonElement raw = ingredient.getRawIngredient();
+        Ingredient resolved = ingredient.getIngredient();
+        if (resolved != null) {
+            var ops = net.minecraft.resources.RegistryOps.create(com.mojang.serialization.JsonOps.INSTANCE,
+                    net.minecraft.core.RegistryAccess.fromRegistryOfRegistries(net.minecraft.core.registries.BuiltInRegistries.REGISTRY));
+            var encoded = Ingredient.CODEC.encodeStart(ops, resolved).result();
+            if (encoded.isPresent()) {
+                return encoded.get();
+            }
+        }
+        return raw != null ? raw : com.google.gson.JsonNull.INSTANCE;
+    }
 
     private static final Codec<Map<String, Identifier>> ATTACHMENTS_CODEC =
             Codec.unboundedMap(Codec.STRING, Identifier.CODEC);

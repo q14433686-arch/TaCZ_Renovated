@@ -78,6 +78,12 @@ public class GunSmithTableIngredient {
         return ingredient;
     }
 
+    /** Snapshot for registry-codec encoding before tags have resolved. */
+    @Nullable
+    public synchronized JsonElement getRawIngredient() {
+        return rawIngredient == null ? null : rawIngredient.deepCopy();
+    }
+
     public int getCount() {
         return count;
     }
