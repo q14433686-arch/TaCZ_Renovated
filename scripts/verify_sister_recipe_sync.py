@@ -25,6 +25,34 @@ class RecipeSyncChecks(unittest.TestCase):
         self.assertIn('recipe.init();', source)
         self.assertIn('Ingredient.CONTENTS_STREAM_CODEC.encode', source)
 
+    def test_workbench_consumers_check_whole_recipe_before_constructing(self):
+        # Static wiring guard: execution and server/network behavior are covered by
+        # the separate Java harness, not by this string check.
+        for relative, expected in (
+            ('client/gui/GunSmithTableScreen.java', 2),
+            ('inventory/GunSmithTableMenu.java', 1),
+            ('api/TimelessAPI.java', 2),
+            ('compat/jei/GunModPlugin.java', 1),
+            ('compat/rei/REIClientPlugin.java', 1),
+        ):
+            source = (JAVA / relative).read_text()
+            with self.subTest(path=relative):
+                self.assertEqual(expected, source.count('new GunSmithTableRecipe('))
+                self.assertEqual(expected, source.count('TableRecipe.validationError('))
+                self.assertLess(source.index('TableRecipe.validationError('),
+                                source.index('new GunSmithTableRecipe('))
+
+    def test_rejected_server_recipes_are_not_synced_and_old_server_data_is_checked(self):
+        server = (JAVA / 'resource/manager/TableRecipeManager.java').read_text()
+        client = (JAVA / 'resource/network/CommonNetworkCache.java').read_text()
+        self.assertIn('String error = TableRecipe.validationError(recipe)', server)
+        self.assertLess(server.index('super.apply(ours,'), server.index('networkCache.forEach('))
+        self.assertIn('if (dataMap.containsKey(id))', server)
+        self.assertIn('networkCache = Map.copyOf(validNetworkCache)', server)
+        self.assertIn('String error = TableRecipe.validationError(recipe)', client)
+        self.assertLess(client.index('TableRecipe.validationError(recipe)'),
+                        client.index('tableRecipe.put(entry.getKey(), recipe)'))
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

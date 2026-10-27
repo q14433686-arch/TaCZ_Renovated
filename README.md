@@ -20,7 +20,8 @@
 并包含 JEI/REI 枪匠台弹药配方与 Ammo Query 的 native recipe-sync 同步；前五项为源码级修复、
 **运行期待实机**，见 [`CHANGELOG.md`](CHANGELOG.md) 与
 [`docs/records/RECIPE_VIEWER_SYNC_12111_20260908.md`](docs/records/RECIPE_VIEWER_SYNC_12111_20260908.md)。
-R3-hotfix4 还跟进工作台掉落、雕像持枪掉落及标靶主人与皮肤的源码修正；**运行期待实机验证**。
+R3-hotfix4 跟进工作台掉落、雕像持枪掉落及标靶主人与皮肤的源码修正，
+并对无效工作台材料配方进行拒绝、调整 Carry On 双格拾取检查位置；**运行期待实机验证**。
 R3 实测 PASS 内容：回传 26.1.2 线七个「静默失效」事件处理器批量接线、创造模式搜索栏同步、
 枪包脚本环境补回 Lua `string` 库（见
 [`docs/records/SCRIPT_STRINGLIB_RESTORE_20260907.md`](docs/records/SCRIPT_STRINGLIB_RESTORE_20260907.md)）。
