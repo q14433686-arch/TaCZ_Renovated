@@ -1,14 +1,14 @@
 package com.tacz.guns.client.renderer.entity;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.tacz.guns.client.model.bedrock.BedrockModel;
 import com.tacz.guns.client.model.bedrock.BedrockPart;
+import com.tacz.guns.client.renderer.other.TargetOwnerSkins;
 import com.tacz.guns.client.resource.InternalAssetLoader;
 import com.tacz.guns.entity.TargetMinecart;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.PlayerSkinRenderCache;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.entity.AbstractMinecartRenderer;
@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.component.ResolvableProfile;
 
 import java.util.Optional;
 
@@ -49,12 +50,14 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
     private static final String HEAD_NAME = "head";
     private static final String HEAD_2_NAME = "head2";
 
-    /** 缓存本帧的 GameProfile：extractRenderState 阶段取，submit 阶段用。 */
-    private static final String PROFILE_KEY = "tacz$profile";
+    /** 原版头颅用的同一个皮肤缓存：异步解析档案 → 皮肤，解析期间/失败时给默认皮肤。 */
+    private final PlayerSkinRenderCache skinRenderCache;
 
     public TargetMinecartRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, ModelLayers.TNT_MINECART);
         this.shadowRadius = 0.25F;
+        // 26.2 由渲染器 context 提供缓存（1.21.11 线是 Minecraft#playerSkinRenderCache()）。
+        this.skinRenderCache = ctx.getPlayerSkinRenderCache();
     }
 
     @Override
@@ -62,9 +65,10 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
         return new TargetMinecartRenderState();
     }
 
-    /** 扩展 vanilla 状态，额外携带皮肤所需的 GameProfile。 */
+    /** The skin is resolved while extracting state, not during geometry submission. */
     public static class TargetMinecartRenderState extends MinecartRenderState {
-        public GameProfile gameProfile;
+        /** 主人头像的渲染类型；{@code null} 表示没有自定义名，不画头。 */
+        public RenderType skinRenderType;
     }
 
     @Override
@@ -72,7 +76,8 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
         // 让父类填好位置、朝向、受击摇晃、沿轨道姿态等全部 vanilla 状态。
         super.extractRenderState(entity, state, partialTicks);
         if (state instanceof TargetMinecartRenderState targetState) {
-            targetState.gameProfile = entity.getGameProfile();
+            ResolvableProfile owner = entity.getOwnerProfile();
+            targetState.skinRenderType = owner == null ? null : TargetOwnerSkins.renderType(this.skinRenderCache, owner);
         }
     }
 
@@ -113,12 +118,9 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
             RenderType renderType = RenderTypes.entityTranslucent(InternalAssetLoader.TARGET_MINECART_TEXTURE_LOCATION);
             model.submit(stack, ItemDisplayContext.NONE, collector, renderType, packedLight, OverlayTexture.NO_OVERLAY);
 
-            GameProfile gameProfile = state instanceof TargetMinecartRenderState t ? t.gameProfile : null;
-            if (gameProfile != null) {
+            RenderType skullRenderType = state instanceof TargetMinecartRenderState t ? t.skinRenderType : null;
+            if (skullRenderType != null) {
                 stack.translate(0, 1, -4.5 / 16d);
-                Minecraft minecraft = Minecraft.getInstance();
-                Identifier skin = minecraft.getSkinManager().createLookup(gameProfile, false).get().body().texturePath();
-                RenderType skullRenderType = RenderTypes.entityTranslucent(skin);
 
                 headModel.visible = true;
                 collector.submitCustomGeometry(stack, skullRenderType, (entryPose, consumer) -> {

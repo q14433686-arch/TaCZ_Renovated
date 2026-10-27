@@ -267,6 +267,110 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
+// Exercise the actual target/statue logic against lightweight test stubs. These are
+// unit tests, not Minecraft codec, profile-service or in-game integration tests.
+// 26.2 侧改用 Java 25（本工程 toolchain），1.21.11 侧是 21。
+def sisterEntityTestClasses = layout.buildDirectory.dir("classes/sisterEntityTest")
+tasks.register("compileSisterEntityTest", JavaCompile) {
+    source files(
+            "src/main/java/com/tacz/guns/util/TargetOwnerProfiles.java",
+            "src/main/java/com/tacz/guns/block/entity/TargetBlockEntity.java",
+            "src/main/java/com/tacz/guns/block/entity/StatueBlockEntity.java")
+    source fileTree(dir: "tests/target-profile", include: "**/*.java")
+    classpath = files()
+    destinationDirectory = sisterEntityTestClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("targetProfileTest", JavaExec) {
+    dependsOn "compileSisterEntityTest"
+    classpath = files(sisterEntityTestClasses)
+    mainClass = "com.tacz.guns.util.TargetOwnerProfilesTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("targetBlockEntitiesTest", JavaExec) {
+    dependsOn "compileSisterEntityTest"
+    classpath = files(sisterEntityTestClasses)
+    mainClass = "com.tacz.guns.block.entity.TargetBlockEntitiesTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+// Exercise the real recipe loaders/network cache and Carry On handler logic with
+// lightweight game/loader stubs; Gson comes from Minecraft's normal compile classpath.
+// These tests do not launch Minecraft or transform Carry On's bytecode.
+// 26.2 侧随本工程 toolchain 用 Java 25（1.21.11 侧是 21）。
+def workbenchRegressionClasses = layout.buildDirectory.dir("classes/workbenchRegression")
+tasks.register("compileWorkbenchRegression", JavaCompile) {
+    source files(
+            "src/main/java/com/tacz/guns/resource/pojo/data/recipe/TableRecipe.java",
+            "src/main/java/com/tacz/guns/resource/serialize/GunSmithTableIngredientSerializer.java",
+            "src/main/java/com/tacz/guns/crafting/GunSmithTableRecipe.java",
+            "src/main/java/com/tacz/guns/resource/ICommonResourceProvider.java",
+            "src/main/java/com/tacz/guns/resource/manager/INetworkCacheReloadListener.java",
+            "src/main/java/com/tacz/guns/resource/manager/JsonDataManager.java",
+            "src/main/java/com/tacz/guns/resource/manager/CommonDataManager.java",
+            "src/main/java/com/tacz/guns/resource/manager/TableRecipeManager.java",
+            "src/main/java/com/tacz/guns/resource/network/CommonNetworkCache.java",
+            "src/main/java/com/tacz/guns/mixin/carryon/CarryOnPickupHandlerMixin.java")
+    source fileTree(dir: "tests/workbench-regression", include: "**/*.java")
+    classpath = sourceSets.main.compileClasspath
+    options.compilerArgs.add("-proc:none")
+    destinationDirectory = workbenchRegressionClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("workbenchRecipeValidationTest", JavaExec) {
+    dependsOn "compileWorkbenchRegression"
+    classpath = files(workbenchRegressionClasses) + sourceSets.main.compileClasspath
+    mainClass = "com.tacz.guns.resource.manager.WorkbenchRecipeValidationTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("carryOnPickupTest", JavaExec) {
+    dependsOn "compileWorkbenchRegression"
+    classpath = files(workbenchRegressionClasses) + sourceSets.main.compileClasspath
+    mainClass = "com.tacz.guns.mixin.carryon.CarryOnPickupTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+// A second isolated harness actually applies the Mixin transformer to a mock
+// Carry On-shaped class. It does not verify FML plugin selection or the real mod.
+def carryOnTransformClasses = layout.buildDirectory.dir("classes/carryOnTransformTest")
+tasks.register("compileCarryOnTransformTest", JavaCompile) {
+    source files(
+            "src/main/java/com/tacz/guns/mixin/carryon/CarryOnPickupHandlerMixin.java",
+            "tests/workbench-regression/stubs/net/minecraft/core/BlockPos.java",
+            "tests/workbench-regression/stubs/net/minecraft/world/level/Level.java",
+            "tests/workbench-regression/stubs/net/minecraft/world/level/block/Block.java",
+            "tests/workbench-regression/stubs/net/minecraft/world/level/block/state/BlockState.java",
+            "tests/workbench-regression/stubs/com/tacz/guns/block/AbstractGunSmithTableBlock.java")
+    source fileTree(dir: "tests/carryon-transform/src", include: "**/*.java")
+    classpath = sourceSets.main.compileClasspath
+    options.compilerArgs.add("-proc:none")
+    destinationDirectory = carryOnTransformClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("carryOnTransformTest", JavaExec) {
+    dependsOn "compileCarryOnTransformTest"
+    classpath = files(carryOnTransformClasses, "tests/carryon-transform/resources") + sourceSets.main.compileClasspath
+    mainClass = "testservice.TransformTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.named("check") {
+    dependsOn "targetProfileTest", "targetBlockEntitiesTest",
+            "workbenchRecipeValidationTest", "carryOnPickupTest", "carryOnTransformTest"
+}
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {
     module {

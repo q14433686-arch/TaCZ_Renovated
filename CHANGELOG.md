@@ -3,6 +3,56 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
+## 1.1.8+neoforge.26.2.R3-hotfix4 — 2026-10-27（未发布）
+
+跟进本仓库 1.21.11 线 `c3dd078`（对应姊妹 Fabric 1.21.11
+[PR #120](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/pull/120)）的方块与标靶修复，
+版本号只改源码标识，`1.1.8` 核心与 `+` build metadata 不变；尚未发布。
+
+- **双格工作台**：删除 `AbstractGunSmithTableBlock` 里的手工克隆掉落，以及本线提前用
+  `removeBlock(companion, false)` 静默清除另一半的路径 —— 两处叠加会绕过根半边战利品表
+  （掉两份 / 一份不掉）。现在 B/C 的掉落只由根半边战利品表产出（`part=foot` / `half=lower`）
+  并从根方块实体拷 `BlockId`，另一半交给 `updateShape` → `Block#updateOrDestroy` 的邻接清空；
+  B 型创造模式的抑制判据由 FOOT 改为 HEAD（原判据照抄原版床、与本仓库的 loot 条件相反，
+  导致创造模式挖任意一半都漏一个工作台）。
+- **雕像**：枪改由服务端的 `BlockEntity#preRemoveSideEffects` 掉落（`Block#onRemove` 在
+  1.21 起已删除，且没有「方块实体移除时自动清理」的默认行为，此前破坏雕像会静默吞掉枪）。
+  掉落方向改用传入的移除前状态取 `FACING`，不再读可能已是空气的缓存状态。
+- **标靶 / 标靶矿车主人**：`new GameProfile(null, 名字)` 在新 authlib 里必抛 NPE（抛在
+  `BlockItem#place` 中途 ⇒ 方块放下但物品不消耗；矿车那条在渲染线程每帧调用 ⇒ 崩溃），
+  改用原版 `ResolvableProfile`（`TargetOwnerProfiles#fromName`），方块实体对称读写
+  `owner_name` 并调用父类 `loadAdditional/saveAdditional`（保留 NeoForge 附件数据）。
+  头像皮肤改走原版异步 `PlayerSkinRenderCache`，解析中/失败回落默认皮肤，渲染提交阶段不再查询皮肤。
+- 新增离线守卫 `scripts/verify_block_drops.py`、`scripts/verify_block_entity_persistence.py`
+  与 `tests/target-profile/` 独立单元测试（接入 Gradle `check`）。依据、与 1.21.11 线的差异及
+  待测矩阵见 [同步审计](docs/records/SISTER_SYNC_262_20261027.md)。
+- **工作台配方（同日第二轮，跟进 1.21.11 线 `581daaa`）**：`TableRecipe#validationError` 把
+  缺 `result` / 缺 `materials` / 材料列表含空项的配方**整条拒绝**并记录配方 ID（不删空项——删了
+  等于降低合成成本，显式 `materials: []` 仍合法）；服务端不再把被拒的原始 JSON 同步给旧客户端，
+  客户端接收端再校验一次；屏幕、合成菜单、`TimelessAPI`、JEI、REI 构造配方前统一防御校验；
+  `GunSmithTableRecipe` 对材料列表做快照并拒绝 `null` 成员。修的是「坏配方让打开工作台直接断线」
+  （1.21.11 线用户日志确认，本线按同因推演，未实测）。
+- **Carry On 双格拾取**：非根半边 → 根的重定向从 `@At("HEAD")` 移到 `CarryOnDataManager#getCarryData`
+  调用之前，使 Carry On 的距离/通用检查按**玩家实际点击的那一格**判定；新增对**残缺半边**
+  （找不到匹配根）的拒绝，避免 `pickupAllBlocks` 把孤立半边当普通方块搬走。已逐条核对
+  **Carry On 2.11.0** 源码（`v2.11.0` blob `c0014165`）的签名与调用顺序。
+- 移植 `tests/workbench-regression/`（配方校验 + 拾取 stub）与 `tests/carryon-transform/`
+  （用 Mixin 0.8.7 transformer 对模拟 Carry On 类做真实注入），接入 Gradle `check`；
+  `scripts/verify_sister_recipe_sync.py` 接入 CI。26.2 的 Mixin 是 Fabric 分支，比上游多在
+  `IMixinService` 里两个抽象方法，注入测试的测试服务已相应适配。依据、CI 结果与待测矩阵见
+  [工作台配方与拾取审计](docs/records/WORKBENCH_PICKUP_CRASH_262_20261027.md)。
+
+**与 1.21.11 线的唯一代码差异**：1.21.11 线从 `Minecraft#playerSkinRenderCache()` 取皮肤缓存，
+26.2 改由渲染器构造参数取得（`BlockEntityRendererProvider.Context#playerSkinRenderCache()` /
+`EntityRendererProvider.Context#getPlayerSkinRenderCache()`），渲染状态里存的是 `RenderType`
+而不是贴图 `Identifier`。理由与可编译依据见同步审计。
+
+**验证状态**：本仓 CI（`build` / `compile-check` / `consistency`，含 R3-hotfix4 两轮的离线守卫与
+Java 桩测试）全绿（含上文
+新增的守卫、python 模型测试与 Gradle `check` 里的标靶/雕像单元测试）；但**尚未实机验证**
+—— 掉落次数、创造模式抑制、皮肤解析与专服同步仍需实测，详见
+[同步审计](docs/records/SISTER_SYNC_262_20261027.md)。
+
 ## 1.1.8+neoforge.26.2.R3-hotfix3 — 2026-09-13（未发布）
 
 ### 修复：第一人称手部错位（全枪械）——中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`

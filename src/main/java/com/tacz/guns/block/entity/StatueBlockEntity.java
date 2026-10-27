@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -14,10 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Set;
 
 import static com.tacz.guns.block.StatueBlock.FACING;
 
@@ -59,20 +55,32 @@ public class StatueBlockEntity extends BlockEntity {
     }
 
     public void dropItem() {
+        dropItem(getBlockState());
+    }
+
+    private void dropItem(BlockState state) {
         if (!gunItem.isEmpty() && level != null) {
-            Direction direction = getBlockState().getValue(FACING);
+            // During removal, the block entity's cached state may already have changed.
+            Direction direction = state.hasProperty(FACING) ? state.getValue(FACING) : Direction.NORTH;
             Block.popResource(level, worldPosition.relative(direction).above(), gunItem);
             this.gunItem = ItemStack.EMPTY;
-            if (level != null) {
-                BlockState state = level.getBlockState(worldPosition);
-                level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_ALL);
-            }
+            BlockState current = level.getBlockState(worldPosition);
+            level.sendBlockUpdated(worldPosition, current, current, Block.UPDATE_ALL);
             this.setChanged();
         }
     }
 
     @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level != null && !level.isClientSide()) {
+            dropItem(state);
+        }
+    }
+
+    @Override
     public void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
         // 26.2 data migration: ItemStack.OPTIONAL_CODEC may fail on legacy NBT data
         // where Item was stored as COMPOUND instead of the new string-based format.
         // Gracefully handle both formats.
@@ -86,7 +94,8 @@ public class StatueBlockEntity extends BlockEntity {
 
     @Override
     protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
-                output.store(ITEM_TAG, ItemStack.OPTIONAL_CODEC, gunItem);
+        super.saveAdditional(output);
+        output.store(ITEM_TAG, ItemStack.OPTIONAL_CODEC, gunItem);
     }
 
     @Override

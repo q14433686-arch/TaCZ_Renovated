@@ -9,7 +9,7 @@
 Minecraft **26.2** + NeoForge **26.2.0.64** + Java **25** 的非官方 GPL-3.0 移植。
 
 - modId 永远是 `tacz`；枪包依赖已绑定该 id。
-- 当前版本：`1.1.8+neoforge.26.2.R3-hotfix3`（未发布；R1 / `R1-hotfix` / R2 / R3 / `R3-hotfix`（2026-09-09）已发布）。
+- 当前版本：`1.1.8+neoforge.26.2.R3-hotfix4`（未发布；R1 / `R1-hotfix` / R2 / R3 / `R3-hotfix`（2026-09-09）已发布）。
 - 热修标签格式（自 R2 轮固定）：`R<n>` → `R<n>-hotfix` → `R<n>-hotfix2` → …，小写、
   序号直接接在 `hotfix` 后面，中间不放 `.` / `-` / `_`。
 - 代码谱系基线：26.1.2 R1 分支

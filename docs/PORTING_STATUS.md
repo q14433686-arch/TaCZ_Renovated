@@ -1,12 +1,12 @@
 # 移植状态
 
 目标版本：Minecraft **26.2** + NeoForge **26.2.0.64**（release）。
-当前源码版本：**1.1.8+neoforge.26.2.R3-hotfix3**（未发布）。
+当前源码版本：**1.1.8+neoforge.26.2.R3-hotfix4**（未发布）。
 状态：**R3-hotfix 已发布（2026-09-09）；R3 / R2 / R1 / R1-hotfix 亦已发布。** 本页按工作包
 记录历史矩阵；发布封口的验证状态以 CHANGELOG / docs/records 为准，本文未把
 未跑项标为 PASS。
 
-> 最后更新：2026-09-01。本文只记录诚实状态；README 不作为逐包进度日志。
+> 最后更新：2026-10-27。本文只记录诚实状态；README 不作为逐包进度日志。
 
 ## 26.2 工作包
 
@@ -34,9 +34,12 @@
 
 ## 版本基线
 
-- **26.2 R3-hotfix3（当前工作树，未发布）**：R3-hotfix + 第一人称手部错位修复
-  （中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`，同步自 Fabric 1.21.11 线 `61ab4a0`）；
-  编译门待 CI 回写、实机未验。
+- **26.2 R3-hotfix4（当前工作树，未发布）**：R3-hotfix3 + 方块与标靶修复（工作台掉落交回
+  战利品表并修正 B 型创造模式判据、雕像持枪改由 `preRemoveSideEffects` 掉落、标靶主人改用
+  `ResolvableProfile` + 异步 `PlayerSkinRenderCache`），同步自本仓库 1.21.11 线 `c3dd078`；
+  编译门待 CI 回写、实机未验，见 `docs/records/SISTER_SYNC_262_20261027.md`。
+- **26.2 R3-hotfix3（未发布，2026-09-13）**：R3-hotfix + 第一人称手部错位修复
+  （中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`，同步自 Fabric 1.21.11 线 `61ab4a0`）。
 - **26.2 R3-hotfix（2026-09-09 发布）**：R3 + Iris scope-mask Fix-A / JEI·REI 枪匠台配方与
   Ammo Query / 移交单可见 bug 四项。
 - **26.2 R3（2026-09-07 发布）**：R2 + string 库热修 / 创造搜索 / 死处理器接线 / mesh 裁剪时序；从完整 26.1.2 R1 前滚，不是重写。

@@ -1,30 +1,26 @@
 package com.tacz.guns.block.entity;
 
-import com.mojang.authlib.GameProfile;
 import com.tacz.guns.block.TargetBlock;
 import com.tacz.guns.config.common.OtherConfig;
 import com.tacz.guns.init.ModBlocks;
 import com.tacz.guns.init.ModSounds;
+import com.tacz.guns.util.TargetOwnerProfiles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
-import java.util.Set;
 
 import static com.tacz.guns.block.TargetBlock.OUTPUT_POWER;
 import static com.tacz.guns.block.TargetBlock.STAND;
@@ -34,11 +30,13 @@ public class TargetBlockEntity extends BlockEntity implements Nameable {
      * 标靶复位时间，暂定为 5 秒
      */
     private static final int RESET_TIME = 5 * 20;
-    private static final String OWNER_TAG = "Owner";
+    // Like the sister 1.21.11 branch, persist the unvalidated name rather than the
+    // profile codec, which rejects non-player names longer than 16 characters, etc.
+    private static final String OWNER_NAME_TAG = "owner_name";
     private static final String CUSTOM_NAME_TAG = "CustomName";
     public float rot = 0;
     public float oRot = 0;
-    private @Nullable GameProfile owner;
+    private @Nullable ResolvableProfile owner;
     private @Nullable Component name;
 
     public TargetBlockEntity(BlockPos pos, BlockState blockState) {
@@ -55,33 +53,39 @@ public class TargetBlockEntity extends BlockEntity implements Nameable {
     }
 
     @Nullable
-    public GameProfile getOwner() {
+    public ResolvableProfile getOwner() {
         return owner;
     }
 
-    public void setOwner(@Nullable GameProfile owner) {
+    public void setOwner(@Nullable ResolvableProfile owner) {
         this.owner = owner;
-        // 26.2: SkullBlockEntity.updateGameprofile removed. Just refresh directly.
         this.refresh();
     }
 
     @Override
     public void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
-        if (!input.getStringOr(OWNER_TAG, "").isEmpty()) {
-            this.owner = new com.mojang.authlib.GameProfile(java.util.UUID.fromString(input.getStringOr("owner_uuid","")), input.getStringOr("owner_name",""));
-        }
-        if (!input.getStringOr(CUSTOM_NAME_TAG, "").isEmpty()) {
-            this.name = net.minecraft.network.chat.ComponentSerialization.CODEC
-                    .parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(input.getStringOr(CUSTOM_NAME_TAG, "")))
-                    .result().orElse(Component.empty());
+        super.loadAdditional(input);
+        // Reads the same key that saveAdditional writes, including older flat-key saves.
+        this.owner = TargetOwnerProfiles.fromName(input.getStringOr(OWNER_NAME_TAG, ""));
+        String rawName = input.getStringOr(CUSTOM_NAME_TAG, "");
+        this.name = null;
+        if (!rawName.isEmpty()) {
+            try {
+                this.name = net.minecraft.network.chat.ComponentSerialization.CODEC
+                        .parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(rawName))
+                        .result().orElse(Component.empty());
+            } catch (RuntimeException e) {
+                // A malformed legacy name must not prevent loading the chunk.
+                this.name = Component.literal(rawName);
+            }
         }
     }
 
     @Override
     protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
-                if (owner != null) {
-            output.putString("owner_uuid", owner.id()!=null?owner.id().toString():"");
-            output.putString("owner_name", owner.name()!=null?owner.name():"");
+        super.saveAdditional(output);
+        if (owner != null) {
+            owner.name().ifPresent(ownerName -> output.putString(OWNER_NAME_TAG, ownerName));
         }
         if (this.name != null) {
             output.putString(CUSTOM_NAME_TAG, net.minecraft.network.chat.ComponentSerialization.CODEC

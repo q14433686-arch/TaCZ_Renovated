@@ -34,7 +34,7 @@
 | REI | `26.2.820` NeoForge，Curse file `8271756` | 工作台、配件/弹药查询、subtype、native recipe-update lifecycle | source/API 已核；未实机 |
 | Architectury API | `21.0.2` NeoForge | REI 26.2.820 的编译/运行依赖 | 按 REI 26.2 source 原始 pin |
 | Iris | `1.11.2` NeoForge 26.2 | 反射 API、HAND/HAND_TRANSLUCENT、shadow、`ShaderCreator#link` 内 fragment `createShader` 直拦截、per-program mask sampler | Iris 26.2 common source/descriptor 已核；Fix-A 的 [`compileJava` + full build CI 已通过](docs/records/REFAB_SYNC_262_MAIN_1B4AF9F_20260909.md)，`HAND_ONLY` / `ALL` / `OFF` **运行期**矩阵待跑。2026-09-02 用户反馈只证明旧桥当时的 PIP/mask 行为，**不是**本次 Fix-A 的 NeoForge PASS。 |
-| Carry On | `2.11.0` NeoForge 26.2 | 多格工作台 root/companion、放置预检、携带模型 BlockId | 2.11.0 descriptor 已核；未实机 |
+| Carry On | `2.11.0` NeoForge 26.2 | 多格工作台 root/companion、放置预检、携带模型 BlockId、拾取注入点后移与残缺半边拒绝 | 2.11.0 源码已核（`v2.11.0` blob `c0014165`：`tryPickUpBlock` 签名、`isBlockInDistance`→`canCarryGeneral`→`getCarryData` 顺序、`removeBlock(pos,false)` 收尾）；Mixin 注入为 `require=0`，**是否真的应用待实机日志确认** |
 | First-person Model | **无 NeoForge 26.2 文件**；2.7.2 只有 Fabric 26.2，NeoForge 止于 26.1.2 | 反射 ActivationHandler 已按 2.7.2 API 预留 | 当前不列为可安装兼容；桥保持 dormant |
 | Not Enough Animations | **无 NeoForge 26.2 文件**；1.12.4 的 NeoForge 文件止于 26.1.2 | 直接手臂提交 guard 已按 1.12.4 API 预留 | 当前不列为可安装兼容；桥保持 dormant |
 | Punchy! | 有 NeoForge 26.2：`2.7d`，Curse file `8697217` | 可选 `@Pseudo` mixin 走 Punchy 既有 blacklist / 让出路径 | API/target 已核；未实机。无 Punchy 时 plugin 不应用 mixin |
