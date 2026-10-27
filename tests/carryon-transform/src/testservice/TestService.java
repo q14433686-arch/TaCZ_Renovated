@@ -24,6 +24,9 @@ public final class TestService extends MixinServiceAbstract implements IClassPro
     // 不加 @Override —— 换回上游分支时这条只是多余方法，不会编译失败。
     // 接口文档要求「不得返回 null」，因此给 Mixin 自带的 GENERIC 实现。
     public IAdviceProvider getAdviceProvider() { return IAdviceProvider.GENERIC; }
+    // 同一条分支加的第二个抽象方法：特性校验器。测试只做普通 @Inject/@ModifyVariable，
+    // 用 Mixin 自带的「全允许」实现（接口注明不得返回 null）。
+    public IFeatureValidator getFeatureValidator() { return IFeatureValidator.ALLOW_ALL; }
     public Collection<String> getPlatformAgents() { return List.of(); }
     public IContainerHandle getPrimaryContainer() { return new ContainerHandleVirtual("isolated"); }
     public InputStream getResourceAsStream(String name) { return ClassLoader.getSystemResourceAsStream(name); }
