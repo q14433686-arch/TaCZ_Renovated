@@ -84,6 +84,40 @@
 
 以上都是**离线**回归：不起 Minecraft、不加载真实 Carry On jar、不验证 FML 的 mixin plugin 选择。
 
+### 26.2 特有的一次适配：Mixin 分支不同
+
+首次 CI（`199f9e7`）的 `Full build` 就红在 `compileCarryOnTransformTest`，报
+
+```
+TestService is not abstract and does not override abstract method getAdviceProvider() in IMixinService
+```
+
+原因是 26.2 依赖的 Mixin 是 **Fabric 维护的那一支**，它在 `IMixinService` 里比上游
+SpongePowered `releases/0.8.7` 多两个**抽象**方法：`IAdviceProvider getAdviceProvider()` 与
+`IFeatureValidator getFeatureValidator()`（对照
+[FabricMC/Mixin `IMixinService.java`](https://github.com/FabricMC/Mixin/blob/main/src/main/java/org/spongepowered/asm/service/IMixinService.java)；
+上游 [SpongePowered/Mixin `releases/0.8.7`](https://github.com/SpongePowered/Mixin/blob/releases/0.8.7/src/main/java/org/spongepowered/asm/service/IMixinService.java) 没有它们）。
+测试服务因此在 `tests/carryon-transform/src/testservice/TestService.java` 里补了这两个方法，
+分别返回接口文档要求「不得为 null」的 `IAdviceProvider.GENERIC` 与 `IFeatureValidator.ALLOW_ALL`；
+**不加 `@Override`**，这样换回上游分支时它们只是多余方法，不会把测试编译搞红。1.21.11 线不需要
+这处改动，是两条线的 Mixin 分支差异，与本轮修的内容无关。
+
+## CI 结果（已回写）
+
+最终提交的 GitHub Actions（分支 `arena/923b2d9d-tacz-renovated`）：
+
+- `build` —— **success**：`Block drops and block-entity persistence guards`、
+  `Workbench recipe and Carry On static wiring`、`Full build`、`Upload jars` 全绿；
+  `Full build` 里 `targetProfileTest` / `targetBlockEntitiesTest` / `workbenchRecipeValidationTest` /
+  `carryOnPickupTest` / `carryOnTransformTest` 全部执行并通过（日志分别打印
+  「TargetOwnerProfilesTest: passed」「Workbench recipe validation and sync regression passed」
+  「Carry On pickup handler regression passed」等）。
+- `compile-check` / `consistency` —— success。
+
+取证方式说明：本沙箱拿不到 Actions 的日志下载地址（被网络策略挡住），因此用一次性诊断工作流把
+`./gradlew check` 的完整输出回推到 `build-reports/diag-check.log` 读取；定位并修完后该工作流与日志
+已从仓库删除。**编译与离线测试 PASS 仍然不等于实机 PASS。**
+
 ## 待实测矩阵
 
 - 单人 + 专服，各用一份含下列问题的枪包：`materials` 含 `null`、尾逗号、缺 `materials`、

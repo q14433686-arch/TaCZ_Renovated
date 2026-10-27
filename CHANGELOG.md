@@ -38,7 +38,8 @@
   **Carry On 2.11.0** 源码（`v2.11.0` blob `c0014165`）的签名与调用顺序。
 - 移植 `tests/workbench-regression/`（配方校验 + 拾取 stub）与 `tests/carryon-transform/`
   （用 Mixin 0.8.7 transformer 对模拟 Carry On 类做真实注入），接入 Gradle `check`；
-  `scripts/verify_sister_recipe_sync.py` 接入 CI。依据与待测矩阵见
+  `scripts/verify_sister_recipe_sync.py` 接入 CI。26.2 的 Mixin 是 Fabric 分支，比上游多在
+  `IMixinService` 里两个抽象方法，注入测试的测试服务已相应适配。依据、CI 结果与待测矩阵见
   [工作台配方与拾取审计](docs/records/WORKBENCH_PICKUP_CRASH_262_20261027.md)。
 
 **与 1.21.11 线的唯一代码差异**：1.21.11 线从 `Minecraft#playerSkinRenderCache()` 取皮肤缓存，
@@ -46,7 +47,8 @@
 `EntityRendererProvider.Context#getPlayerSkinRenderCache()`），渲染状态里存的是 `RenderType`
 而不是贴图 `Identifier`。理由与可编译依据见同步审计。
 
-**验证状态**：本仓 CI 在 `f057d11` 上 `build` / `compile-check` / `consistency` 全绿（含上文
+**验证状态**：本仓 CI（`build` / `compile-check` / `consistency`，含 R3-hotfix4 两轮的离线守卫与
+Java 桩测试）全绿（含上文
 新增的守卫、python 模型测试与 Gradle `check` 里的标靶/雕像单元测试）；但**尚未实机验证**
 —— 掉落次数、创造模式抑制、皮肤解析与专服同步仍需实测，详见
 [同步审计](docs/records/SISTER_SYNC_262_20261027.md)。
