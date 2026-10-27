@@ -9,8 +9,9 @@
 > 与姊妹项目 `26.1.2` [PR #119](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/pull/119) /
 > `1.21.11` [PR #120](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/pull/120)，
 > 版本号仅变更源码标识，保持 `1.1.8` 核心及 NeoForge build metadata；尚未发布。
-> **本线尚未实机验证**，API 证据、加载器差异与待测矩阵见
-> [`docs/records/SISTER_SYNC_2612_20261027.md`](docs/records/SISTER_SYNC_2612_20261027.md)。
+> 本仓 GitHub Actions 的完整构建、编译检查与一致性检查已通过，见
+> [CI 验证记录](docs/records/SISTER_SYNC_2612_CI_20261027.md)；**本线尚未实机验证**，
+> API 证据、加载器差异与待测矩阵见 [`docs/records/SISTER_SYNC_2612_20261027.md`](docs/records/SISTER_SYNC_2612_20261027.md)。
 
 ### 修复
 
