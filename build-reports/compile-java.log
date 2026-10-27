@@ -1,4 +1,4 @@
-commit: f057d11ef94c12255b3a97c22d61a72caed0cadc
+commit: 199f9e78f68d55818d5650d3d636b2e58fa92a0f
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
 Calculating task graph as no cached configuration is available for tasks: compileJava
@@ -10,30 +10,30 @@ Creating Minecraft artifacts without recompilation.
 Loaded 137 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
 [1m*** Started working on [4mdownloadManifest[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
- [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.40s
+ [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.51s
 [1m*** Started working on [4mdownloadJson[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
   ↓ https://piston-meta.mojang.com/v1/packages/bdfd9856166b7171857c491f15479762f3abda99/26.2.json
- [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.11s
+ [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.14s
 [1m*** Started working on [4mdownloadServer[0m[0m
 [1m*** Started working on [4mdownloadClient[0m[0m
-  ↓ https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar
   ↓ https://piston-data.mojang.com/v1/objects/2dc72797acbc1b63fc16a11c4ac393605f453754/client.jar
- [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.58s
- [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.67s
+  ↓ https://piston-data.mojang.com/v1/objects/823e2250d24b3ddac457a60c92a6a941943fcd6a/server.jar
+ [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.67s
+ [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.81s
 [1m*** Started working on [4mpreProcessJar[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.16:fatjar
- [1m[92m✓[0m Completed [4mpreProcessJar[0m in 2.43s
+ [1m[92m✓[0m Completed [4mpreProcessJar[0m in 3.22s
 [1m*** Started working on [4mbinaryPatch[0m[0m
   [33mWARNING: [0mnet.neoforged.installertools:binarypatcher:4.0.17:fatjar is not present in the artifact manifest
   ↓ https://maven.neoforged.net/releases/net/neoforged/installertools/binarypatcher/4.0.17/binarypatcher-4.0.17-fatjar.jar
  ↳ Running external tool net.neoforged.installertools:binarypatcher:4.0.17:fatjar
- [1m[92m✓[0m Completed [4mbinaryPatch[0m in 2.89s
+ [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.68s
 [1m*** Started working on [4mcopyUnpatchedClasses[0m[0m
- [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 2.28s
+ [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 3.10s
 [1m*** Started working on [4mapplyDevTransforms[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.12:fatjar
- [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 2.51s
+ [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 3.25s
 Performing periodic cache maintenance on /home/runner/.gradle/caches/neoformruntime
 Cleaning intermediate results cache in /home/runner/.gradle/caches/neoformruntime/intermediate_results
  Maximum age: 744h
@@ -42,7 +42,7 @@ Cleaning intermediate results cache in /home/runner/.gradle/caches/neoformruntim
  [0;2;3m267 MiB overall size[0m
  [0;2;3m0 expired keys found[0m
 [0;2;3m Deleted 12 outdated lock files
-Total runtime: 12.26s
+Total runtime: 15.35s
 
 
 > Task :compileJava
@@ -50,7 +50,7 @@ Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1793063198083.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1793067317494.json
 
 [Incubating] Problems report is available at: file:///home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/reports/problems/problems-report.html
 
@@ -60,7 +60,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 59s
+BUILD SUCCESSFUL in 1m 3s
 2 actionable tasks: 2 executed
 Configuration cache entry stored.
 
