@@ -11,6 +11,8 @@ on:
   push:
     paths:
       - '.github/workflows/diag-check.yml'
+      - 'tests/**'
+      - 'src/main/java/com/tacz/guns/mixin/carryon/**'
 
 concurrency:
   group: diag-${{ github.ref }}
