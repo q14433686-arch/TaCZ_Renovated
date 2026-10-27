@@ -56,6 +56,10 @@
 - `REFAB_SYNC_HAND_ZROT_20260913.md` —— 对 1.21.11 姊妹线 `469f646` 的同步
   （第一人称手部错位：中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`；HMI 兼容登记未做；
   版本号升 `R3-hotfix3`）；
+- `SISTER_SYNC_262_20261027.md` —— 跟本仓库 1.21.11 线 `c3dd078`（`R3-hotfix4`）的方块与标靶
+  修复：工作台掉落交回战利品表、雕像持枪改由 `preRemoveSideEffects` 掉落、标靶主人改用
+  `ResolvableProfile` + 异步 `PlayerSkinRenderCache`；含 26.2 与 1.21.11 的唯一偏差（皮肤缓存
+  来源）与待测矩阵，版本号升 `R3-hotfix4`；
 - `SYNC_SIBLING_0105E43_20260901.md` —— 对 1.21.11 姊妹线的等价移植对照；
 - `BUG_MESHGUNBODY_SCOPE_CLIP_RERENDER_20260902.md` —— 「高模枪身开镜不被孔径裁切」
   的根因时序、误判与回滚、帧快照修法全记录；

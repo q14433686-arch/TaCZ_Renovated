@@ -267,6 +267,41 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
+// Exercise the actual target/statue logic against lightweight test stubs. These are
+// unit tests, not Minecraft codec, profile-service or in-game integration tests.
+// 26.2 侧改用 Java 25（本工程 toolchain），1.21.11 侧是 21。
+def sisterEntityTestClasses = layout.buildDirectory.dir("classes/sisterEntityTest")
+tasks.register("compileSisterEntityTest", JavaCompile) {
+    source files(
+            "src/main/java/com/tacz/guns/util/TargetOwnerProfiles.java",
+            "src/main/java/com/tacz/guns/block/entity/TargetBlockEntity.java",
+            "src/main/java/com/tacz/guns/block/entity/StatueBlockEntity.java")
+    source fileTree(dir: "tests/target-profile", include: "**/*.java")
+    classpath = files()
+    destinationDirectory = sisterEntityTestClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("targetProfileTest", JavaExec) {
+    dependsOn "compileSisterEntityTest"
+    classpath = files(sisterEntityTestClasses)
+    mainClass = "com.tacz.guns.util.TargetOwnerProfilesTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("targetBlockEntitiesTest", JavaExec) {
+    dependsOn "compileSisterEntityTest"
+    classpath = files(sisterEntityTestClasses)
+    mainClass = "com.tacz.guns.block.entity.TargetBlockEntitiesTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.named("check") {
+    dependsOn "targetProfileTest", "targetBlockEntitiesTest"
+}
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {
     module {
