@@ -19,6 +19,11 @@ public final class TestService extends MixinServiceAbstract implements IClassPro
     public ITransformerProvider getTransformerProvider() { return null; }
     public IClassTracker getClassTracker() { return null; }
     public IMixinAuditTrail getAuditTrail() { return null; }
+    // Fabric 的 Mixin 分支（NeoForge 26.2 依赖的那一支）在 IMixinService 里把
+    // getAdviceProvider() 加成了抽象方法；上游 SpongePowered 0.8.7 没有它，所以这里
+    // 不加 @Override —— 换回上游分支时这条只是多余方法，不会编译失败。
+    // 接口文档要求「不得返回 null」，因此给 Mixin 自带的 GENERIC 实现。
+    public IAdviceProvider getAdviceProvider() { return IAdviceProvider.GENERIC; }
     public Collection<String> getPlatformAgents() { return List.of(); }
     public IContainerHandle getPrimaryContainer() { return new ContainerHandleVirtual("isolated"); }
     public InputStream getResourceAsStream(String name) { return ClassLoader.getSystemResourceAsStream(name); }
