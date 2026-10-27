@@ -3,7 +3,30 @@
 版本号格式：`1.1.8+neoforge.26.1.2.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 1.1.8+neoforge.26.1.2.R3-hotfix3 — 未发布
+## 1.1.8+neoforge.26.1.2.R3-hotfix4 — 未发布
+
+> 跟进本仓库 `1.21.11` 分支 [PR #64](https://github.com/q14433686-arch/TaCZ_Renovated/pull/64)
+> 与姊妹项目 `26.1.2` [PR #119](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/pull/119) /
+> `1.21.11` [PR #120](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/pull/120)，
+> 版本号仅变更源码标识，保持 `1.1.8` 核心及 NeoForge build metadata；尚未发布。
+> **本线尚未实机验证**，API 证据、加载器差异与待测矩阵见
+> [`docs/records/SISTER_SYNC_2612_20261027.md`](docs/records/SISTER_SYNC_2612_20261027.md)。
+
+### 修复
+
+- **双格工作台**：移除 `AbstractGunSmithTableBlock` 手工克隆掉落及提前静默清除另一半的 `affectNeighborsAfterRemoval`，
+  改由邻接更新移除伴随半边、根半边战利品表统一负责单次掉落与 `BlockId` 拷贝；`GunSmithTableBlockB` 创造模式抑制判据翻正为挖 `HEAD` 时清除 `FOOT`。
+  Carry On 仍通过根半边重定向拾取并在放置时重建另一半。
+- **雕像**：在服务端 `StatueBlockEntity#preRemoveSideEffects` 按移除前状态方向掉出持有的枪械并清空槽位；
+  `StatueBlockEntity` 与 `TargetBlockEntity` 的持久化补齐 NeoForge `BlockEntity` 父类 `super.loadAdditional` / `super.saveAdditional` 调用。
+- **标靶与标靶矿车**：用 `TargetOwnerProfiles`（`ResolvableProfile#createUnresolved`）替代在 authlib 7+ 下因 null UUID 抛异常的 `GameProfile`，
+  `TargetBlockEntity` 对称读写 `owner_name` 并在缺失键时清空旧值；客户端通过 `TargetOwnerSkins`（`PlayerSkinRenderCache#getOrDefault`）异步获取皮肤、异常回退默认皮肤，
+  标靶矿车按自定义名变化刷新档案且仅在 `extractRenderState` 阶段解析贴图。
+- **守卫与离线测试**：新增 `scripts/verify_block_drops.py`、`scripts/verify_block_entity_persistence.py`、
+  `tests/test_sister_block_sync.py`、`tests/test_sync_guards.py` 以及接入 Gradle `check`（JDK 25）的
+  `targetProfileTest` / `targetBlockEntitiesTest`，并挂入 `.github/workflows/build.yml`。
+
+## 1.1.8+neoforge.26.1.2.R3-hotfix3 — 2026-10-21
 
 > 同步姊妹项目 [TaCZ_Refabricated_Unofficial](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial)
 > `26.1.2` 分支至 `5bf6352`（含 26.3 线弹孔朝向修复的 26.1.2 回移），并新增 YSM（Yes Steve Model）兼容门面。

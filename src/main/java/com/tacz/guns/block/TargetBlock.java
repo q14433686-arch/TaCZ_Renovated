@@ -1,10 +1,10 @@
 package com.tacz.guns.block;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.MapCodec;
 import com.tacz.guns.block.entity.TargetBlockEntity;
 import com.tacz.guns.entity.EntityKineticBullet;
 import com.tacz.guns.init.ModBlocks;
+import com.tacz.guns.util.TargetOwnerProfiles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -189,10 +189,9 @@ public class TargetBlock extends BaseEntityBlock {
             if (stack.getCustomName() != null) {
                 BlockEntity blockentity = world.getBlockEntity(pos);
                 if (blockentity instanceof TargetBlockEntity e) {
-                    GameProfile gameprofile = new GameProfile(null, stack.getHoverName().getString());
-                    e.setOwner(gameprofile);
                     e.setCustomName(stack.getHoverName());
-                    e.refresh();
+                    // A name-only GameProfile with a null UUID throws in authlib 7+.
+                    e.setOwner(TargetOwnerProfiles.fromName(stack.getHoverName().getString()));
                 }
             }
         }

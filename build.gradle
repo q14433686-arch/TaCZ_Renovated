@@ -303,6 +303,37 @@ tasks.register("meshRenderPassTest", JavaExec) {
         languageVersion = JavaLanguageVersion.of(25)
     }
 }
+// Exercise the actual target/statue logic against lightweight test stubs. These are
+// unit tests, not Minecraft codec, profile-service or in-game integration tests.
+def sisterEntityTestClasses = layout.buildDirectory.dir("classes/sisterEntityTest")
+tasks.register("compileSisterEntityTest", JavaCompile) {
+    source files(
+            "src/main/java/com/tacz/guns/util/TargetOwnerProfiles.java",
+            "src/main/java/com/tacz/guns/block/entity/TargetBlockEntity.java",
+            "src/main/java/com/tacz/guns/block/entity/StatueBlockEntity.java")
+    source fileTree(dir: "tests/target-profile", include: "**/*.java")
+    classpath = files()
+    destinationDirectory = sisterEntityTestClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("targetProfileTest", JavaExec) {
+    dependsOn "compileSisterEntityTest"
+    classpath = files(sisterEntityTestClasses)
+    mainClass = "com.tacz.guns.util.TargetOwnerProfilesTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("targetBlockEntitiesTest", JavaExec) {
+    dependsOn "compileSisterEntityTest"
+    classpath = files(sisterEntityTestClasses)
+    mainClass = "com.tacz.guns.block.entity.TargetBlockEntitiesTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 tasks.named("check") {
-    dependsOn "meshRenderPassTest"
+    dependsOn "meshRenderPassTest", "targetProfileTest", "targetBlockEntitiesTest"
 }
