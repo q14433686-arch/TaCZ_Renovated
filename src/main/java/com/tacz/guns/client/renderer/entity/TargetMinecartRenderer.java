@@ -1,13 +1,12 @@
 package com.tacz.guns.client.renderer.entity;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.tacz.guns.client.model.bedrock.BedrockModel;
 import com.tacz.guns.client.model.bedrock.BedrockPart;
+import com.tacz.guns.client.renderer.other.TargetOwnerSkins;
 import com.tacz.guns.client.resource.InternalAssetLoader;
 import com.tacz.guns.entity.TargetMinecart;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,6 +18,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.component.ResolvableProfile;
 
 import java.util.Optional;
 
@@ -49,9 +49,6 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
     private static final String HEAD_NAME = "head";
     private static final String HEAD_2_NAME = "head2";
 
-    /** 缓存本帧的 GameProfile：extractRenderState 阶段取，submit 阶段用。 */
-    private static final String PROFILE_KEY = "tacz$profile";
-
     public TargetMinecartRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, ModelLayers.TNT_MINECART);
         this.shadowRadius = 0.25F;
@@ -62,9 +59,9 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
         return new TargetMinecartRenderState();
     }
 
-    /** 扩展 vanilla 状态，额外携带皮肤所需的 GameProfile。 */
+    /** The texture is resolved while extracting state, not during geometry submission. */
     public static class TargetMinecartRenderState extends MinecartRenderState {
-        public GameProfile gameProfile;
+        public Identifier skinTexture;
     }
 
     @Override
@@ -72,7 +69,8 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
         // 让父类填好位置、朝向、受击摇晃、沿轨道姿态等全部 vanilla 状态。
         super.extractRenderState(entity, state, partialTicks);
         if (state instanceof TargetMinecartRenderState targetState) {
-            targetState.gameProfile = entity.getGameProfile();
+            ResolvableProfile owner = entity.getOwnerProfile();
+            targetState.skinTexture = owner == null ? null : TargetOwnerSkins.texture(owner);
         }
     }
 
@@ -113,11 +111,9 @@ public class TargetMinecartRenderer extends AbstractMinecartRenderer<TargetMinec
             RenderType renderType = RenderTypes.entityTranslucent(InternalAssetLoader.TARGET_MINECART_TEXTURE_LOCATION);
             model.submit(stack, ItemDisplayContext.NONE, collector, renderType, packedLight, OverlayTexture.NO_OVERLAY);
 
-            GameProfile gameProfile = state instanceof TargetMinecartRenderState t ? t.gameProfile : null;
-            if (gameProfile != null) {
+            Identifier skin = state instanceof TargetMinecartRenderState t ? t.skinTexture : null;
+            if (skin != null) {
                 stack.translate(0, 1, -4.5 / 16d);
-                Minecraft minecraft = Minecraft.getInstance();
-                Identifier skin = minecraft.getSkinManager().createLookup(gameProfile, false).get().body().texturePath();
                 RenderType skullRenderType = RenderTypes.entityTranslucent(skin);
 
                 headModel.visible = true;

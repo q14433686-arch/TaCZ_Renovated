@@ -3,7 +3,19 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 之后是 SemVer build metadata，
 因此枪包的 `tacz >= 1.1.8` 依赖检查照常通过（**禁止**改用 `-`，那是 pre-release，会静默不满足 `>=1.1.8`）。
 
-## 1.1.8+neoforge.1.21.11.R3-hotfix3（未发布，2026-10-22）
+## 1.1.8+neoforge.1.21.11.R3-hotfix4（未发布，2026-10-27）
+
+跟进姊妹 Fabric 1.21.11 [PR #120](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/pull/120)，
+版本号仅变更源码标识，保持 `1.1.8` 核心及 NeoForge build metadata；尚未发布。
+
+- **双格工作台**：移除手工克隆掉落及本线提前静默清除另一半的逻辑，改由根半边战利品表负责单次掉落和 `BlockId` 拷贝；B 型创造模式的抑制判据改为 HEAD 移除 FOOT。Carry On 仍将拾取重定向至根半边，由邻接更新清除另一半并在放置时重建。
+- **雕像**：在服务端 `preRemoveSideEffects` 掉落持有的枪，并使用被移除前的状态取得方向；标靶与雕像的持久化也调用 NeoForge 父类以保留其附加数据。
+- **标靶与标靶矿车**：用可按名称解析的原版档案替代会因 null UUID 抛异常的 `GameProfile`，方块实体对称读写 `owner_name`；客户端通过原版缓存异步获取皮肤并在失败时回退默认皮肤。矿车改名时更新缓存，且不再在渲染提交阶段查询皮肤。
+- 加入方块掉落及方块实体静态守卫；代码与 Carry On 路径的适配依据和待测矩阵见 [同步审计](docs/records/SISTER_SYNC_12111_20261027.md)。
+
+本仓 GitHub Actions 的完整构建、编译检查与一致性检查已通过，见 [CI 验证记录](docs/records/SISTER_SYNC_12111_CI_20261027.md)；本线**尚未实机验证**。
+
+## 1.1.8+neoforge.1.21.11.R3-hotfix3（2026-10-22）
 
 同步姊妹 Fabric 1.21.11 `a5f1c95d79` 中适用于本线的修复：
 
