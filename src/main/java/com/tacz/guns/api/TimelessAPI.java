@@ -121,7 +121,7 @@ public final class TimelessAPI {
      */
     public static Optional<GunSmithTableRecipe> getRecipe(Identifier recipeId) {
         TableRecipe pojo = CommonAssetsManager.get().getTableRecipe(recipeId);
-        if (pojo == null || pojo.getResult() == null) {
+        if (TableRecipe.validationError(pojo) != null) {
             return Optional.empty();
         }
         GunSmithTableRecipe recipe = new GunSmithTableRecipe(recipeId, pojo);
@@ -152,7 +152,7 @@ public final class TimelessAPI {
         Map<Identifier, GunSmithTableRecipe> result = new java.util.LinkedHashMap<>();
         for (Map.Entry<Identifier, TableRecipe> entry : CommonAssetsManager.get().getAllTableRecipes()) {
             TableRecipe pojo = entry.getValue();
-            if (pojo == null || pojo.getResult() == null) {
+            if (TableRecipe.validationError(pojo) != null) {
                 continue;
             }
             GunSmithTableRecipe recipe = new GunSmithTableRecipe(entry.getKey(), pojo);

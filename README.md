@@ -23,7 +23,7 @@
 
 | MC / Loader | 线 | 当前状态 |
 |---|---|---|
-| **26.2 / NeoForge（本仓库，`26.2` 分支）** | [`26.2`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.2) | `R1` / `R1-hotfix` / `R2` / `R3` / `R3-hotfix` 已发布；当前源码为 **R3-hotfix4**（`1.1.8+neoforge.26.2.R3-hotfix4`，方块掉落 / 雕像持枪 / 标靶主人修复 —— 见 [CHANGELOG](CHANGELOG.md)） |
+| **26.2 / NeoForge（本仓库，`26.2` 分支）** | [`26.2`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.2) | `R1` / `R1-hotfix` / `R2` / `R3` / `R3-hotfix` 已发布；当前源码为 **R3-hotfix4**（`1.1.8+neoforge.26.2.R3-hotfix4`：方块掉落 / 雕像持枪 / 标靶主人 / 工作台坏配方与 Carry On 拾取 —— 见 [CHANGELOG](CHANGELOG.md)） |
 | 26.1.2 / NeoForge | [`26.1.2`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/26.1.2) | `R1` / `R1-hotfix` 已发布 |
 | 1.21.11 / NeoForge | [`1.21.11`](https://github.com/q14433686-arch/TaCZ_Renovated/tree/1.21.11) | `R1` / `R1-hotfix` 已发布 |
 | Fabric 姊妹项目 | [`q14433686-arch/TaCZ_Refabricated_Unofficial`](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial) | 1.21.11 Fabric 主线 + 26.2 Fabric 工作线（本仓库游戏语义权威线） |

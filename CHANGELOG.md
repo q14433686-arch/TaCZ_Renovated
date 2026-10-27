@@ -26,6 +26,20 @@
 - 新增离线守卫 `scripts/verify_block_drops.py`、`scripts/verify_block_entity_persistence.py`
   与 `tests/target-profile/` 独立单元测试（接入 Gradle `check`）。依据、与 1.21.11 线的差异及
   待测矩阵见 [同步审计](docs/records/SISTER_SYNC_262_20261027.md)。
+- **工作台配方（同日第二轮，跟进 1.21.11 线 `581daaa`）**：`TableRecipe#validationError` 把
+  缺 `result` / 缺 `materials` / 材料列表含空项的配方**整条拒绝**并记录配方 ID（不删空项——删了
+  等于降低合成成本，显式 `materials: []` 仍合法）；服务端不再把被拒的原始 JSON 同步给旧客户端，
+  客户端接收端再校验一次；屏幕、合成菜单、`TimelessAPI`、JEI、REI 构造配方前统一防御校验；
+  `GunSmithTableRecipe` 对材料列表做快照并拒绝 `null` 成员。修的是「坏配方让打开工作台直接断线」
+  （1.21.11 线用户日志确认，本线按同因推演，未实测）。
+- **Carry On 双格拾取**：非根半边 → 根的重定向从 `@At("HEAD")` 移到 `CarryOnDataManager#getCarryData`
+  调用之前，使 Carry On 的距离/通用检查按**玩家实际点击的那一格**判定；新增对**残缺半边**
+  （找不到匹配根）的拒绝，避免 `pickupAllBlocks` 把孤立半边当普通方块搬走。已逐条核对
+  **Carry On 2.11.0** 源码（`v2.11.0` blob `c0014165`）的签名与调用顺序。
+- 移植 `tests/workbench-regression/`（配方校验 + 拾取 stub）与 `tests/carryon-transform/`
+  （用 Mixin 0.8.7 transformer 对模拟 Carry On 类做真实注入），接入 Gradle `check`；
+  `scripts/verify_sister_recipe_sync.py` 接入 CI。依据与待测矩阵见
+  [工作台配方与拾取审计](docs/records/WORKBENCH_PICKUP_CRASH_262_20261027.md)。
 
 **与 1.21.11 线的唯一代码差异**：1.21.11 线从 `Minecraft#playerSkinRenderCache()` 取皮肤缓存，
 26.2 改由渲染器构造参数取得（`BlockEntityRendererProvider.Context#playerSkinRenderCache()` /

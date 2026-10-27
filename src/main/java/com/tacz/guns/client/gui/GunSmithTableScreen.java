@@ -140,7 +140,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
         for (Map.Entry<Identifier, TableRecipe> entry : CommonAssetsManager.get().getAllTableRecipes()) {
             Identifier id = entry.getKey();
             TableRecipe pojo = entry.getValue();
-            if (pojo == null || pojo.getResult() == null) {
+            if (TableRecipe.validationError(pojo) != null) {
                 continue;
             }
             if (namespaces != null && !namespaces.contains(id.getNamespace())) {
@@ -277,7 +277,7 @@ public class GunSmithTableScreen extends AbstractContainerScreen<GunSmithTableMe
         // 第 12 轮：同上，改走客户端可用的同步数据。
         if (recipeId != null) {
             TableRecipe pojo = CommonAssetsManager.get().getTableRecipe(recipeId);
-            if (pojo != null && pojo.getResult() != null) {
+            if (TableRecipe.validationError(pojo) == null) {
                 GunSmithTableRecipe recipe = new GunSmithTableRecipe(recipeId, pojo);
                 recipe.init();   // 同上，必须解析 raw result
                 if (Minecraft.getInstance().level != null) {

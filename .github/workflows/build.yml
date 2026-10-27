@@ -133,6 +133,10 @@ jobs:
           python3 tests/test_sister_block_sync.py
           python3 tests/test_sync_guards.py
 
+      - name: Workbench recipe and Carry On static wiring
+        run: |
+          python3 scripts/verify_sister_recipe_sync.py
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
