@@ -16,7 +16,7 @@
 - **Carry On 双格拾取**：将非根半边到根半边的重定向移至点击位置通过距离检查之后；残缺或不匹配的另一半不作为独立方块搬运。其他拾取与根位置权限检查仍由 Carry On 执行。
 - 添加配方解析及网络缓存的桩测试，并用 Mixin 0.8.7 对模拟目标执行注入测试；这是离线回归，**未在游戏内或真实 Carry On 环境验证**。日志依据、拒绝规则及待测矩阵见 [工作台崩溃审计](docs/records/WORKBENCH_PICKUP_CRASH_12111_20261027.md)；其中暂定的 hotfix5 版本已按后续决定撤回，见 [版本记录](docs/records/WORKBENCH_PICKUP_VERSION_12111_20261027.md)。
 
-先前同步提交的 GitHub Actions 完整构建、编译检查与一致性检查已通过，见 [CI 验证记录](docs/records/SISTER_SYNC_12111_CI_20261027.md)；本线**尚未实机验证**。
+先前同步提交及本次工作台修复的首轮 GitHub Actions 完整构建、编译检查与一致性检查均已通过，分别见[同步 CI 记录](docs/records/SISTER_SYNC_12111_CI_20261027.md)与[工作台 CI 记录](docs/records/WORKBENCH_PICKUP_CI_12111_20261027.md)；本线**尚未实机验证**。
 
 ## 1.1.8+neoforge.1.21.11.R3-hotfix3（2026-10-22）
 
