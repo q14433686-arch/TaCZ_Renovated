@@ -12,6 +12,7 @@ import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.builder.BlockItemBuilder;
 import com.tacz.guns.compat.recipeviewer.AmmoQueryEntry;
 import com.tacz.guns.crafting.GunSmithTableRecipe;
+import com.tacz.guns.resource.pojo.data.recipe.TableRecipe;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
@@ -56,7 +57,7 @@ public class REIClientPlugin implements me.shedaniel.rei.api.client.plugins.REIC
         if (Minecraft.getInstance().level == null) return;
         List<GunSmithTableRecipe> recipes = new java.util.ArrayList<>();
         for (var e : com.tacz.guns.resource.CommonAssetsManager.get().getAllTableRecipes()) {
-            if (e.getValue() != null && e.getValue().getResult() != null) {
+            if (TableRecipe.validationError(e.getValue()) == null) {
                 GunSmithTableRecipe r = new GunSmithTableRecipe(e.getKey(), e.getValue());
                 try {
                     r.init();

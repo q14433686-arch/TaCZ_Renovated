@@ -5,13 +5,15 @@
 
 ## 1.1.8+neoforge.26.1.2.R3-hotfix4 — 未发布
 
-> 跟进本仓库 `1.21.11` 分支 [PR #64](https://github.com/q14433686-arch/TaCZ_Renovated/pull/64)
+> 跟进本仓库 `1.21.11` 分支 [PR #64](https://github.com/q14433686-arch/TaCZ_Renovated/pull/64)、
+> [PR #66](https://github.com/q14433686-arch/TaCZ_Renovated/pull/66)
 > 与姊妹项目 `26.1.2` [PR #119](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/pull/119) /
 > `1.21.11` [PR #120](https://github.com/q14433686-arch/TaCZ_Refabricated_Unofficial/pull/120)，
 > 版本号仅变更源码标识，保持 `1.1.8` 核心及 NeoForge build metadata；尚未发布。
-> 本仓 GitHub Actions 的完整构建、编译检查与一致性检查已通过，见
-> [CI 验证记录](docs/records/SISTER_SYNC_2612_CI_20261027.md)；**本线尚未实机验证**，
-> API 证据、加载器差异与待测矩阵见 [`docs/records/SISTER_SYNC_2612_20261027.md`](docs/records/SISTER_SYNC_2612_20261027.md)。
+> 先前方块与标靶同步提交的 GitHub Actions 完整构建、编译检查与一致性检查已通过，见
+> [同步 CI 记录](docs/records/SISTER_SYNC_2612_CI_20261027.md)；**本线尚未实机验证**，
+> API 证据、加载器差异与待测矩阵分别见 [`docs/records/SISTER_SYNC_2612_20261027.md`](docs/records/SISTER_SYNC_2612_20261027.md)
+> 与 [`docs/records/WORKBENCH_PICKUP_2612_20261027.md`](docs/records/WORKBENCH_PICKUP_2612_20261027.md)。
 
 ### 修复
 
@@ -23,9 +25,11 @@
 - **标靶与标靶矿车**：用 `TargetOwnerProfiles`（`ResolvableProfile#createUnresolved`）替代在 authlib 7+ 下因 null UUID 抛异常的 `GameProfile`，
   `TargetBlockEntity` 对称读写 `owner_name` 并在缺失键时清空旧值；客户端通过 `TargetOwnerSkins`（`PlayerSkinRenderCache#getOrDefault`）异步获取皮肤、异常回退默认皮肤，
   标靶矿车按自定义名变化刷新档案且仅在 `extractRenderState` 阶段解析贴图。
-- **守卫与离线测试**：新增 `scripts/verify_block_drops.py`、`scripts/verify_block_entity_persistence.py`、
-  `tests/test_sister_block_sync.py`、`tests/test_sync_guards.py` 以及接入 Gradle `check`（JDK 25）的
-  `targetProfileTest` / `targetBlockEntitiesTest`，并挂入 `.github/workflows/build.yml`。
+- **工作台配方校验与同步过滤**：服务端 `TableRecipeManager` 与客户端 `CommonNetworkCache` 均通过 `TableRecipe#validationError` 整条拒绝缺失材料列表、缺失结果或含 `null`/尾逗号空项的配方并记录配方 ID，服务端不再把被拒原始 JSON 写入同步缓存；`GunSmithTableRecipe` 对材料列表作防御性快照，界面、合成菜单、`TimelessAPI`、JEI 与 REI 构造前均做校验，不通过静默删项降低合成成本，显式 `materials: []` 保留原语义。
+- **Carry On 双格拾取**：核对 Carry On `2.10.0`（`26.1.2`）`PickupHandler#tryPickUpBlock`，将非根半边到根半边的重定向推迟至点击格完成距离与通用条件检查之后（首个 `CarryOnDataManager#getCarryData` 调用前），并拒绝缺失或朝向不匹配的孤立半边，防止 `pickupAllBlocks` 搬走残缺半边。
+- **守卫与离线测试**：新增 `scripts/verify_block_drops.py`、`scripts/verify_block_entity_persistence.py`、`scripts/verify_sister_recipe_sync.py`、
+  `tests/test_sister_block_sync.py`、`tests/test_sync_guards.py`，以及接入 Gradle `check`（JDK 25）的
+  `targetProfileTest`、`targetBlockEntitiesTest`、`workbenchRecipeValidationTest`、`carryOnPickupTest` 与模拟目标 Mixin 注入测试 `carryOnTransformTest`，并挂入 `.github/workflows/build.yml`（均为离线回归，**未在游戏内或真实 Carry On 环境验证**）。
 
 ## 1.1.8+neoforge.26.1.2.R3-hotfix3 — 2026-10-21
 

@@ -334,6 +334,74 @@ tasks.register("targetBlockEntitiesTest", JavaExec) {
         languageVersion = JavaLanguageVersion.of(25)
     }
 }
+// Exercise the real recipe loaders/network cache and Carry On handler logic with
+// lightweight game/loader stubs; Gson comes from Minecraft's normal compile classpath.
+// These tests do not launch Minecraft or transform Carry On's bytecode.
+def workbenchRegressionClasses = layout.buildDirectory.dir("classes/workbenchRegression")
+tasks.register("compileWorkbenchRegression", JavaCompile) {
+    source files(
+            "src/main/java/com/tacz/guns/resource/pojo/data/recipe/TableRecipe.java",
+            "src/main/java/com/tacz/guns/resource/serialize/GunSmithTableIngredientSerializer.java",
+            "src/main/java/com/tacz/guns/crafting/GunSmithTableRecipe.java",
+            "src/main/java/com/tacz/guns/resource/ICommonResourceProvider.java",
+            "src/main/java/com/tacz/guns/resource/manager/INetworkCacheReloadListener.java",
+            "src/main/java/com/tacz/guns/resource/manager/JsonDataManager.java",
+            "src/main/java/com/tacz/guns/resource/manager/CommonDataManager.java",
+            "src/main/java/com/tacz/guns/resource/manager/TableRecipeManager.java",
+            "src/main/java/com/tacz/guns/resource/network/CommonNetworkCache.java",
+            "src/main/java/com/tacz/guns/mixin/carryon/CarryOnPickupHandlerMixin.java")
+    source fileTree(dir: "tests/workbench-regression", include: "**/*.java")
+    classpath = sourceSets.main.compileClasspath
+    options.compilerArgs.add("-proc:none")
+    destinationDirectory = workbenchRegressionClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("workbenchRecipeValidationTest", JavaExec) {
+    dependsOn "compileWorkbenchRegression"
+    classpath = files(workbenchRegressionClasses) + sourceSets.main.compileClasspath
+    mainClass = "com.tacz.guns.resource.manager.WorkbenchRecipeValidationTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("carryOnPickupTest", JavaExec) {
+    dependsOn "compileWorkbenchRegression"
+    classpath = files(workbenchRegressionClasses) + sourceSets.main.compileClasspath
+    mainClass = "com.tacz.guns.mixin.carryon.CarryOnPickupTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+// A second isolated harness actually applies the Mixin transformer to a mock
+// Carry On-shaped class. It does not verify FML plugin selection or the real mod.
+def carryOnTransformClasses = layout.buildDirectory.dir("classes/carryOnTransformTest")
+tasks.register("compileCarryOnTransformTest", JavaCompile) {
+    source files(
+            "src/main/java/com/tacz/guns/mixin/carryon/CarryOnPickupHandlerMixin.java",
+            "tests/workbench-regression/stubs/net/minecraft/core/BlockPos.java",
+            "tests/workbench-regression/stubs/net/minecraft/world/level/Level.java",
+            "tests/workbench-regression/stubs/net/minecraft/world/level/block/Block.java",
+            "tests/workbench-regression/stubs/net/minecraft/world/level/block/state/BlockState.java",
+            "tests/workbench-regression/stubs/com/tacz/guns/block/AbstractGunSmithTableBlock.java")
+    source fileTree(dir: "tests/carryon-transform/src", include: "**/*.java")
+    classpath = sourceSets.main.compileClasspath
+    options.compilerArgs.add("-proc:none")
+    destinationDirectory = carryOnTransformClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("carryOnTransformTest", JavaExec) {
+    dependsOn "compileCarryOnTransformTest"
+    classpath = files(carryOnTransformClasses, "tests/carryon-transform/resources") + sourceSets.main.compileClasspath
+    mainClass = "testservice.TransformTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 tasks.named("check") {
-    dependsOn "meshRenderPassTest", "targetProfileTest", "targetBlockEntitiesTest"
+    dependsOn "meshRenderPassTest", "targetProfileTest", "targetBlockEntitiesTest",
+            "workbenchRecipeValidationTest", "carryOnPickupTest", "carryOnTransformTest"
 }

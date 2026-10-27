@@ -182,10 +182,11 @@ zip 可以直接加载，也可以解压为目录。无论哪种形式，包根�
   枪包版本、可选模组组合或部署环境一并标为 PASS。
 - **R3-hotfix4 新增改动尚待实机验收**：R3-hotfix2 的工作台配方启动 WARN、格洛克 17 缺失 raise 音效、
   Iris 手部管线无效 WARN、高模枪 Iris 下检视明暗/反射，R3-hotfix3 的弹孔朝向/法线偏移修复与
-  YSM 兼容门面 + 第一人称握手，以及本轮**双格工作台掉落与创造守卫、雕像移除掉枪、标靶与标靶矿车档案及异步皮肤缓存**
-  均已完成源码与离线守卫校验（`verify_block_drops` / `verify_block_entity_persistence` /
+  YSM 兼容门面 + 第一人称握手，以及本轮**双格工作台掉落与创造守卫、雕像移除掉枪、标靶与标靶矿车档案及异步皮肤缓存、
+  工作台无效材料配方拒绝与 Carry On 双格拾取距离检查调整**均已完成源码与离线守卫校验（`verify_block_drops` /
+  `verify_block_entity_persistence` / `verify_sister_recipe_sync` /
   `verify_bullet_hole_orientation` / `verify_ysm_compat` 通过）；
-  它们不继承 R3 的实机 PASS。发布前仍须实测工作台两半与 Carry On、雕像掉枪、改名标靶/矿车与皮肤缓存、弹孔六面、YSM 联调、光影及性能。
+  它们不继承 R3 的实机 PASS。发布前仍须实测异常配方枪包、工作台两半与 Carry On、雕像掉枪、改名标靶/矿车与皮肤缓存、弹孔六面、YSM 联调、光影及性能。
 - **联机**：局域网与**真实专用服务器**（生产 jar 部署 + 双客户端）均已实测通过
   （2026-08-21，R1）；混合服（Youer/Arclight 等）、代理网络（Velocity）、
   面板服等形态未测试。测试预案与形态矩阵见
