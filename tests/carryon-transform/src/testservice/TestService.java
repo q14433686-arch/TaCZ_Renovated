@@ -19,6 +19,8 @@ public final class TestService extends MixinServiceAbstract implements IClassPro
     public ITransformerProvider getTransformerProvider() { return null; }
     public IClassTracker getClassTracker() { return null; }
     public IMixinAuditTrail getAuditTrail() { return null; }
+    public IFeatureValidator getFeatureValidator() { return IFeatureValidator.ALLOW_ALL; }
+    public IAdviceProvider getAdviceProvider() { return IAdviceProvider.GENERIC; }
     public Collection<String> getPlatformAgents() { return List.of(); }
     public IContainerHandle getPrimaryContainer() { return new ContainerHandleVirtual("isolated"); }
     public InputStream getResourceAsStream(String name) { return ClassLoader.getSystemResourceAsStream(name); }

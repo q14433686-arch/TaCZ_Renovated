@@ -79,6 +79,7 @@ public final class TransformTest {
     }
 
     public static void main(String[] args) throws Exception {
+        System.setProperty("mixin.service", "testservice.TestService");
         MixinBootstrap.init();
         Mixins.addConfiguration("pickup-test.mixins.json", (IMixinConfigSource) null);
         String name = "tschipp.carryon.common.carry.PickupHandler";
