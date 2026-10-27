@@ -91,7 +91,7 @@ public class GunSmithTableMenu extends AbstractContainerMenu {
         }
 
         TableRecipe pojo = CommonAssetsManager.get().getTableRecipe(recipeId);
-        if (pojo == null || pojo.getResult() == null) {
+        if (TableRecipe.validationError(pojo) != null) {
             return null;
         }
         GunSmithTableRecipe gunSmithTableRecipe = new GunSmithTableRecipe(recipeId, pojo);

@@ -16,6 +16,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GunSmithTableRecipe implements Recipe<SingleRecipeInput> {
@@ -24,9 +25,15 @@ public class GunSmithTableRecipe implements Recipe<SingleRecipeInput> {
     private final List<GunSmithTableIngredient> inputs;
 
     public GunSmithTableRecipe(Identifier id, GunSmithTableResult result, List<GunSmithTableIngredient> inputs) {
+        // Work on a snapshot: POJO changes must not remove a cost or insert a null while
+        // this recipe is displayed or crafted. The copy also accepts immutable List.of inputs.
+        List<GunSmithTableIngredient> snapshot = inputs == null ? null : new ArrayList<>(inputs);
+        if (snapshot == null || snapshot.contains(null)) {
+            throw new IllegalArgumentException("Invalid materials for gun smith table recipe " + id);
+        }
         this.id = id;
         this.result = result;
-        this.inputs = inputs;
+        this.inputs = snapshot;
     }
 
     @Override
