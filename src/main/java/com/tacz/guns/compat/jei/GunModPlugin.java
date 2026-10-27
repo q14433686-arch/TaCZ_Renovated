@@ -11,6 +11,7 @@ import com.tacz.guns.compat.jei.entry.AttachmentQueryEntry;
 import com.tacz.guns.compat.recipeviewer.AmmoQueryEntry;
 import com.tacz.guns.crafting.GunSmithTableRecipe;
 import com.tacz.guns.init.ModItems;
+import com.tacz.guns.resource.pojo.data.recipe.TableRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.recipe.types.IRecipeType;
@@ -64,7 +65,7 @@ public class GunModPlugin implements IModPlugin {
         RegistryAccess registryAccess = minecraft.level.registryAccess();
         List<GunSmithTableRecipe> recipes = new java.util.ArrayList<>();
         for (var e : com.tacz.guns.resource.CommonAssetsManager.get().getAllTableRecipes()) {
-            if (e.getValue() != null && e.getValue().getResult() != null) {
+            if (TableRecipe.validationError(e.getValue()) == null) {
                 GunSmithTableRecipe r = new GunSmithTableRecipe(e.getKey(), e.getValue());
                 try {
                     r.init();   // 解析 raw result，否则 getResult() 恒为 EMPTY

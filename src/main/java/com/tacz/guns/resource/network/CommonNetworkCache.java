@@ -222,8 +222,15 @@ public enum CommonNetworkCache implements ICommonResourceProvider {
                     case ATTACHMENT_TAGS -> resolveAttachmentTags(data);
                     case BLOCK_INDEX -> blockIndex.put(entry.getKey(), parse(entry.getValue(), CommonBlockIndex.class));
                     case RECIPE_FILTER -> recipeFilter.put(entry.getKey(), parse(entry.getValue(), RecipeFilter.class));
-                    // 第 12 轮：接上此前只声明未接线的 RECIPES 通道
-                    case RECIPES -> tableRecipe.put(entry.getKey(), parse(entry.getValue(), TableRecipe.class));
+                    // Validate again for older servers that still sync rejected source JSON.
+                    case RECIPES -> {
+                        TableRecipe recipe = parse(entry.getValue(), TableRecipe.class);
+                        String error = TableRecipe.validationError(recipe);
+                        if (error != null) {
+                            throw new JsonParseException(error);
+                        }
+                        tableRecipe.put(entry.getKey(), recipe);
+                    }
                     case BLOCK_DATA -> blockData.put(entry.getKey(), parse(entry.getValue(), BlockData.class));
                 }
             } catch (IllegalArgumentException | JsonParseException exception) {

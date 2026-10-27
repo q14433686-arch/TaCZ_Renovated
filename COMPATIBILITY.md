@@ -1,14 +1,25 @@
-# TaCZ: Renovated 26.2 兼容矩阵
+# TaCZ: Renovated 26.3 / 26.2 兼容矩阵
 
-适用构建：`1.1.8+neoforge.26.2.R2`（**R2 期快照**；TML / PIP 的专项说明见根 README §2 与
-[`docs/MESH_LOADER.md`](docs/MESH_LOADER.md)）
+当前候选：`1.1.8+neoforge.26.3.R1-hotfix3`（未发布；26.3 构建和实机验收待完成）。
+下方既有逐 Mod 表格仍是 **26.2 线历史快照**，不表示 26.3 可安装性或兼容性通过。
+TML / PIP 专项说明见根 README §2 与 [`docs/MESH_LOADER.md`](docs/MESH_LOADER.md)。
 
+历史矩阵适用构建：`1.1.8+neoforge.26.2.R2`（**R2 期快照**）。
 游戏 / 加载器：Minecraft 26.2 / NeoForge 26.2.0.64  
 核验日期：2026-08-22（2026-09-02 补：Iris 行实机反馈）
 
 > **状态纪律**：下表的“API 已核”表示发布文件、坐标与源码签名已核对，**不等于游戏内
-> PASS**。旧 L0-L3 回执覆盖 LR 合入前的 26.2 核心候选；当前 R2 候选必须
-> 重跑构建、专服与多人。26.1.2 的 LR 单机/专服 PASS 也不自动继承到 26.2。
+> PASS**。旧 L0-L3 回执覆盖 LR 合入前的 26.2 核心候选；26.3 当前候选必须重新
+> 构建、专服与多人验收。26.1.2 的 LR 单机/专服 PASS 也不自动继承到 26.3。
+
+## 26.3 当前候选增量
+
+- **Carry On 2.12.0（26.3）**：上游 branch/tag source commit
+  `168f3fb28fd7ff48d342483142469c3023c54ec0` 已核。`PickupHandler#tryPickUpBlock`
+  保存方块与 BE 数据后清除 BE、再以 `removeBlock(pos, false)` 移除根方块；本仓在可达性/通用条件检查后才重定向到匹配 root，并拒绝孤立 companion，保留完整放置空间预检。**仅做源码核对，未实机验证**；
+  需验证两种摆向/三种工作台、拾取/完整放置、空间受阻失败不清数据，以及携带模型/BlockId。
+- `tacz:target` 与 `tacz:statue` 仍保留现有 Carry On 黑名单；本次不改变其对象抓取策略。
+
 
 ## 内置 LRTactical
 
@@ -80,6 +91,11 @@
   asset itself was not used as a byte-hash assertion; compile and runtime remain separate
   gates. Full port/disposition and test protocol:
   [`docs/records/REFAB_SYNC_262_MAIN_1B4AF9F_20260909.md`](docs/records/REFAB_SYNC_262_MAIN_1B4AF9F_20260909.md).
+- **Carry On 2.12.0（26.3）**：branch/tag source commit
+  `168f3fb28fd7ff48d342483142469c3023c54ec0`。已核 reach / 通用条件早于 `getCarryData`，
+  随后保存方块实体数据、移除方块实体并调用 `removeBlock(pos, false)`；本仓在该调用点后
+  重定向有效 companion 并拒绝孤立半边。placement 的方块/方块实体顺序也已核；本次仅源码核对，
+  **未作本 mod 的游戏内兼容验收**。
 - **Carry On 2.11.0**：tag `v2.11.0` →
   `b82a8ccfe8b4a9af98b7485826c2162e8faaae81`。已核：
   `PickupHandler#tryPickUpBlock(ServerPlayer,BlockPos,Level,BiFunction)`、
@@ -136,9 +152,9 @@
 3. PAL only：第三人称持枪、切枪、趴姿→站立、淡出重复。
 4. Controllable + Framework：绑定、按住连射、换弹/近战/瞄准、各 fire mode 震动。
 5. Shoulder Surfing 5.0.7：双手枪判定、adaptive aim、free-look、准星。
-6. JEI only / REI only / JEI+REI：默认包的 24 条 ammo 工作台配方、TaCZ Ammo Query、第三方包、远程同步后刷新、工作台 catalyst；专服端不安装 viewer 的场景也要分别验证。
+6. JEI only / REI only / JEI+REI：默认包的 24 条 ammo 工作台配方、TaCZ Ammo Query、第三方包、远程同步后刷新、工作台 catalyst；并用缺失/`null` materials、`[null]`（及尾逗号解析失败）、有效空数组验证整条拒绝/空数组保留、服务端不向旧客户端同步非法 JSON，以及 JEI/REI 不构造坏 recipe。专服端不安装 viewer 的场景也要分别验证。
 7. Iris 1.11.2：无光影/有光影、HAND solid/translucent、shadow、mask mode 泄漏、水/粒子/云；光影下依次验证 `HAND_ONLY`、`ALL`、`OFF`，每次改档重载 shader pack，并保存 debug sampler/validate 日志。不要把别的 NeoForge 版本或 Fabric 分支的结果外推到本线。
-8. Carry On 2.11.0：A/B/C 工作台任一半格搬起、完整放下、阻挡时原子失败、BlockId 模型。
+8. Carry On 2.12.0（26.3）：A/B/C 工作台任一半格搬起，超出 reach 时保持失败，验证两种摆向的 root/companion 校验、孤立 companion 拒绝、权限回调位置、完整放下、阻挡时原子失败及 BlockId 模型。Carry On 2.11.0（26.2）另行按对应运行环境回归。
 9. Vulkan：阶段边界 target 切换、mask debug 预览、无 device loss、镜身/准星/火光裁剪。
 10. LRTactical：单机与专服分别验证 tooltip/HUD、投掷/近战/消耗品、烟雾/闪光、
     index 同步、实体 tracking、分类冷却及至少一个 LR 内容包。

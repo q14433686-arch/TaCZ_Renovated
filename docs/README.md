@@ -1,6 +1,7 @@
-# TaCZ: Renovated 26.2 文档索引
+# TaCZ: Renovated 26.3 文档索引
 
-当前版本：`1.1.8+neoforge.26.2.R2`（R2 候选，待发布命令）。
+当前版本：`1.1.8+neoforge.26.3.R1-hotfix3`（未发布候选；构建与实机验收尚未完成）。
+26.2 的工作包记录和发布清单保留为历史档案，不能作为 26.3 的验证结果。
 
 一条总纪律：**不要把冻结记录当成当前状态，也不要把工作包过程写回根 README。**
 当前口径以“开发与发布”这一节为准；带日期的文件是档案，原则上写完不改结论。
@@ -22,8 +23,8 @@
 |---|---|
 | [`DEVELOPMENT.md`](DEVELOPMENT.md) | JDK/Gradle、构建、运行、源码权威和验证纪律 |
 | [`PORTING_STATUS.md`](PORTING_STATUS.md) | 当前候选真实状态与剩余闸门 |
-| [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | **R2** 发布前逐项检查；未全部关闭不得发布 |
-| [`../CHANGELOG.md`](../CHANGELOG.md) | 对外版本变更；R2 条目待发布命令 |
+| [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | 26.2 R2 历史发布清单（归档），不是当前 26.3 验收表 |
+| [`../CHANGELOG.md`](../CHANGELOG.md) | 对外版本变更；26.3 R1-hotfix3 为当前未发布候选 |
 | [`../AGENTS.md`](../AGENTS.md) / [`../CHARTER.md`](../CHARTER.md) | AI/人类协作规则与洁净室红线 |
 
 ## 子系统口径
@@ -65,6 +66,9 @@
   `SCOPE_RING_IRIS_OVERLAY_20260830.md` —— 目镜掩码与光影的三份取证；
 - `RECIPE_VIEWER_SYNC_262_20260908.md` —— JEI / REI 默认弹药工作台配方与 Ammo Query
   的 native recipe-sync 时序、REI null-entry 根因、修复与待验收矩阵；
+- `SISTER_SYNC_263_20261027.md` —— 26.3 NeoForge R1-hotfix3 候选的工作台、雕像、标靶档案/皮肤
+  移植、上游证据、版本决策和未完成的实机验收；
+- `SISTER_SYNC_12111_FOLLOWUP_20261027.md` —— 1.21.11 后续的异常工作台配方校验、旧客户端同步过滤与 Carry On 拾取顺序修复的 26.3 移植记录；
 - `SERVER_TEST_*.md`、`BRANDING.md`、`RELEASE_CHECKLIST_26_2_R1.md` —— 实测回执、
   品牌决策与 R1 归档清单。
 
@@ -89,9 +93,9 @@ Fabric 分支，加载器表面不同不代表游戏语义不同 —— 回单�
 
 ## 收尾流程（每版必做）
 
-1. 跑 `bash scripts/check_release_consistency.sh --strict`，版本号三处必须一致；
+1. 跑 `bash scripts/check_release_consistency.sh --strict`，`gradle.properties`、README、CHANGELOG 与当前状态页的版本号必须一致；
 2. 生成条目草稿：
-   `bash scripts/generate_changelog.sh <since-ref> --version 1.1.8+neoforge.26.2.R2`
+   `bash scripts/generate_changelog.sh <since-ref> --version 1.1.8+neoforge.26.3.R1-hotfix3`
    （或在 Actions 里手工触发 `changelog` workflow，产物可下载）；
 3. **人工核对草稿** —— 脚本只按 `feat/fix/docs/...` 前缀归类，不负责判断机制描述
    是否准确，也不负责补「谁在什么时候实机验证过」；

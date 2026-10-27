@@ -1,13 +1,16 @@
 # 移植状态
 
 目标版本：Minecraft **26.3** + NeoForge **26.3.0.51-beta**（beta 钉选；2026-10-05 自 .7 重钉，上游 FML 破坏性变更）。
-当前源码版本：**1.1.8+neoforge.26.3.R1**（未发布）。
-状态：**26.3 全量端口已完成源码层移植（编译级，实机验收全部未做）**；26.2 线
-`R3-hotfix` 已发布（2026-09-09），`R3 / R2 / R1 / R1-hotfix` 亦已发布，26.3 线以
-未发布的 R3-hotfix2 源码为直接母本。本页按工作包记录历史矩阵；发布封口的验证
-状态以 CHANGELOG / docs/records 为准，本文未把未跑项标为 PASS。
+当前源码版本：**1.1.8+neoforge.26.3.R1-hotfix3**（未发布候选）。
+状态：26.3 全量端口以 2026-09-21 的 CI 编译绿为基础；2026-10-27 先增加工作台、
+雕像、标靶档案/皮肤修复，后跟进 1.21.11 新增的异常配方校验、旧客户端同步过滤与
+Carry On 拾取顺序修复，并补静态回归门禁。当前工作树尚未执行 Gradle（环境无 Java /
+Gradle 缓存），因此新增代码**没有编译或游戏验收结论**；Carry On 与全部运行时行为仍待 CI/实机。
+26.2 线 `R3-hotfix` 已发布（2026-09-09），`R3 / R2 / R1 / R1-hotfix` 亦已发布，
+26.3 线以未发布的 R3-hotfix2 源码为直接母本。本页按工作包记录历史矩阵；发布封口的
+验证状态以 CHANGELOG / docs/records 为准，本文未把未跑项标为 PASS。
 
-> 最后更新：2026-09-21（26.3 移植日）。本文只记录诚实状态；README 不作为逐包进度日志。
+> 最后更新：2026-10-27（26.3 R1-hotfix3 未发布候选，含 1.21.11 跟进）。本文只记录诚实状态；README 不作为逐包进度日志。
 
 ## 26.3 工作包（当前线）
 
@@ -24,21 +27,23 @@
 | WP-263-2 渲染重构 | pass 归属倒置（§2.4）、第一人称拆分（§2.3）、投影 accessor（§2.5）、shader 方言（§2.6）、管线预热（§2.7） | 八朝向跟手 / 开镜掩码 / PIP / 水下雾 |
 | WP-263-3 高模 | PolyMeshGpuRenderer 26.3 化（externalPass / ExecuteInfo / 强制重绑） | 无光影 + 光影高模全矩阵 |
 | WP-263-4 Iris | mode 标记采样器判别、setupDraw/空形参注入、FrontendRenderPass 配对 | 光影下裁剪 / 首次开镜不崩 |
-| WP-263-5 数据与同步 | 战利品表 schema + 迁移层、配方 codec 延迟解析、sendRecipes、RecipeViewerReloadBridge、枪包 lang 保底（GunPackLangCompat，同步自姊妹仓 f52dab8e；**实机 PASS** 2026-09-30，`dc9e4b0`） | 挖工作台 / 旧枪包进存档 / 专服 JEI |
+| WP-263-5 数据与同步 | 战利品表 schema + 迁移层、配方 codec 延迟解析、sendRecipes、RecipeViewerReloadBridge、枪包 lang 保底（GunPackLangCompat，同步自姊妹仓 f52dab8e；**实机 PASS** 2026-09-30，`dc9e4b0`）；2026-10-27 增加多方块掉落、异常配方服务端/网络校验、旧客户端 JSON 过滤、Carry On 顺序静态门禁 | 工作台两半/创造模式/异常枪包配方/Carry On 实机回归；旧枪包进存档 / 专服 JEI |
 | WP-263-6 兼容门面 | REI 26.3.823 + Architectury 22.0.3 **恢复参编**（2026-09-30，同步姊妹 abfaeffd）；SSR 26.3-5.2.0+neoforge **恢复参编**（同步姊妹 146aa42e，plugin json 还原）；Controllable 仍禁用（上游无 26.3 构件，2026-09-30 复核） | REI 类别/查询/配方显示、SSR 准星与 adaptive aim 实机验证 |
-| WP-263-7 发布准备 | README / CHANGELOG / 版本一致性脚本通过 | 实机验收 + 发布闸门（RELEASE_CHECKLIST） |
+| WP-263-7 发布准备 | 2026-10-27 候选版本号 / README / CHANGELOG、版本一致性检查与静态门禁已更新并通过 | 当前候选构建、实机验收 + 发布闸门（RELEASE_CHECKLIST） |
 
 ### 26.3 后续修复（移植指南与姊妹仓之外）
 
 | 修复 | 内容 | 验证状态 |
 |---|---|---|
+| 工作台/雕像/标靶（2026-10-27，R1-hotfix3） | 工作台 companion 由邻接更新移除，B 型创造模式无掉落清除 FOOT 根半边；雕像用 `preRemoveSideEffects` 掉落持枪并调用 NeoForge 父类持久化；标靶迁移旧主人标签、异步解析 `ResolvableProfile`，方块与矿车皮肤改走 26.3 `PlayerSkinRenderCache`；补 loot/persistence 静态门禁。对照 1.21.11 TaCZ commit `c3dd0785` 与 Refabricated 26.3 `13d3fff1`；取舍与证据见 [同步记录](records/SISTER_SYNC_263_20261027.md)。 | 两个 Python 静态门禁与 6 个变异用例（另含基线自检）PASS；版本检查 PASS；当前无 Java/Gradle，未编译；**工作台、Carry On、雕像、旧档迁移、皮肤均待实机验收** |
+| 异常配方 / Carry On（2026-10-27，同一未发布候选） | 跟进 1.21.11 `581daaa`：原子拒绝空/缺材料列表、null 材料项和 null 结果；过滤服务端网络缓存，并在旧服务器客户端接收端、菜单/GUI/API/JEI/REI 重复校验；Carry On 在距离/通用条件后才解析根半边，匹配校验并拒绝孤立 companion。证据与版本取舍见 [后续同步记录](records/SISTER_SYNC_12111_FOLLOWUP_20261027.md)。 | 三个 Python 静态门禁和 16 项回归脚本（基线 + 15 个变异）PASS；无 Java/Gradle，未编译；**异常枪包数据、Carry On 2.12.0 注入、reach/权限及孤立半边流程均未实机验收** |
 | 弹孔朝向（2026-09-30） | `BulletHoleParticle#extract` 四元数改为 `getRotation(d)·Rx(-90°)·Rz(180°)`：1.21.1 原四边形躺 XZ 平面（+Y 为法线）而 26.x vanilla 顶点管线固定 XY 平面（+Z 为法线），旧写法六面法线全错（墙面→水平朝下、地面→竖直朝南、天花板→竖直朝北）。姊妹仓 26.3 线同病未修。 | 数值验证六面；**实机待验**（打六个面确认弹孔贴面） |
 | 配方同步断连（2026-09-30，姊妹 c7160480） | `GunSmithTableSerializer#encode` 只编码已解析非空材料 + id/result/group 兜底 + `init()` 异常隔离；`RecipeCompat#normalizeLegacyIngredient` 展开数组内嵌 `#tag`、过滤未安装模组物品。防多枪包进档 `EncoderException` 踢人。 | CI 编译绿；**实机待验**（多枪包进档不断连） |
 | REI / SSR 兼容恢复（2026-09-30，姊妹 abfaeffd / 146aa42e） | REI 26.3.823 + Architectury 22.0.3、SSR 26.3-5.2.0+neoforge 钉选并恢复 IMPL 参编；Cloth 26.3.159。 | CI 编译绿；**实机待验**（REI 显示 / SSR 准星与 adaptive aim） |
 | NeoForge .51 运行时兼容（2026-10-05，维护者 RawOutput.log） | `ModConfig.Type` COMMON→LOCAL、SERVER→SYNCED（FML 12.0.8 移除旧枚举，进游戏即崩），显式保留 tacz-common/server.toml 文件名；VoxyCompatMixinPlugin 改 LoadingModList 探测（修 mixin 期 NPE）；mods.toml 加 neoforge `[26.3.0.51-beta,)` 门槛；neo_version 重钉 .51。 | CI 编译绿；**实机待验**（进游戏 + 老配置文件被读取） |
 
 
-## 26.2 工作包
+## 26.2 工作包（26.3 移植的历史母本档案）
 
 | 工作包 | 已落地 | 尚缺验收 |
 |---|---|---|
@@ -53,25 +58,27 @@
 基础证据：`docs/investigations/WP262_0_EVIDENCE.md` 至 `docs/investigations/WP262_5_EVIDENCE.md`。LR 前滚证据：
 `docs/records/LR_R1_SYNC_26_2_20260822.md`。
 
-## 已有 PASS 的适用范围
+## 历史 PASS 的适用范围
 
 用户曾对 LR 合入前的 26.2 核心候选报告 build、L0-L3 **PASS**；冻结回执：
-`docs/records/SERVER_TEST_20260821_262_R1.md`。该结果继续证明原有 TaCZ 核心逻辑，但不能
-代表当前增加 LR 代码/资源/AT/mixin/payload 后的完整 artifact。
+`docs/records/SERVER_TEST_20260821_262_R1.md`。该结果属于历史 26.2 artifact，不能代表
+26.3，更不能代表本轮增加的工作台、雕像、档案迁移与皮肤代码。
 
 26.1.2 R1 尖端 `6020a5cf1dd02c356f797557f6323b0d430b75e1` 的 LR 层已有用户单机与
-专服 PASS。它是此次前滚的稳定源基线，不是 26.2 实测结果。
+专服 PASS。它是历史稳定源基线，不是 26.3 实测结果。
 
 ## 版本基线
 
-- **26.2 R3-hotfix2（当前工作树，未发布）**：R3-hotfix + 第一人称手部错位修复
+- **26.3 R1-hotfix3（当前源码候选，未发布）**：在 26.3 R1 全量移植基础上，追加 2026-10-27
+  工作台/雕像/标靶修复，以及后续异常配方 / Carry On 修复与静态门禁；静态检查 PASS，当前修改尚未编译或实机验收。
+- **26.2 R3-hotfix2（26.3 移植的直接母本，未发布）**：R3-hotfix + 第一人称手部错位修复
   （中和 vanilla 1.21.9+ 手臂 `zRot=±0.1`，同步自 Fabric 1.21.11 线 `61ab4a0`）；
-  编译门待 CI 回写、实机未验。
+  不作为当前工作树版本。
 - **26.2 R3-hotfix（2026-09-09 发布）**：R3 + Iris scope-mask Fix-A / JEI·REI 枪匠台配方与
   Ammo Query / 移交单可见 bug 四项。
 - **26.2 R3（2026-09-07 发布）**：R2 + string 库热修 / 创造搜索 / 死处理器接线 / mesh 裁剪时序；从完整 26.1.2 R1 前滚，不是重写。
-- **26.1.2 R1（完整功能基线）**：LAN、真实专服、枪包及 LR 单机/专服专项实测通过；
-  其 PASS 不能自动继承为 26.2 PASS。
+- **26.1.2 R1（历史完整功能基线）**：LAN、真实专服、枪包及 LR 单机/专服专项实测通过；
+  其 PASS 不能自动继承为 26.3 PASS。
 - **Beta-1 / b9de5e0 / r1–r30**：历史或不含 LR 的中间基线，不再作为完整起点。
 
 ## 当前明确边界
@@ -107,13 +114,13 @@
 ### 可选 Mod
 
 所有发布文件、source commit、pin 与未实测标记见根目录
-[`COMPATIBILITY.md`](../COMPATIBILITY.md)。当前没有任何 26.2 可选兼容项被标记为用户 PASS。
+[`COMPATIBILITY.md`](../COMPATIBILITY.md)。本候选的可选兼容项仍需按 26.3 逐行实测，当前没有任何 Carry On 或皮肤相关兼容项被标记为用户 PASS。
 
 ## 发布阻塞项
 
-在以下项目全部完成前，仍不得发布 R2 或声称移植完成：
+在以下项目全部完成前，不得发布当前 `R1-hotfix3` 候选或声称移植完成：
 
-1. 当前 R2 候选：JDK 25 clean build、L0、Mod List 与 `Done`；
+1. 当前 26.3 候选：JDK 25 clean build、L0、Mod List 与 `Done`；
 2. 当前 artifact：L2 生产专服、L3 双客户端与 L2.5 枪包专项；
 3. LR 专项：单机/专服的同步、tracking、冷却、近战、投掷、烟雾/闪光及 LR 内容包；
 4. 客户端：无可选 Mod 的完整枪械/资源回归；

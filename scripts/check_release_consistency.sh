@@ -29,6 +29,8 @@ check_file() {
 # README: current-version line, support table and installation/version sections.
 check_file README.md 3
 check_file CHANGELOG.md 1
+# The active branch status page must track the exact candidate version too.
+check_file docs/PORTING_STATUS.md 1
 
 echo "--- metadata placeholders"
 template="src/main/templates/META-INF/neoforge.mods.toml"

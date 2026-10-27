@@ -12,7 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -41,6 +40,12 @@ import org.jetbrains.annotations.Nullable;
  * <p>The menu carries the data-pack index id rather than the physical block id. A single
  * registered workbench block can represent several gun-pack table definitions, so the id is
  * resolved from the placed item when possible and otherwise from the block-index mapping.</p>
+ *
+ * <p>For B/C tables, only the root half's loot table produces an item and copies its BlockId.
+ * The other half must be removed through {@code updateShape}; do not hand-spawn a clone or
+ * silently clear the companion before neighbor updates run, because that can suppress the root
+ * half's loot. Carry On pickup redirects to the root, whose neighbor updates remove the
+ * companion; placing the root reconstructs it here.</p>
  */
 public abstract class AbstractGunSmithTableBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -135,31 +140,6 @@ public abstract class AbstractGunSmithTableBlock extends BaseEntityBlock {
             return BlockItemBuilder.create(this).setId(table.getId()).build();
         }
         return new ItemStack(this);
-    }
-
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        // 多方块工作台不在这里手工掉落。挖掉任一半时，另一半经 updateShape 变 AIR →
-        // Block.updateOrDestroy → level.destroyBlock(pos, dropResources=true) 走自己的战利品表；
-        // 战利品表用 match_block 只让根方块（foot/lower）那一半掉落，并从根的方块实体拷 BlockId。
-        // 早前这里对「挖非根半边」额外 popResource 一个克隆物品，与根半边的战利品表掉落叠加 →
-        // 挖上半/头部时爆出两个工作台（姊妹仓 2026-09-20 实测），已移除（未实测：本仓）。
-        return super.playerWillDestroy(level, pos, state, player);
-    }
-
-    @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        BlockPos companionPos = isRoot(state)
-                ? getCompanionPos(pos, state)
-                : getRootPos(pos, state);
-        if (companionPos != null && !companionPos.equals(pos)
-                && level.getBlockState(companionPos).is(this)) {
-            // Carry On removes only the clicked half and does not call playerWillDestroy.
-            // Remove the other half here so a horizontal table is never left behind as a
-            // one-block fragment.
-            level.removeBlock(companionPos, false);
-        }
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
     @Override
