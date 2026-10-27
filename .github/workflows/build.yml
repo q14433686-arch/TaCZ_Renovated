@@ -1,9 +1,9 @@
 name: build
 
 # ---------------------------------------------------------------------------
-# 【TaCZ_Renovated（NeoForge）26.2 线 · 待上线稿】
-# 代拟：refab 26.2(main) 侧 arena/01a061a4 会话，2026-09-02。
-# 目标：TaCZ_Renovated 仓库 `26.2` 分支 → 新建 `.github/workflows/build.yml`（本文件全文）。
+# 【TaCZ_Renovated（NeoForge）26.2 / 26.3 线 · build】
+# 本文件保留 2026-09-02 的历史设计说明；当前 26.3 分支也运行完整 build。
+# 目标：arena 分支及受支持的长期线（26.2、26.3）生成可审计构建结果。
 # 上线方式与其它线一致：GitHub 网页 → Add file → Create new file → 粘贴 → commit 到该分支
 # （沙箱 Agent 的 token 无 `workflows` 权限，推不动正式件）。
 #
@@ -35,6 +35,7 @@ on:
     branches:
       - 'arena/**'
       - '26.2'
+      - '26.3'
     paths-ignore:
       - 'build-reports/**'
       - 'docs/**'

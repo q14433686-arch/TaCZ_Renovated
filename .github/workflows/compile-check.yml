@@ -1,9 +1,9 @@
 name: compile-check
 
 # ---------------------------------------------------------------------------
-# 【TaCZ_Renovated（NeoForge）26.2 线 · 待上线稿（v4）】
-# 代拟：refab 26.2(main) 侧 arena/01a061a4 会话，2026-09-02。
-# 目标：TaCZ_Renovated 仓库 `26.2` 分支 → 替换 `.github/workflows/compile-check.yml`（本文件全文）。
+# 【TaCZ_Renovated（NeoForge）26.2 / 26.3 线 · compile-check】
+# 来源说明保留 2026-09-02 的历史 v4 设计；当前 26.3 分支也由此 workflow 编译检查。
+# 目标：arena 分支和受支持的长期线（26.2、26.3）均运行 compileJava。
 #
 # 与本线现役件的差异 = refab 26.2 侧 2026-08-31 的 v4 三点（那边已跑通一个月）：
 #   1) 补主分支 push + pull_request 触发 —— 此前只有 arena/**，PR 合并进 `26.2` 的
@@ -22,6 +22,7 @@ on:
     branches:
       - 'arena/**'
       - '26.2'
+      - '26.3'
     # 防止“日志回推 commit”再次触发本流程造成死循环；文档改动由 consistency 流程守着
     paths-ignore:
       - 'build-reports/**'

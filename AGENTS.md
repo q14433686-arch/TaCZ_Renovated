@@ -1,25 +1,25 @@
 # AGENTS.md — 给 AI 助手的仓库规则
 
 > 本文件供 AI 编码助手在每次会话开始时读取。涉及移植或写代码时，还必须完整阅读
-> [`CHARTER.md`](CHARTER.md)。两者与用户下发的 26.2 工单共同构成工作合同。
+> [`CHARTER.md`](CHARTER.md)。两者与用户当前分支的任务共同构成工作合同。
 
 ## 0. 本仓库是什么
 
-**TaCZ: Renovated 26.2 candidate**：从 NeoForge 26.1.2 R1 前滚到
-Minecraft **26.2** + NeoForge **26.2.0.64** + Java **25** 的非官方 GPL-3.0 移植。
+**TaCZ: Renovated 26.3 NeoForge candidate**：从 NeoForge 26.2 R3-hotfix2 前滚到
+Minecraft **26.3** + NeoForge **26.3.0.51-beta** + Java **25** 的非官方 GPL-3.0 移植。
 
 - modId 永远是 `tacz`；枪包依赖已绑定该 id。
-- 当前版本：`1.1.8+neoforge.26.2.R3-hotfix2`（未发布；R1 / `R1-hotfix` / R2 / R3 / `R3-hotfix`（2026-09-09）已发布）。
+- 当前版本：`1.1.8+neoforge.26.3.R1-hotfix3`（未发布候选；26.2 线至 R3-hotfix 已发布）。
 - 热修标签格式（自 R2 轮固定）：`R<n>` → `R<n>-hotfix` → `R<n>-hotfix2` → …，小写、
   序号直接接在 `hotfix` 后面，中间不放 `.` / `-` / `_`。
 - 代码谱系基线：26.1.2 R1 分支
   `arena/01a023bf-tacz-1-1-8-neoforge-26-1-2-r0`，尖端
   `6020a5cf1dd02c356f797557f6323b0d430b75e1`；该稳定基线包含多人修复与
   LRTactical 内置层，不能再把 Beta-1 `4d2edc1` 或旧 `b9de5e0` 当作完整功能基线。
-- 26.1.2 的 LR 单机/专服 PASS 不自动继承到 26.2；当前 LR-integrated HEAD 必须重跑
-  build、L0-L3、L2.5 与 LR 专项。
-- 游戏语义权威：`TaCZ_Refabricated_Unofficial` 的 `26.2(main)`；只取游戏语义，
-  不复制 Fabric API 表面。
+- 26.2 与历史 26.1.2 的 PASS 不自动继承到 26.3；当前 HEAD 必须重新构建并验收。
+  本轮 hotfix3 当前无本地 Java/Gradle 环境；CI 和游戏内验收仍待完成。
+- 游戏语义权威：`TaCZ_Refabricated_Unofficial` 的 `26.3` 分支；只取游戏语义，
+  不复制 Fabric API 表面；NeoForge 生命周期需保留本线适配。
 
 ## 1. 版本一致性门禁
 

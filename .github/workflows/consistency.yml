@@ -12,6 +12,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: 版本号一致性门禁（AGENTS.md §1）
         run: bash scripts/check_release_consistency.sh --strict
+      - name: 26.3 block / persistence / recipe / pickup static and mutation guards
+        run: |
+          if ! grep -Fq 'neoforge.26.3.' gradle.properties; then
+            echo "Skipping 26.3-specific source guards on this version line."
+            exit 0
+          fi
+          python3 scripts/verify_block_drops.py --strict
+          python3 scripts/verify_block_entity_persistence.py --strict
+          python3 scripts/verify_workbench_recipes.py --strict
+          python3 scripts/test_block_guards.py
       - name: 文档链接核验
         run: |
           python3 - <<'EOF'

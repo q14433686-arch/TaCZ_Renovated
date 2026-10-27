@@ -1,87 +1,296 @@
 package com.tacz.guns.block.entity;
 
 import com.mojang.authlib.GameProfile;
+import com.tacz.guns.GunMod;
 import com.tacz.guns.block.TargetBlock;
 import com.tacz.guns.config.common.OtherConfig;
 import com.tacz.guns.init.ModBlocks;
 import com.tacz.guns.init.ModSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.StringUtil;
+import net.minecraft.util.Util;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import java.util.Set;
+import java.util.Optional;
+import java.util.UUID;
 
 import static com.tacz.guns.block.TargetBlock.OUTPUT_POWER;
 import static com.tacz.guns.block.TargetBlock.STAND;
 
 public class TargetBlockEntity extends BlockEntity implements Nameable {
-    /**
-     * 标靶复位时间，暂定为 5 秒
-     */
+    /** 标靶复位时间，暂定为 5 秒。 */
     private static final int RESET_TIME = 5 * 20;
-    private static final String OWNER_TAG = "Owner";
+    private static final String OWNER_PROFILE_TAG = "OwnerProfile";
+    private static final String LEGACY_OWNER_TAG = "Owner";
+    private static final String OWNER_UUID_TAG = "owner_uuid";
+    private static final String OWNER_NAME_TAG = "owner_name";
     private static final String CUSTOM_NAME_TAG = "CustomName";
+
     public float rot = 0;
     public float oRot = 0;
-    private @Nullable GameProfile owner;
+    private @Nullable ResolvableProfile owner;
+    // Dynamic UUID profiles have an empty partial name; retain the legacy display name.
+    private @Nullable String ownerNameHint;
     private @Nullable Component name;
+    private boolean profileResolveAttempted;
+    private long profileLookupGeneration;
 
     public TargetBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlocks.TARGET_BE.get(), pos, blockState);
     }
 
-    public static void clientTick(Level level, BlockPos pos, BlockState state, TargetBlockEntity pBlockEntity) {
-        pBlockEntity.oRot = pBlockEntity.rot;
+    public static void clientTick(Level level, BlockPos pos, BlockState state, TargetBlockEntity blockEntity) {
+        blockEntity.oRot = blockEntity.rot;
         if (state.getValue(STAND)) {
-            pBlockEntity.rot = Math.max(pBlockEntity.rot - 18, 0);
+            blockEntity.rot = Math.max(blockEntity.rot - 18, 0);
         } else {
-            pBlockEntity.rot = Math.min(pBlockEntity.rot + 45, 90);
+            blockEntity.rot = Math.min(blockEntity.rot + 45, 90);
         }
+    }
+
+    /** Preserve the legacy GameProfile-facing API for integrations. */
+    @Nullable
+    public GameProfile getOwner() {
+        if (this.owner == null) {
+            return null;
+        }
+        GameProfile partial = this.owner.partialProfile();
+        if (partial.name().isEmpty() && this.ownerNameHint != null && !this.ownerNameHint.isEmpty()) {
+            return new GameProfile(partial.id(), this.ownerNameHint, partial.properties());
+        }
+        return partial;
     }
 
     @Nullable
-    public GameProfile getOwner() {
-        return owner;
+    public ResolvableProfile getOwnerProfile() {
+        return this.owner;
     }
 
+    /**
+     * Preserve the legacy setter while ensuring incomplete profiles are resolved without a null UUID.
+     */
     public void setOwner(@Nullable GameProfile owner) {
+        if (owner == null) {
+            this.setOwnerProfile(null, null);
+            return;
+        }
+
+        ResolvableProfile profile;
+        if (owner.id() != null && owner.properties().containsKey("textures")) {
+            profile = ResolvableProfile.createResolved(owner);
+        } else if (owner.id() != null) {
+            profile = ResolvableProfile.createUnresolved(owner.id());
+        } else if (owner.name() != null && !owner.name().isEmpty()) {
+            profile = ResolvableProfile.createUnresolved(owner.name());
+        } else {
+            profile = null;
+        }
+        this.setOwnerProfile(profile, owner.name());
+    }
+
+    /** Store a name-only owner as a dynamic profile; never construct a GameProfile with a null UUID. */
+    public void setOwnerName(@Nullable String ownerName) {
+        this.setOwnerProfile(ownerName == null || ownerName.isEmpty()
+                ? null : ResolvableProfile.createUnresolved(ownerName), ownerName);
+    }
+
+    private void setOwnerProfile(@Nullable ResolvableProfile owner, @Nullable String ownerNameHint) {
         this.owner = owner;
-        // 26.2: SkullBlockEntity.updateGameprofile removed. Just refresh directly.
+        this.ownerNameHint = owner == null ? null : ownerNameHint;
+        this.profileLookupGeneration++;
+        this.profileResolveAttempted = false;
         this.refresh();
+        this.resolveOwnerProfile();
     }
 
     @Override
-    public void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
-        if (!input.getStringOr(OWNER_TAG, "").isEmpty()) {
-            this.owner = new com.mojang.authlib.GameProfile(java.util.UUID.fromString(input.getStringOr("owner_uuid","")), input.getStringOr("owner_name",""));
+    public void setLevel(Level level) {
+        if (this.level != level) {
+            this.profileLookupGeneration++;
+            this.profileResolveAttempted = false;
         }
-        if (!input.getStringOr(CUSTOM_NAME_TAG, "").isEmpty()) {
-            this.name = net.minecraft.network.chat.ComponentSerialization.CODEC
-                    .parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(input.getStringOr(CUSTOM_NAME_TAG, "")))
-                    .result().orElse(Component.empty());
+        super.setLevel(level);
+        this.resolveOwnerProfile();
+    }
+
+    @Override
+    public void setRemoved() {
+        this.profileLookupGeneration++;
+        this.profileResolveAttempted = false;
+        super.setRemoved();
+    }
+
+    /**
+     * Resolve names/UUIDs off-thread, then keep the resulting profile dynamic so the client skin cache
+     * can resolve the current texture rather than persisting a server-side skin snapshot.
+     */
+    private void resolveOwnerProfile() {
+        if (this.profileResolveAttempted || !(this.owner instanceof ResolvableProfile.Dynamic requested)
+                || !(this.level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        this.profileResolveAttempted = true;
+        long generation = this.profileLookupGeneration;
+        String requestedName = requested.name().orElse(null);
+        UUID requestedId = requested.partialProfile().id();
+        String label = requestedName != null ? requestedName
+                : requestedId != null ? requestedId.toString() : "<empty>";
+        if (requestedName != null && !StringUtil.isValidPlayerName(requestedName)) {
+            GunMod.LOGGER.warn("[TaCZ] Cannot resolve target owner profile '{}': invalid player name", label);
+            return;
+        }
+        if (requestedName == null && requestedId == null) {
+            GunMod.LOGGER.warn("[TaCZ] Cannot resolve target owner profile: no name or UUID was supplied");
+            return;
+        }
+
+        MinecraftServer server = serverLevel.getServer();
+        var resolver = server.services().profileResolver();
+        Util.nonCriticalIoPool().execute(() -> {
+            Optional<GameProfile> resolved;
+            try {
+                resolved = requestedName != null
+                        ? resolver.fetchByName(requestedName)
+                        : resolver.fetchById(requestedId);
+            } catch (RuntimeException exception) {
+                server.execute(() -> {
+                    if (this.isCurrentLookup(requested, serverLevel, generation)) {
+                        this.profileResolveAttempted = false;
+                        GunMod.LOGGER.warn("[TaCZ] Target owner profile lookup for '{}' failed", label, exception);
+                    }
+                });
+                return;
+            }
+
+            server.execute(() -> {
+                // The block entity may have been removed, reloaded, or renamed while the lookup ran.
+                if (!this.isCurrentLookup(requested, serverLevel, generation)) {
+                    return;
+                }
+                if (resolved.isEmpty()) {
+                    GunMod.LOGGER.warn("[TaCZ] Could not resolve target owner profile '{}'; leaving it unresolved", label);
+                    return;
+                }
+
+                GameProfile complete = resolved.get();
+                if (complete.id() == null) {
+                    GunMod.LOGGER.warn("[TaCZ] Profile lookup for '{}' returned no UUID; leaving it unresolved", label);
+                    return;
+                }
+                this.owner = ResolvableProfile.createUnresolved(complete.id());
+                this.ownerNameHint = complete.name();
+                this.refresh();
+            });
+        });
+    }
+
+    private boolean isCurrentLookup(ResolvableProfile requested, ServerLevel serverLevel, long generation) {
+        return !this.isRemoved() && this.level == serverLevel && this.owner == requested
+                && this.profileLookupGeneration == generation;
+    }
+
+    @Override
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.ownerNameHint = input.getStringOr(OWNER_NAME_TAG, "");
+        this.owner = input.read(OWNER_PROFILE_TAG, ResolvableProfile.CODEC)
+                .orElseGet(() -> this.readLegacyOwner(input));
+        this.profileLookupGeneration++;
+        this.profileResolveAttempted = false;
+
+        String customName = input.getStringOr(CUSTOM_NAME_TAG, "");
+        this.name = null;
+        if (!customName.isEmpty()) {
+            try {
+                this.name = net.minecraft.network.chat.ComponentSerialization.CODEC
+                        .parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(customName))
+                        .result().orElse(Component.empty());
+            } catch (RuntimeException exception) {
+                GunMod.LOGGER.warn("[TaCZ] Failed to read target custom name", exception);
+            }
+        }
+        // A loaded block entity may already have a level; normal chunk loading starts this in setLevel.
+        this.resolveOwnerProfile();
+    }
+
+    @Nullable
+    private ResolvableProfile readLegacyOwner(ValueInput input) {
+        String ownerName = input.getStringOr(OWNER_NAME_TAG, "");
+        UUID uuid = tryParseUuid(input.getStringOr(OWNER_UUID_TAG, ""));
+        if (uuid != null) {
+            return ResolvableProfile.createUnresolved(uuid);
+        }
+        if (!ownerName.isEmpty()) {
+            return ResolvableProfile.createUnresolved(ownerName);
+        }
+
+        // Support the old string form as well as the upstream NBT compound (Name / Id).
+        String oldStringOwner = input.getStringOr(LEGACY_OWNER_TAG, "");
+        if (!oldStringOwner.isEmpty()) {
+            this.ownerNameHint = oldStringOwner;
+            return ResolvableProfile.createUnresolved(oldStringOwner);
+        }
+        Optional<ValueInput> oldOwner = input.child(LEGACY_OWNER_TAG);
+        if (oldOwner.isPresent()) {
+            ValueInput legacy = oldOwner.get();
+            String legacyName = legacy.getStringOr("Name", "");
+            this.ownerNameHint = legacyName;
+            int[] id = legacy.getIntArray("Id").orElse(null);
+            if (id != null && id.length == 4) {
+                return ResolvableProfile.createUnresolved(UUIDUtil.uuidFromIntArray(id));
+            }
+            if (!legacyName.isEmpty()) {
+                return ResolvableProfile.createUnresolved(legacyName);
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private static UUID tryParseUuid(String value) {
+        try {
+            return UUID.fromString(value);
+        } catch (IllegalArgumentException exception) {
+            return null;
         }
     }
 
     @Override
-    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
-                if (owner != null) {
-            output.putString("owner_uuid", owner.id()!=null?owner.id().toString():"");
-            output.putString("owner_name", owner.name()!=null?owner.name():"");
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        if (this.owner != null) {
+            GameProfile partial = this.owner.partialProfile();
+            String partialName = partial.name();
+            // Preserve flat legacy keys, including a dynamic profile's display-name hint.
+            String savedName = partialName.isEmpty() && this.ownerNameHint != null
+                    ? this.ownerNameHint : partialName;
+            output.putString(OWNER_NAME_TAG, savedName);
+            output.putString(OWNER_UUID_TAG,
+                    this.owner instanceof ResolvableProfile.Dynamic && this.owner.name().isPresent()
+                            ? "" : partial.id().toString());
+            if ((this.owner instanceof ResolvableProfile.Dynamic && this.owner.name().isEmpty())
+                    || StringUtil.isValidPlayerName(partialName)) {
+                output.store(OWNER_PROFILE_TAG, ResolvableProfile.CODEC, this.owner);
+            }
         }
         if (this.name != null) {
             output.putString(CUSTOM_NAME_TAG, net.minecraft.network.chat.ComponentSerialization.CODEC

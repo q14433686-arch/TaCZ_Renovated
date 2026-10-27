@@ -1,16 +1,4 @@
-commit: 44971f4051fb2f0e6b192be8c9babd3d84102ca9
-Downloading https://services.gradle.org/distributions/gradle-9.2.1-bin.zip
-............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
-
-Welcome to Gradle 9.2.1!
-
-Here are the highlights of this release:
- - Windows ARM support
- - Improved publishing APIs
- - Better guidance for dependency verification failures
-
-For more details see https://docs.gradle.org/9.2.1/release-notes.html
-
+commit: 482a4420078c69f3404e79eca92bcd4e6d3993be
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
 Calculating task graph as no cached configuration is available for tasks: compileJava
@@ -22,31 +10,39 @@ Creating Minecraft artifacts without recompilation.
 Loaded 135 artifacts from /home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/tmp/createMinecraftArtifacts/nfrt_artifact_manifest.properties
 [1m*** Started working on [4mdownloadManifest[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
- [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.43s
+ [1m[92m✓[0m Completed [4mdownloadManifest[0m in 0.42s
 [1m*** Started working on [4mdownloadJson[0m[0m
   ↓ https://launchermeta.mojang.com/mc/game/version_manifest_v2.json
-  ↓ https://piston-meta.mojang.com/v1/packages/4fe1aa1ef8da1cb95c5bad1fb98890ca56dd8ca3/26.3.json
- [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.15s
-[1m*** Started working on [4mdownloadServer[0m[0m
+  ↓ https://piston-meta.mojang.com/v1/packages/61fff1316bd50312624a858bbb5eb18fa45208ed/26.3.json
+ [1m[92m✓[0m Completed [4mdownloadJson[0m in 0.10s
 [1m*** Started working on [4mdownloadClient[0m[0m
+[1m*** Started working on [4mdownloadServer[0m[0m
   ↓ https://piston-data.mojang.com/v1/objects/e877b6a07acd633fb3bb475002175cec036e7b87/client.jar
   ↓ https://piston-data.mojang.com/v1/objects/33680f5f2ac32864d6d7cf5e56a705fdb3e05f4c/server.jar
- [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.80s
- [1m[92m✓[0m Completed [4mdownloadServer[0m in 1.02s
+ [1m[92m✓[0m Completed [4mdownloadClient[0m in 0.83s
+ [1m[92m✓[0m Completed [4mdownloadServer[0m in 0.97s
 [1m*** Started working on [4mpreProcessJar[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.17:fatjar
- [1m[92m✓[0m Completed [4mpreProcessJar[0m in 3.12s
+ [1m[92m✓[0m Completed [4mpreProcessJar[0m in 3.08s
 [1m*** Started working on [4mbinaryPatch[0m[0m
   [33mWARNING: [0mnet.neoforged.installertools:binarypatcher:4.0.17:fatjar is not present in the artifact manifest
   ↓ https://maven.neoforged.net/releases/net/neoforged/installertools/binarypatcher/4.0.17/binarypatcher-4.0.17-fatjar.jar
  ↳ Running external tool net.neoforged.installertools:binarypatcher:4.0.17:fatjar
- [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.86s
+ [1m[92m✓[0m Completed [4mbinaryPatch[0m in 3.77s
 [1m*** Started working on [4mcopyUnpatchedClasses[0m[0m
- [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 3.02s
+ [1m[92m✓[0m Completed [4mcopyUnpatchedClasses[0m in 3.01s
 [1m*** Started working on [4mapplyDevTransforms[0m[0m
  ↳ Running external tool net.neoforged.installertools:installertools:4.0.12:fatjar
- [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 3.31s
-Total runtime: 15.67s
+ [1m[92m✓[0m Completed [4mapplyDevTransforms[0m in 3.36s
+Performing periodic cache maintenance on /home/runner/.gradle/caches/neoformruntime
+Cleaning intermediate results cache in /home/runner/.gradle/caches/neoformruntime/intermediate_results
+ Maximum age: 744h
+ Maximum cache size: 10 GiB
+ [0;2;3m16 files found[0m
+ [0;2;3m274 MiB overall size[0m
+ [0;2;3m0 expired keys found[0m
+[0;2;3m Deleted 12 outdated lock files
+Total runtime: 15.54s
 
 
 > Task :compileJava
@@ -54,7 +50,7 @@ Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 Note: Some input files use unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
-gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1791199150903.json
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run-1793067708983.json
 
 [Incubating] Problems report is available at: file:///home/runner/work/TaCZ_Renovated/TaCZ_Renovated/build/reports/problems/problems-report.html
 
@@ -64,7 +60,7 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.2.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 34s
+BUILD SUCCESSFUL in 1m 20s
 2 actionable tasks: 2 executed
 Configuration cache entry stored.
 

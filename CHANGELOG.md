@@ -3,6 +3,30 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
+## 1.1.8+neoforge.26.3.R1-hotfix3 — 2026-10-27（未发布 · 26.3 工作台与标靶修复）
+
+> **状态红线**：这是活动 26.3 NeoForge 线的未发布源码候选，不是已发布版本。
+> 本轮尚未本地运行 Gradle（环境无 Java / Gradle 缓存）；静态检查结果见下方，
+> 工作台、Carry On、雕像掉落与皮肤效果仍需 CI 和实机验收。
+> 版本号对齐当前 Refabricated 26.3 姊妹线的 `R1-hotfix3` 标记；未照搬 1.21.11
+> NeoForge 的 `R3-hotfix4`，也不表示两线已发布。
+
+### 修复与移植
+
+- **多方块枪匠台掉落**：移除拆方块后提前静默清理伴随半边的自定义逻辑，依赖邻接更新移除 companion，让唯一根半边 loot entry 正常处理掉落及 `BlockId`。创造模式挖 B 型 `HEAD` 时，无掉落移除唯一会掉物品的 `FOOT` 根半边。
+- **枪匠台异常配方**：缺少/为空的材料列表、空材料项或空结果均拒绝整条配方，不删项、不降低成本；显式 `materials: []` 保持有效。服务端只同步已验证条目，客户端网络接收端及工作台、TimelessAPI、JEI/REI 消费路径也重复校验；构造 recipe 时快照并拒绝 null 成员。
+- **Carry On 拾取顺序**：将非根半边重定向移至 Carry On 距离和通用条件检查之后，保持实际点击位置参与距离校验；仅在根/伴随半边状态完全匹配时重定向，并拒绝孤立半边被 `pickupAllBlocks` 当作独立方块拾取。完整放置空间预检保留。
+- **雕像持枪移除**：在 `StatueBlockEntity#preRemoveSideEffects` 使用传入的旧 `BlockState` 计算掉落方向，服务器侧掉落一次并清空持有栈；在 NeoForge `loadAdditional` / `saveAdditional` 保留父类调用。
+- **标靶主人迁移**：用 `ResolvableProfile` 读取/写入当前档案，兼容旧 `owner_uuid`、`owner_name` 与 `Owner` 复合标签；名字/UUID 在线程池异步解析，generation、世界、方块实体和 owner identity 守卫过期回调。标靶放置使用名字档案，不再构造空 UUID 的 `GameProfile`。
+- **标靶皮肤**：方块标靶及标靶矿车在渲染状态提取阶段使用 26.3 `PlayerSkinRenderCache`；submit 阶段不再同步阻塞查询 SkinManager。保留 Carry On 的根半边重定向、完整放置空间预检适配，仍需和 Carry On 26.3 实机验证。
+- **回归门禁**：新增 loot schema / 多方块创造模式、方块实体持久化/档案皮肤、工作台配方与 Carry On 顺序静态检查，累计 15 个变异回归用例（另有基线自检）接入 CI。
+
+### 验证状态
+
+- 上游证据、移植取舍与验证边界记录：[`SISTER_SYNC_263_20261027.md`](docs/records/SISTER_SYNC_263_20261027.md) 与 [`SISTER_SYNC_12111_FOLLOWUP_20261027.md`](docs/records/SISTER_SYNC_12111_FOLLOWUP_20261027.md)。
+- 三个 Python 静态门禁、`scripts/test_block_guards.py` 的 16 项测试（基线自检 + 15 个变异用例）、脚本 `py_compile`、版本严格一致性、`git diff --check` 与 Markdown 相对链接检查：**PASS**（静态检查，不代表 Java 编译或运行时验收）。
+- 本轮未运行 Gradle / CI；环境无 Java 和 Gradle 缓存。游戏内工作台掉落/异常配方、旧档迁移、雕像掉落、标靶皮肤及 Carry On reach/权限/孤立半边流程：**未验证**。
+
 ## 1.1.8+neoforge.26.3.R1 — 2026-09-21（未发布 · 编译级移植）
 
 > **状态红线**：本轮为 **26.2（R3-hotfix2 源码基线）→ 26.3 全量端口**，对照姊妹仓
