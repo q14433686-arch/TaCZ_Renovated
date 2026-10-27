@@ -1,7 +1,6 @@
 package com.tacz.guns.entity;
 
 import com.tacz.guns.api.LogicalSide;
-import com.mojang.authlib.GameProfile;
 import com.tacz.guns.api.entity.ITargetEntity;
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent;
 import com.tacz.guns.config.client.RenderConfig;
@@ -11,6 +10,7 @@ import com.tacz.guns.init.ModItems;
 import com.tacz.guns.init.ModSounds;
 import com.tacz.guns.network.NetworkHandler;
 import com.tacz.guns.network.message.event.ServerMessageGunHurt;
+import com.tacz.guns.util.TargetOwnerProfiles;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
@@ -22,6 +22,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -36,13 +37,16 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.server.level.ServerLevel;
 
+import java.util.Objects;
+
 public class TargetMinecart extends AbstractMinecart implements ITargetEntity {
     public static EntityType<TargetMinecart> TYPE = EntityType.Builder.<TargetMinecart>of(TargetMinecart::new, MobCategory.MISC)
             .sized(0.75F, 2.4F)
             .clientTrackingRange(8)
             .build(ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath("tacz", "target_minecart")));
 
-    private @Nullable GameProfile gameProfile = null;
+    private @Nullable String cachedOwnerName;
+    private @Nullable ResolvableProfile ownerProfile;
 
     public TargetMinecart(EntityType<TargetMinecart> type, Level world) {
         super(type, world);
@@ -130,11 +134,14 @@ public class TargetMinecart extends AbstractMinecart implements ITargetEntity {
     }
 
     @Nullable
-    public GameProfile getGameProfile() {
-        if (this.gameProfile == null && this.getCustomName() != null) {
-            this.gameProfile = new GameProfile(null, this.getCustomName().getString());
+    public ResolvableProfile getOwnerProfile() {
+        Component customName = this.getCustomName();
+        String name = customName == null ? null : customName.getString();
+        if (!Objects.equals(name, this.cachedOwnerName)) {
+            this.cachedOwnerName = name;
+            this.ownerProfile = TargetOwnerProfiles.fromName(name);
         }
-        return gameProfile;
+        return this.ownerProfile;
     }
 
     @Override
