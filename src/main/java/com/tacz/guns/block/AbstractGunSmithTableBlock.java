@@ -12,7 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -41,6 +40,12 @@ import org.jetbrains.annotations.Nullable;
  * <p>The menu carries the data-pack index id rather than the physical block id. A single
  * registered workbench block can represent several gun-pack table definitions, so the id is
  * resolved from the placed item when possible and otherwise from the block-index mapping.</p>
+ *
+ * <p>For B/C tables, only the root's loot table drops an item and copies its BlockId.
+ * Removing either half causes the other to be removed through {@code updateShape}; do not
+ * additionally drop a clone or silently remove the companion here. When a permitted
+ * Carry On pickup uses our mixin, it redirects to the root, saves its block entity and
+ * removes the root with neighbor updates, cleaning the non-root half without another item.</p>
  */
 public abstract class AbstractGunSmithTableBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -135,34 +140,6 @@ public abstract class AbstractGunSmithTableBlock extends BaseEntityBlock {
             return BlockItemBuilder.create(this).setId(table.getId()).build();
         }
         return new ItemStack(this);
-    }
-
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        // Only the root carries the custom BlockId. Preserve it when survival breaks the
-        // companion half, otherwise the normal loot table cannot reconstruct the data item.
-        if (!level.isClientSide() && !player.isCreative() && !isRoot(state)) {
-            ItemStack drop = getCloneItemStack(level, pos, state, true);
-            if (!drop.isEmpty()) {
-                popResource(level, pos, drop);
-            }
-        }
-        return super.playerWillDestroy(level, pos, state, player);
-    }
-
-    @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        BlockPos companionPos = isRoot(state)
-                ? getCompanionPos(pos, state)
-                : getRootPos(pos, state);
-        if (companionPos != null && !companionPos.equals(pos)
-                && level.getBlockState(companionPos).is(this)) {
-            // Carry On removes only the clicked half and does not call playerWillDestroy.
-            // Remove the other half here so a horizontal table is never left behind as a
-            // one-block fragment.
-            level.removeBlock(companionPos, false);
-        }
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
     @Override

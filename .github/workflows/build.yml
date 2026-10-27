@@ -126,6 +126,19 @@ jobs:
             echo "::notice::本分支没有 scripts/check_release_consistency.sh，跳过版本一致性校验"
           fi
 
+      - name: Block drops and block-entity persistence guards
+        run: |
+          python3 scripts/verify_block_drops.py --strict
+          python3 scripts/verify_block_entity_persistence.py --strict
+          python3 scripts/verify_sister_recipe_sync.py
+          python3 tests/test_sister_block_sync.py
+          python3 tests/test_sync_guards.py
+
+      - name: Previously ported sister fixes
+        run: |
+          python3 scripts/verify_bullet_hole_orientation.py
+          python3 scripts/verify_ysm_compat.py
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

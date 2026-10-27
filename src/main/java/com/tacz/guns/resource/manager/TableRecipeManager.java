@@ -2,6 +2,7 @@ package com.tacz.guns.resource.manager;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.tacz.guns.GunMod;
 import com.tacz.guns.crafting.RecipeCompat;
 import com.tacz.guns.init.ModRecipe;
@@ -51,6 +52,17 @@ public class TableRecipeManager extends CommonDataManager<TableRecipe> {
     }
 
     @Override
+    protected TableRecipe parseJson(JsonElement element) {
+        TableRecipe recipe = super.parseJson(element);
+        String error = TableRecipe.validationError(recipe);
+        if (error != null) {
+            // JsonDataManager logs the ID and rejects the entire recipe.
+            throw new JsonParseException(error);
+        }
+        return recipe;
+    }
+
+    @Override
     protected void apply(Map<Identifier, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         Map<Identifier, JsonElement> ours = new LinkedHashMap<>();
         int vanillaLegacy = 0;
@@ -66,9 +78,19 @@ public class TableRecipeManager extends CommonDataManager<TableRecipe> {
                     "Left {} vanilla recipe(s) from 'recipes/' to PackResources remapping (RecipeManager registry).",
                     vanillaLegacy);
         }
-        GunMod.LOGGER.debug(getMarker(), "Gun smith table recipes: {} accepted, {} vanilla crafting skipped",
+        GunMod.LOGGER.debug(getMarker(), "Gun smith table recipes: {} candidate(s), {} vanilla crafting skipped",
                 ours.size(), vanillaLegacy);
         super.apply(ours, pResourceManager, pProfiler);
+
+        // CommonDataManager caches the original JSON even when parsing failed. Only sync
+        // recipes accepted into the server's authoritative dataMap, including to old clients.
+        Map<Identifier, String> validNetworkCache = new LinkedHashMap<>();
+        networkCache.forEach((id, json) -> {
+            if (dataMap.containsKey(id)) {
+                validNetworkCache.put(id, json);
+            }
+        });
+        networkCache = Map.copyOf(validNetworkCache);
     }
 
     private static boolean isGunSmithTableRecipe(JsonElement element) {
