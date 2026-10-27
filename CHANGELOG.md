@@ -32,7 +32,10 @@
 `EntityRendererProvider.Context#getPlayerSkinRenderCache()`），渲染状态里存的是 `RenderType`
 而不是贴图 `Identifier`。理由与可编译依据见同步审计。
 
-本线**尚未实机验证**，也没有 CI 编译结果（沙箱无 JDK），具体离线检查结果见同步审计。
+**验证状态**：本仓 CI 在 `f057d11` 上 `build` / `compile-check` / `consistency` 全绿（含上文
+新增的守卫、python 模型测试与 Gradle `check` 里的标靶/雕像单元测试）；但**尚未实机验证**
+—— 掉落次数、创造模式抑制、皮肤解析与专服同步仍需实测，详见
+[同步审计](docs/records/SISTER_SYNC_262_20261027.md)。
 
 ## 1.1.8+neoforge.26.2.R3-hotfix3 — 2026-09-13（未发布）
 
