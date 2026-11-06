@@ -1,7 +1,9 @@
 package com.tacz.guns.entity.shooter;
 
 import com.tacz.guns.api.entity.ReloadState;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.resource.modifier.AttachmentCacheProperty;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.luaj.vm2.LuaValue;
 
@@ -72,6 +74,16 @@ public class ShooterDataHolder {
     @Nullable
     public Supplier<ItemStack> currentGunItem = null;
     /**
+     * 切枪时确认的枪械 ID，用于识别「迟到的脚本回调是不是还属于当前这把枪」。
+     */
+    @Nullable
+    public Identifier currentGunId = null;
+    /**
+     * 当前持枪期间脚本抛过错；为 true 时暂停一切脚本动作，直到下一次 {@link #initialData()}
+     * 或重新切枪（{@link #setCurrentGunItem}）。
+     */
+    public boolean gunScriptFailed = false;
+    /**
      * 缓存当前枪械的收枪时间，以确保下一次切枪的时候使用此时间计算收枪。
      * 此数值不会因 tacz$CurrentGunItem 提供的 ItemStack 改变而改变，因此应当在恰当的时机调用 updatePutAwayTime() 进行更新。
      */
@@ -107,6 +119,33 @@ public class ShooterDataHolder {
     @Nullable
     public AttachmentCacheProperty cacheProperty = null;
 
+    /**
+     * 绑定当前手持枪物品，并记录枪械 ID（脚本兜底靠它判断回调是否过期）。
+     */
+    public void setCurrentGunItem(Supplier<ItemStack> gunItemSupplier) {
+        currentGunItem = gunItemSupplier;
+        ItemStack stack = gunItemSupplier == null ? ItemStack.EMPTY : gunItemSupplier.get();
+        IGun gun = IGun.getIGunOrNull(stack);
+        currentGunId = gun == null ? null : gun.getGunId(stack);
+        // 换了枪就重新给脚本一次机会（1.2.0 语义：失败只暂停到下次切枪）。
+        gunScriptFailed = false;
+    }
+
+    /**
+     * 中止旧枪的中间状态，但<b>不</b>重置射击冷却与收枪计时。
+     *
+     * <p>脚本炸掉时调用：正在进行的换弹/拉栓/近战前摇都作废（否则会卡在「永远差一点完成」
+     * 的状态），但冷却继续走，避免玩家靠触发脚本异常绕过射击间隔。
+     */
+    public void cancelGunScriptState() {
+        reloadTimestamp = -1;
+        reloadStateType = ReloadState.StateType.NOT_RELOADING;
+        boltTimestamp = -1;
+        isBolting = false;
+        meleePrepTickCount = -1;
+        scriptData = null;
+    }
+
     public void initialData() {
         // 重置各个状态
         shootTimestamp = -1;
@@ -124,5 +163,7 @@ public class ShooterDataHolder {
         chargeProgress = 0f;
         scriptData = null;
         heatTimestamp = -1;
+        currentGunId = null;
+        gunScriptFailed = false;
     }
 }

@@ -17,6 +17,7 @@ import com.tacz.guns.api.util.LuaNbtAccessor;
 import com.tacz.guns.client.animation.statemachine.GunAnimationStateContext;
 import com.tacz.guns.config.common.AmmoConfig;
 import com.tacz.guns.entity.EntityKineticBullet;
+import com.tacz.guns.entity.shooter.GunScriptGuard;
 import com.tacz.guns.entity.shooter.ShooterDataHolder;
 import com.tacz.guns.network.NetworkHandler;
 import com.tacz.guns.network.message.event.ServerMessageGunFire;
@@ -150,9 +151,12 @@ public class ModernKineticGunScriptAPI {
         // 连发间隔
         long period = modifyProperty(GunProperties.RuntimeOnly.BURST_SHOOT_INTERVAL, Long.class, fireMode == FireMode.BURST ? gunData.getBurstShootInterval() : 1);
 
+        // 1.2.0：脚本异常不再冒出 tick 循环。失败时返回 false，连发立即中止。
         CycleTaskHelper.addCycleTask(
-                () -> runShootCycle(consumeAmmo, gunData, bulletData, gunOperator, shotDamageMultiplier,
-                        inaccuracy, soundDistance, useSilenceSound, processedSpeed, bulletAmount),
+                () -> GunScriptGuard.run(dataHolder, shooter, gunId, "shoot",
+                        () -> runShootCycle(consumeAmmo, gunData, bulletData, gunOperator, shotDamageMultiplier,
+                                inaccuracy, soundDistance, useSilenceSound, processedSpeed, bulletAmount),
+                        false),
                 period, cycles);
     }
 
@@ -709,7 +713,10 @@ public class ModernKineticGunScriptAPI {
      */
     public void safeAsyncTask(LuaValue value, long delayMs, long periodMs, int cycles) {
         LuaFunction func = value.checkfunction();
-        CycleTaskHelper.addCycleTask(() -> runLuaCycleTask(func), delayMs, periodMs, cycles);
+        CycleTaskHelper.addCycleTask(
+                () -> GunScriptGuard.run(dataHolder, shooter, gunId, "safe_async_task",
+                        () -> runLuaCycleTask(func), false),
+                delayMs, periodMs, cycles);
     }
 
     /**

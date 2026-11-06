@@ -388,10 +388,32 @@ tasks.register("gunPackSyncTest", JavaExec) {
         languageVersion = JavaLanguageVersion.of(25)
     }
 }
+// Exercise the shipped AttachmentScriptManager (src/main/java, not a copy) against the real
+// luaj jar: the x/r/y contract the gun pack scripts rely on, and the sandbox that must keep
+// load/io/os/package out of reach. GuMod's logger is stood in for so no Minecraft is needed.
+def attachmentScriptTestClasses = layout.buildDirectory.dir("classes/attachmentScriptTest")
+tasks.register("compileAttachmentScriptTest", JavaCompile) {
+    source files("src/main/java/com/tacz/guns/resource/manager/AttachmentScriptManager.java")
+    source fileTree(dir: "tests/attachment-script/src", include: "**/*.java")
+    classpath = files("libs/luaj-jse-3.0.1.jar")
+    options.compilerArgs.add("-proc:none")
+    destinationDirectory = attachmentScriptTestClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("attachmentScriptTest", JavaExec) {
+    dependsOn "compileAttachmentScriptTest"
+    classpath = files(attachmentScriptTestClasses, "libs/luaj-jse-3.0.1.jar")
+    mainClass = "attachmentscripttest.AttachmentScriptTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 tasks.named("check") {
     dependsOn "targetProfileTest", "targetBlockEntitiesTest",
             "workbenchRecipeValidationTest", "carryOnPickupTest", "carryOnTransformTest",
-            "gunPackSyncTest"
+            "gunPackSyncTest", "attachmentScriptTest"
 }
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {

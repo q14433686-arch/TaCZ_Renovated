@@ -101,7 +101,7 @@ public abstract class LivingEntityMixin extends Entity implements IGunOperator, 
         // 初始化 ShooterDataHolder
         this.tacz$data.initialData();
         // 刷新当前武器
-        this.tacz$data.currentGunItem = () -> tacz$shooter.getMainHandItem();
+        this.tacz$data.setCurrentGunItem(() -> tacz$shooter.getMainHandItem());
         // 刷新配件属性缓存
         AttachmentPropertyManager.postChangeEvent(tacz$shooter, tacz$shooter.getMainHandItem());
     }

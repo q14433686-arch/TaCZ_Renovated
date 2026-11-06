@@ -137,6 +137,10 @@ jobs:
         run: |
           python3 scripts/verify_sister_recipe_sync.py
 
+      - name: Attachment inline scripts (compiled at load, sandboxed at run)
+        run: |
+          python3 scripts/verify_attachment_scripts.py
+
       - name: Gun pack sync protocol wiring (1.2.0 compressed chunks)
         run: |
           python3 scripts/verify_gunpack_sync.py

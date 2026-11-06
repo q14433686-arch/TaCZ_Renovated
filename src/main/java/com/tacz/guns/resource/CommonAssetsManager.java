@@ -44,6 +44,7 @@ import com.tacz.guns.resource.serialize.GunSmithTableIngredientSerializer;
 import com.tacz.guns.resource.serialize.GunSmithTableResultSerializer;
 import com.tacz.guns.resource.serialize.IdentifierSerializer;
 import com.tacz.guns.resource.serialize.IgniteSerializer;
+import com.tacz.guns.resource.serialize.ModifierTypeAdapterFactory;
 import com.tacz.guns.resource.serialize.PairSerializer;
 import com.tacz.guns.resource.serialize.Vec3Serializer;
 import com.tacz.guns.util.AllowAttachmentTagMatcher;
@@ -95,6 +96,8 @@ public class CommonAssetsManager implements ICommonResourceProvider {
             .registerTypeAdapter(CommonAttachmentIndex.class, new CommonAttachmentIndexSerializer())
             .registerTypeAdapter(CommonBlockIndex.class, new CommonBlockIndexSerializer())
             .registerTypeAdapter(TabConfig.class, new TabConfig.Deserializer())
+            // 配件内联 function 在反序列化时预编译（数据包加载与网络同步两条路径共用）。
+            .registerTypeAdapterFactory(new ModifierTypeAdapterFactory())
             .create();
 
     private final List<INetworkCacheReloadListener> listeners = new ArrayList<>();
