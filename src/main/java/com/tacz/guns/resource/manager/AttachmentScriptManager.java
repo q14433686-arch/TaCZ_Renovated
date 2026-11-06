@@ -5,6 +5,7 @@ import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaClosure;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaNumber;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Prototype;
 import org.luaj.vm2.compiler.LuaC;
@@ -38,9 +39,17 @@ import java.util.Locale;
  * {@code debug}、{@code coroutine}，并把 {@code load}/{@code loadfile}/{@code dofile}/
  * {@code collectgarbage}/{@code print}/{@code getmetatable} 置为 {@code nil}。
  *
- * <p><b>与上游 1.2.0 的差异（有意为之）</b>：上游用 {@code JseStringLib} 提权（反射访问
- * Java 侧字符串方法），本仓的 {@code luaj-jse} 里并没有这个类，也不该有 —— 这里用
- * {@code StringLib}，脚本拿到的 {@code string.*} 语义不变，但无法从 Lua 触达 Java 反射。
+ * <p><b>与上游 1.2.0 的差异（有意为之）</b>：
+ * <ul>
+ *   <li>上游用 {@code JseStringLib} 提权（反射访问 Java 侧字符串方法），本仓的
+ *       {@code luaj-jse} 里并没有这个类，也不该有 —— 这里用 {@code StringLib}，
+ *       脚本拿到的 {@code string.*} 语义不变，但无法从 Lua 触达 Java 反射。</li>
+ *   <li>上游按原样先装库、不留 {@code package}，但 luaj 3.0.x 的
+ *       {@code TableLib}/{@code StringLib}/{@code Bit32Lib}/{@code MathLib} 装载时都会写
+ *       {@code package.loaded}，没有 {@code package} 会直接抛
+ *       {@code attempt to index ? (a nil value)}（本仓测试实测）。这里先垫一个只含
+ *       {@code loaded} 的 {@code package}，装完库再摘掉。</li>
+ * </ul>
  *
  * <p><b>线程安全</b>：所有脚本共用一份 {@code GLOBALS}，求值时必须持有它的监视器，
  * 否则并发执行会互相覆盖 {@code x}/{@code r}/{@code y}。锁的粒度就是「一次求值」。
@@ -79,18 +88,30 @@ public final class AttachmentScriptManager {
 
     private static Globals secureStandardGlobals() {
         Globals globals = new Globals();
+        // TableLib / StringLib / Bit32Lib / MathLib 在装载时都会执行
+        // `package.loaded[<name>] = <table>`，没有 package 就直接 LuaError。
+        // 所以先塞一个只含 loaded 的最小垫片，装完库再把 package 摘掉
+        //（上游 1.2.0 的写法在这几个库上会崩，见类注释里的差异说明）。
+        LuaTable loaded = new LuaTable();
+        LuaTable packageShim = new LuaTable();
+        packageShim.set("loaded", loaded);
+        globals.set("package", packageShim);
+
         globals.load(new BaseLib());
         globals.load(new Bit32Lib());
         globals.load(new TableLib());
         globals.load(new StringLib());
         // 数学库用 luaj 自带的 Lua 语义实现，不引入 java.lang.Math 的反射包装。
         globals.load(new MathLib());
+
         // 顺序要紧：LuaC.install 会把 load / loadstring 之类重新装进 globals，
         // 所以必须先 install、再摘掉危险入口，否则沙箱是漏的。
         LuaC.install(globals);
         for (String name : UNSAFE_GLOBALS) {
             globals.set(name, LuaValue.NIL);
         }
+        // 垫片用完即撤：脚本里 package / require 必须是 nil。
+        globals.set("package", LuaValue.NIL);
         return globals;
     }
 

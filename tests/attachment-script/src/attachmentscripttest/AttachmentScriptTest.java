@@ -108,6 +108,10 @@ public final class AttachmentScriptTest {
         require(near(compile("y = (string.upper('ab') == 'AB') and 1 or 0").eval(0, 0), 1),
                 "string lib is available");
         require(near(compile("y = bit32.band(6, 3)").eval(0, 0), 2), "bit32 lib is available");
+        require(near(compile("y = select('#', table.unpack({1,2,3}))").eval(0, 0), 3), "table lib is available");
+        // 装载期垫的 package 必须已经被撤掉：否则 require 又能加载任意模块。
+        require(near(compile("y = (package == nil) and 1 or 0").eval(0, 0), 1),
+                "the package shim must not survive library loading");
     }
 
     /** 同一份编译结果要能反复求值（每条配件属性都复用同一个对象）。 */

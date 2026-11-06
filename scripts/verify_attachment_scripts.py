@@ -52,6 +52,11 @@ def main() -> int:
     for name in ("load", "loadfile", "dofile", "collectgarbage", "print", "getmetatable"):
         check('"' + name + '"' in manager, f"沙箱应把 '{name}' 从 globals 摘掉")
     check("LuaC.install(globals)" in manager, "缺少 LuaC.install（否则 compilePrototype 不可用）")
+    check('globals.set("package", packageShim)' in manager,
+          "装载库之前必须先垫一个 package 垫片：luaj 3.0.x 的 table/string/bit32/math 库"
+          "装载时会写 package.loaded，没有 package 直接抛 LuaError")
+    check('globals.set("package", LuaValue.NIL)' in manager,
+          "垫片只能在装载期存在，装完必须把 package 摘掉（否则 require 又活了）")
     install_at = manager.find("LuaC.install(globals)")
     strip_at = manager.find("globals.set(name, LuaValue.NIL)")
     check(strip_at > install_at >= 0,
