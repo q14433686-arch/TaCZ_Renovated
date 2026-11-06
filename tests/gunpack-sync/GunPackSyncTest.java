@@ -92,12 +92,14 @@ public final class GunPackSyncTest {
 
     /** 新的 index 0 表示新事务：未完成的旧事务直接丢弃。 */
     private static void receiverRestartsOnIndexZero() throws Exception {
-        byte[] first = buildPayload(2, 512);
+        // 第一个快照必须真的跨片，否则 index 0 当场收齐，"abandoned" 这个前提就不成立。
+        byte[] first = randomNoise(GunPackSync.CHUNK_SIZE + 4096);
         byte[] second = buildPayload(4, 32_000);
         List<GunPackSync.Part> firstParts = GunPackSync.compressAndSplit(first);
         List<GunPackSync.Part> secondParts = GunPackSync.compressAndSplit(second);
         GunPackSync.Receiver receiver = new GunPackSync.Receiver();
-        require(receiver.accept(firstParts.get(0)) == null, "abandoned transfer is accepted");
+        require(firstParts.size() >= 2, "the abandoned snapshot spans several parts");
+        require(receiver.accept(firstParts.get(0)) == null, "first part of the abandoned transfer is buffered");
         byte[] result = feedAll(receiver, secondParts);
         require(result != null && Arrays.equals(second, result), "the restarted transfer wins");
     }
