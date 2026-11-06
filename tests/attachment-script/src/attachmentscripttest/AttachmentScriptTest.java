@@ -112,9 +112,10 @@ public final class AttachmentScriptTest {
     private static void scriptIsLowercasedBeforeCompilation() {
         CompiledScript script = compile("y = (string.len('ABC') == 3) and 1 or 0");
         require(near(script.eval(0, 0), 1), "string literals are lowercased too (legacy contract)");
-        CompiledScript upperResult = compile("y = (string.upper('ab') == 'ab') and 1 or 0");
-        require(near(upperResult.eval(0, 0), 1),
-                "the lowercased literal must be visible to the script (legacy contract)");
+        // 源码里的 'ABC' 在编译前被转成 'abc'，于是这个比较成立 —— 说明字面量也被改了。
+        CompiledScript literal = compile("y = ('ABC' == 'abc') and 1 or 0");
+        require(near(literal.eval(0, 0), 1),
+                "the literal in the source is lowercased before compiling (legacy contract)");
     }
 
     private static void sandboxHasMathAndString() {
