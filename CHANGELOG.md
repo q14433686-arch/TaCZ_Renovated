@@ -33,6 +33,40 @@
 去掉预压缩、协议层引入 MC 依赖，均能被抓到）；协议层单元测试与编译门走 CI。
 **未实机**：大枪包进服、专服多人、重载后重连均未实测。
 
+### B1-2 配件内联脚本：加载期预编译 + 沙箱化；枪械脚本异常兜底（1.2.0 上游内容）
+
+对应上游 `resource/manager/AttachmentScriptManager`、`resource/serialize/ModifierTypeAdapterFactory`、
+`entity/shooter/GunScriptGuard` 与 `ShooterDataHolder#setCurrentGunItem/cancelGunScriptState`。
+
+- 新增 `AttachmentScriptManager`：`Modifier#function` 在**加载期**编译成 `Prototype` 并缓存，
+  运行期在共享的受限 `Globals` 上执行（只读 `x`/`r`、写 `y`，求值持锁串行）。
+  1.1.8 的做法是每次求值都 `ScriptEngine.eval(String)`，且脚本环境是全功能的。
+- 沙箱只装载 `base`/`bit32`/`table`/`string`/`math`；不装载 `package`/`io`/`os`/`debug`/
+  `coroutine`/`luajava`；`load`/`loadfile`/`dofile`/`collectgarbage`/`print`/`getmetatable` 置 nil。
+- 新增 `ModifierTypeAdapterFactory` 并注册进 `CommonAssetsManager.GSON`：数据包加载与
+  **网络同步**两条路径都会预编译（否则进服后配件属性退回未编译状态）。
+- 新增 `GunScriptGuard`：脚本抛 `LuaError` 时记 error、清中间状态、暂停脚本到下一次切枪；
+  接入射击循环与 `safeAsyncTask` 两个入口。`ShooterDataHolder` 增加 `currentGunId`/
+  `gunScriptFailed`/`setCurrentGunItem`/`cancelGunScriptState`，切枪与初始化改走
+  `setCurrentGunItem`（否则 `currentGunId` 恒为 null，兜底会一直短路）。
+
+**与上游的两处有意差异**（都写进了类注释）：
+1. 用 `StringLib` 代替上游的 `JseStringLib`（本仓 vendored 的 `luaj-jse-3.0.1` 没有这个类，
+   也不该有：那是从 Lua 反射触达 Java 的提权口）；
+2. 沙箱装载顺序不同 —— luaj 3.0.x 的 `table`/`string`/`bit32`/`math` 库在装载时会写
+   `package.loaded`，没有 `package` 直接抛 `LuaError`。上游按原样写会在 stock luaj 上崩，
+   本仓改为「先垫最小 `package` 垫片 → 装库 → `LuaC.install` → 摘危险全局 → 摘 `package`」。
+
+**未完成（本块边界）**：上游把 `GunScriptGuard` 铺到 reload / bolt / melee / heat / fire_select
+等每个操作入口，那层与同批引入的动画时钟 `GunTime`（依赖 SBM 的 `AnimationClock`）耦合，
+属于独立的后续改动，本块未做。
+
+**验证状态**：`scripts/verify_attachment_scripts.py`（43 项，已做 6 类破坏回归）与
+`tests/attachment-script`（跑的是 `src/main/java` 里的真实现 + 真 luaj jar，55 项断言：
+`x`/`r`/`y` 契约、坏脚本不抛、沙箱逐条探测、字面量转小写的历史契约）在 CI 全绿；
+`build`（含 jar 产物）绿。**未实机**：真实枪包脚本、进服后配件属性、脚本炸掉后的暂停/恢复
+都未在游戏内验证。
+
 ## 1.1.8+neoforge.26.2.R3-hotfix4 — 2026-10-27（未发布）
 
 跟进本仓库 1.21.11 线 `c3dd078`（对应姊妹 Fabric 1.21.11
