@@ -8,6 +8,7 @@ import java.util.List;
  * 这里只要一个能接收 warn 的对象，顺便把日志留在内存里给断言用。
  */
 public final class GunMod {
+    /** 测试替身的日志缓冲区：断言「坏脚本有被记一条」用。 */
     public static final List<String> LOG = new ArrayList<>();
 
     public static final Logger LOGGER = new Logger();

@@ -14,7 +14,6 @@ import org.luaj.vm2.lib.Bit32Lib;
 import org.luaj.vm2.lib.StringLib;
 import org.luaj.vm2.lib.TableLib;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Locale;
@@ -60,9 +59,10 @@ public final class AttachmentScriptManager {
     /**
      * 编译一段配件脚本。空串与 {@code null} 返回 {@code null}（调用方视为「没有脚本」），
      * 语法错误同样返回 {@code null} 并记一条 warn：一条坏脚本不该让整个枪包加载失败。
+     *
+     * <p>返回 {@code null} 是常态，不是异常；调用方一律按「没有脚本」处理。
      */
-    @Nullable
-    public static CompiledScript compile(@Nullable String script) {
+    public static CompiledScript compile(String script) {
         if (script == null || script.isEmpty()) {
             return null;
         }
