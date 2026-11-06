@@ -3,6 +3,7 @@ package com.tacz.guns.client.event;
 import com.tacz.guns.client.gameplay.LocalPlayerDataHolder;
 import com.tacz.guns.client.resource.ClientIndexManager;
 import com.tacz.guns.resource.CommonAssetsManager;
+import com.tacz.guns.network.message.ServerMessageSyncGunPack;
 import com.tacz.guns.resource.network.CommonNetworkCache;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 
@@ -22,6 +23,9 @@ public final class CommonNetworkCacheEvent {
         }
         CommonNetworkCache.INSTANCE.clear();
         ClientIndexManager.clear();
+        // Discard any half-received gun pack snapshot: the rest of its parts belong to the
+        // connection being closed and will never arrive.
+        ServerMessageSyncGunPack.clearPendingSync();
         // Reset the static base timestamp so a stale value from a previous world does
         // not corrupt the first shoot packet sent after joining the next world.
         LocalPlayerDataHolder.clientBaseTimestamp = -1L;

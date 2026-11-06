@@ -367,9 +367,31 @@ tasks.register("carryOnTransformTest", JavaExec) {
         languageVersion = JavaLanguageVersion.of(25)
     }
 }
+// Exercise the real 1.2.0 gun pack sync protocol (compression, chunking, reassembly and
+// the integrity checks on every incoming part). GunPackSync is pure JDK, so this needs no
+// stubs and no Minecraft classpath — it does not run a client, server or network.
+def gunPackSyncClasses = layout.buildDirectory.dir("classes/gunPackSyncTest")
+tasks.register("compileGunPackSyncTest", JavaCompile) {
+    source files("src/main/java/com/tacz/guns/resource/network/GunPackSync.java")
+    source fileTree(dir: "tests/gunpack-sync", include: "**/*.java")
+    classpath = files()
+    destinationDirectory = gunPackSyncClasses
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+tasks.register("gunPackSyncTest", JavaExec) {
+    dependsOn "compileGunPackSyncTest"
+    classpath = files(gunPackSyncClasses)
+    mainClass = "com.tacz.guns.resource.network.GunPackSyncTest"
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
 tasks.named("check") {
     dependsOn "targetProfileTest", "targetBlockEntitiesTest",
-            "workbenchRecipeValidationTest", "carryOnPickupTest", "carryOnTransformTest"
+            "workbenchRecipeValidationTest", "carryOnPickupTest", "carryOnTransformTest",
+            "gunPackSyncTest"
 }
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {

@@ -3,6 +3,36 @@
 版本号格式：`1.1.8+neoforge.<mc>.<标签>`。`+` 后是 SemVer build metadata，不参与
 `>=1.1.8` 排序；禁止改用 `-neoforge...` pre-release。
 
+## 1.1.8+neoforge.26.2.R4 的进行中工作（未发布、未升版本号）
+
+上游 1.2.0 同步轮。滚动记录，**每完成一块就补**；条目只写「改了什么 + 验证到哪一步」，
+未实机的一律标注。覆盖面审计见
+[docs/records/UPSTREAM_120_SCOPE_AUDIT_20261107.md](docs/records/UPSTREAM_120_SCOPE_AUDIT_20261107.md)。
+
+### B1-1 枪包同步协议：单包 → GZIP 压缩分片（1.2.0 上游内容）
+
+对应上游 `1.2.0-forge-mc1.20.1` / `1.2.0-neoforge-1.21.1` 的
+`resource/network/GunPackSync`（两平台字节相同，纯 JDK）。修的是「枪包多到进不了服」：
+1.1.8 把整份缓存塞进单条 payload，枪包一多就超过网络层上限。
+
+- 新增 `resource/network/GunPackSync`：GZIP（`java.util.zip`）+ 256 KiB 分片 + UUID 事务；
+  接收端逐片校验事务 ID / 顺序 / 声明长度，解压时多读一字节以拒绝「声明长度偏小」的快照。
+- `ServerMessageSyncGunPack` 改为「一条 payload = 一片」，并保留 dedicated-safe 反射桥
+  （`Minecraft` / `ClientIndexManager` 不进该类的常量池）。
+- 客户端 `ClientPacketHandlers#onSyncGunPackPart`：先校验 `IPayloadContext#connection()`
+  与当前连接是同一实例，再收片；**收齐整个快照才重建索引**，解压/校验失败直接断开连接。
+- 服务端 `CommonAssetsManager`：资源重载尾端一次性压缩（所有玩家复用同一组不可变分片），
+  `OnDatapackSyncEvent` 只负责分发；快照未就绪时退回现场编码，不会把空缓存发出去。
+- 登出时 `CommonNetworkCacheEvent` 丢弃未完成事务；`NetworkHandler.VERSION` `1.0.5 → 1.0.14`
+  （新旧格式不兼容，旧客户端必须被握手拒绝）。
+- 新增离线守卫 `scripts/verify_gunpack_sync.py`（38 项接线检查，含反射桥方法名/参数类型）
+  与 `tests/gunpack-sync`（协议行为 + **由 Python `gzip` 产出的跨实现夹具**），
+  `scripts/gen_gunpack_sync_fixture.py` 可重现该夹具；两者接入 CI 与 Gradle `check`。
+
+**验证状态**：静态守卫在本地通过，并对 4 类人为破坏做了回归（改名反射桥、去掉连接校验、
+去掉预压缩、协议层引入 MC 依赖，均能被抓到）；协议层单元测试与编译门走 CI。
+**未实机**：大枪包进服、专服多人、重载后重连均未实测。
+
 ## 1.1.8+neoforge.26.2.R3-hotfix4 — 2026-10-27（未发布）
 
 跟进本仓库 1.21.11 线 `c3dd078`（对应姊妹 Fabric 1.21.11

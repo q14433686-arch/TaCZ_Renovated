@@ -98,6 +98,11 @@ public class CommonAssetsManager implements ICommonResourceProvider {
             .create();
 
     private final List<INetworkCacheReloadListener> listeners = new ArrayList<>();
+    /**
+     * 本次资源重载预压缩好的枪包同步分片。重载完成后只压缩一次，所有玩家复用同一组
+     * 不可变分片；{@code List.of()} 表示「还没有可发的快照」。
+     */
+    private List<ServerMessageSyncGunPack> networkSyncMessages = List.of();
     private CommonDataManager<GunData> gunData;
     private CommonDataManager<AttachmentData> attachmentData;
     private CommonDataManager<BlockData> blockData;
@@ -153,8 +158,15 @@ public class CommonAssetsManager implements ICommonResourceProvider {
         blockIndex = registerNetwork(new CommonDataManager<>(DataType.BLOCK_INDEX, CommonBlockIndex.class, GSON, "index/blocks", "BlockIndexLoader"), register);
         tableRecipe = registerNetwork(new TableRecipeManager(), register);
 
+        // 1.2.0：同步快照在重载尾端一次性压缩好。顺序很重要 —— 必须在所有
+        // INetworkCacheReloadListener 产出的缓存都写回之后取 getNetworkCache()，
+        // 且要先清空上一轮的快照，避免重载失败时把旧数据当成新数据发出去。
         register.accept((sharedState, backgroundExecutor, barrier, gameExecutor) ->
-                barrier.wait(null).thenRunAsync(AllowAttachmentTagMatcher::resetCache, gameExecutor));
+                barrier.wait(null).thenRunAsync(() -> {
+                    AllowAttachmentTagMatcher.resetCache();
+                    networkSyncMessages = List.of();
+                    networkSyncMessages = ServerMessageSyncGunPack.createMessages(getNetworkCache());
+                }, gameExecutor));
     }
 
     private <T extends INetworkCacheReloadListener> T registerNetwork(T listener, java.util.function.Consumer<PreparableReloadListener> register) {
@@ -354,8 +366,16 @@ public class CommonAssetsManager implements ICommonResourceProvider {
         //
         // REI already reacts to the vanilla recipe-update packet which follows this event. Do not
         // race that reload with REI's internal reloadPlugins hook from the gun-pack packet handler.
-        ServerMessageSyncGunPack message = new ServerMessageSyncGunPack(getInstance().getNetworkCache());
-        event.getRelevantPlayers().forEach(player -> NetworkHandler.sendToClientPlayer(message, player));
+        // 1.2.0：分片已在资源重载尾端压缩好，这里只负责按玩家发出去（同一组不可变分片
+        // 被所有玩家复用，不再为每个玩家重新编码整份缓存）。
+        List<ServerMessageSyncGunPack> messages = getInstance().networkSyncMessages;
+        if (messages.isEmpty()) {
+            // 重载尾端的快照还没准备好（例如 reload 与 sync 竞争）：退回现场编码，
+            // 至少不把「没有枪包数据」发给客户端。
+            messages = ServerMessageSyncGunPack.createMessages(getInstance().getNetworkCache());
+        }
+        List<ServerMessageSyncGunPack> toSend = messages;
+        event.getRelevantPlayers().forEach(player -> toSend.forEach(message -> NetworkHandler.sendToClientPlayer(message, player)));
         event.sendRecipes(ModRecipe.GUN_SMITH_TABLE_CRAFTING.get());
     }
 

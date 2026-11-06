@@ -34,11 +34,17 @@ import com.tacz.guns.network.message.event.ServerMessageGunKill;
 import com.tacz.guns.network.message.event.ServerMessageGunMelee;
 import com.tacz.guns.network.message.event.ServerMessageGunReload;
 import com.tacz.guns.network.message.event.ServerMessageGunShoot;
+import com.tacz.guns.GunMod;
+import com.tacz.guns.resource.CommonAssetsManager;
 import com.tacz.guns.resource.network.CommonNetworkCache;
+import com.tacz.guns.resource.network.DataType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.SessionSearchTrees;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CreativeModeTab;
@@ -50,7 +56,9 @@ import net.neoforged.neoforge.client.CreativeModeTabSearchRegistry;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public final class ClientPacketHandlers {
     private ClientPacketHandlers() {
@@ -181,8 +189,42 @@ public final class ClientPacketHandlers {
         message.getEntries().forEach(entry -> syncedData.set(entity, entry.getKey(), entry.getValue()));
     }
 
-    public static void onSyncGunPack(ServerMessageSyncGunPack message) {
-        CommonNetworkCache.INSTANCE.fromNetwork(message.getCache());
+    /**
+     * 收下一片枪包同步数据（1.2.0 压缩分片协议）。
+     *
+     * <p>只有收齐整个快照才动索引，避免在半份数据上重建。分片自洽性错误或解压失败
+     * 会断开连接 —— 让损坏的快照直接失败，而不是留下一个半初始化的枪包状态。
+     *
+     * <p>{@code connection} 来自 {@code IPayloadContext#connection()}；与当前
+     * {@code ClientPacketListener} 持有的连接不是同一个实例时（上一局的迟到分片），
+     * 直接丢弃。
+     */
+    public static void onSyncGunPackPart(ServerMessageSyncGunPack message, Connection connection) {
+        Minecraft minecraft = Minecraft.getInstance();
+        ClientPacketListener listener = minecraft.getConnection();
+        if (listener == null || listener.getConnection() != connection || !connection.isConnected()) {
+            return;
+        }
+        Map<DataType, Map<Identifier, String>> cache;
+        try {
+            cache = ServerMessageSyncGunPack.acceptPart(message.getPart());
+        } catch (IOException | RuntimeException exception) {
+            ServerMessageSyncGunPack.clearPendingSync();
+            GunMod.LOGGER.error("Failed to synchronize gun pack data", exception);
+            connection.disconnect(Component.literal("Failed to synchronize gun pack data"));
+            return;
+        }
+        if (cache == null) {
+            return;
+        }
+        if (!connection.isMemoryConnection()) {
+            CommonAssetsManager.clearInstance();
+        }
+        onSyncGunPack(cache);
+    }
+
+    private static void onSyncGunPack(Map<DataType, Map<Identifier, String>> cache) {
+        CommonNetworkCache.INSTANCE.fromNetwork(cache);
         ClientIndexManager.reload();
 
         // OnDatapackSyncEvent sends this cache before the vanilla recipe update and the

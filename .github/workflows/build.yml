@@ -137,6 +137,14 @@ jobs:
         run: |
           python3 scripts/verify_sister_recipe_sync.py
 
+      - name: Gun pack sync protocol wiring (1.2.0 compressed chunks)
+        run: |
+          python3 scripts/verify_gunpack_sync.py
+          # 夹具必须与生成脚本一致，否则「外部实现产出的快照」这一前提就不成立。
+          cp tests/gunpack-sync/fixtures/python-gzip.parts /tmp/fixture.committed
+          python3 scripts/gen_gunpack_sync_fixture.py
+          diff --brief /tmp/fixture.committed tests/gunpack-sync/fixtures/python-gzip.parts
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
