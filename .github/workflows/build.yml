@@ -157,7 +157,19 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Full build
-        run: ./gradlew build --console=plain --stacktrace --no-daemon
+        # 失败时把关键行作为 ::error:: 注解抛出：本仓的 job 日志托管在 blob storage，
+        # 有些环境（含 CI 辅助会话）下载不到，注解走 api.github.com 一定能读到。
+        run: |
+          set +e
+          ./gradlew build --console=plain --stacktrace --no-daemon 2>&1 | tee /tmp/gradle-build.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            grep -nE "(> Task .* FAILED|AssertionError|What went wrong|Execution failed for task|error:|Caused by:)" \
+              /tmp/gradle-build.log | tail -n 40 | while IFS= read -r line; do
+                echo "::error::${line//$'\n'/ }"
+              done
+          fi
+          exit "$status"
 
       - name: Upload jars
         uses: actions/upload-artifact@v4
