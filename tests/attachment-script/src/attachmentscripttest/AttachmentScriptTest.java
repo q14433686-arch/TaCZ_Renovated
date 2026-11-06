@@ -19,6 +19,26 @@ public final class AttachmentScriptTest {
     private static int checks;
 
     public static void main(String[] args) {
+        try {
+            runAll();
+            System.out.println("AttachmentScriptTest: passed (" + checks + " checks)");
+        } catch (Throwable failure) {
+            // 以 ::error:: 形式输出：GitHub Actions 会把它变成 annotation，
+            // 即使 job 日志拿不到也能定位失败点。
+            System.out.println("::error::AttachmentScriptTest FAILED after " + checks + " checks: " + failure);
+            for (StackTraceElement frame : failure.getStackTrace()) {
+                System.out.println("::error::  at " + frame);
+            }
+            Throwable cause = failure.getCause();
+            while (cause != null) {
+                System.out.println("::error::  caused by " + cause);
+                cause = cause.getCause();
+            }
+            System.exit(1);
+        }
+    }
+
+    private static void runAll() {
         basicArithmetic();
         readsDefaultValue();
         missingResultKeepsInput();
@@ -29,7 +49,6 @@ public final class AttachmentScriptTest {
         sandboxHasMathAndString();
         compiledScriptIsReusable();
         exceptionsInOneScriptDoNotPoisonTheNext();
-        System.out.println("AttachmentScriptTest: passed (" + checks + " checks)");
     }
 
     private static void basicArithmetic() {

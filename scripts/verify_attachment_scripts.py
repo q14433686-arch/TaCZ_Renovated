@@ -51,7 +51,12 @@ def main() -> int:
         check(banned not in manager, f"沙箱不允许装载 {banned}")
     for name in ("load", "loadfile", "dofile", "collectgarbage", "print", "getmetatable"):
         check('"' + name + '"' in manager, f"沙箱应把 '{name}' 从 globals 摘掉")
-    check("LuaC.install(globals)" in manager, "缺少 LuaC.install（否则动态 load 仍可用）")
+    check("LuaC.install(globals)" in manager, "缺少 LuaC.install（否则 compilePrototype 不可用）")
+    install_at = manager.find("LuaC.install(globals)")
+    strip_at = manager.find("globals.set(name, LuaValue.NIL)")
+    check(strip_at > install_at >= 0,
+          "摘除危险全局必须发生在 LuaC.install 之后：install 会把 load/loadstring 重新装回 globals，"
+          "顺序反了沙箱就是漏的")
 
     # --- 2. 预编译：加载期编译一次，运行期不再传脚本文本。
     check("compilePrototype(" in manager, "脚本应在编译期解析成 Prototype，而不是每次 eval 文本")

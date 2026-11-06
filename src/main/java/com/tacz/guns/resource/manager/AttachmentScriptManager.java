@@ -85,10 +85,12 @@ public final class AttachmentScriptManager {
         globals.load(new StringLib());
         // 数学库用 luaj 自带的 Lua 语义实现，不引入 java.lang.Math 的反射包装。
         globals.load(new MathLib());
+        // 顺序要紧：LuaC.install 会把 load / loadstring 之类重新装进 globals，
+        // 所以必须先 install、再摘掉危险入口，否则沙箱是漏的。
+        LuaC.install(globals);
         for (String name : UNSAFE_GLOBALS) {
             globals.set(name, LuaValue.NIL);
         }
-        LuaC.install(globals);
         return globals;
     }
 
