@@ -47,6 +47,7 @@ public final class AttachmentScriptTest {
         runtimeErrorDoesNotThrow();
         sandboxBlocksDangerousGlobals();
         sandboxHasMathAndString();
+        scriptIsLowercasedBeforeCompilation();
         compiledScriptIsReusable();
         exceptionsInOneScriptDoNotPoisonTheNext();
     }
@@ -103,10 +104,22 @@ public final class AttachmentScriptTest {
         require(near(escape.eval(0, 0), 1), "dynamic loading entry points are removed");
     }
 
+    /**
+     * 历史契约（1.1.8 就有，且默认枪包的脚本依赖它）：整段脚本在编译前被转成小写，
+     * 连字符串字面量一起。这条用例是**记录**这个行为，不是认可它 —— 谁要改就得
+     * 同时改枪包内容并抬版本。
+     */
+    private static void scriptIsLowercasedBeforeCompilation() {
+        CompiledScript script = compile("y = (string.len('ABC') == 3) and 1 or 0");
+        require(near(script.eval(0, 0), 1), "string literals are lowercased too (legacy contract)");
+        CompiledScript upperResult = compile("y = (string.upper('ab') == 'ab') and 1 or 0");
+        require(near(upperResult.eval(0, 0), 1),
+                "the lowercased literal must be visible to the script (legacy contract)");
+    }
+
     private static void sandboxHasMathAndString() {
         require(near(compile("y = math.floor(x)").eval(2.7, 0), 2), "math lib is available");
-        require(near(compile("y = (string.upper('ab') == 'AB') and 1 or 0").eval(0, 0), 1),
-                "string lib is available");
+        require(near(compile("y = string.len('abc')").eval(0, 0), 3), "string lib is available");
         require(near(compile("y = bit32.band(6, 3)").eval(0, 0), 2), "bit32 lib is available");
         require(near(compile("y = select('#', table.unpack({1,2,3}))").eval(0, 0), 3), "table lib is available");
         // 装载期垫的 package 必须已经被撤掉：否则 require 又能加载任意模块。
